@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ampliagro Desktop — Download</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+        color: #e2e8f0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1.5rem;
+        flex: 1;
+      }
+      header {
+        text-align: center;
+        margin-bottom: 3rem;
+      }
+      .logo {
+        font-size: 3rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #22c55e, #16a34a);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 1rem;
+      }
+      .tagline {
+        font-size: 1.25rem;
+        color: #94a3b8;
+        max-width: 600px;
+        margin: 0 auto;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+      }
+      .card {
+        background: rgba(30, 41, 59, 0.8);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 1rem;
+        padding: 2rem;
+        position: relative;
+        overflow: hidden;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+      }
+      .card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 40px rgba(34, 197, 94, 0.15);
+      }
+      .card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--accent);
+      }
+      .card.windows {
+        --accent: #0078d4;
+      }
+      .card.macos {
+        --accent: #999999;
+      }
+      .card.linux {
+        --accent: #fcc624;
+      }
+      .card.unavailable {
+        opacity: 0.6;
+        pointer-events: none;
+      }
+      .os-icon {
+        width: 64px;
+        height: 64px;
+        margin-bottom: 1rem;
+      }
+      .os-name {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+      }
+      .os-version {
+        color: #94a3b8;
+        margin-bottom: 1rem;
+        font-family: monospace;
+      }
+      .size {
+        color: #64748b;
+        margin-bottom: 1.5rem;
+        font-size: 0.9rem;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.875rem 1.5rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        font-size: 1rem;
+        text-decoration: none;
+        transition: all 0.2s;
+        border: none;
+        cursor: pointer;
+      }
+      .btn-primary {
+        background: var(--accent);
+        color: #0f172a;
+      }
+      .btn-primary:hover {
+        filter: brightness(1.1);
+        transform: translateY(-1px);
+      }
+      .btn-disabled {
+        background: #334155;
+        color: #64748b;
+        cursor: not-allowed;
+      }
+      .badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+      }
+      .badge-ready {
+        background: rgba(34, 197, 94, 0.2);
+        color: #22c55e;
+      }
+      .badge-soon {
+        background: rgba(251, 191, 36, 0.2);
+        color: #fbbf24;
+      }
+      .badge-na {
+        background: rgba(148, 163, 184, 0.2);
+        color: #94a3b8;
+      }
+      .features {
+        list-style: none;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid rgba(148, 163, 184, 0.1);
+      }
+      .features li {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        color: #cbd5e1;
+      }
+      .features li::before {
+        content: '✓';
+        color: #22c55e;
+        font-weight: 700;
+      }
+      footer {
+        text-align: center;
+        padding: 2rem;
+        color: #64748b;
+        font-size: 0.875rem;
+        border-top: 1px solid rgba(148, 163, 184, 0.1);
+        margin-top: 3rem;
+      }
+      .github-link {
+        color: #64748b;
+        text-decoration: none;
+      }
+      .github-link:hover {
+        color: #22c55e;
+      }
+      @media (max-width: 640px) {
+        .logo {
+          font-size: 2rem;
+        }
+        .features {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <div class="logo">Ampliagro Desktop</div>
+        <p class="tagline">Gestão agrícola offline-first. Windows • Linux • macOS</p>
+      </header>
+
+      <main>
+        <div class="grid">
+          <!-- Windows -->
+          <article class="card windows">
+            <svg class="os-icon" viewBox="0 0 24 24" fill="none" stroke="#0078d4" stroke-width="2">
+              <path d="M21 16V8a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2Z" />
+              <polyline points="15 3 9 3 9 9 15 9" />
+            </svg>
+            <span class="badge badge-ready">Disponível</span>
+            <h2 class="os-name">Windows 10/11 (x64)</h2>
+            <p class="os-version">v0.1.0 • Portable</p>
+            <p class="size">~151 MB</p>
+            <a
+              href="https://github.com/luck-of-luck/Ampliagro-releases/releases/latest/download/Ampliagro-x64.exe"
+              class="btn btn-primary"
+              id="win-download"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+              </svg>
+              Baixar .exe (Portable)
+            </a>
+            <ul class="features">
+              <li>Windows 10/11 (x64)</li>
+              <li>Sem instalação (portable)</li>
+              <li>Auto-atualizador (stable/beta)</li>
+              <li>Offline-first (CSP local)</li>
+              <li>Packs de cultura sob demanda</li>
+              <li>Auto-atualizador (stable/beta)</li>
+            </ul>
+          </article>
+
+          <!-- macOS -->
+          <article class="card macos unavailable">
+            <svg class="os-icon" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2">
+              <rect x="2" y="3" width="20" height="14" rx="2" />
+              <path d="M8 21h8" />
+              <circle cx="12" cy="17" r="1" />
+            </svg>
+            <span class="badge badge-soon">Em breve</span>
+            <h2 class="os-name">macOS 12+ (Intel / Apple Silicon)</h2>
+            <p class="os-version">v0.1.0 • .dmg + .pkg</p>
+            <p class="size">~175 MB</p>
+            <button class="btn btn-disabled" disabled>
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+              </svg>
+              Em breve (requer Mac runner)
+            </button>
+            <ul class="features">
+              <li>macOS 12+ (Intel / ARM)</li>
+              <li>.dmg (drag-to-Applications)</li>
+              <li>.pkg (instalador sistema)</li>
+              <li>Hardened Runtime + Entitlements</li>
+              <li>Notarização Apple (planejado)</li>
+              <li>Auto-atualizador (stable/beta)</li>
+            </ul>
+          </article>
+
+          <!-- Linux -->
+          <article class="card linux unavailable">
+            <svg class="os-icon" viewBox="0 0 24 24" fill="none" stroke="#fcc624" stroke-width="2">
+              <path d="M12 2l3 9h10l-8 5 3 10L12 16l-7 8 3-10-8-5 10-3Z" />
+            </svg>
+            <span class="badge badge-soon">Em breve</span>
+            <h2 class="os-name">Linux (x64)</h2>
+            <p class="os-version">v0.1.0 • AppImage + .deb</p>
+            <p class="size">~190 MB</p>
+            <button class="btn btn-disabled" disabled>
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+              </svg>
+              Em breve (requer Linux runner)
+            </button>
+            <ul class="features">
+              <li>AppImage (portable universal)</li>
+              <li>.deb (Ubuntu/Debian/Fedora)</li>
+              <li>Desktop entry + ícones</li>
+              <li>AppImage auto-updater</li>
+              <li>GTK3/Qt6 theme integration</li>
+              <li>systemd service (opcional)</li>
+            </ul>
+          </article>
+        </div>
+      </main>
+
+      <footer>
+        <p>
+          Ampliagro Desktop v0.1.0 —
+          <a
+            href="https://github.com/luck-of-luck/Ampliagro-releases/releases"
+            class="github-link"
+            target="_blank"
+            >Ver todos releases no GitHub</a
+          >
+        </p>
+        <p>
+          Código aberto —
+          <a
+            href="https://github.com/luck-of-luck/Ampliagro"
+            class="github-link"
+            target="_blank"
+            >github.com/luck-of-luck/Ampliagro</a
+          >
+        </p>
+      </footer>
+    </div>
+
+    <script>
+      // Auto-redirect Windows users to download
+      if (navigator.platform.includes('Win') && document.getElementById('win-download')) {
+        // Optional: auto-trigger download after 3s
+        // setTimeout(() => document.getElementById('win-download').click(), 3000);
+      }
+    </script>
+  </body>
+</html>

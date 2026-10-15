@@ -1,0 +1,185 @@
+{% extends base_template %}
+{% load static %}
+
+{% block title %}Ampliagro - Comandos IoT{% endblock %}
+
+{% block extra_css %}
+
+{% endblock %}
+
+{% block dashboard_appbar %}{% endblock %}
+
+{% block content %}
+<div class="section-container">
+    <div class="section-header">
+        <h1 class="section-title"><i class="bi bi-command"></i> Comandos IoT</h1>
+        <div style="display:flex;gap:0.5rem;">
+            <a href="{% url 'sensores' %}" class="btn-secondary btn-sm"><i class="bi bi-broadcast"></i> Sensores</a>
+            <a href="{% url 'dispositivos' %}" class="btn-secondary btn-sm"><i class="bi bi-hdd-stack"></i> Dispositivos</a>
+        </div>
+    </div>
+
+    <div class="content-card">
+        <h3 style="font-size:0.938rem;font-weight:700;margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem;"><i class="bi bi-terminal"></i> Enviar Comando</h3>
+        <form onsubmit="return sendCmd(event)" style="display:flex;flex-direction:column;gap:1rem;">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Device *</label>
+                    <select name="device" id="cmd-device-select" required style="padding:0.625rem 0.875rem;font-size:0.875rem;border:1px solid #e2e8f0;border-radius:0.5rem;background:#fff;">
+                        <option value="">Carregando devices...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Comando *</label>
+                    <select name="comando" style="padding:0.625rem 0.875rem;font-size:0.875rem;border:1px solid #e2e8f0;border-radius:0.5rem;background:#fff;">
+                        <option value="reboot">Reboot</option>
+                        <option value="set_interval">Set Interval</option>
+                        <option value="calibrate">Calibrar</option>
+                        <option value="valve_open">Abrir Válvula</option>
+                        <option value="valve_close">Fechar Válvula</option>
+                        <option value="sleep">Sleep</option>
+                        <option value="atualizar">OTA Atualizar</option>
+                        <option value="coleta">Forçar Coleta</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Payload JSON</label>
+                <textarea name="payload" rows="2" placeholder='{"interval": 300, "calibration": 0.5}' style="padding:0.625rem 0.875rem;font-size:0.875rem;border:1px solid #e2e8f0;border-radius:0.5rem;resize:vertical;"></textarea>
+                <small style="color:#94a3b8;font-size:0.688rem;">Ex: {"interval":300} para set_interval, {"offset":0.2} para calibrate</small>
+            </div>
+            <div style="display:flex;gap:0.5rem;justify-content:flex-end;">
+                <button type="submit" class="btn-primary"><i class="bi bi-send"></i> Enviar (fila + ACK)</button>
+            </div>
+        </form>
+        <small style="color:#94a3b8;font-size:0.688rem;display:block;margin-top:0.75rem;">Fila em <code>ComandoDevice</code> → ACK via MQTT/HTTP. Use o Centro de Controle em Sensores para ver ao vivo.</small>
+    </div>
+
+    <div class="content-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+            <h3 style="font-size:1rem;font-weight:600;">Histórico de Comandos</h3>
+            <button class="btn-secondary btn-sm" onclick="carregarComandos()"><i class="bi bi-arrow-clockwise"></i> Atualizar</button>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Device</th><th>Comando</th><th>Payload</th><th>Status</th><th>Criado</th><th>Ações</th></tr></thead>
+                <tbody id="tbody-comandos"><tr><td colspan="6" style="text-align:center;padding:2rem;color:#94a3b8;">Carregando...</td></tr></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div id="toast" style="position:fixed;bottom:2rem;right:2rem;padding:0.75rem 1.25rem;border-radius:0.5rem;font-size:0.813rem;font-weight:500;z-index:9999;opacity:0;transition:opacity 0.3s;pointer-events:none;background:#15803d;color:#fff;"></div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+function getCSRFToken(){ return document.querySelector('[name=csrfmiddlewaretoken]')?.value||''; }
+function showToast(msg, type){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.style.background=type==='error'?'#dc2626':'#15803d';
+  t.style.opacity='1';
+  setTimeout(()=> t.style.opacity='0', 3000);
+}
+async function carregarDevices(){
+  try{
+    const r=await fetch('/api/iot/devices/');
+    let lista=[];
+    if(r.ok){
+      const d=await r.json();
+      lista=Array.isArray(d)?d:(d.results||[]);
+    }
+    if(!lista.length){
+      const r2=await fetch('/api/maquinarios/?tipo=CAMINHAO');
+      if(r2.ok){
+        const d2=await r2.json();
+        lista=Array.isArray(d2)?d2:(d2.results||[]);
+      }
+    }
+    const sel=document.getElementById('cmd-device-select');
+    if(!sel) return;
+    if(!lista.length){
+      sel.innerHTML='<option value="">Nenhum device encontrado</option>';
+      return;
+    }
+    sel.innerHTML='<option value="">Selecione o device</option>' + lista.map(d=> `<option value="${d.id}">${d.nome||d.device_eui||'Device '+d.id} (${d.device_eui? d.device_eui.slice(0,8):d.id})</option>`).join('');
+  }catch(e){
+    console.error(e);
+  }
+}
+async function carregarComandos(){
+  const tbody=document.getElementById('tbody-comandos');
+  try{
+    let lista=[];
+    // A rota correcta e' `/api/iot/comandos/`. O `router` que a regista esta
+    // em `app/iot/urls.py`, montado em `/api/iot/` pelo `config/urls.py` — e nao
+    // em `/api/`, que e' `app.api.urls`.
+    let r=await fetch('/api/iot/comandos/');
+    if(r.ok){
+      const d=await r.json();
+      lista=Array.isArray(d)?d:(d.results||[]);
+    }
+    if(!lista.length){
+      tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:2rem;color:#94a3b8;">Nenhum comando na fila. Envie um acima.</td></tr>';
+      return;
+    }
+    tbody.innerHTML=lista.slice(0,30).map(c=> {
+      const st=(c.status||'pendente').toLowerCase();
+      let badgeClass='badge-pendente';
+      if(st==='enviado') badgeClass='badge-enviado';
+      else if(st==='ack') badgeClass='badge-ack';
+      else if(st==='erro') badgeClass='badge-erro';
+      return `<tr>
+        <td>${c.device||c.device_eui||'-'}</td>
+        <td><code style="font-size:0.688rem;background:#f1f5f9;padding:0.125rem 0.375rem;border-radius:0.25rem;">${c.comando||'-'}</code></td>
+        <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${JSON.stringify(c.payload||{}).slice(0,80)}</td>
+        <td><span class="badge ${badgeClass}">${c.status||'-'}</span></td>
+        <td>${c.criado_em? new Date(c.criado_em).toLocaleString('pt-BR'): '-'}</td>
+        <td><button class="btn-secondary btn-sm" onclick="reenviarComando(${c.id})">Reenviar</button></td>
+      </tr>`;
+    }).join('');
+  }catch(e){
+    tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:2rem;color:#dc2626;">Erro: '+e.message+'</td></tr>';
+  }
+}
+async function sendCmd(e){
+  e.preventDefault();
+  const f=e.target;
+  const device=f.device.value;
+  const comando=f.comando.value;
+  let payload={};
+  const raw=f.payload.value.trim();
+  if(raw){
+    try{ payload=JSON.parse(raw); }catch(err){ alert('Payload JSON inválido: '+err.message); return false; }
+  }
+  if(!device){ alert('Selecione o device'); return false; }
+  const data={ device: parseInt(device)||device, comando, payload };
+  // Sem rota de reserva. `/api/comandos/` nao existe — o `router` regista o
+  // viewset em `app/iot/urls.py` — e um fallback para um 404 nao e' "tentar
+  // outra vez": e' trocar a mensagem real do servidor por um "Not Found" que
+  // nao explica nada. Quando o comando e' recusado (validacao, permissao,
+  // device desconhecido), o produtor tem de ler o que a API respondeu.
+  const r=await fetch('/api/iot/comandos/',{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':getCSRFToken()},body:JSON.stringify(data)});
+  if(r.ok){
+    showToast('Comando enfileirado','success');
+    f.payload.value='';
+    carregarComandos();
+  } else {
+    const t=await r.text();
+    showToast('Erro: '+t.slice(0,150),'error');
+    alert('Erro: '+t.slice(0,300));
+  }
+  return false;
+}
+async function reenviarComando(id){
+  try{
+    const r=await fetch('/api/iot/comandos/'+id+'/reenviar/',{method:'POST',headers:{'X-CSRFToken':getCSRFToken()}});
+    if(r.ok) showToast('Reenviado','success');
+    else showToast('Erro ao reenviar','error');
+    carregarComandos();
+  }catch(e){ alert(e.message); }
+}
+document.addEventListener('DOMContentLoaded', ()=>{ carregarDevices(); carregarComandos(); });
+</script>
+{% endblock %}

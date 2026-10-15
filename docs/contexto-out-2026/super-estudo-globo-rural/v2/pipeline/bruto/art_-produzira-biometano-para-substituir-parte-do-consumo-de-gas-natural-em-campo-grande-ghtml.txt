@@ -1,0 +1,19 @@
+A americana Archer Daniels Midland ( ADM ) vai começar a utilizar os resíduos de uma de suas indústrias no Brasil para produzir biometano e substituir parte de seu consumo de gás natural. A multinacional vai instalar a estação de biometano em sua fábrica de Campo Grande (MS), que produz proteína de soja para a indústria alimentícia.
+
+A companhia não informa o valor do investimento nem a capacidade de produção, mas afirma que a medida vai permitir substituir 15% do consumo de gás natural da unidade.
+
+A substituição do uso do gás de origem fóssil pelo de origem renovável permitirá também a redução de 5% das emissões de gases de efeito estufa da planta sul- mato-grossense e de 0,7% de suas emissões na América Latina. Globalmente, a ADM tem a meta de reduzir suas emissões nos escopos 1 e 2 em 25% entre 2019 e 2035.
+
+Ao utilizar o resíduo gerado atualmente pela planta, conseguimos dar uma destinação sustentável ao gás que seria queimado para eliminar compostos tóxicos, como é comumente feito no setor atualmente. Além de contribuirmos para a redução dos impactos ambientais de nossa produção, ampliamos a autossuficiência da planta, por meio do tratamento de um efluente antes totalmente subutilizado , disse Guilherme Rissi, comprador sênior de energia elétrica da ADM no Brasil.
+
+A unidade de Campo Grande da ADM já gera biogás (não purificado), mas o destino atual dele é a queima em flare, expelindo os gases à atmosfera. Com a biodigestão desse biogás, a unidade passará a utilizar a parcela de metano contida no biogás, emitindo apenas o gás carbônico (C02).
+
+Esse gás carbônico, porém, tem caráter biogênico, já que é proveniente da decomposição anaeróbia da matéria orgânica que dá origem ao biogás , explica Filipi Randi, Gerente de Projetos de Tecnologia Industrial da ADM. Diferente do C02 de origem fóssil, ele apresenta um ciclo curto de carbono e não adiciona carbono novo acumulado ao meio ambiente , afirmou.
+
+O sistema será montado na fábrica em parceria com a 3Di Biogás, empresa brasileira sediada em Foz do Iguaçu (PR) e integrante do grupo italiano Pietro Fiorentini, especializada no fornecimento de biorrefinarias modulares e sistemas de purificação de biogás para conversão de resíduos orgânicos em biometano.
+
+A unidade terá uma estação de lavagem de gases que dessulfuriza o gás e retira o C02. A remoção do gás carbônico e da umidade residual será realizada por um sistema de upgrading por meio de membranas poliméricas de poliimida.
+
+O processo apresenta perda de metano de aproximadamente 2,5%, e o produto terá qualidade compatível com as especificações da Agência Nacional do Petróleo, Gás Natural e Biocombustíveis (ANP).
+
+Segundo Randi, será possível no futuro instalar um módulo adicional para tratamento do gás carbônico, permitindo recuperar o metano residual e realizar a purificação e liquefação do C02. Dessa forma, o COS poderá ser aproveitado comercialmente, dependendo da viabilidade técnica e econômica do projeto , explicou.

@@ -1,0 +1,153 @@
+ick}`).toBeTruthy();
+      expect(typeof window.IaRail[nome], `IaRail.${nome} nao existe`).toBe('function');
+    }
+  });
+
+  it('todos os botoes com accao estão ligados à accao certa', () => {
+    /* Os dois de menu não entram aqui: não chamam uma acção, abrem uma lista —
+       e é o que os testes dos menus verificam. */
+    const comAccao = window.IaRail.ITENS.filter((i) => i.accao);
+    expect(comAccao.length).toBeGreaterThan(0);
+    for (const item of comAccao) {
+      const b = rail.querySelector(`.ia-rail-item[data-id="${item.id}"]`);
+      const alvo = vi.fn();
+      window[item.accao] = alvo;
+      clique(b);
+      expect(alvo, `${item.id} nao chamou ${item.accao}`).toHaveBeenCalledTimes(1);
+      delete window[item.accao];
+    }
+  });
+
+  /* O QUE O PRODUTOR PEDIU: o icone `bi-layout-sidebar` no TOPO da rail abre e
+     guarda os nomes das ferramentas. Clica-se nele, a barra cresce (212px) e o
+     rotulo passa a "Guardar"; clica outra vez, recolhe (42px, so' icones). */
+  it('o icone sidebar no topo da rail expande e guarda, e o rotulo acompanha', () => {
+    const btn = rail.querySelector('.ia-rail-item[data-id="alternar-barra"]');
+    expect(btn, 'o botao alternar-barra nao foi desenhado').toBeTruthy();
+    /* O desenho e' o do pedido: moldura com a divisoria da lateral. */
+    const svg = btn.querySelector('svg');
+    expect(svg.getAttribute('viewBox')).toBe('0 0 16 16');
+    expect(svg.querySelector('path').getAttribute('d')).toContain('M0 3a2 2 0 0 1 2-2h12');
+
+    /* Comeca recolhida: nomes escondidos, rotulo a dizer "Expandir". */
+    expect(rail.classList.contains('aberta')).toBe(false);
+    expect(btn.querySelector('.ia-rail-txt').textContent).toBe('Expandir ferramentas');
+
+    /* Um clique abre: largura expandida (classe) e o rotulo vira "Guardar". */
+    clique(btn);
+    expect(rail.classList.contains('aberta')).toBe(true);
+    expect(btn.querySelector('.ia-rail-txt').textContent).toBe('Guardar ferramentas');
+    expect(btn.getAttribute('aria-expanded')).toBe('true');
+
+    /* Outro clique guarda: classe sai, rotulo volta a "Expandir". */
+    clique(btn);
+    expect(rail.classList.contains('aberta')).toBe(false);
+    expect(btn.querySelector('.ia-rail-txt').textContent).toBe('Expandir ferramentas');
+    expect(btn.getAttribute('aria-expanded')).toBe('false');
+  });
+
+  /* O toggle NAO e' hover: a barra abre e fecha so' no clique. O `:hover` que
+     existia fazia a janela saltar de passar o rato por cima — e e' isso que o
+     CSS, sem a regra `.ia-rail:hover`, ja' impede; aqui mede-se que o estado
+     so' muda pelo botao. */
+  it('o estado da barra nao muda sem clique — o hover nao abre nada', () => {
+    const btn = rail.querySelector('.ia-rail-item[data-id="alternar-barra"]');
+    /* Passar o rato nao existe como caminho de abertura: nenhuma classe muda. */
+    btn.dispatchEvent(new window.MouseEvent('mouseover', { bubbles: true }));
+    rail.dispatchEvent(new window.MouseEvent('mouseover', { bubbles: true }));
+    expect(rail.classList.contains('aberta')).toBe(false);
+    expect(rail.classList.contains('ia-rail-guardada')).toBe(false);
+  });
+
+  it('os separadores sao separadores, nao botoes vazios', () => {
+    const seps = rail.querySelectorAll('.ia-rail-sep');
+    expect(seps.length).toBeGreaterThan(0);
+    for (const s of seps) {
+      expect(s.tagName).toBe('DIV');
+      expect(s.querySelector('button')).toBeNull();
+      expect(s.textContent.trim()).toBe('');
+    }
+  });
+
+  it('"nova conversa" chama o reset do TEMPLATE, nao uma copia', () => {
+    /* MEDIDO: havia um `window.iaChatReset` no módulo de acções que só fechava
+       a janela. Como o módulo carrega depois do template, ele sobrescrevia o
+       reset verdadeiro — e o botão fechava o painel sem apagar nada. */
+    window.IaRail.passar('nova-conversa');
+    expect(window.iaChatReset).toHaveBeenCalledTimes(1);
+  });
+
+  it('"historico" escreve no chat, e nao num alert', () => {
+    window.IaRail.passar('historico');
+    expect(window.iaLocalMsg).toHaveBeenCalled();
+  });
+
+  /* O botão não dá mais a instrução em código: quem fala agora é o módulo do
+     print, porque quem pede a tela e quem mostra o overlay é ele. O que
+     importa é que DIGA alguma coisa — e o bloco do print mede cada recusa. */
+
+  describe('os menus', () => {
+    it('"criar no chat" abre com planilha e grafico', () => {
+      window.IaRail.passar('criar-no-chat');
+      const menu = document.querySelector('.ia-rail-menu');
+      expect(menu).toBeTruthy();
+      const rotulos = [...menu.querySelectorAll('button')].map((b) => b.textContent);
+      expect(rotulos).toEqual(['Planilha', 'Gráfico']);
+      /* E o botao diz que esta aberto — sem isto, o produtor não sabe se
+         carregou no botão ou se a lista veio de outro sítio. */
+      expect(rail.querySelector('[data-id="criar-no-chat"]').getAttribute('aria-expanded')).toBe(
+        'true'
+      );
+    });
+
+    it('"criar no painel" abre com as DUAS formas de montar', () => {
+      window.IaRail.passar('criar-no-painel');
+      const menu = document.querySelector('.ia-rail-menu');
+      const rotulos = [...menu.querySelectorAll('button')].map((b) => b.textContent);
+      expect(rotulos).toContain('Com os widgets que já existem');
+      expect(rotulos).toContain('Widgets vazios + seus valores');
+    });
+
+    /* O menu vive IRMÃO do item: o `overflow:hidden` do item existe para o
+       texto não vazar, e um menu dentro dele é cortado no mesmo quadro. */
+    it('o menu é irmão do botão, e nunca filho', () => {
+      window.IaRail.passar('criar-no-chat');
+      const item = rail.querySelector('[data-id="criar-no-chat"]');
+      const menu = document.querySelector('.ia-rail-menu');
+      expect(item.contains(menu), 'o menu esta dentro do item e vai ser cortado').toBe(false);
+      expect(menu.parentElement).toBe(rail);
+    });
+
+    it('abrir um menu fecha o anterior', () => {
+      window.IaRail.passar('criar-no-chat');
+      expect(document.querySelectorAll('.ia-rail-menu').length).toBe(1);
+      window.IaRail.passar('criar-no-painel');
+      expect(document.querySelectorAll('.ia-rail-menu').length).toBe(1);
+    });
+
+    it('a ferramenta escolhida é executada e o menu fecha', () => {
+      window.IaRail.passar('criar-no-chat');
+      clique(document.querySelectorAll('.ia-rail-menu button')[0]);
+      expect(window.AmpliaChamado.pedirChat).toHaveBeenCalledTimes(1);
+      expect(document.querySelector('.ia-rail-menu')).toBeNull();
+    });
+
+    /* Um `onclick` com um nome de função mal escrito é o defeito mais caro
+     * desta barra: o botão fica activo, o clique não faz nada, e a única pista
+     * é um `TypeError` na consola de quem sabe abrir a consola. */
+    it('o onclick de cada ferramenta aponta para uma função que existe', () => {
+      for (const menu of ['criar-no-chat', 'criar-no-painel']) {
+        window.IaRail.passar(menu);
+        for (const b of document.querySelectorAll('.ia-rail-menu button')) {
+          const onclick = b.getAttribute('onclick');
+          expect(onclick, `${menu}: botao sem onclick`).toBeTruthy();
+          const nome = (onclick.match(/IaRail\.(\w+)\(/) || [])[1];
+          expect(nome, `onclick mal formado: ${onclick}`).toBeTruthy();
+          expect(typeof window.IaRail[nome], `IaRail.${nome} nao existe`).toBe('function');
+        }
+      }
+    });
+  });
+
+  describe('os botoes que produzem pecas', () => {
+    it('planilha e grafico mandam um pedido COMPLETO, nao um 

@@ -1,0 +1,383 @@
+{% extends base_template %}
+{% load static %}
+
+{% block title %}Ampliagro - Rastreabilidade{% endblock %}
+
+{% block extra_css %}
+
+{% endblock %}
+
+{% block dashboard_appbar %}{% endblock %}
+
+{% block content %}
+<div class="section-container">
+    <div class="section-header">
+        <h1 class="section-title"><i class="bi bi-qr-code me-2"></i>Rastreabilidade por Lote</h1>
+        <div style="display:flex;gap:0.75rem;">
+            <button class="btn-secondary" onclick="carregarRastros()"><i class="bi bi-arrow-clockwise"></i> Atualizar</button>
+            <button class="btn-primary" onclick="abrirModal()"><i class="bi bi-plus-lg"></i> Novo Lote</button>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Total Lotes</div>
+            <div class="stat-value" id="stat-total">--</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Vencidos</div>
+            <div class="stat-value" id="stat-vencidos" style="color:#dc2626;">--</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Vencem em 30 dias</div>
+            <div class="stat-value" id="stat-proximos" style="color:#d97706;">--</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Saldo Total</div>
+            <div class="stat-value" id="stat-saldo">--</div>
+        </div>
+    </div>
+
+    <div id="alertas-container"></div>
+
+    <div class="content-card">
+        <div class="search-bar">
+            <input type="text" class="search-input" id="search-input" placeholder="Buscar por lote, insumo, NF..." oninput="filtrarTabela()">
+            <select class="search-input" id="filtro-vencimento" style="flex:0 0 auto;min-width:160px;" onchange="filtrarTabela()">
+                <option value="">Todos</option>
+                <option value="vencido">Vencidos</option>
+                <option value="avencer">A vencer (30d)</option>
+                <option value="ok">Em dia</option>
+            </select>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Lote</th>
+                        <th>Insumo</th>
+                        <th>Qtd Recebida</th>
+                        <th>Saldo</th>
+                        <th>Validade</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tabela-rastros">
+                    <tr><td colspan="7" class="empty-state"><i class="bi bi-inbox" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>Carregando...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Novo/Editar Lote -->
+<div class="modal-overlay" id="modal-lote" onclick="if(event.target===this)fecharModal()">
+    <div class="modal">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+            <h3 class="modal-title" id="modal-titulo">Novo Lote</h3>
+            <button class="btn-secondary" onclick="fecharModal()" style="padding:0.25rem 0.5rem;"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <form id="form-lote" onsubmit="salvarLote(event)">
+            <input type="hidden" id="edit-id" value="">
+            <div class="form-group">
+                <label class="form-label">Propriedade *</label>
+                <select class="form-input" id="f-propriedade" required><option value="">Carregando...</option></select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Insumo *</label>
+                <select class="form-input" id="f-insumo" required><option value="">Selecione a propriedade primeiro</option></select>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Nº Lote</label>
+                    <input type="text" class="form-input" id="f-lote" placeholder="L2026-001">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Nº Série</label>
+                    <input type="text" class="form-input" id="f-serie" placeholder="Opcional">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">NF Entrada</label>
+                    <input type="text" class="form-input" id="f-nf" placeholder="000123">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Fornecedor</label>
+                    <input type="text" class="form-input" id="f-fornecedor" placeholder="Nome do fornecedor">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Quantidade *</label>
+                    <input type="number" class="form-input" id="f-qtd" step="0.01" min="0.01" required placeholder="100">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Unidade *</label>
+                    <input type="text" class="form-input" id="f-unidade" required placeholder="kg, L, sc">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Data Recebimento *</label>
+                    <input type="date" class="form-input" id="f-data-rec" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Data Validade</label>
+                    <input type="date" class="form-input" id="f-data-val">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Observação</label>
+                <textarea class="form-input" id="f-obs" rows="2" placeholder="Opcional"></textarea>
+            </div>
+            <div style="display:flex;gap:0.75rem;justify-content:flex-end;margin-top:1.5rem;">
+                <button type="button" class="btn-secondary" onclick="fecharModal()">Cancelar</button>
+                <button type="submit" class="btn-primary" id="btn-salvar">Salvar Lote</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal QR / Cadeia -->
+<div class="modal-overlay" id="modal-qr" onclick="if(event.target===this)fecharQR()">
+    <div class="modal" style="max-width:480px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+            <h3 class="modal-title">Rastreabilidade</h3>
+            <button class="btn-secondary" onclick="fecharQR()" style="padding:0.25rem 0.5rem;"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <div id="qr-container" class="qr-preview"></div>
+        <div id="cadeia-container" style="font-size:0.813rem;line-height:1.6;"></div>
+        <div style="display:flex;gap:0.75rem;justify-content:flex-end;margin-top:1rem;">
+            <button class="btn-secondary" onclick="fecharQR()">Fechar</button>
+            <button class="btn-primary" onclick="imprimirQR()"><i class="bi bi-printer"></i> Imprimir</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="{% static 'js/pwa/qr.js' %}"></script>
+<script>
+(function(){
+    const API = '/api/rastros/';
+    let rastros = [];
+    let propriedades = [];
+    let insumosCache = [];
+
+    function getCSRF(){ return document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''; }
+
+    async function carregarPropriedades(){
+        try{ const r=await fetch('/api/propriedades/'); if(r.ok){ const d=await r.json(); propriedades = Array.isArray(d)?d:(d.results||[]); preencherPropSelect(); }}catch(e){}
+    }
+    function preencherPropSelect(){
+        const sel=document.getElementById('f-propriedade');
+        sel.innerHTML='<option value=\"\">Selecione</option>';
+        propriedades.forEach(p=>{ const o=document.createElement('option'); o.value=p.id; o.textContent=p.nome; sel.appendChild(o); });
+        // auto-select primeira se só uma
+        if(propriedades.length===1) { sel.value=propriedades[0].id; carregarInsumos(propiedades[0].id); }
+    }
+    async function carregarInsumos(propId){
+        const sel=document.getElementById('f-insumo');
+        sel.innerHTML='<option value=\"\">Carregando...</option>';
+        try{ const r=await fetch('/api/insumos/?propriedade='+propId); if(!r.ok) throw 1; const d=await r.json(); const arr=Array.isArray(d)?d:(d.results||[]); insumosCache=arr; sel.innerHTML='<option value=\"\">Selecione o insumo</option>'; arr.forEach(i=>{const o=document.createElement('option');o.value=i.id;o.textContent=i.nome+' ('+i.categoria+')';sel.appendChild(o);}); }catch(e){ sel.innerHTML='<option value=\"\">Nenhum insumo encontrado</option>'; }
+    }
+    document.getElementById('f-propriedade').addEventListener('change', function(){ if(this.value) carregarInsumos(this.value); });
+
+    async function carregarRastros(){
+        try{
+            const r=await fetch(API);
+            if(!r.ok) throw new Error('Falha ao carregar');
+            rastros = await r.json();
+            if(rastros.results) rastros=rastros.results;
+            renderTabela();
+            renderStats();
+            renderAlertas();
+        }catch(e){ document.getElementById('tabela-rastros').innerHTML='<tr><td colspan=\"7\" class=\"empty-state\">Erro ao carregar dados.</td></tr>'; }
+    }
+
+    function renderTabela(){
+        const tbody=document.getElementById('tabela-rastros');
+        if(!rastros.length){ tbody.innerHTML='<tr><td colspan=\"7\" class=\"empty-state\"><i class=\"bi bi-inbox\" style=\"font-size:2rem;display:block;margin-bottom:0.5rem;\"></i>Nenhum lote cadastrado.</td></tr>'; return; }
+        let html='';
+        rastros.forEach(item=>{
+            const vencido=item.vencido;
+            const dias=item.dias_para_vencer;
+            let statusBadge='';
+            if(item.data_validade===null) statusBadge='<span class=\"badge badge-info\">Sem validade</span>';
+            else if(vencido) statusBadge='<span class=\"badge badge-danger\">Vencido</span>';
+            else if(dias!==null && dias<=30) statusBadge='<span class=\"badge badge-warning\">'+dias+'d</span>';
+            else statusBadge='<span class=\"badge badge-safe\">Em dia</span>';
+            const saldo=item.saldo!=null?parseFloat(item.saldo).toFixed(2):'--';
+            html+='<tr data-search=\"'+(item.numero_lote+' '+item.insumo_nome+' '+(item.nf_entrada||'')).toLowerCase()+'\" data-venc=\"'+(vencido?'vencido':(dias!==null&&dias<=30?'avencer':'ok'))+'\">'
+                +'<td><strong>'+(item.numero_lote||'#'+item.id)+'</strong> <small style=\"color:#94a3b8\">'+(item.numero_serie||'')+'</small></td>'
+                +'<td>'+(item.insumo_nome||'--')+'</td>'
+                +'<td>'+parseFloat(item.quantidade_recebida).toFixed(2)+' '+item.unidade+'</td>'
+                +'<td>'+saldo+' '+item.unidade+'</td>'
+                +'<td>'+(item.data_validade?new Date(item.data_validade).toLocaleDateString('pt-BR'):'--')+'</td>'
+                +'<td>'+statusBadge+'</td>'
+                +'<td style=\"display:flex;gap:0.25rem;\">'
+                +'<button class=\"btn-secondary\" style=\"padding:0.25rem 0.5rem;\" onclick=\"verQR('+item.id+')\" title=\"QR / Cadeia\"><i class=\"bi bi-qr-code\"></i></button>'
+                +'<button class=\"btn-secondary\" style=\"padding:0.25rem 0.5rem;\" onclick=\"editarRastro('+item.id+')\" title=\"Editar\"><i class=\"bi bi-pencil\"></i></button>'
+                +'<button class=\"btn-secondary\" style=\"padding:0.25rem 0.5rem;background:#fef2f2;color:#dc2626;\" onclick=\"excluirRastro('+item.id+')\" title=\"Excluir\"><i class=\"bi bi-trash\"></i></button>'
+                +'</td></tr>';
+        });
+        tbody.innerHTML=html;
+        filtrarTabela();
+    }
+
+    function renderStats(){
+        const total=rastros.length;
+        const vencidos=rastros.filter(r=>r.vencido).length;
+        const proximos=rastros.filter(r=>!r.vencido && r.dias_para_vencer!==null && r.dias_para_vencer<=30).length;
+        const saldoTotal=rastros.reduce((s,r)=>s+(parseFloat(r.saldo)||0),0);
+        document.getElementById('stat-total').textContent=total;
+        document.getElementById('stat-vencidos').textContent=vencidos;
+        document.getElementById('stat-proximos').textContent=proximos;
+        document.getElementById('stat-saldo').textContent=saldoTotal.toFixed(1);
+    }
+
+    function renderAlertas(){
+        const c=document.getElementById('alertas-container');
+        const vencidos=rastros.filter(r=>r.vencido);
+        const proximos=rastros.filter(r=>!r.vencido && r.dias_para_vencer!==null && r.dias_para_vencer<=7);
+        let html='';
+        if(vencidos.length) html+='<div class=\"alert-banner alert-danger\"><i class=\"bi bi-exclamation-triangle-fill\"></i> <strong>'+vencidos.length+' lote(s) vencido(s):</strong> '+vencidos.map(r=>r.insumo_nome+' ['+(r.numero_lote||'#'+r.id)+']').join(', ')+'</div>';
+        if(proximos.length) html+='<div class=\"alert-banner alert-warn\"><i class=\"bi bi-hourglass-split\"></i> <strong>'+proximos.length+' lote(s) vence(m) em até 7 dias:</strong> '+proximos.map(r=>r.insumo_nome+' ['+(r.numero_lote||'#'+r.id)+'] ('+r.dias_para_vencer+'d)').join(', ')+'</div>';
+        c.innerHTML=html;
+    }
+
+    window.filtrarTabela=function(){
+        const q=document.getElementById('search-input').value.toLowerCase();
+        const fv=document.getElementById('filtro-vencimento').value;
+        document.querySelectorAll('#tabela-rastros tr').forEach(row=>{
+            if(row.querySelector('.empty-state')) return;
+            const txt=row.getAttribute('data-search')||'';
+            const venc=row.getAttribute('data-venc')||'';
+            const okQ=!q||txt.includes(q);
+            const okV=!fv||venc===fv;
+            row.style.display=(okQ&&okV)?'':'none';
+        });
+    };
+
+    window.abrirModal=function(editItem){
+        document.getElementById('form-lote').reset();
+        document.getElementById('edit-id').value='';
+        document.getElementById('modal-titulo').textContent=editItem?'Editar Lote':'Novo Lote';
+        document.getElementById('f-insumo').innerHTML='<option value=\"\">Selecione a propriedade primeiro</option>';
+        if(editItem){
+            document.getElementById('edit-id').value=editItem.id;
+            document.getElementById('f-propriedade').value=editItem.propriedade;
+            carregarInsumos(editItem.propriedade).then(()=>{
+                document.getElementById('f-insumo').value=editItem.insumo;
+            });
+            document.getElementById('f-lote').value=editItem.numero_lote||'';
+            document.getElementById('f-serie').value=editItem.numero_serie||'';
+            document.getElementById('f-nf').value=editItem.nf_entrada||'';
+            document.getElementById('f-fornecedor').value=editItem.fornecedor||'';
+            document.getElementById('f-qtd').value=editItem.quantidade_recebida||'';
+            document.getElementById('f-unidade').value=editItem.unidade||'';
+            document.getElementById('f-data-rec').value=editItem.data_recebimento||'';
+            document.getElementById('f-data-val').value=editItem.data_validade||'';
+            document.getElementById('f-obs').value=editItem.observacao||'';
+        } else {
+            document.getElementById('f-data-rec').valueAsDate=new Date();
+        }
+        document.getElementById('modal-lote').classList.add('open');
+    };
+    window.fecharModal=function(){ document.getElementById('modal-lote').classList.remove('open'); };
+    window.editarRastro=function(id){
+        const item=rastros.find(r=>r.id===id);
+        if(item) abrirModal(item);
+    };
+    window.excluirRastro=async function(id){
+        if(!confirm('Excluir este lote? Esta ação não pode ser desfeita.')) return;
+        try{
+            const r=await fetch(API+id+'/',{method:'DELETE',headers:{'X-CSRFToken':getCSRF()}});
+            if(r.ok) carregarRastros();
+            else alert('Erro ao excluir');
+        }catch(e){ alert('Erro de conexão'); }
+    };
+    window.salvarLote=async function(e){
+        e.preventDefault();
+        const btn=document.getElementById('btn-salvar');
+        btn.disabled=true; btn.textContent='Salvando...';
+        const editId=document.getElementById('edit-id').value;
+        const payload={
+            propriedade: parseInt(document.getElementById('f-propriedade').value),
+            insumo: parseInt(document.getElementById('f-insumo').value),
+            numero_lote: document.getElementById('f-lote').value.trim(),
+            numero_serie: document.getElementById('f-serie').value.trim(),
+            nf_entrada: document.getElementById('f-nf').value.trim(),
+            fornecedor: document.getElementById('f-fornecedor').value.trim(),
+            quantidade_recebida: document.getElementById('f-qtd').value,
+            unidade: document.getElementById('f-unidade').value.trim(),
+            data_recebimento: document.getElementById('f-data-rec').value,
+            data_validade: document.getElementById('f-data-val').value || null,
+            observacao: document.getElementById('f-obs').value.trim(),
+        };
+        try{
+            const url=editId?API+editId+'/':API;
+            const method=editId?'PATCH':'POST';
+            const r=await fetch(url,{method,headers:{'Content-Type':'application/json','X-CSRFToken':getCSRF()},body:JSON.stringify(payload)});
+            if(!r.ok){ const err=await r.json(); alert('Erro: '+JSON.stringify(err)); btn.disabled=false; btn.textContent='Salvar Lote'; return; }
+            fecharModal(); carregarRastros();
+        }catch(ex){ alert('Erro de conexão'); }
+        btn.disabled=false; btn.textContent='Salvar Lote';
+    };
+
+    window.verQR=async function(id){
+        const item=rastros.find(r=>r.id===id);
+        if(!item) return;
+        const qrC=document.getElementById('qr-container');
+        const cadC=document.getElementById('cadeia-container');
+        qrC.innerHTML='<small style=\"color:#94a3b8\">Gerando QR...</small>';
+        cadC.innerHTML='<small style=\"color:#94a3b8\">Carregando cadeia...</small>';
+        document.getElementById('modal-qr').classList.add('open');
+        // QR via pwa/qr.js
+        try{
+            if(window.QRGenerator){
+                const gen=window.QRGenerator;
+                const data={type:'rastreabilidade',id:item.id,hash:item.qr_code_hash,lote:item.numero_lote,insumo:item.insumo_nome};
+                const canvas=await gen.generate({type:'lote',id:item.id,produto_id:item.insumo,validade:item.data_validade});
+                qrC.innerHTML='';
+                if(canvas instanceof HTMLCanvasElement) qrC.appendChild(canvas);
+                else if(typeof canvas==='string'){ const img=document.createElement('img'); img.src=canvas; img.style.maxWidth='200px'; qrC.appendChild(img); }
+                else qrC.innerHTML='<code style=\"font-size:0.7rem;word-break:break-all;\">'+item.qr_code_hash+'</code>';
+            } else {
+                qrC.innerHTML='<code style=\"font-size:0.7rem;word-break:break-all;\">'+item.qr_code_hash+'</code>';
+            }
+        }catch(e){ qrC.innerHTML='<small style=\"color:#dc2626\">Erro ao gerar QR</small>'; }
+        // Cadeia
+        try{
+            const r=await fetch(API+id+'/cadeia/');
+            if(r.ok){
+                const data=await r.json();
+                let html='<strong>Lote:</strong> '+(data.rastro.numero_lote||'#'+data.rastro.id)+' — '+data.rastro.insumo_nome+'<br>';
+                html+='<strong>Recebido:</strong> '+data.rastro.data_recebimento+' ('+data.rastro.quantidade_recebida+' '+data.rastro.unidade+')<br>';
+                html+='<strong>Saldo:</strong> '+data.rastro.saldo+' '+data.rastro.unidade+'<br>';
+                if(data.movimentos && data.movimentos.length){
+                    html+='<strong>Movimentos ('+data.movimentos.length+'):</strong><ul style=\"margin:0.25rem 0;padding-left:1.25rem;\">';
+                    data.movimentos.forEach(m=>{ html+='<li>'+m.tipo+' '+m.quantidade+' em '+m.data_movimento+(m.motivo?' — '+m.motivo:'')+'</li>'; });
+                    html+='</ul>';
+                } else html+='<em style=\"color:#94a3b8\">Nenhum movimento registrado.</em><br>';
+                if(data.aplicacoes_safra && data.aplicacoes_safra.length){
+                    html+='<strong>Aplicado em safras:</strong><ul style=\"margin:0.25rem 0;padding-left:1.25rem;\">';
+                    data.aplicacoes_safra.forEach(a=>{ html+='<li>'+a.quantidade_aplicada+' em '+a.data_aplicacao+' ('+a.operacao+')</li>'; });
+                    html+='</ul>';
+                }
+                cadC.innerHTML=html;
+            } else cadC.innerHTML='<small style=\"color:#dc2626\">Erro ao carregar cadeia</small>';
+        }catch(e){ cadC.innerHTML='<small style=\"color:#dc2626\">Erro de conexão</small>'; }
+    };
+    window.fecharQR=function(){ document.getElementById('modal-qr').classList.remove('open'); };
+    window.imprimirQR=function(){ window.print(); };
+
+    window.carregarRastros=carregarRastros;
+    document.addEventListener('DOMContentLoaded', function(){ carregarPropriedades(); carregarRastros(); });
+})();
+</script>
+{% endblock %}

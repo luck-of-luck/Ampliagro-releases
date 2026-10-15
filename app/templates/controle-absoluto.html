@@ -1,0 +1,81 @@
+{% extends base_template %}
+{% load static %}
+
+{% block title %}Ampliagro — Controle Absoluto{% endblock %}
+
+{% block extra_css %}
+
+{% endblock %}
+
+{% block content %}
+<div style="max-width: 1400px; margin: 0 auto; padding: 2rem 1rem;">
+  <div class="ctrl-header">
+    <h1 class="ctrl-title"><i class="bi bi-bullseye"></i> Controle Absoluto por Talhão</h1>
+    <span style="font-size: 0.875rem; color: var(--cor-texto-suave);">{{ talhoes|length }} talhões • {{ culturas|length }} culturas</span>
+  </div>
+
+  <div class="ctrl-card">
+    <h3 style="font-weight: 600; margin-bottom: 1rem;"><i class="bi bi-graph-up"></i> Custo e Lucro por Talhão</h3>
+    <div class="ctrl-grid">
+      {% for item in custos_por_talhao %}
+      <div class="ctrl-stat">
+        <div class="ctrl-stat-label">{{ item.talhao.nome }} — {{ item.talhao.cultura_atual.nome|default:"Sem cultura" }}</div>
+        {% if item.tem_medicao %}
+        <div class="ctrl-stat-value">R$ {{ item.custo|floatformat:2 }}</div>
+        <div style="font-size: 0.75rem;">R$ {{ item.custo_por_ha|floatformat:2 }}/ha • {{ item.talhao.area_hectare }} ha</div>
+        {% else %}
+        {# Nao medido NAO e' zero. "R$ 0,00/ha" e' um numero que o produtor #}
+        {# le como "gastei nada"; o que e' verdade e' "nenhum lancamento #}
+        {# foi apontado para este talhao". Ver a nota em app/tests_custo. #}
+        <div class="ctrl-stat-value" style="color: var(--cor-texto-suave);">Sem medição</div>
+        <div style="font-size: 0.75rem; color: var(--cor-texto-suave);">nenhum lançamento apontado • {{ item.talhao.area_hectare }} ha</div>
+        {% endif %}
+        <div style="margin-top: 0.5rem;">
+          <button class="btn btn-sm" style="background: var(--cor-primaria); color: #fff; border: none; padding: 0.25rem 0.75rem; border-radius: 6px; font-size: 0.75rem;" onclick="simularTalhoes({{ item.talhao.id }})">Simular</button>
+          <button class="btn btn-sm" style="background: transparent; border: 1px solid var(--cor-borda); padding: 0.25rem 0.75rem; border-radius: 6px; font-size: 0.75rem;" onclick="verHistorico({{ item.talhao.id }})">Histórico</button>
+        </div>
+      </div>
+      {% empty %}
+      <div style="grid-column: 1/-1; text-align: center; padding: 2rem; color: var(--cor-texto-suave);">Nenhum talhão cadastrado. <a href="{% url 'cadastro-talhao' %}" style="color: var(--cor-primaria);">Cadastrar talhão</a></div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="ctrl-card">
+    <h3 style="font-weight: 600; margin-bottom: 1rem;"><i class="bi bi-moisture"></i> IoT — Boia e Sensores</h3>
+    <p style="font-size: 0.875rem; color: var(--cor-texto-suave); margin-bottom: 1rem;">Conecte boias em tanques e pulverizadores para gasto por litro por talhão.</p>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+      <div style="border: 1px dashed var(--cor-borda); border-radius: 8px; padding: 1rem; text-align: center;">
+        <i class="bi bi-water" style="font-size: 1.5rem; color: var(--cor-primaria);"></i>
+        <div style="font-weight: 600; margin-top: 0.5rem;">Boia Tanque</div>
+        <div style="font-size: 0.75rem; color: var(--cor-texto-suave);">Gasto L/ha por talhão</div>
+        <button class="btn btn-sm" style="margin-top: 0.75rem; background: var(--cor-suave); border: 1px solid var(--cor-borda); padding: 0.25rem 0.75rem; border-radius: 6px; font-size: 0.75rem;" onclick="alert('Conectar boia via /api/iot/boia/ — em breve')">Conectar</button>
+      </div>
+      <div style="border: 1px dashed var(--cor-borda); border-radius: 8px; padding: 1rem; text-align: center;">
+        <i class="bi bi-droplet-half" style="font-size: 1.5rem; color: var(--cor-primaria);"></i>
+        <div style="font-weight: 600; margin-top: 0.5rem;">Pulverizador</div>
+        <div style="font-size: 0.75rem; color: var(--cor-texto-suave);">Dose e custo por aplicação</div>
+        <button class="btn btn-sm" style="margin-top: 0.75rem; background: var(--cor-suave); border: 1px solid var(--cor-borda); padding: 0.25rem 0.75rem; border-radius: 6px; font-size: 0.75rem;" onclick="alert('Configurar pulverizador — em breve')">Configurar</button>
+      </div>
+      <div style="border: 1px dashed var(--cor-borda); border-radius: 8px; padding: 1rem; text-align: center;">
+        <i class="bi bi-sliders" style="font-size: 1.5rem; color: var(--cor-primaria);"></i>
+        <div style="font-weight: 600; margin-top: 0.5rem;">Variáveis Livres</div>
+        <div style="font-size: 0.75rem; color: var(--cor-texto-suave);">Equipe técnica cria % fertilizante etc.</div>
+        <a href="{% url 'config-sistema' %}" style="margin-top: 0.75rem; display: inline-block; background: var(--cor-suave); border: 1px solid var(--cor-borda); padding: 0.25rem 0.75rem; border-radius: 6px; font-size: 0.75rem; text-decoration: none; color: var(--cor-texto);">Gerenciar</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="ctrl-card">
+    <h3 style="font-weight: 600; margin-bottom: 1rem;"><i class="bi bi-calculator"></i> Simulação e Histórico</h3>
+    <p style="font-size: 0.875rem; color: var(--cor-texto-suave);">Simule fertilizante % por talhão, gere gráficos e históricos sem obrigatoriedade.</p>
+    <div style="height: 200px; background: var(--cor-suave); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--cor-texto-fraco); font-size: 0.875rem;">
+      <span><i class="bi bi-bar-chart"></i> Gráficos por talhão — selecione um talhão acima para simular</span>
+    </div>
+  </div>
+</div>
+<script>
+function simularTalhoes(id) { alert('Simulação para talhão ' + id + ' — em breve: fertilizante % + IoT boia + gráfico'); }
+function verHistorico(id) { alert('Histórico para talhão ' + id + ' — em breve'); }
+</script>
+{% endblock %}

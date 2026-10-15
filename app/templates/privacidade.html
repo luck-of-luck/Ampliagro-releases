@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Privacidade - LGPD{% endblock %}
+{% block content %}
+<div style="max-width:800px;margin:2rem auto;padding:0 1.5rem">
+  <h1 style="font-size:1.6rem;font-weight:700;color:var(--ncs-green-dark)">Política de Privacidade (LGPD)</h1>
+  <p style="color:#475569;margin-top:0.6rem">Ampliagro respeita a Lei Geral de Proteção de Dados. Seus dados são usados apenas para gestão da propriedade rural.</p>
+  <h2 style="margin-top:1.5rem;font-weight:600">Seus direitos</h2>
+  <ul style="list-style:disc;margin-left:1.2rem;color:#334155;line-height:1.8">
+    <li><strong>Acesso:</strong> <a href="/lgpd/export/" target="_blank">Baixar meus dados (JSON)</a></li>
+    <li><strong>Exclusão:</strong> solicite anonimização via suporte ou botão abaixo (requer login)</li>
+    <li><strong>Correção:</strong> edite em Perfil → Configurações</li>
+  </ul>
+  {% if user.is_authenticated %}
+  <form method="post" action="/lgpd/delete/" style="margin-top:1.2rem" onsubmit="return confirm('Anonimizar seus dados? Esta ação desativa seu login.')">
+    {% csrf_token %}
+    <button type="submit" style="background:#fee2e2;color:#dc2626;padding:0.6rem 1rem;border-radius:0.5rem;border:none;cursor:pointer">Anonimizar meus dados</button>
+  </form>
+  {% endif %}
+  <h2 style="margin-top:1.5rem;font-weight:600">Backups criptografados</h2>
+  <p style="color:#475569">Backups diários são criptografados com Fernet (AES128) quando <code>BACKUP_ENCRYPTION_KEY</code> está configurado. Sem a chave, o arquivo <code>.enc</code> é ilegível.</p>
+  <p style="color:#64748b;font-size:0.85rem">Gere a chave: <code>python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"</code></p>
+</div>
+{% endblock %}

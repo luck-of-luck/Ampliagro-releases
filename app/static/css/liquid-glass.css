@@ -1,0 +1,140 @@
+/* ════════════════════════════════════════════════════════════════════
+   AMPLIAGRO — Liquid Glass (painel de widgets)
+   Inspirado em 2026-09-16 liquid-glass + Apple WWDC26 glass
+   Aplica no fundo do .matrix-container (grid 128x60)
+   Vanilla + backdrop-filter + SVG displacement. Sem React.
+   ════════════════════════════════════════════════════════════ */
+
+/* ---------- container ---------- */
+.matrix-container.liquid-glass {
+  position: relative;
+  isolation: isolate;
+  border-radius: 0px !important;
+  overflow: hidden;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+html.dark .matrix-container.liquid-glass {
+  border: none !important;
+  box-shadow: none !important;
+}
+html.custom-theme .matrix-container.liquid-glass {
+  border: none !important;
+}
+
+/* ---------- camadas de vidro (blur + displace) ---------- */
+.matrix-container.liquid-glass::before,
+.matrix-container.liquid-glass::after,
+.matrix-container.liquid-glass .lg-border,
+.matrix-container.liquid-glass .lg-glow {
+  display: none !important;
+}
+
+/* ---------- conteúdo acima do vidro ---------- */
+.matrix-container.liquid-glass > .bento-block {
+  z-index: 2;
+}
+
+/* ---------- modo edição mantém grade por cima do vidro ---------- */
+.matrix-container.liquid-glass.editing {
+  border-style: dashed !important;
+  border-color: rgba(19, 122, 89, 0.18) !important;
+  border-radius: 0 !important;
+  height: calc(100vh - 96px) !important;
+  max-height: calc(100vh - 96px) !important;
+  overflow: visible !important;
+}
+.matrix-container.liquid-glass.editing::before,
+.matrix-container.liquid-glass.editing::after,
+.matrix-container.liquid-glass.editing .lg-border,
+.matrix-container.liquid-glass.editing .lg-glow {
+  border-radius: 0 !important;
+}
+.matrix-container.liquid-glass.editing::before {
+  /* leve redução do blur pra grade ficar nítida */
+  backdrop-filter: blur(calc(var(--lg-blur) * 0.72)) saturate(1.08);
+  -webkit-backdrop-filter: blur(calc(var(--lg-blur) * 0.72)) saturate(1.08);
+}
+
+/* ---------- FIX: #content estava afetando dashboard (pb-14 + min-h-screen) ----------
+   Quando há liquid-glass, deixa o #content fluir natural e sem padding extra que
+   criava scroll duplo / corte do painel. Só atua no dashboard (has matrix). */
+body:has(.matrix-container.liquid-glass) #content {
+  position: relative !important;
+  padding-bottom: 0px !important;
+  margin-bottom: 0px !important;
+  height: calc(100vh - 64px) !important; /* Trava a altura do content após a navbar (64px) */
+  min-height: 0 !important; /* Remove o min-height do tailwind */
+  display: block !important;
+  overflow: hidden !important; /* Remove qualquer scroll da página */
+}
+
+body:has(.matrix-container.liquid-glass) #content .matrix-container.liquid-glass {
+  position: absolute !important;
+  top: 0 !important;
+  bottom: var(--widgetbar-altura, 56px) !important; /* espaço da widget-bar embaixo */
+  left: 0 !important;
+  right: 0 !important;
+  height: auto !important;
+  min-height: 0 !important; /* Acabou o respiro gigante de 2000px, agora é cravado na tela */
+  max-height: none !important;
+  flex: none !important;
+  border-radius: 0px !important;
+  padding: 12px !important;
+  display: grid !important;
+  grid-template-rows: repeat(
+    var(--grid-rows, 120),
+    1fr
+  ) !important; /* 1fr funciona perfeitamente com altura absoluta */
+}
+
+.matrix-container.liquid-glass .lg-border,
+.matrix-container.liquid-glass .lg-glow {
+  border-radius: 0px !important;
+  height: 100% !important;
+}
+
+/* ---------- performance: desliga displacement em telas pequenas / reduce-motion ---------- */
+@media (max-width: 860px) {
+  .matrix-container.liquid-glass {
+    --lg-blur: 10px;
+    --lg-displacement: 6;
+  }
+  .matrix-container.liquid-glass::after {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .matrix-container.liquid-glass {
+    transition: none;
+  }
+  .matrix-container.liquid-glass::after {
+    display: none;
+  }
+}
+@supports not (backdrop-filter: blur(1px)) {
+  .matrix-container.liquid-glass::before,
+  .matrix-container.liquid-glass::after {
+    display: none;
+  }
+  .matrix-container.liquid-glass {
+    background: color-mix(in srgb, var(--cor-fundo) 88%, transparent) !important;
+    border-color: var(--cor-borda) !important;
+    box-shadow: var(--sombra-card) !important;
+  }
+}
+
+/* ---------- SVG escondido ---------- */
+.lg-svg-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* ---------- tweak opcional: quando usuário usa custom theme workspace, respeita ---------- */
+html.custom-theme.custom-theme-workspace .matrix-container.liquid-glass {
+  background: transparent !important;
+}

@@ -1,0 +1,62 @@
+import io
+
+CAM = "tests/unit/ia_rail_dom.test.js"
+t = io.open(CAM, encoding="utf-8").read()
+
+# O teste está em 25004 - procurar o { que abre a função
+idx = 25004
+start_brace = -1
+for k in range(idx, len(t)):
+    if t[k] == "{":
+        print(f"Achou {{ em {k}: {repr(t[max(0, k - 20) : k + 20])}")
+        start_brace = k
+        break
+
+if start_brace >= 0:
+    d = 1
+    fim_it = None
+    for k in range(start_brace + 1, len(t)):
+        if t[k] == "{":
+            d += 1
+        elif t[k] == "}":
+            d -= 1
+            if d == 0:
+                fim_it = k + 1
+                print(f"Fim do it em {fim_it}")
+                break
+
+    if fim_it:
+        print(f"Fim do it em {fim_it}")
+        # Verificar o que vem depois
+        prox = t.find("    it(", fim_it)
+        if prox < 0:
+            prox = t.find("  describe(", fim_it)
+        if prox < 0:
+            prox = t.find("});", fim_it)
+            if prox >= 0:
+                prox += 2
+
+        if prox >= 0:
+            meio = t[fim_it:prox]
+            print(f"Conteúdo entre ({len(meio)} chars): {repr(meio[:500])}")
+
+            if (
+                "return codecs" in meio
+                or "charmap_encode" in meio
+                or "codecs.charmap_encode" in meio
+            ):
+                print("ACHOU LIXO!")
+                t_limpo = t[:fim_it] + "\n\n" + t[prox:]
+                with open("tests/unit/ia_rail_dom.test.js", "w", encoding="utf-8") as f:
+                    f.write(t[:fim_it] + "\n\n" + t[prox:])
+                print("ARQUIVO LIMPO!")
+            else:
+                print("Sem lixo detectado")
+                print(f"Conteúdo: {repr(meio[:500])}")
+            print(f"fim_it={fim_it}, prox={prox}")
+        else:
+            print("Não achou próximo bloco")
+    else:
+        print("Não achou fim do it")
+else:
+    print("Não achou { de abertura")

@@ -1,0 +1,100 @@
+gf-grelha { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 760px) {
+  .gf-grelha { grid-template-columns: repeat(2, 1fr); }
+  .gf-nav { overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; }
+  .gf-nav::-webkit-scrollbar { display: none; }
+}
+@media (max-width: 560px) {
+  .gf-grelha { grid-template-columns: 1fr; }
+}
+@media (max-width: 420px) {
+  .gf-grelha { grid-template-columns: 1fr; }
+}
+
+<style>
+/* ═══════════════════════════════════════════════════════════════════════
+   PAINEL DE DETALHE CENTRALIZADO (estilo cadastro-cultura)
+   ══════════════════════════════════════════════════════════════════════ */
+.gf-detail-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(11, 17, 32, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 9998;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .25s ease, visibility .25s ease;
+}
+.gf-detail-overlay.ativo {
+  opacity: 1;
+  visibility: visible;
+}
+
+.gf-detail-wrap {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--lcdpr-space-4);
+  z-index: 9999;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .25s ease, visibility .25s ease;
+}
+.gf-detail-wrap.ativo {
+  opacity: 1;
+  visibility: visible;
+}
+
+.gf-detail-card {
+  width: 100%;
+  max-width: 720px;
+  max-height: 90vh;
+  background: var(--cor-fundo-card);
+  border: 1px solid var(--cor-borda);
+  border-radius: 16px;
+  box-shadow: 0 12px 28px var(--cor-sombra);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transform: scale(0.95);
+  transition: transform .25s var(--cor-ease), opacity .25s ease;
+  opacity: 0;
+}
+.gf-detail-wrap.ativo .gf-detail-card {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.gf-detail-head {
+  padding: var(--lcdpr-space-4) var(--lcdpr-space-5);
+  border-bottom: 1px solid var(--cor-borda);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--cor-fundo-card);
+  flex-shrink: 0;
+}
+.gf-detail-title {
+  font-family: 'Sora', 'IBM Plex Sans', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--cor-texto);
+  margin: 0;
+  letter-spacing: -.01em;
+}
+.gf-detail-close {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--lcdpr-radius-full);
+  background: var(--cor-fundo-card-aninhado);
+  border: 1px solid var(--cor-borda);
+  color: var(--cor-texto-secundario);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--cor-ease-2);
+  flex-

@@ -1,0 +1,149 @@
+{% extends base_template %}
+{% load static agro_icons %}
+
+{% block title %}Ampliagro - Guia Sistemas{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/paginas/painel-cadastro.css' %}?v=20261008a">
+
+{% endblock %}
+
+{% block dashboard_appbar %}{% endblock %}
+
+{% block content %}
+<div class="guide-container">
+    <div class="guide-header">
+        <h1 class="guide-title"><i class="bi bi-diagram-3"></i> Guia Sistemas</h1>
+        <a href="{% url 'index_spa' %}" class="btn-secondary btn-sm">Dashboard</a>
+    </div>
+
+    <div class="sub-tabs" id="subTabs">
+        <button class="sub-tab active" data-tab="integrados">Sistemas Integrados</button>
+        <button class="sub-tab" data-tab="apicultura">Apicultura</button>
+        <button class="sub-tab" data-tab="culturas">Outras Culturas</button>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card"><div class="stat-label">Sistemas</div><div class="stat-value" id="totalSistemas">—</div></div>
+        <div class="stat-card"><div class="stat-label">Colmeias</div><div class="stat-value" id="totalColmeias">—</div></div>
+        <div class="stat-card"><div class="stat-label">Propriedades</div><div class="stat-value" id="totalProp">—</div></div>
+        <div class="stat-card"><div class="stat-label">Funcionários</div><div class="stat-value" id="totalFunc">—</div></div>
+    </div>
+
+    <div class="tab-content active" id="tab-integrados">
+        <h2 style="font-size:1.125rem;font-weight:600;margin-bottom:1rem;color:var(--ncs-green-dark);">
+            <i class="bi bi-arrow-repeat"></i> Sistemas Integrados
+        </h2>
+        {# Os tres sistemas vinham escritos a mao no HTML. Agora vem da vista: #}
+        {# o `totalSistemas` e' o comprimento desta lista, e nao um '3' posto #}
+        {# a mao no template que ninguem media. #}
+        {% for s in sistemas %}
+        <div class="system-card">
+            <div class="system-icon"><i class="bi {{ s.icone }}"></i></div>
+            <div class="system-info"><h3>{{ s.nome }}</h3><p>{{ s.descricao }}</p></div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="tab-content" id="tab-apicultura">
+        <h2 style="font-size:1.125rem;font-weight:600;margin-bottom:1rem;color:var(--ncs-green-dark);">
+            <i class="bi bi-bug"></i> Apicultura
+        </h2>
+        {% for grupo, culturas in grupos.items %}
+            {% if grupo == 'apicultura' %}
+            {% if culturas %}
+            <div class="cultura-grid">
+                {% for c in culturas %}
+                <div class="cultura-card" data-cultura-id="{{ c.id }}" data-cultura-nome="{{ c.nome }}" onclick="showCulturaDetail('{{ c.id }}', '{{ c.nome }}', 'animal')">
+                    <div class="cultura-icon">{{ grupo|grupo_icon }}</div>
+                    <div class="cultura-name">{{ c.nome }}</div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            {# A procura e' por nome EXACTO ("Mel") e a base nao tem nenhuma #}
+            {# cultura com esse nome (MEDIDO: 0). Um `icontains "mel"` dava #}
+            {# 16 falsos positivos — Melancia, Marmelo, Jamelão — e era pior #}
+            {# do que um separador vazio. Sem este `{% else %}`, a aba ficava #}
+            {# com o titulo e nada abaixo: parecia que a pagina falhava. #}
+            <div class="empty-state">
+                <i class="bi bi-inbox" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>
+                Nenhuma cultura de apicultura cadastrada.
+            </div>
+            {% endif %}
+            {% endif %}
+        {% endfor %}
+        <a href="{% url 'cadastro-apiario' %}" class="btn-primary" style="display:inline-flex;margin-top:1rem;"><i class="bi bi-plus-lg"></i> Gerenciar Colmeias</a>
+    </div>
+
+    <div class="tab-content" id="tab-culturas">
+        <h2 style="font-size:1.125rem;font-weight:600;margin-bottom:1rem;color:var(--ncs-green-dark);">
+            <i class="bi bi-grid"></i> Outras Culturas
+        </h2>
+        {% for grupo, culturas in grupos.items %}
+            {% if grupo == 'outras' %}
+            {% if culturas %}
+            <div class="cultura-grid">
+                {% for c in culturas %}
+                <div class="cultura-card" data-cultura-id="{{ c.id }}" data-cultura-nome="{{ c.nome }}" onclick="showCulturaDetail('{{ c.id }}', '{{ c.nome }}', 'vegetal')">
+                    <div class="cultura-icon">{{ grupo|grupo_icon }}</div>
+                    <div class="cultura-name">{{ c.nome }}</div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state"><i class="bi bi-inbox" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>Nenhuma cultura cadastrada.</div>
+            {% endif %}
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
+
+<div class="detail-overlay" id="culturaOverlay" onclick="closeCulturaDetail()"></div>
+<div class="detail-panel" id="culturaDetail">
+    <div class="detail-header">
+        <span class="detail-nome"></span>
+        <button class="detail-close" id="culturaDetailClose"><i class="bi bi-x"></i></button>
+    </div>
+    <div class="detail-body"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+{# `?v=` para o browser nao servir uma copia antiga. Sem a versao, este era #}
+{# o UNICO template de guia que carregava `guide.js` sem `?v=` — e e' assim #}
+{# que sobreviveram varias das correcoes de hoje. #}
+<script src="{% static 'js/guide.js' %}?v=20261007n"></script>
+<script>
+// Os endpoints sao do DRF e respondem PAGINADO
+// ({count, next, previous, results}). `data.length` sobre esse objecto e'
+// `undefined`, e o KPI ficava VAZIO em vez de mostrar o numero.
+// MEDIDO 2026-10-06: Colmeias, Propriedades e Funcionarios apareciam vazios.
+// E' o mesmo bug que travou as guias animal e aquatica.
+function itens(resposta){
+    if (Array.isArray(resposta)) return resposta;
+    if (resposta && Array.isArray(resposta.results)) return resposta.results;
+    return [];
+}
+// O fetch pode resolver DEPOIS de o utilizador ter navegado: o `stat-value`
+// ja nao existe, e `el.textContent` em `null` rebenta.
+function por(sel, valor){
+    var el = document.querySelector(sel);
+    if (el) el.textContent = valor;
+}
+
+fetch('/api/colmeias/').then(r => r.json()).then(res => {
+    por('#totalColmeias', itens(res).length);
+}).catch(() => {});
+// Contagem dos sistemas: o comprimento da lista da vista, nao um numero
+// escrito a mao.
+por('#totalSistemas', {{ sistemas|length }});
+fetch('/api/propriedades/').then(r => r.json()).then(res => {
+    por('#totalProp', itens(res).length);
+}).catch(() => {});
+fetch('/api/funcionarios/').then(r => r.json()).then(res => {
+    por('#totalFunc', itens(res).length);
+}).catch(() => {});
+</script>
+{% endblock %}

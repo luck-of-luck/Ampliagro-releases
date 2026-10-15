@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container-fluid py-4">
+<h2><i class="bi bi-exclamation-triangle"></i> Alertas IoT</h2>
+<div style="display:flex;gap:8px;margin-bottom:12px;"><button class="pcrud-btn pcrud-btn-primary" onclick="testAlerta()"><i class="bi bi-bell"></i> Testar Telegram/Slack</button><span style="font-size:11px;color:var(--cor-texto-fraco);align-self:center;">RegraAlertaTelemetria → alert_engine → health_alerts</span></div>
+<div id="alert-list"><div class="pcrud-empty">Carregando regras...</div></div>
+</div>
+<script>
+function testAlerta(){ fetch('/api/alertas/test/',{method:'POST',headers:{'X-CSRFToken':getCSRFToken()}}).then(r=>r.json()).then(d=>alert(d.msg||'Teste enviado')).catch(()=>alert('Teste — configure TELEGRAM/SLACK em .env'));}
+fetch('/api/regras-alerta/').then(r=>r.json()).then(d=>{ var arr=d.results||d; var el=document.getElementById('alert-list'); if(!arr.length){ el.innerHTML='<div class=pcrud-empty>Sem regras — crie em /admin</div>'; return;} el.innerHTML='<div class=pcrud-table-wrap><table class=pcrud-table><thead><tr><th>Device</th><th>Métrica</th><th>Limiar</th><th>Canal</th></tr></thead><tbody>'+arr.map(r=>'<tr><td>'+(r.device||'—')+'</td><td>'+r.metrica+'</td><td>'+r.limiar+'</td><td>'+r.canal+'</td></tr>').join('')+'</tbody></table></div>';}).catch(()=>{});
+</script>
+{% endblock %}

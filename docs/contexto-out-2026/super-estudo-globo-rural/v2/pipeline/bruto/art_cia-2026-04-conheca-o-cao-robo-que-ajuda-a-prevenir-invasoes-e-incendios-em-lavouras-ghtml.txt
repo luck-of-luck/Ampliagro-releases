@@ -1,0 +1,13 @@
+Cachorros robôs controlados remotamente, alimentados por inteligência artificial e com câmeras térmicas são algumas das inovações que pretendem contribuir com a segurança das lavouras pelo mundo. Entre os seus produtos robóticos, a startup americana Asylon, criou o “DroneDog”, feitos para patrulhar áreas extensas, transmitir imagens em tempo real e identificar ameaças.
+
+Segundo a fabricante, o modelo é capaz de enfrentar qualquer terreno, subir escadas, atravessar superfícies irregulares e manobrar em espaços apertados. E essa tecnologia já é utilizada em operações agrícolas.
+
+Segundo informações do Future Farming, site especializado em tecnologia para agricultura, a Bayer , multinacional alemã de biotecnologia, por exemplo, utiliza os robôs em suas unidades de cultivo no Havaí (EUA), onde mantém cerca de 3,2 mil hectares dedicados à produção de sementes de milho, responsáveis, inclusive, por grande parte do abastecimento global da companhia.
+
+Os cães robóticos estão atuando como um complemento das patrulhas tradicionais feitas por agentes em áreas mais vulneráveis a invasões, incêndios florestais e ataques de animais.
+
+As câmeras do robô possuem um zoom de até 20 vezes. Operam conectadas ao Centro de Operações de Segurança Robótica (RSOC). As imagens são enviadas para o controle, onde as equipes identificam e respondem às possíveis ocorrências.
+
+E tem até “canil”. Quando não estão em patrulha, os robôs retornam automaticamente para a estações de recarga para carregar a bateria.
+
+A Bayer informou que o uso dos robôs ampliou a frequência das patrulhas, reduziu custos operacionais e diminuiu a necessidade de veículos no campo. Outra vantagem foi a geração de vídeos de incidentes que podem servir para análises mais robustas ou até processos legais.

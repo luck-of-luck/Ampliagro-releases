@@ -1,0 +1,167 @@
+{% extends base_template %}
+{% load static %}
+
+{% block title %}Ampliagro - Frota de Caminhões{% endblock %}
+
+{% block extra_css %}
+
+{% endblock %}
+
+{% block dashboard_appbar %}{% endblock %}
+
+{% block content %}
+<div class="section-container">
+    <div class="section-header">
+        <h1 class="section-title"><i class="bi bi-truck me-2"></i>Frota de Caminhões</h1>
+        <div style="display:flex;gap:0.75rem;">
+            <a href="{% url 'logistica-rotas' %}" class="btn-secondary"><i class="bi bi-arrow-return-right"></i> Rotas</a>
+            <button class="btn-primary" onclick="novoCaminhao()"><i class="bi bi-plus-lg"></i> Novo Caminhão</button>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Total Caminhões</div>
+            <div class="stat-value" id="total-caminhoes">--</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Ativos</div>
+            <div class="stat-value" id="total-ativos">--</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Em Rota</div>
+            <div class="stat-value" id="total-rota">--</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Em Manutenção</div>
+            <div class="stat-value" id="total-manutencao">--</div>
+        </div>
+    </div>
+
+    <div class="content-card">
+        <div class="search-bar">
+            <input type="text" class="search-input" id="search-input" placeholder="Buscar por placa, modelo, motorista..." oninput="filtrarTabela()">
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Placa</th>
+                        <th>Modelo</th>
+                        <th>Motorista</th>
+                        <th>Capacidade (kg)</th>
+                        <th>Status</th>
+                        <th>Última Viagem</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tabela-caminhoes">
+                    <tr>
+                        <td colspan="7" class="empty-state">
+                            <i class="bi bi-truck" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>
+                            Nenhum caminhão cadastrado.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+    const API_URL = '/api/caminhoes/';
+
+    async function carregarCaminhoes() {
+        try {
+            const resp = await fetch(API_URL);
+            if (!resp.ok) throw new Error('Falha ao carregar');
+            const dados = await resp.json();
+            const tbody = document.getElementById('tabela-caminhoes');
+            const lista = Array.isArray(dados) ? dados : (dados.results || []);
+
+            if (!lista.length) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><i class="bi bi-truck" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>Nenhum caminhão cadastrado.</td></tr>';
+                atualizarStats(0, 0, 0, 0);
+                return;
+            }
+
+            let html = '';
+            let ativos = 0, emRota = 0, manutencao = 0;
+            lista.forEach(c => {
+                const st = (c.status || 'disponivel').toLowerCase();
+                if (st === 'disponivel') ativos++;
+                else if (st === 'em rota' || st === 'em_rota') emRota++;
+                else if (st === 'manutencao' || st === 'em manutencao') manutencao++;
+
+                let badge = '';
+                if (st === 'disponivel') badge = '<span class="badge badge-success">Disponível</span>';
+                else if (st === 'em rota' || st === 'em_rota') badge = '<span class="badge badge-info">Em Rota</span>';
+                else if (st === 'manutencao' || st === 'em manutencao') badge = '<span class="badge badge-danger">Manutenção</span>';
+                else badge = '<span class="badge badge-warning">' + (c.status || '--') + '</span>';
+
+                html += '<tr>' +
+                    '<td><strong>' + (c.placa || '--') + '</strong></td>' +
+                    '<td>' + (c.modelo || '--') + '</td>' +
+                    '<td>' + (c.motorista || '--') + '</td>' +
+                    '<td>' + (c.capacidade_kg || c.capacidade || '--') + '</td>' +
+                    '<td>' + badge + '</td>' +
+                    '<td>' + (c.ultima_viagem ? new Date(c.ultima_viagem).toLocaleDateString('pt-BR') : '--') + '</td>' +
+                    '<td><div class="action-cell">' +
+                    '<button class="btn-secondary btn-sm" onclick="editarCaminhao(' + c.id + ')"><i class="bi bi-pencil"></i></button>' +
+                    '<button class="btn-secondary btn-sm" onclick="excluirCaminhao(' + c.id + ')" style="background:#fef2f2;color:#dc2626;"><i class="bi bi-trash"></i></button>' +
+                    '</div></td></tr>';
+            });
+            tbody.innerHTML = html;
+            atualizarStats(lista.length, ativos, emRota, manutencao);
+            filtrarTabela();
+        } catch (e) {
+            console.error('Erro ao carregar caminhões:', e);
+        }
+    }
+
+    function atualizarStats(total, ativos, rota, manutencao) {
+        document.getElementById('total-caminhoes').textContent = total;
+        document.getElementById('total-ativos').textContent = ativos;
+        document.getElementById('total-rota').textContent = rota;
+        document.getElementById('total-manutencao').textContent = manutencao;
+    }
+
+    function filtrarTabela() {
+        const q = document.getElementById('search-input').value.toLowerCase();
+        const rows = document.querySelectorAll('#tabela-caminhoes tr');
+        rows.forEach(row => {
+            if (row.classList.contains('empty-state')) return;
+            row.style.display = (!q || row.textContent.toLowerCase().includes(q)) ? '' : 'none';
+        });
+    }
+
+    function novoCaminhao() {
+        window.location.href = '/cadastro-caminhao/';
+    }
+
+    function editarCaminhao(id) {
+        window.location.href = '/cadastro-caminhao/?edit=' + id;
+    }
+
+    async function excluirCaminhao(id) {
+        if (!confirm('Excluir este caminhão?')) return;
+        try {
+            const resp = await fetch(API_URL + id + '/', { method: 'DELETE', headers: { 'X-CSRFToken': getCSRFToken() } });
+            if (resp.ok) carregarCaminhoes();
+            else alert('Erro ao excluir');
+        } catch (e) {
+            alert('Erro de conexão');
+        }
+    }
+
+    function getCSRFToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+    }
+
+    document.addEventListener('DOMContentLoaded', carregarCaminhoes);
+</script>
+{% endblock %}

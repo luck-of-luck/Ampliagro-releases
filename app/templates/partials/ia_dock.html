@@ -1,0 +1,791 @@
+
+{% load static %}
+<!-- O `?v=` busta o cache do CSS, na convenção de `base.html`.
+     MEDIDO: corrigir o hover da barra e recarregar não mudou nada no ecrã — o
+     browser serviu a folha antiga e o `width:212px` do `:hover` não existia.
+     Um CSS sem versão é um CSS que se corrige à vontade sem que ninguém veja. -->
+<link rel="stylesheet" href="{% static 'css/ia-rail.css' %}?v=20261010f">
+<div id="ia-dock">
+  <!-- A barra é filha do #ia-dock e NÃO do #ia-chat.
+       O #ia-chat tem `overflow: hidden`, que cortava o texto que cresce ao
+       expandir. Fora do chat, cresce dentro do dock — que é onde há espaço.
+       Expande por BOTAO (`iaRailToggle`), nunca por `:hover`: abrir no hover
+       fazia a janela saltar so' de passar o rato por cima. -->
+  <nav class="ia-rail ia-rail-guardada" id="ia-rail" aria-label="Ferramentas do AmplIA"></nav>
+  <div id="ia-chat">
+    <div id="ia-chat-head">
+      <div style="display:flex;align-items:center;gap:8px"><strong>ampl<span style="color:#0f9d6e">ia</span></strong><small id="ia-status">assistente</small></div>
+      <div style="display:flex;gap:4px;align-items:center">
+        <span id="ia-dock-ia-status" class="text-[10px] text-slate-500 dark:text-slate-400 hidden">carregando…</span>
+        <button onclick="iaDockDiagnostico()" class="w-6 h-6 rounded hover:bg-black/5 dark:hover:bg-white/10 flex items-center justify-center" title="Diagnóstico da IA" style="font-size:12px">
+            <i class="bi bi-activity"></i>
+        </button>
+        <button id="ia-chat-reset" onclick="iaChatReset()" title="Zerar conversa"><svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0 .908-.417A6 6 0 1 0 8 2v1z"/><path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/></svg></button>
+        <button onclick="iaDockFechar()" title="Guardar chat" aria-label="Guardar chat" style="background:transparent;border:none;color:inherit;font-size:20px;cursor:pointer;line-height:1">×</button>
+    </div>
+    <div id="ia-chat-body">
+      <div class="ia-msg bot">Olá! Como posso ajudar você hoje?</div>
+      <div class="ia-suggestions">
+        <button class="ia-chip" onclick="document.getElementById('ia-dock-input').value='Abrir cadastro de safra'; iaDockSend()">Abrir cadastro de safra</button>
+        <button class="ia-chip" onclick="document.getElementById('ia-dock-input').value='Ver estoque'; iaDockSend()">Ver estoque</button>
+        <button class="ia-chip" onclick="document.getElementById('ia-dock-input').value='Criar operação para amanhã'; iaDockSend()">Criar operação</button>
+      </div>
+    </div>
+    <div id="ia-progress"><i></i><span>Preparando assistente...</span></div>
+    <div id="ia-tasks">
+      <button id="ia-tasks-toggle" onclick="iaTasksToggle()" title="Ver tarefas da IA"><span>☰ Tarefas da IA</span><span id="ia-tasks-count" class="ia-tasks-badge" hidden></span><span id="ia-tasks-caret">▸</span></button>
+      <div id="ia-tasks-list" hidden></div>
+    </div>
+    <!-- O PRINT, em cima do campo — e não no fim da conversa.
+         Onde o producer olha quando diz "olha para aqui" e onde o polegar dele
+         ja' esta. No fundo da conversa, o print desaparecia a seguir a primeira
+         resposta, e era a unica prova do que a IA tinha estado a ver.
+         Vem ANTES de `#ia-chat-input` no DOM e por isso fica ACIMA dele sem
+         CSS nenhum: e' a ordem do flex que faz o trabalho. -->
+    <div id="ia-print-caixa" hidden></div>
+    <div id="ia-chat-input">
+      <button onclick="iaDockVoz()" title="Falar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10a7 7 0 0 1-14 0"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg></button>
+      <input id="ia-dock-input" placeholder="Digite sua mensagem..." onkeydown="if(event.key==='Enter') iaDockSend()">
+      <button onclick="iaDockSend()" title="Enviar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg></button>
+      <label style="width:34px;height:34px;border-radius:10px;border:1px solid #e5e7eb;background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0" title="Enviar foto, nota em XML ou lista de insumos"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg><input type="file" id="ia-image" accept=".png,.jpg,.jpeg,.webp,.gif,.xml,.csv,.txt,image/*" capture="environment" hidden onchange="iaDockImage(this)"></label>
+    </div>
+  </div>
+  <button id="ia-dock-btn" onclick="iaDockToggle()" title="AmplIA — Assistente"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"></rect><circle cx="12" cy="5" r="2"></circle><path d="M12 7v4"></path><line x1="8" y1="16" x2="8" y2="16"></line><line x1="16" y1="16" x2="16" y2="16"></line></svg></button>
+</div>
+<script>
+/* O DOCK, ABERTO E GUARDADO POR BOTAO — NUNCA POR HOVER.
+ *
+ * MEDIDO 2026-10-10: guardado, um pedaco de 42px (a `.ia-rail` absoluta, orfa
+ * do `#ia-dock` sem area propria) ficava na tela. E a barra abria no `:hover`,
+ * ou seja, a janela saltava so' de passar o rato por cima.
+ *
+ * Agora: `iaDockFechar()` tira o `open` do chat E guarda a barra
+ * (`display:none` — some tudo, nao fica lasca); `iaDockAbrir()` poe o `open`
+ * e mostra a barra recolhida (42px, nomes escondidos); `iaRailToggle()`
+ * expande/recolhe a barra (classe `.aberta`) com o chat ja' aberto.
+ * `iaDockToggle()` alterna entre os dois para os navbars que ja' o chamam. */
+function iaDockAplicaEstado(aberto) {
+  const c = document.getElementById('ia-chat');
+  const rail = document.getElementById('ia-rail');
+  if (c) c.classList.toggle('open', aberto);
+  if (rail) {
+    rail.classList.toggle('ia-rail-guardada', !aberto);
+    if (!aberto) rail.classList.remove('aberta');
+  }
+  /* O item `alternar-barra` (icone sidebar, topo da rail) anda com a classe
+   * `.aberta`: "Expandir" fechada, "Guardar" aberta. Vai pelo `IaRail` quando
+   * ele ja' carregou; antes disso o `monta()` sincroniza sozinho. */
+  if (window.IaRail && typeof window.IaRail.sincronizaAlternar === 'function') {
+    try { window.IaRail.sincronizaAlternar(); } catch (e) {}
+  }
+}
+window.iaDockAbrir = window.iaDockAbrir || function(){ iaDockAplicaEstado(true); };
+window.iaDockFechar = window.iaDockFechar || function(){ iaDockAplicaEstado(false); };
+// Fallback imediato para o botão amplia (garante abertura mesmo se modulo falhar)
+window.iaDockToggle = window.iaDockToggle || function(){
+  const c = document.getElementById('ia-chat');
+  iaDockAplicaEstado(c ? !c.classList.contains('open') : true);
+};
+// O `iaRailToggle` (expandir/guardar a barra) mora em `ia-rail-acoes.js`, com
+// as outras accoes da barra: o `itemHTML` so' ativa um botao cuja funcao existe
+// quando o desenha, e uma copia aqui seria uma segunda copia para manter.
+</script>
+<script type="module">
+/* A tag de static do Django e NAO um caminho absoluto: o projeto usa
+ * `whitenoise.storage.CompressedManifestStaticFilesStorage`, que devolve o nome
+ * JA COM HASH (`ia-local.<hash>.js`). Esse hash E o cache-busting.
+ *
+ * Antes isto era `/static/js/ia-local/ia-local.js?v=23` - caminho sem hash e com
+ * um `?v=` que a memoria mantinha a mao. Duas consequencias:
+ *   1. base.html servia `?v=24` e este ficheiro servia `?v=23` - duas copias em
+ *      cache do MESMO agente, conforme a pagina de onde o produtor entrou.
+ *   2. Em producao, o path sem hash nao muda quando o ficheiro muda: o
+ *      navegador podia servir a versao antiga indefinidamente. Era o "corrigi e
+ *      nao mudou nada" que o produtor relatava.
+ *
+ * NOTA: nunca escrever a tag de static por extenso dentro de um comentario
+ * daqui. O Django avalia tags de template dentro de comentarios, porque nao sao
+ * comentarios HTML - e uma tag sem argumento quebra a pagina com
+ * "'static' takes at least one argument".
+ */
+import * as mod from "{% static 'js/ia-local/ia-local.js' %}?v=20261015a";
+import { ensureRail } from "{% static 'js/ia-local/ia-rail-loader.js' %}?v=20261009";
+/* A LOJA, IMPORTADA AQUI E NÃO SÓ NO LOADER.
+ *
+ * O `ia-rail-loader.js` também a carrega, mas DINAMICAMENTE, e por isso
+ * DEPOIS de este módulo correr. Na primeira versão, o código daqui lia
+ * `window.IaSessoes` e encontrava `undefined`: o `iaHist` arrancava vazio
+ * com uma conversa guardada, e o observador da troca de secção nunca era
+ * registado. Dois falhos silenciosos — nada rebentava, nada se via.
+ *
+ * Um `import` estático é avaliado ANTES do corpo deste módulo. É a ordem
+ * escrita, e não a sorte de qual dos dois chega primeiro.
+ *
+ * O URL é diferente do do loader (`?v=` contra a tag de static), e por isso
+ * são dois módulos: a IIFE da loja é singleton e a segunda execução sai. */
+import "{% static 'js/ia-local/ia-sessoes.js' %}?v=20261010";
+window.iaLocal = mod.iaLocal || mod.default || window.iaLocal;
+// Versão com memória (stateful) — a loja das sessões vive em
+// `ia-sessoes.js`, registada em `window.IaSessoes`.
+//
+// MEDIDO 2026-10-10: esta lógica estava AQUI, inline no template, e o botão
+// "Histórico" dizia "Ainda não há conversa para ver" com conversa no ecrã. A
+// causa era o escopo: `iaHist` era um `let` deste `<script type="module">`, e
+// `ia-rail-acoes.js` é OUTRO módulo — um `typeof iaHist` do lado de lá é
+// `'undefined'` para sempre, e a guarda calava-se. Duas consequências:
+//   1. o botão nunca viu a conversa;
+//   2. uma cópia da lógica no template é uma cópia que nenhum teste alcança,
+//      porque os testes correm os ficheiros de `app/static/js/ia-local/`.
+//
+// Fica aqui só o que é do DOCK — o `iaHist` e o desenho — e a loja num sítio
+// que se testa.
+let iaHist = [];
+if (window.IaSessoes) iaHist = window.IaSessoes.mensagens().slice();
+
+/* A ponte entre o DOCK e a loja. Só o dock sabe desenhar, e só a loja sabe
+   guardar — e nenhum dos dois pode ser dono do outro.
+ *
+ * `window.IaDock` é o que o botão "Histórico" (`ia-rail-acoes.js`) chama para
+ * mostrar uma conversa antiga no ecrã. Antes isso era impossível por escopo:
+ * a acção não via o `iaHist`. Agora vê uma função, que é o que uma API é. */
+function iaGuardarSessao() {
+  if (window.IaSessoes) window.IaSessoes.guardar(iaHist);
+}
+/* O nome que os oito sítios deste ficheiro já usavam. Uma definição só. */
+function salvarHist() { iaGuardarSessao(); }
+
+/* Desenha as mensagens no corpo da conversa.
+ *
+ * `mostrarSaudacao` quando a conversa está vazia: a saudação e as sugestões
+ * são de uma conversa sem nada, e mostrá-las por cima de um histórico
+ * restaurado é dizer "olá, como posso ajudar" imediatamente antes da
+ * pergunta que já foi respondida. */
+function iaRenderizar(mensagens, mostrarSaudacao) {
+  const body = document.getElementById('ia-chat-body');
+  if (!body) return;
+  body.innerHTML = '';
+  const lista = Array.isArray(mensagens) ? mensagens : [];
+  if (!lista.length && mostrarSaudacao && iaChatInitial !== null) {
+    body.innerHTML = iaChatInitial;
+  } else {
+    lista.forEach(function (m) {
+      const el = document.createElement('div');
+      el.className = 'ia-msg ' + (m.role === 'user' ? 'user' : 'bot');
+      el.textContent = String(m.content || '').replace(/<[^>]*>/g, '').slice(0, 600);
+      body.appendChild(el);
+    });
+  }
+  body.scrollTop = body.scrollHeight;
+}
+window.IaDock = {
+  secao: function () {
+    return window.IaSessoes ? window.IaSessoes.secao() : window.location.pathname;
+  },
+  mensagens: function () {
+    return iaHist;
+  },
+  renderizar: iaRenderizar,
+  /* Troca a conversa que está no ecrã por uma do histórico. */
+  aplicar: function (mensagens) {
+    iaHist = Array.isArray(mensagens) ? mensagens.slice() : [];
+    iaRenderizar(iaHist, false);
+    const box = document.getElementById('ia-coleta-box');
+    if (box) box.remove();
+    if (window.IaColeta) window.IaColeta.limpar();
+    if (window.IaPrint) window.IaPrint.limpar();
+    const inp = document.getElementById('ia-dock-input');
+    if (inp) inp.value = '';
+    /* `iaDockAbrir()`, e NAO `classList.add('open')`: abrir o chat sem tirar
+     * a barra do `display:none` deixava a janela sem ferramentas. */
+    if (document.getElementById('ia-chat') && !document.getElementById('ia-chat').classList.contains('open')) {
+      if (typeof window.iaDockAbrir === 'function') window.iaDockAbrir();
+      else document.getElementById('ia-chat').classList.add('open');
+    }
+  },
+};
+
+function iaDockDiagnostico() {
+    const statusEl = document.getElementById('ia-dock-ia-status');
+    if (statusEl) statusEl.textContent = 'carregando…';
+    fetch('/api/ia/diagnostico/', { credentials: 'same-origin', headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(r => r.json())
+        .then(j => {
+            if (!j.integro) {
+                statusEl.textContent = '⚠️ não íntegro';
+                statusEl.style.color = '#ef4444';
+            } else {
+                statusEl.textContent = '✅ íntegro';
+                statusEl.style.color = '#0f9d6e';
+            }
+            // Mostrar modal simples com detalhes
+            const msg = [
+                `Intents: ${j.intents_total || 0}`,
+                `Catálogos: ${j.catalogos_carregados || 0}/${j.catalogos_esperados || 0}`,
+                `Sandbox intents: ${j.sandbox_intents || 0}`,
+                j.integro ? '✅ Sistema íntegro' : '⚠️ Não íntegro',
+                j.catalogos_falharam?.length ? 'Falhas: ' + j.catalogos_falharam.join(', ') : 'Sem falhas de import',
+                j.drift_registro_sandbox?.length ? 'Drift: ' + j.drift_registro_sandbox.join(', ') : 'Sem drift',
+                Object.keys(j.duplicados_diferentes || {}).length ? 'Colisões: ' + Object.keys(j.duplicados_diferentes).join(', ') : 'Sem colisões',
+            ].join('\n');
+            alert(msg);
+        })
+        .catch(e => {
+            if (statusEl) {
+                statusEl.textContent = '❌ erro diagnóstico';
+                statusEl.style.color = '#ef4444';
+            }
+            console.error(e);
+        });
+}
+
+/* A TROCA DE SECÇÃO. O SPA muda de página com `pushState`, que não dispara
+   evento. Sem este gancho o dock só descobre a troca quando o produtor
+   escreve — e a primeira mensagem da secção nova entraria na conversa da
+   secção anterior, que é exactamente o que esta função impede. */
+if (window.IaSessoes) {
+  window.IaSessoes.observar(function () {
+    iaHist = window.IaSessoes.mensagens().slice();
+    iaRenderizar(iaHist, true);
+  });
+}
+
+/* Snapshot do estado inicial (saudação + sugestões) para o "zerar conversa".
+   Vem ANTES do `iaRenderizar`, que o usa para repor a conversa vazia. */
+let iaChatInitial = null;
+try {
+  const _b0 = document.getElementById('ia-chat-body');
+  if (_b0) iaChatInitial = _b0.innerHTML;
+} catch {}
+
+/* O restauro no arranque. Atrasado porque o corpo da conversa pode ainda estar
+   a ser desenhado pelo template, e um `innerHTML` a meio do desenho perdia a
+   saudação — que é o que fica quando a conversa está vazia.
+ *
+ * A saída é a mesma de `iaRenderizar(iaHist, false)`: uma linha por mensagem,
+ * sem a saudação por cima. Chamá-la é o que impede duas cópias do desenho a
+ * divergirem — e a divergência aqui seria o histórico a aparecer com uma forma
+ * diferente da que o resto do dock usa. */
+setTimeout(()=>{
+  try{
+    const body=document.getElementById('ia-chat-body');
+    if(iaHist.length && body && !body.dataset.restored){
+      body.dataset.restored='1';
+      const already = body.querySelectorAll('.ia-msg').length;
+      if(already <= 2){
+        iaRenderizar(iaHist, false);
+      }
+    }
+  }catch{}
+},400);
+// VALVA DE PESO — o download do modelo é de ~1,1 GB.
+//
+// Sem esta valva, abrir a conversa num celular com dados móveis beginsse
+// 1,1 GB sem o produtor ter pedido nada. A etiqueta dizia só "Preparando
+// assistente...", que não é consentimento informado de nada: é uma barra de
+// progresso que anda para cima sem dizer o que está a descer do plano.
+//
+// Três decisões antes de gastar o plano:
+//   1. `saveData` ligado pelo produtor  -> não perguntamos, NÃO carregamos.
+//   2. 2g/3g ou `downlink` baixo       -> não perguntamos, NÃO carregamos.
+//   3. o resto                          -> perguntamos o tamanho, e o
+//                                         produtor decide. Recusar é normal e
+//                                         não custa nada: sem motor, a
+//                                         conversa continua a responder pelo
+//                                         caminho do servidor (`iaChat` cai
+//                                         para `sandbox`), que é o que o
+//                                         produtor precisa no meio do talhão.
+//
+// O que NÃO muda: o modelo continua a ser local, quantizado e privado. Esta
+// valva é sobre QUANDO se paga o download, não sobre o que ele faz.
+window.iaMotorConsentido = function(){
+  try{
+    if(localStorage.getItem('amplia_ia_motor') === 'recusado') return false;
+    if(localStorage.getItem('amplia_ia_motor') === 'aceito')  return true;
+  }catch(e){}
+  var c = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  if(c){
+    if(c.saveData) return false;
+    var tipo = String(c.effectiveType || '');
+    if(tipo === 'slow-2g' || tipo === '2g' || tipo === '3g') return false;
+    if(typeof c.downlink === 'number' && c.downlink > 0 && c.downlink < 2) return false;
+  }
+  if(navigator.deviceMemory && navigator.deviceMemory < 2) return false;
+  return null; // ainda não decidido
+};
+// window.iaMotorConsentido() devolve null quando ainda não se sabe.
+window.iaMotorPergunta = async function(){
+  var ok = window.iaMotorConsentido();
+  if(ok !== null) return ok;
+  var msg = 'O assistente inteligente roda dentro do teu celular, sem enviar os teus dados para fora. '
+          + 'Na primeira vez ele descarrega cerca de 1,1 GB do modelo e fica guardado no aparelho. '
+          + 'Depois disso funciona sem internet. Queres descarregar agora?';
+  var resp = false;
+  try{ resp = window.confirm(msg); }catch(e){ resp = false; }
+  try{ localStorage.setItem('amplia_ia_motor', resp ? 'aceito' : 'recusado'); }catch(e){}
+  return resp;
+};
+// Toggle — por BOTAO, nunca por hover. Abre pelo `iaDockAbrir()` e guarda
+// pelo `iaDockFechar()` para a barra ir junto (sem isso, fechar tirava o
+// `open` mas a `.ia-rail` ficava orfa na tela, e abrir punha o `open` mas a
+// barra ficava em `display:none`).
+window.iaDockToggle=async function(){
+  const c=document.getElementById('ia-chat');
+  const abrindo = c ? !c.classList.contains('open') : true;
+  if (typeof window.iaDockAbrir === 'function' && typeof window.iaDockFechar === 'function') {
+    if (abrindo) window.iaDockAbrir();
+    else window.iaDockFechar();
+  } else if (c) {
+    c.classList.toggle('open');
+  }
+  if(c && c.classList.contains('open')){
+    try{ iaTasksCount(); }catch(e){}
+    await ensureRail(); // monta a barra se ainda não foi montada
+  }
+  if(c.classList.contains('open') && window.iaLocal && !window.iaLocal.ready){
+    // Sem motor local a conversa continua a funcionar pelo servidor. Dizê-lo
+    // é melhor do que um spinner eterno: o produtor precisa de saber se o
+    // que está a ver é a IA do telemóvel ou a resposta guardada no banco.
+    if(!(await window.iaMotorPergunta())){
+      document.getElementById('ia-status').textContent='sem motor';
+      document.getElementById('ia-progress').style.display='none';
+      try{ addMsg('Assistente local desligado. Continuo a responder com os dados do teu servidor — '
+                + 'para ligar o modelo local, usa o Wi-Fi e recarrega esta página.', 'bot'); }catch(e){}
+      return;
+    }
+    const p=document.getElementById('ia-progress'); p.style.display='flex';
+    p.querySelector('span').textContent='A descarregar o modelo (~1,1 GB).só acontece uma vez.';
+    try{
+      await window.iaLocal.iaInit((prog)=>{
+        const t=prog.text||'';
+        if(t) p.querySelector('span').textContent=t;
+      });
+      document.getElementById('ia-status').textContent='pronto';
+      p.style.display='none';
+    }catch(e){ p.querySelector('span').textContent='Não foi possível iniciar'; setTimeout(()=>p.style.display='none',2500); }
+  }
+};
+window.iaDockSend=async function(){
+  const inp=document.getElementById('ia-dock-input'); const txt=inp.value.trim(); if(!txt) return;
+  inp.value=''; addMsg(txt,'user');
+  iaHist.push({role:'user', content:txt}); salvarHist();
+  const body=document.getElementById('ia-chat-body');
+  // remove sugestões após primeiro envio
+  const sug=body.querySelector('.ia-suggestions'); if(sug) sug.style.display='none';
+  const botEl=document.createElement('div'); botEl.className='ia-msg bot'; botEl.textContent='…'; body.appendChild(botEl); body.scrollTop=body.scrollHeight;
+  if(!window.iaLocal || typeof window.iaLocal.iaChat !== 'function'){
+    botEl.textContent='Assistente iniciando... recarregue a página e tente novamente.';
+    return;
+  }
+
+  // Função auxiliar para limpar JSON/código de qualquer resposta
+  function limpar(t){
+    if(!t || typeof t !== 'string') return t || '';
+    let s = t.trim();
+    // Remove blocos JSON completos (incluindo aninhados)
+    s = s.replace(/\{(?:[^{}]|\{[^{}]*\})*\}/g, '').trim();
+    // Remove blocos de código
+    s = s.replace(/```[\s\S]*?```/g, '').trim();
+    // Remove chaves/colchetes soltos
+    s = s.replace(/[{}\[\]]/g, '').trim();
+    // Remove linhas que parecem JSON
+    s = s.split('\n').filter(line => {
+      const l = line.trim();
+      return l && !l.startsWith('"') && !l.startsWith('{') && !l.startsWith('}') && !l.match(/^["']\w+["']\s*:/);
+    }).join('\n').trim();
+    return s || 'Entendi! Como posso ajudar?';
+  }
+
+  function exibirResposta(el, texto){
+    const limpo = limpar(texto);
+    if(limpo.includes('<div') || limpo.includes('📋')) el.innerHTML = limpo.replace(/\\n/g,'<br>').replace(/\n/g,'<br>');
+    else el.textContent = limpo;
+    body.scrollTop = body.scrollHeight;
+  }
+
+  try{
+    const res=await window.iaLocal.iaChat(iaHist, (delta, full)=>{
+      exibirResposta(botEl, full);
+    });
+
+    // Se a resposta é um JSON de tool, executa silenciosamente
+    const isToolJson = res && res.trim().startsWith('{') && res.includes('"tool"');
+
+    if(res && res.includes('📋')) {
+      exibirResposta(botEl, res);
+      iaHist.push({role:'assistant', content:limpar(res)}); salvarHist();
+      return;
+    }
+
+    if(isToolJson) {
+      const toolRes=await window.iaLocal.iaToolCall(res);
+      if(toolRes){
+        exibirResposta(botEl, toolRes);
+        iaHist.push({role:'assistant', content:limpar(toolRes)}); salvarHist();
+        const fala = limpar(toolRes);
+        if(fala && !fala.includes('📋') && 'speechSynthesis' in window && fala.length<300){ const u=new SpeechSynthesisUtterance(fala.replace(/<[^>]*>/g,'').slice(0,200)); u.lang='pt-BR'; u.rate=1.05; speechSynthesis.speak(u); }
+      } else {
+        botEl.textContent = 'Não entendi. Tente "qual minha produção total" ou "mostrar estoque".';
+      }
+      return;
+    }
+
+    // Resposta normal — sanitiza e exibe
+    exibirResposta(botEl, res);
+
+    /* A LISTA DE CAMPOS, quando a IA está a pedir dados.
+     *
+     * `res` é a PROSA — "Vamos cadastrar uma safra! Cultura?" — e continua a
+     * ser mostrada, porque é o que o telefone lê e porque ninguém pediu para
+     * a tirar. A lista vem por cima: os mesmos campos, numerados, com o que
+     * falta a saber quantos são.
+     *
+     * Fica DEPOIS de `exibirResposta` e não antes porque o `limpar()` de
+     * `exibirResposta` come blocos entre `{}`, e o `coleta` vem exactamente
+     * assim. */
+    if (window.IaColeta && window._sbColeta) {
+      /* A LISTA substitui a prosa que a enumera.
+       *
+       * MEDIDO na tela: a IA escrevia "Vamos cadastrar uma safra! 🌾 Cultura
+       * Nome da safra Talhão/Zona Ano Área plantada Qual a cultura?" — cinco
+       * campos em prosa E a lista. O mesmo conteúdo duas vezes, e a linha
+       * mais importante ("Qual a cultura?") era a última, já abaixo do dobra.
+       *
+       * A regra de não repetir o que está no ecrã vai na `IA_SYSTEM`; aqui
+       * apaga-se o resto. Guarda-se uma frase que NÃO enumere campos, porque
+       * a lista é o que responde e a prosa vira ruído em cima dela. */
+      try {
+        const faltam = window.IaColeta.desenha({ coleta: window._sbColeta });
+        const fala = limpar(res);
+        const enumera = window._sbColeta.length > 1 &&
+          window._sbColeta.some((c) => fala.includes(c.campo));
+        if (enumera || fala.length > 220) botEl.textContent = '';
+        else if (fala) botEl.textContent = fala;
+        else botEl.textContent = '';
+        if (!fala || enumera) {
+          iaHist.push({ role: 'assistant', content: '' });
+          salvarHist();
+          return;
+        }
+      } catch (e) { /* sem lista, segue com a prosa */ }
+    } else if (window.IaColeta) {
+      /* Sem campos a pedir, a lista TEM de sair. Uma lista congelada diz ao
+       * produtor que ainda falta responder a uma coisa que já não está a ser
+       * pedida — e ele responde a uma pergunta que ninguém fez. */
+      try { window.IaColeta.desenha({ coleta: [] }); } catch (e) {}
+    }
+
+    /* A SÉRIE, quando o modo CRIAR está ligado: prosa + gráfico no chat,
+     * peça rica no dashboard. Sem modo, nada se desenha (prosa pura, como
+     * sempre foi) — e dado velho sai de cena em vez de grudar na próxima
+     * resposta, pela mesma regra da lista de campos acima. */
+    var __serie = window._sbSerie;
+    var __peca = window._sbPeca;
+    window._sbSerie = null;
+    window._sbPeca = null;
+    var __modoChat = false;
+    var __modoPainel = false;
+    try {
+      if (window.IaModos && typeof window.IaModos.activo === 'function') {
+        __modoChat = window.IaModos.activo('chat');
+        __modoPainel = window.IaModos.activo('painel');
+      }
+    } catch (e) {}
+    try { if (window.IaSerie) window.IaSerie.limpar(); } catch (e) {}
+    if (__serie && __modoChat && window.IaSerie) {
+      var __temSlot = false;
+      try {
+        __temSlot = Boolean(
+          document.querySelector('#widget-chamado-amplia .widget-content') ||
+          document.getElementById('amplia-chamado-ancora')
+        );
+      } catch (e) {}
+      /* Com painel ligado mas sem onde aterrar, o chat mostra a versão
+       * expandida (gráfico+tabela+total): detalhe adaptado, nunca perdido. */
+      try { window.IaSerie.mostrar(__serie, { expandido: __modoPainel && !__temSlot }); } catch (e) {}
+    }
+    if (__peca && __modoPainel && window.AmpliaChamado && typeof window.AmpliaChamado.desenha === 'function') {
+      var __podeDesenhar = false;
+      try {
+        __podeDesenhar = Boolean(
+          document.querySelector('#widget-chamado-amplia .widget-content') ||
+          document.getElementById('amplia-chamado-ancora')
+        );
+      } catch (e) {}
+      /* Sem âncora real, NÃO se desenha: o fallback do Chamado (`#content`,
+       * `body`) poria a peça por baixo da matriz bento no dashboard ou no
+       * meio de um formulário noutra página — desenho invisível ou intruso. */
+      if (__podeDesenhar) { try { window.AmpliaChamado.desenha(__peca); } catch (e) {} }
+    }
+
+    // Verifica se tem tool call embutida na resposta
+    const toolRes=await window.iaLocal.iaToolCall(res);
+    if(toolRes){
+      const t=document.createElement('div'); t.className='ia-msg bot';
+      exibirResposta(t, toolRes);
+      body.appendChild(t);
+      body.scrollTop=body.scrollHeight;
+      if(toolRes.includes('📋')) { iaHist.push({role:'assistant', content:limpar(res)}); salvarHist(); return; }
+    }
+    iaHist.push({role:'assistant', content:limpar(res)}); salvarHist();
+    const fala = limpar(res);
+    if('speechSynthesis' in window && fala.length<300 && !fala.includes('📋')){ const u=new SpeechSynthesisUtterance(fala.replace(/<[^>]*>/g,'').slice(0,200)); u.lang='pt-BR'; u.rate=1.05; speechSynthesis.speak(u); }
+  }catch(e){
+    console.error(e);
+    botEl.textContent='Não consegui processar agora. Tente: "qual minha produção total" ou "mostrar estoque".';
+  }
+};
+function addMsg(t, who){
+  const body=document.getElementById('ia-chat-body');
+  const el=document.createElement('div'); el.className='ia-msg '+who; el.textContent=t; body.appendChild(el); body.scrollTop=body.scrollHeight;
+}
+// ── Tarefas da IA (dropdown acima do input, recolhido por padrão) ──
+function iaEsc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function iaCsrf(){ try{ const m=document.cookie.split('; ').find(c=>c.startsWith('csrftoken=')); return m?m.split('=')[1]:''; }catch(e){ return ''; } }
+function iaFmtData(d){ d=String(d||''); return d.length>=10 ? d.slice(8,10)+'/'+d.slice(5,7) : d; }
+window.iaTasksToggle=function(){
+  const list=document.getElementById('ia-tasks-list');
+  const caret=document.getElementById('ia-tasks-caret');
+  if(!list) return;
+  const willOpen=list.hidden;
+  list.hidden=!willOpen;
+  if(caret) caret.textContent=willOpen?'▾':'▸';
+  if(willOpen) iaTasksLoad();
+};
+async function iaTasksFetch(){
+  // União: atividades planejadas + tarefas de estágio (criadas pelo ciclo)
+  const [a, b] = await Promise.all([
+    fetch('/api/atividades/?concluida=false', { headers: { 'X-Requested-With': 'XMLHttpRequest' } }).then(r => { if (!r.ok) throw new Error('ativ'); return r.json(); }).catch(() => ({ results: [] })),
+    fetch('/api/tarefas-estagio/?concluida=false', { headers: { 'X-Requested-With': 'XMLHttpRequest' } }).then(r => { if (!r.ok) throw new Error('tar'); return r.json(); }).catch(() => ({ results: [] })),
+  ]);
+  const acts = (a.results || a || []).map(t => ({ tipo: 'atividade', id: t.id, titulo: t.nome || ('Atividade #' + t.id), data: t.data_prevista || '', quem: t.responsavel || '' }));
+  const tars = (b.results || b || []).map(t => ({ tipo: 'tarefa', id: t.id, titulo: t.descricao || ('Tarefa #' + t.id), data: t.data_limite || '', quem: t.funcionario_nome || t.cargo_alvo || t.estagio_nome || '' }));
+  const all = acts.concat(tars);
+  all.sort((x, y) => (x.data || '9999').localeCompare(y.data || '9999'));
+  return all.slice(0, 40);
+}
+async function iaTasksCount(){
+  try{
+    const all = await iaTasksFetch();
+    const b = document.getElementById('ia-tasks-count');
+    if(b){ b.hidden = all.length === 0; b.textContent = all.length; }
+  }catch(e){}
+}
+async function iaTasksLoad(){
+  const list = document.getElementById('ia-tasks-list');
+  if(!list) return;
+  list.innerHTML = '<div class="ia-task-empty">Carregando...</div>';
+  try{
+    const items = await iaTasksFetch();
+    const b = document.getElementById('ia-tasks-count');
+    if(b){ b.hidden = items.length === 0; b.textContent = items.length; }
+    if(!items.length){ list.innerHTML = '<div class="ia-task-empty">Nenhuma tarefa pendente 🎉</div>'; return; }
+    list.innerHTML = items.map(t => {
+      const sub = [iaFmtData(t.data), t.quem].filter(Boolean).map(iaEsc).join(' • ');
+      return '<div class="ia-task"><button class="ia-task-done" onclick="iaTaskDone(' + t.id + ',\'' + t.tipo + '\')" title="Marcar concluída">✓</button>'
+        + '<div class="ia-task-txt"><strong>' + iaEsc(t.titulo) + '</strong>'
+        + (sub ? '<small>' + sub + '</small>' : '') + '</div></div>';
+    }).join('');
+  }catch(e){
+    list.innerHTML = '<div class="ia-task-empty">Não consegui carregar as tarefas.</div>';
+  }
+}
+window.iaTaskDone = async function(id, tipo){
+  try{
+    const base = tipo === 'tarefa' ? '/api/tarefas-estagio/' : '/api/atividades/';
+    const r = await fetch(base + id + '/', { method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'X-CSRFToken': iaCsrf(), 'X-Requested-With': 'XMLHttpRequest' },
+      body: JSON.stringify({ concluida: true }) });
+    if(!r.ok) throw new Error('HTTP ' + r.status);
+    iaTasksLoad();
+  }catch(e){}
+};
+// ── Zerar conversa: limpa msgs, histórico/tokens, wizards e fecha dropdown ──
+window.iaChatReset=function(){
+  try{
+    if(window.iaLocal && typeof window.iaLocal.iaReset==='function') window.iaLocal.iaReset();
+    else if(window.iaLocal && typeof window.iaLocal.limparWizard==='function') window.iaLocal.limparWizard();
+  }catch(e){}
+  /* A conversa que acaba fica no histórico COM NOME — o `guardar` corre
+     antes, e é ele que lhe põe o título da primeira pergunta. Sem esta ordem
+     o produtor carrega em "Nova conversa" e perde a conversa anterior sem
+     nome: ela fica em `sessoes`, sim, mas com título vazio, e na lista aparece
+     como uma linha sem texto — que é uma conversa que ninguém reconhece. */
+  iaGuardarSessao();
+  /* Conversa nova nesta secção. A anterior fica onde estava. */
+  if (window.IaSessoes) {
+    window.IaSessoes.nova();
+    iaHist = window.IaSessoes.mensagens().slice();
+  } else {
+    iaHist = [];
+  }
+  try{ if('speechSynthesis' in window) speechSynthesis.cancel(); }catch(e){}
+  const body=document.getElementById('ia-chat-body');
+  if(body && iaChatInitial!==null){ body.innerHTML=iaChatInitial; body.scrollTop=0; }
+  const inp=document.getElementById('ia-dock-input'); if(inp) inp.value='';
+  const p=document.getElementById('ia-progress'); if(p) p.style.display='none';
+  const st=document.getElementById('ia-status'); if(st) st.textContent='assistente';
+  const list=document.getElementById('ia-tasks-list'); if(list) list.hidden=true;
+  const caret=document.getElementById('ia-tasks-caret'); if(caret) caret.textContent='▸';
+  try{ iaTasksCount(); }catch(e){}
+  /* A lista de campos pertence a um pedido. "Nova conversa" tem de a tirar de
+   * cima, ou o produtor recomeça a conversa e continua a ver os campos da
+   * anterior — a ler "Cultura: soja" numa tela que já não tem nada a ver com
+   * soja.
+   *
+   * O print é do mesmo género: é o print de um ecrã que já não está no ecrã. Deixá-lo
+   * por cima do campo recomeçado é o produtor a mandar, na mensagem seguinte,
+   * uma imagem do que estava a ver ANTES de recomeçar — e a IA não tem como
+   * saber que já não é o mesmo ecrã. */
+  try{
+    const box=document.getElementById('ia-coleta-box'); if(box) box.remove();
+    if(window.IaColeta) window.IaColeta.limpar();
+    if(window.IaPrint) window.IaPrint.limpar();
+  }catch(e){}
+};
+window.iaDockVoz=function(){
+  /* Trava de reentrada. Sem isto o ciclo nunca terminava: o microfone ficava
+   * quente, a RESPOSTA do agente era captada como nova transcricao, e voltava a
+   * chamar `iaDockSend()` — sem o produtor tocar em nada. `iaVoz` ja devolve o
+   * ultimo resultado em vez do primeiro, mas enquanto o envio anterior nao
+   * terminar nao se aceita outra frase. */
+  if (window._iaVozEnviando) return;
+  window._iaVozEnviando = true;
+  const _destravar = () => { window._iaVozEnviando = false; };
+
+  window.iaLocal.iaVoz((txt)=>{
+    if (txt === '__erro_microfone__') {
+      _destravar();
+      addMsg('Microfone bloqueado ou indisponivel. Autorize o microfone ou escreva a pergunta.', 'bot');
+      return;
+    }
+    document.getElementById('ia-dock-input').value=txt;
+    let p;
+    try { p = iaDockSend(); } catch (e) { _destravar(); return; }
+    if (p && typeof p.then === 'function') p.then(_destravar, _destravar);
+    else _destravar();
+  });
+};
+/* ── LEITURA DE DOCUMENTO ───────────────────────────────────────────────────
+ *
+ * TRÊS ENTRADAS, UM SÓ LEITOR
+ * =============================
+ * `iaDockImage` (o clipe do input), `iaDockImageComFicheiro` (a barra lateral) e
+ * `iaEnviarTextoParaLeitura` (CSV/TXT) mandam todos para `iaLerDocumento`.
+ *
+ * Um leitor só porque a confirmação é a parte que importa: o "Confirmar e
+ * gravar" valida o lote INTEIRO e reverte tudo se algo falhar
+ * (`app/ia/views.py:confirmar_estoque`). Duas cópias desse botão são duas
+ * oportunidades de a divergirem — e a divergência que dói é uma que grava a
+ * metade do que o produtor viu.
+ *
+ * E o texto NÃO vai como ficheiro: `imagem_estoque` manda os bytes ao OCR, e o
+ * OCR abre-os com o Pillow. Um CSV não é uma imagem — vai pelo campo `texto`,
+ * que a mesma view aceita e que a heurística "NOME qtd unidade" lê linha a
+ * linha. A NFe em XML é o contrário: o que a torna fiável é ser um XML, e por
+ * isso vai como ficheiro, para `parece_nfe_xml` ver os bytes. */
+function iaCsrfToken(){ try{ const m=document.cookie.split('; ').find(c=>c.startsWith('csrftoken=')); return m?m.split('=')[1]:''; }catch(e){ return ''; } }
+
+async function iaLerDocumento(corpo, rotulo){
+  addMsg(rotulo,'user');
+  const body=document.getElementById('ia-chat-body');
+  const botEl=document.createElement('div'); botEl.className='ia-msg bot';
+  botEl.textContent='A ler...'; body.appendChild(botEl); body.scrollTop=body.scrollHeight;
+  try{
+    const r=await fetch('/api/ia/imagem-estoque/', {method:'POST', headers:{'X-CSRFToken':iaCsrfToken()}, body:corpo, credentials:'same-origin'});
+    const j=await r.json();
+    if(!r.ok || j.ok===false){
+      botEl.textContent='Não consegui ler: '+(j.erro||('HTTP '+r.status))+'. Descreva os itens (ex: Ureia 50 sc).';
+      return;
+    }
+    window._iaRascunho=j.itens||[];
+    botEl.innerHTML='';
+    /* O `aviso` do servidor vai ANTES do rascunho e com destaque.
+     *
+     * MEDIDO na prática: sem tesseract instalado, o servidor devolve
+     * `itens: []` e um aviso. A tela mostrava "Rascunho pronto." e o produtor
+     * via um rascunho com zero itens e nenhuma explicação. A ausência de
+     * medição tem de se ler como ausência de medição — `chamado.py` chama a
+     * isto `sem_dado` em todo o lado, e o mesmo vale aqui. */
+    if(j.aviso){
+      const av=document.createElement('div');
+      av.style.cssText='background:#fffbeb;border:1px solid #f59e0b;border-radius:8px;padding:8px;margin-bottom:8px;font-size:12px;color:#92400e';
+      av.textContent=j.aviso;
+      botEl.appendChild(av);
+    }
+    const pre=document.createElement('div'); pre.style.whiteSpace='pre-wrap';
+    pre.textContent=j.resposta||'Rascunho pronto.';
+    botEl.appendChild(pre);
+    if((j.itens||[]).length){
+      const bar=document.createElement('div'); bar.style.marginTop='8px'; bar.style.display='flex'; bar.style.gap='8px';
+      const ok=document.createElement('button'); ok.textContent='✓ Confirmar e gravar'; ok.className='ia-chip';
+      ok.onclick=async ()=>{
+        ok.disabled=true; ok.textContent='Gravando...';
+        try{
+          const rr=await fetch('/api/ia/confirmar-estoque/', {method:'POST', headers:{'Content-Type':'application/json','X-CSRFToken':iaCsrfToken()}, body:JSON.stringify({itens:window._iaRascunho||[]}), credentials:'same-origin'});
+          const jj=await rr.json();
+          addMsg(jj.resposta||'Gravado.','bot'); window._iaRascunho=[];
+        }catch(e){ addMsg('Erro ao gravar: '+e.message,'bot'); }
+      };
+      const no=document.createElement('button'); no.textContent='Corrigir no chat'; no.className='ia-chip';
+      no.onclick=()=>{ const i=document.getElementById('ia-dock-input'); i.value='Corrigindo: '; i.focus(); };
+      bar.appendChild(ok); bar.appendChild(no); botEl.appendChild(bar);
+    }
+    body.scrollTop=body.scrollHeight;
+    iaHist.push({role:'assistant', content:String(j.resposta||'').slice(0,600)}); salvarHist();
+  }catch(e){ botEl.textContent='Falha ao enviar o documento: '+e.message; }
+}
+
+/* O clipe do input. O `accept` fica largo DE PROPÓSITO e é o mesmo da barra:
+ * dois arquivos que aceitam coisas diferentes são um ficheiro que o produtor
+ * escolhe e o sistema recusa. */
+window.iaDockImage=function(inp){
+  const f=inp.files && inp.files[0]; if(!f) return;
+  inp.value='';
+  const fd=new FormData(); fd.append('imagem', f);
+  return iaLerDocumento(fd, /\.(xml|csv|txt)$/i.test(f.name) ? 'documento '+f.name : 'imagem '+f.name);
+};
+window.iaDockImageComFicheiro=function(f){ if(!f) return; const fd=new FormData(); fd.append('imagem', f); return iaLerDocumento(fd, 'documento '+f.name); };
+window.iaEnviarTextoParaLeitura=function(texto, nome){
+  const fd=new FormData(); fd.append('texto', String(texto||''));
+  return iaLerDocumento(fd, 'documento '+(nome||'sem nome'));
+};
+
+/* O print da tela vem em base64 e nao como File: o `getDisplayMedia` devolve um
+ * canvas, e nao um ficheiro que se possa pôr num `<input type=file>`.
+ *
+ * Vai pelo MESMO caminho (`imagem-estoque` -> OCR -> rascunho -> confirmar).
+ * Um `POST` de escrita próprio para o print seria um caminho novo para o mesmo
+ * registo — que e' exactamente o que `app/amplia_mcp/` existe para fechar. */
+window.iaEnviarDocumentoBase64=async function(dataUrl, nome){
+  const bruto = String(dataUrl||'').split(',')[1];
+  if(!bruto){ addMsg('O print veio vazio. Tire-o outra vez.','bot'); return; }
+  let bin;
+  try{ bin = atob(bruto); }catch(e){ addMsg('O print veio ilegível. Tire-o outra vez.','bot'); return; }
+  const bytes = new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i);
+  const fd = new FormData();
+  fd.append('imagem', new File([bytes], nome || 'print.png', { type:'image/png' }));
+  return iaLerDocumento(fd, 'print ' + (nome || 'da tela'));
+};
+
+</script>
+<script type="module">
+/* A barra de ícones, montada depois de o DOM estar pronto.
+ *
+ * `type="module"` e' diferido por definicao, por isso o `ia-rail` ja' existe
+ * quando isto corre.
+ *
+ * O `import()` dinamico, e nao um `import` estatico: um import estatico
+ * resolve e CACHEIA o loader pelo URL, e o `?v=` que existe dentro dele nunca
+ * chega a ser lido. MEDIDO: corrigir `ia-rail.js` (o `{sep:1}` que o browser
+ * nao via) nao mudou nada no ecra, porque era o loader que estava em cache e
+ * ele nao se Auto actualizou. Por isso aquery entra aqui, na template. */
+import('/static/js/ia-local/ia-rail-loader.js?v=' + Date.now())
+  .then(function (m) { return m.ensureRail(); })
+  .catch(function (e) {
+  /* Sem barra o chat continua a funcionar. Uma barra que nao monta e' um
+   * cosmetico; o que fica partido se deixarmos a excecao subir e' a conversa. */
+  if (window.console) console.warn('[amplia] barra de ferramentas nao montou:', e);
+});
+</script>
+

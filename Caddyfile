@@ -1,0 +1,158 @@
+# ============================================================
+# Caddy — borda da Ampliagro
+#
+# O arquivo anterior era um bloco de opcoes globais com `handle`,
+# `header`, `encode` e `rate_limit` dentro — `handle` so existe em site
+# block, entao o Caddy nao parseava e o container reiniciava em laco
+# (nada respondia). Alem disso o compose nao montava /app/staticfiles nem
+# /app/media no container do Caddy, que sao os roots servidos aqui.
+#
+# Variaveis (vindas do compose):
+#   DOMAIN      — dominio do site (default: localhost)
+#   AUTO_HTTPS  — off (padrao, so HTTP) | ignore | (vazio = ACME automatico)
+#                 Para TLS de verdade: aponte o DNS e use
+#                 AUTO_HTTPS= (vazio) + DOMAIN=app.seudominio.com
+# ============================================================
+
+{
+	admin off
+	# Vazio => Caddy pede certificado (ACME). "off" => somente HTTP.
+	auto_https {$AUTO_HTTPS:off}
+
+	log {
+		output stdout
+		format json
+		level INFO
+	}
+}
+
+{$DOMAIN:localhost} {
+	encode gzip zstd
+
+	# HSTS so faz sentido em HTTPS; com auto_https off os navegadores
+	# simplesmente ignoram o header.
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+		# A Content-Security-Policy **nao** e' aqui, e' no Django.
+		#
+		# Este cabecalho vivia neste ficheiro e era a razao de a politica do
+		# Django nao servir para nada em producao: o Caddy e' a borda, e um
+		# cabecalho posto na borda SOBRESCREVE o que o Django mandou. A
+		# politica daqui tinha `'unsafe-inline' 'unsafe-eval'` em script-src e
+		# `connect-src https:` — ou seja, protecto que nao protegeva, e
+		# nenhuma das restricoes que o django mandava chegava ao browser.
+		#
+		# MEDIDO: `curl -I` a um servidor com este Caddyfile mostrava um CSP
+		# com `'unsafe-inline'`; o mesmo servidor sem ele mostrava o do Django,
+		# sem `'unsafe-inline'`.
+		#
+		# Uma politica, num sitio. O Django define-a em
+		# `CONTENT_SECURITY_POLICY` (config/settings/base.py), e
+		# `tests/test_csp.py` garante que cobre tudo o que os templates
+		# carregam. Um segundo lugar a definir a mesma politica e' a forma
+		# garantida de as duas divergirem sem ninguem ver.
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=(self), payment=()"
+		X-Frame-Options "DENY"
+		X-Content-Type-Options "nosniff"
+		-Server
+	}
+
+	# Rate limit so na API (10 req/s por IP)
+	#
+	# A CHAVE e' o que decide se isto funciona. `{remote_host}` e' o IP de
+	# quem abre a ligacao — e, com o Cloudflare a frente, isso e' o IP da
+	# BORDA, o mesmo para todas as pessoas. Ate a Cloudflare, este limite
+	# tratava o mundo inteiro como um unico cliente: 10 req/s no total, e o
+	# primeiro a aparecer levava com o bloqueio de todos os outros.
+	#
+	# O Cloudflare poe o IP real em `CF-Connecting-IP`, que so ele escreve.
+	# A sintaxe `{placeholder:default}` da o IP real quando o cabecalho existe
+	# e cai para o comportamento antigo quando nao existe — que e' o caso de
+	# desenvolvimento e de quem nao usa Cloudflare.
+	@api path /api/*
+	rate_limit @api {
+		zone api_limit 10r/s
+		key {http.cf-connecting-ip:{remote_host}}
+		rejected_status 429
+	}
+
+	# /api/* -> Django
+	handle /api/* {
+		reverse_proxy app:8000 {
+			header_up Host {host}
+			header_up X-Real-IP {remote_host}
+			header_up X-Forwarded-For {remote_host}
+			header_up X-Forwarded-Proto {scheme}
+		}
+	}
+
+	# WebSocket (tempo real)
+	handle /ws/* {
+		reverse_proxy app:8000 {
+			header_up Host {host}
+			header_up X-Real-IP {remote_host}
+			header_up X-Forwarded-For {remote_host}
+			header_up X-Forwarded-Proto {scheme}
+		}
+	}
+
+	# Health: sem rate limit (o proprio healthcheck seria barrado)
+	# O X-Forwarded-Proto e' fixado aqui tambem. O /healthz nao devolve
+	# conteudo nenhum, mas o Django ainda decide `is_secure()` com este
+	# header (SECURE_PROXY_SSL_HEADER), e um healthcheck que receba 301
+	# porque o Django acha que nao ha TLS conta como deploy caido.
+	handle /healthz {
+		reverse_proxy app:8000 {
+			header_up Host {host}
+			header_up X-Forwarded-Proto {scheme}
+		}
+	}
+
+	handle /healthz/* {
+		reverse_proxy app:8000 {
+			header_up Host {host}
+			header_up X-Forwarded-Proto {scheme}
+		}
+	}
+
+	# Static com cache longo. O WhiteNoise tambem serve /static (esta no
+	# MIDDLEWARE do base.py), entao se este volume nao estiver montado o
+	# Django ainda responde — este bloco e so o caminho rapido.
+	handle /static/* {
+		root * /app/staticfiles
+		file_server {
+			browse off
+		}
+		header Cache-Control "public, max-age=31536000, immutable"
+	}
+
+	# Media: em prod ninguem no Django serve (DEBUG=0), quem serve e o Caddy.
+	handle /media/* {
+		root * /app/media
+		file_server {
+			browse off
+		}
+		header Cache-Control "public, max-age=86400"
+	}
+
+	# Default -> Django (templates). O front oficial e Django templates;
+	# a SPA em src/ nao e servida em prod.
+	handle {
+		reverse_proxy app:8000 {
+			header_up Host {host}
+			header_up X-Real-IP {remote_host}
+			header_up X-Forwarded-For {remote_host}
+			header_up X-Forwarded-Proto {scheme}
+		}
+	}
+
+	# Aspas de JSON: use crase (backtick) — o Caddy nao aceita aspas
+	# duplas aninhadas, e era o que quebrava o parse do handle_errors.
+	handle_errors {
+		respond `{"error":"internal server error"}` 500
+		respond `{"error":"not found"}` 404
+		respond `{"error":"forbidden"}` 403
+		respond `{"error":"bad request"}` 400
+	}
+}

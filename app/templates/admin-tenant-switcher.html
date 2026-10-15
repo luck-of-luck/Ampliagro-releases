@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Tenant Switcher{% endblock %}
+{% block content %}
+<div style="max-width:900px;margin:2rem auto;padding:0 1.5rem">
+  <h1 style="font-size:1.4rem;font-weight:700">Tenant Switcher (Admin)</h1>
+  <p style="color:#64748b">Fixa <code>tenant_id</code> na sessão para debug multi-tenant. Atual: <strong>{{ current|default:"nenhum (usa do user)" }}</strong></p>
+  <form method="post" style="margin:1rem 0;display:flex;gap:0.6rem">
+    {% csrf_token %}
+    <select name="tenant_id" style="flex:1;padding:0.6rem;border:1px solid #e2e8f0;border-radius:0.5rem">
+      <option value="">— usar do usuário logado —</option>
+      {% for p in propriedades %}
+      <option value="{{ p.id }}" {% if current == p.id %}selected{% endif %}>{{ p.nome }} ({{ p.user.username }})</option>
+      {% endfor %}
+    </select>
+    <button type="submit" style="background:var(--ncs-green-dark);color:#fff;padding:0.6rem 1.2rem;border-radius:0.5rem">Fixar</button>
+  </form>
+</div>
+{% endblock %}

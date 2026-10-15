@@ -1,0 +1,46 @@
+# FINAIS DE LINHA
+#
+# O repositorio estava partido ao meio: 687 ficheiros com CRLF e 228 com
+# LF, num Windows. Isso nao e' cosmectico — e' a razao pela qual o
+# prettier "reformatava" 25 371 linhas do app/templates/index.html
+# (commit fae6a3f): o .prettierrc mandava `endOfLine: lf`, o ficheiro
+# tinha CRLF, e cada corrida convertia o ficheiro INTEIRO. O git via
+# 14 356 linhas alteradas num commit de tres linhas, e a revisao perdia-
+# se a tempo de ver a correccao.
+#
+# `text=auto` diz ao git para normalizar para LF no indice e devolver
+# CRLF ao fazer checkout em Windows. O resultado e' o mesmo conteudo em
+# todo o lado, e um diff que so mostra o que MUDOU.
+#
+# Isto so vale para ficheiros que NAO ja estejam no indice com CRLF
+# gravado. Esses precisam de `git add --renormalize .`, que e' uma
+# operacao que toca em todos os ficheiros de uma vez e por isso precisa
+# de a equipa toda parada. Fica para essa janela.
+#
+# Binarios: declarados um a um. Um binario passado por text=auto produz
+# um diff ilegivel e, pior, pode ser CORROMPIDO na normalizacao.
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.ico   binary
+*.pdf   binary
+*.zip   binary
+*.whl   binary
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.sqlite3 binary
+*.db    binary
+*.pyc   binary
+
+# Scripts de shell: LF e' o standard. Um .sh com CRLF da
+# "$'\r': command not found" em Linux/macOS.
+*.sh text eol=lf
+
+# .bat e' o oposto: o cmd.exe do Windows precisa de CRLF.
+*.bat  text eol=crlf
+*.cmd  text eol=crlf
+
+# O resto: detectado. Python, JS, HTML, YAML, JSON.
+*       text=auto

@@ -1,0 +1,558 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   PAINEL DE CADASTRO DE CULTURA — paleta da Agenda Agrícola
+   ═══════════════════════════════════════════════════════════════════════════
+
+   O QUE MUDOU NESTA VERSÃO
+   ────────────────────────
+   A versão anterior seguia o design system do Ampliagro, que é verde-preto
+   (`--cor-fundo` = #0b0f0e) e usava borda esmeralda em tudo. O produtor
+   pediu o visual da Agenda Agrícola, e o que ele viu lá foi outra coisa.
+
+   MEDIDO na Agenda (`.content-card`, `.calendar-day`, `.calendar-header`),
+   tema escuro, no browser — não a olho:
+
+     fundo da página      #0b1120   slate-900, NAVY
+     cartão                #1e293b   slate-800, mais claro que a página
+     célula interna        #0f172a   slate-900, mais escuro que o cartão
+     barra de destaque     #3ec48f   esmeralda SÓLIDO, texto branco, 12px/600
+     texto primário        #e9eeec
+     texto de grade        #cbd5e1   slate-300
+     borda                 rgba(148,163,184,0.1)  slate-400 a 10%
+     raio                  16px
+     sombra                0 4px 24px rgba(0,0,0,0.06)   muito suave
+
+   E as "pílulas" de evento, que são a assinatura da Agenda: fundo escuro
+   saturado com texto vivo da mesma família.
+
+     plantio     fundo #052e16   texto #4ade80
+     colheita    fundo #451a03   texto #fbbf24
+     aplicação   fundo #172554   texto #60a5fa
+     manutenção  fundo #123b2e   texto #3ec48f
+
+   DUAS COISAS QUE MUDARAM DE PRINCÍPIO
+   ────────────────────────────────────
+   1. BORDAS. A versão anterior pôs esmeralda em todas as bordas, a pedido.
+      A Agenda faz o contrário: borda cinza a 10% e o esmeralda SÓ como
+      destaque (a barra dos dias da semana). Uma linha esmeralda em cada um
+      dos 456 cartões da lista faz o ecrã vibrar e deixa de dizer o que é
+      que se está a seleccionar. Agora o esmeralda marca o que é interactivo
+      ou o que está activo — que é o que ele sinaliza na Agenda.
+
+   2. PROFUNDIDADE. Na Agenda o cartão é mais CLARO que a página e as células
+      internas são mais escuras. O painel fazia o contrário. Invertido, como
+      na Agenda: o painel afunda e o conteúdo salta.
+
+   SEM VIDRO FOSCO, SEM ALPHA, SEM GRADIENTE — mantém-se da versão anterior.
+   A excepção é o véu por trás do painel, que tem de ser translúcido para o
+   produtor não perder a noção de onde está.
+
+   COMO ESTE FICHEIRO VENCE O `guide.js`
+   ──────────────────────────────────────
+   O `guide.js` injecta o `GUIDE_PANEL_CSS` em RUNTIME, depois deste ficheiro
+   na cascata. Todos os seletores levam `#culturaDetail` à frente: um id vale
+   100 de especificidade contra os 10 de uma classe.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+#culturaDetail {
+  /* Superfícies — slate, iguais às da Agenda */
+  --pc-fundo: #0b1120;
+  --pc-surface: #1e293b;
+  --pc-surface-2: #0f172a;
+  --pc-surface-3: #0b1120;
+
+  /* Linhas — cinza, não esmeralda */
+  --pc-line: rgba(148, 163, 184, 0.1);
+  --pc-line-forte: rgba(148, 163, 184, 0.22);
+
+  /* Esmeralda, só como destaque */
+  --pc-esmeralda: #3ec48f;
+  --pc-esmeralda-forte: #57d7a0;
+  --pc-esmeralda-fundo: #052e16;
+  --pc-esmeralda-texto: #4ade80;
+
+  /* Pílulas de estado, com as cores da Agenda */
+  --pc-pilula-neutra-fundo: #1e293b;
+  --pc-pilula-neutra-texto: #cbd5e1;
+  --pc-pilula-azul-fundo: #172554;
+  --pc-pilula-azul-texto: #60a5fa;
+  --pc-pilula-ambar-fundo: #451a03;
+  --pc-pilula-ambar-texto: #fbbf24;
+
+  /* Texto */
+  --pc-titulo: #f8fafc;
+  --pc-texto: #e9eeec;
+  --pc-texto-2: #cbd5e1;
+  --pc-texto-3: #94a3b8;
+
+  --pc-raio: 16px;
+  --pc-sombra: 0 4px 24px rgba(0, 0, 0, 0.06);
+}
+html:not(.dark) #culturaDetail {
+  /* No tema claro o branco puro e' texto invisivel sobre quase-branco.
+     MEDIDO 2026-10-06: com `--pc-titulo` fixo em #fff, o titulo resolvia
+     para rgb(255,255,255) sobre painel rgb(253,254,254). */
+  --pc-fundo: #f8fafc;
+  --pc-surface: #ffffff;
+  --pc-surface-2: #f1f5f9;
+  --pc-surface-3: #ffffff;
+  --pc-line: rgba(15, 23, 42, 0.1);
+  --pc-line-forte: rgba(15, 23, 42, 0.2);
+  --pc-esmeralda: #0f9d6e;
+  --pc-esmeralda-forte: #0b7f58;
+  --pc-esmeralda-fundo: #d1fae5;
+  --pc-esmeralda-texto: #065f46;
+  --pc-titulo: #0f172a;
+  --pc-texto: #1d2421;
+  --pc-texto-2: #475569;
+  --pc-texto-3: #64748b;
+  --pc-sombra: 0 4px 24px rgba(15, 23, 42, 0.08);
+}
+
+/* ── OVERLAY ───────────────────────────────────────────────────────────────
+   Escuro e liso. Sem `blur`: na Agenda a página de trás lê-se nítida. */
+.detail-overlay {
+  background: rgba(11, 17, 32, 0.82) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* ── SUPERFÍCIE ─────────────────────────────────────────────────────────────
+   Raio e sombra copiados da `.content-card` da Agenda. */
+.detail-panel,
+#culturaDetail.gc-editor-panel {
+  background: var(--pc-surface) !important;
+  border: 1px solid var(--pc-line) !important;
+  border-radius: var(--pc-raio) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: var(--pc-sombra) !important;
+}
+
+/* ── BARRA DE CONTEXTO ─────────────────────────────────────────────────────
+   É a peça mais próxima da "barra dos dias da semana": superfície mais
+   escura, e o esmeralda fica reservado para o nome da cultura. */
+#culturaDetail .gc-context-bar {
+  background: var(--pc-surface-2);
+  border-bottom: 1px solid var(--pc-line);
+}
+#culturaDetail .gc-context-left {
+  color: var(--pc-texto-3);
+}
+#culturaDetail .gc-brand-mark {
+  background: var(--pc-esmeralda);
+  color: #08120e;
+  border: 1px solid var(--pc-esmeralda-forte);
+  box-shadow: none;
+  font-weight: 800;
+}
+#culturaDetail .gc-brand-name {
+  color: var(--pc-titulo);
+  font-weight: 700;
+}
+#culturaDetail .gc-crumb-sep {
+  color: var(--pc-texto-3);
+}
+#culturaDetail .gc-crumb {
+  color: var(--pc-texto-2);
+}
+#culturaDetail .gc-crumb-current {
+  color: var(--pc-esmeralda);
+  font-weight: 600;
+}
+
+/* ── HERO ──────────────────────────────────────────────────────────────────
+   Célula escura com filete esmeralda no topo — a mesma ideia da barra
+   sólida da Agenda, em vez do degradê que havia. */
+#culturaDetail .gc-hero {
+  background: var(--pc-surface-2);
+  border-top: 3px solid var(--pc-esmeralda);
+  border-bottom: 1px solid var(--pc-line);
+  padding: 18px 24px 16px;
+}
+#culturaDetail .gc-hero-name {
+  color: var(--pc-titulo);
+  font-weight: 800;
+}
+#culturaDetail .gc-hero-sub {
+  color: var(--pc-texto-3);
+}
+#culturaDetail .gc-hero-ava {
+  background: var(--pc-surface-3);
+  color: var(--pc-esmeralda);
+  border: 1px solid var(--pc-line-forte);
+  box-shadow: none;
+}
+/* "Editando dados" — pílula esmeralda, no formato da Agenda. */
+#culturaDetail .gc-hero-editing {
+  background: var(--pc-esmeralda-fundo);
+  color: var(--pc-esmeralda-texto);
+  border: 1px solid transparent;
+  border-radius: 4px;
+  font-weight: 600;
+}
+#culturaDetail .gc-hero-close {
+  background: var(--pc-surface-3);
+  color: var(--pc-texto-3);
+  border: 1px solid var(--pc-line);
+  border-radius: 4px;
+}
+#culturaDetail .gc-hero-close:hover {
+  background: var(--pc-surface-2);
+  color: var(--pc-esmeralda);
+  border-color: var(--pc-esmeralda);
+}
+
+/* ── CHIPS DE RESUMO ───────────────────────────────────────────────────────
+   Fundo escuro sólido e texto claro, como as pílulas da Agenda. */
+#culturaDetail .gc-chip {
+  background: var(--pc-surface-3);
+  color: var(--pc-texto);
+  border: 1px solid var(--pc-line);
+  border-radius: 4px;
+  box-shadow: none;
+}
+#culturaDetail .gc-chip i {
+  color: var(--pc-esmeralda);
+}
+#culturaDetail .gc-chip.warm i {
+  color: var(--pc-texto-3);
+}
+
+/* ── CARTÕES DE TALHÃO ─────────────────────────────────────────────────────
+   Cópia da `.calendar-day`: fundo escuro, borda cinza a 10%. O esmeralda
+   entra no hover e no estado activo — o que se destaca é o que se pode
+   tocar, não tudo. */
+#culturaDetail .gc-car-card {
+  background: var(--pc-surface-2);
+  border: 1px solid var(--pc-line);
+  border-radius: 8px;
+  box-shadow: none;
+}
+#culturaDetail .gc-car-card:hover {
+  background: var(--pc-surface-3);
+  border-color: var(--pc-esmeralda);
+}
+#culturaDetail .gc-car-card.gc-active,
+#culturaDetail .gc-car-card.is-active {
+  border-color: var(--pc-esmeralda);
+  box-shadow: 0 0 0 1px var(--pc-esmeralda);
+}
+#culturaDetail .gc-car-head,
+#culturaDetail .gc-car-sub,
+#culturaDetail .gc-car-zone {
+  color: var(--pc-texto-3);
+}
+#culturaDetail .gc-car-metrics {
+  border-color: var(--pc-line);
+}
+#culturaDetail .gc-car-metric-label {
+  color: var(--pc-texto-3);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+#culturaDetail .gc-car-metric-val {
+  color: var(--pc-texto-2);
+  font-weight: 700;
+}
+#culturaDetail .gc-car-stage {
+  background: var(--pc-surface-3);
+  border: 1px solid var(--pc-line);
+}
+#culturaDetail .gc-car-stage-fill {
+  background: var(--pc-esmeralda);
+}
+#culturaDetail .gc-car-stage-label {
+  color: var(--pc-texto-2);
+}
+/* "Completo" e afins — pílulas de estado, cores da Agenda. */
+#culturaDetail .gc-badge.green,
+#culturaDetail .gc-car-zone.bom,
+#culturaDetail .gc-stage-label.bom {
+  background: var(--pc-esmeralda-fundo);
+  color: var(--pc-esmeralda-texto);
+  border: 1px solid transparent;
+  border-radius: 4px;
+  font-weight: 600;
+}
+#culturaDetail .gc-badge.warn,
+#culturaDetail .gc-car-zone.atencao,
+#culturaDetail .gc-stage-label.atencao {
+  background: var(--pc-pilula-ambar-fundo);
+  color: var(--pc-pilula-ambar-texto);
+  border: 1px solid transparent;
+  border-radius: 4px;
+  font-weight: 600;
+}
+#culturaDetail .gc-badge.info,
+#culturaDetail .gc-car-zone.info {
+  background: var(--pc-pilula-azul-fundo);
+  color: var(--pc-pilula-azul-texto);
+  border: 1px solid transparent;
+  border-radius: 4px;
+  font-weight: 600;
+}
+#culturaDetail .gc-badge.coffee,
+#culturaDetail .gc-badge.neutral {
+  background: var(--pc-pilula-neutra-fundo);
+  color: var(--pc-pilula-neutra-texto);
+  border: 1px solid var(--pc-line);
+  border-radius: 4px;
+}
+/* "Novo Registo" — traço esmeralda, como na Agenda o cartão de adicionar. */
+#culturaDetail .gc-car-card.gc-car-new {
+  background: var(--pc-surface-2);
+  border: 1px dashed var(--pc-esmeralda);
+  color: var(--pc-esmeralda);
+}
+#culturaDetail .gc-car-card.gc-car-new:hover {
+  background: var(--pc-esmeralda-fundo);
+  border-color: var(--pc-esmeralda-forte);
+}
+#culturaDetail .gc-carousel-btn {
+  background: var(--pc-surface-3);
+  color: var(--pc-texto-2);
+  border: 1px solid var(--pc-line);
+  border-radius: 4px;
+}
+#culturaDetail .gc-carousel-btn:hover {
+  color: var(--pc-titulo);
+  border-color: var(--pc-esmeralda);
+}
+#culturaDetail .gc-car-dots,
+#culturaDetail .gc-carousel-thumb {
+  background: var(--pc-surface-3);
+  border: 1px solid var(--pc-line);
+}
+#culturaDetail .gc-car-dots.on,
+#culturaDetail .gc-carousel-thumb.on {
+  background: var(--pc-esmeralda);
+  border-color: var(--pc-esmeralda);
+}
+
+/* ── ETIQUETAS DE SECÇÃO ────────────────────────────────────────────────────
+   12px como o `.calendar-header` da Agenda. */
+#culturaDetail .gc-section-label {
+  border-bottom: 1px solid var(--pc-line);
+  padding-bottom: 8px;
+}
+#culturaDetail .gc-section-label h3 {
+  color: var(--pc-texto-3);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ── MÓDULOS E CAMPOS ───────────────────────────────────────────────────── */
+#culturaDetail .gc-module {
+  background: var(--pc-surface-2);
+  border: 1px solid var(--pc-line);
+  border-radius: 12px;
+}
+#culturaDetail .gc-module-head {
+  color: var(--pc-titulo);
+  border-bottom: 1px solid var(--pc-line);
+}
+#culturaDetail .gc-field label,
+#culturaDetail .gc-field .gc-label {
+  color: var(--pc-texto-3);
+  font-size: 12px;
+  font-weight: 600;
+}
+#culturaDetail .gc-field input,
+#culturaDetail .gc-field select,
+#culturaDetail .gc-field textarea {
+  background: var(--pc-surface-3);
+  color: var(--pc-texto);
+  border: 1px solid var(--pc-line-forte);
+  border-radius: 6px;
+}
+#culturaDetail .gc-field input:focus,
+#culturaDetail .gc-field select:focus,
+#culturaDetail .gc-field textarea:focus {
+  border-color: var(--pc-esmeralda);
+  box-shadow: 0 0 0 2px rgba(62, 196, 143, 0.2);
+  outline: none;
+}
+#culturaDetail .gc-field input::placeholder,
+#culturaDetail .gc-field textarea::placeholder {
+  color: var(--pc-texto-3);
+}
+#culturaDetail .gc-field select option {
+  background: var(--pc-surface-3);
+  color: var(--pc-texto);
+}
+
+/* ── RAIL ────────────────────────────────────────────────────────────────── */
+#culturaDetail .gc-rail {
+  border-right: 1px solid var(--pc-line);
+}
+#culturaDetail .gc-rail-btn {
+  background: transparent;
+  color: var(--pc-texto-3);
+  border: 1px solid transparent;
+}
+#culturaDetail .gc-rail-btn:hover {
+  background: var(--pc-surface-2);
+  color: var(--pc-texto);
+  border-color: var(--pc-line);
+}
+#culturaDetail .gc-rail-btn.active {
+  background: var(--pc-esmeralda-fundo);
+  color: var(--pc-esmeralda-texto);
+  border-color: var(--pc-esmeralda);
+}
+
+/* ── ESTATÍSTICAS ────────────────────────────────────────────────────────── */
+#culturaDetail .gc-stat-card {
+  background: var(--pc-surface-2);
+  border: 1px solid var(--pc-line);
+  border-radius: 12px;
+  box-shadow: none;
+}
+#culturaDetail .gc-stat-card .gc-stat-label {
+  color: var(--pc-texto-3);
+  font-size: 12px;
+}
+#culturaDetail .gc-stat-card .gc-stat-value {
+  color: var(--pc-titulo);
+}
+#culturaDetail .gc-bar-compare {
+  background: var(--pc-surface-2);
+  border: 1px solid var(--pc-line);
+  border-radius: 12px;
+  box-shadow: none;
+}
+
+/* ── TRATAMENTOS ─────────────────────────────────────────────────────────── */
+#culturaDetail .gc-treat-item,
+#culturaDetail .gc-treat-row,
+#culturaDetail .gc-mon-card {
+  background: var(--pc-surface-2);
+  border: 1px solid var(--pc-line);
+  border-radius: 8px;
+  box-shadow: none;
+}
+#culturaDetail .gc-treat-row:hover,
+#culturaDetail .gc-treat-item:hover {
+  background: var(--pc-surface-3);
+  border-color: var(--pc-esmeralda);
+}
+#culturaDetail .gc-treat-row input,
+#culturaDetail .gc-treat-row select {
+  background: var(--pc-surface-3);
+  color: var(--pc-texto);
+  border: 1px solid var(--pc-line-forte);
+  border-radius: 6px;
+}
+#culturaDetail .gc-treat-del {
+  background: var(--pc-surface-3);
+  color: var(--pc-texto-3);
+  border: 1px solid var(--pc-line);
+  border-radius: 4px;
+}
+#culturaDetail .gc-treat-del:hover {
+  color: #fbbf24;
+  border-color: #fbbf24;
+}
+#culturaDetail .gc-add-row {
+  background: transparent;
+  color: var(--pc-esmeralda);
+  border: 1px dashed var(--pc-esmeralda);
+  border-radius: 8px;
+}
+#culturaDetail .gc-add-row:hover {
+  background: var(--pc-esmeralda-fundo);
+}
+
+/* ── BARRA DE ACÇÃO ──────────────────────────────────────────────────────── */
+#culturaDetail .gc-action-bar {
+  background: var(--pc-surface-2);
+  border-top: 1px solid var(--pc-line);
+  box-shadow: none;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* ── BOTÕES ────────────────────────────────────────────────────────────────
+   O primário leva texto ESCURO sobre esmeralda: branco sobre #3ec48f dá
+   ~2:1 e falha WCAG AA para texto normal. (O `.calendar-header` da Agenda
+   usa branco, mas é um cabeçalho curto e não se lê texto corrido.) */
+#culturaDetail .gc-btn-primary {
+  background: var(--pc-esmeralda);
+  color: #08120e;
+  border: 1px solid var(--pc-esmeralda-forte);
+  border-radius: 6px;
+  font-weight: 700;
+}
+#culturaDetail .gc-btn-primary:hover {
+  background: var(--pc-esmeralda-forte);
+  color: #08120e;
+}
+#culturaDetail .gc-btn-ghost {
+  background: var(--pc-surface-3);
+  color: var(--pc-texto);
+  border: 1px solid var(--pc-line-forte);
+  border-radius: 6px;
+}
+#culturaDetail .gc-btn-ghost:hover {
+  background: var(--pc-surface-2);
+  color: var(--pc-titulo);
+  border-color: var(--pc-esmeralda);
+}
+#culturaDetail .gc-btn-add {
+  background: transparent;
+  color: var(--pc-esmeralda);
+  border: 1px solid var(--pc-esmeralda);
+  border-radius: 6px;
+}
+#culturaDetail .gc-btn-add:hover {
+  background: var(--pc-esmeralda-fundo);
+}
+#culturaDetail .gc-btn {
+  font-weight: 600;
+}
+
+/* ── FECHAR ──────────────────────────────────────────────────────────────── */
+#culturaDetail .detail-close {
+  background: var(--pc-surface-3) !important;
+  color: var(--pc-texto-2) !important;
+  border: 1px solid var(--pc-line) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+#culturaDetail .detail-close:hover {
+  background: var(--pc-surface-2) !important;
+  color: var(--pc-esmeralda) !important;
+  border-color: var(--pc-esmeralda) !important;
+}
+
+/* ── NÚMEROS E TEXTOS ───────────────────────────────────────────────────────
+   Regra de fundo escuro: a leveza vem do TOM, nunca do alpha. O `guide.js`
+   escreve `opacity` em vários nós, e texto a opacity < 1 perde contraste. */
+#culturaDetail .gc-hero-name,
+#culturaDetail .gc-car-metric-val,
+#culturaDetail .gc-stat-value,
+#culturaDetail .gc-brand-name {
+  opacity: 1 !important;
+}
+#culturaDetail p,
+#culturaDetail span,
+#culturaDetail td,
+#culturaDetail th,
+#culturaDetail label {
+  opacity: 1;
+}
+#culturaDetail hr {
+  border-color: var(--pc-line) !important;
+  opacity: 1;
+}
+
+/* ── RESPONSIVO ───────────────────────────────────────────────────────────── */
+@media (max-width: 760px) {
+  .detail-panel,
+  #culturaDetail.gc-editor-panel {
+    border-radius: 0 !important;
+  }
+}

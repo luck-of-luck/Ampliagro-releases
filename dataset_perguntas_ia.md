@@ -1,0 +1,1113 @@
+# 🤖 Mega Dataset de Treinamento e Testes: Perguntas da IA
+
+> **Propósito:** Validar detecção de intenções, testar falsos positivos, e guiar o desenvolvimento de novos *handlers*.
+
+Este arquivo contém **1025 perguntas naturais**, organizadas por categoria. Inclui as operações que a IA já faz (para evitar regressão de NLP) e funções complexas marcadas como `[AINDA NAO EXISTENTE]` para o *roadmap*.
+
+## Clima Agora 
+- Qual a temperatura agora?
+- Como está o tempo lá fora?
+- Tá muito quente na fazenda?
+- Qual o clima atual?
+- Manda a temperatura de hoje.
+- Tá sol ou nublado?
+- Me dá o boletim do tempo agora.
+- Quantos graus tá fazendo?
+- Preciso saber o clima agora.
+- Tá abafado?
+- Qual a sensação térmica?
+- Como tá o tempo na propriedade?
+- Verifica o clima pra mim.
+- Diz aí o clima.
+- Clima em tempo real.
+- O tempo virou?
+- Tá ventando muito agora?
+- Qual a umidade do ar nesse momento?
+- Puxa os dados do clima de agora.
+- Como amanheceu o tempo?
+- Tá frio?
+- O céu tá limpo?
+- Manda as condições atuais do tempo.
+- Atualiza o clima aí.
+- Como estão as condições climáticas agora?
+
+## Previsão de Chuva 
+- Vai chover hoje?
+- Qual a chance de chuva pra amanhã?
+- Chove essa semana?
+- Tem previsão de água pra hoje?
+- Vai cair um pé d'água?
+- Acha que chove à tarde?
+- Vai dar chuva?
+- Tem alerta de temporal?
+- Vai chover quantos milímetros?
+- A chuva chega quando?
+- Vai molhar a terra amanhã?
+- Qual a probablidade de chover?
+- Chove nos próximos dias?
+- O tempo vai fechar?
+- Previsão de chuva pra hoje.
+- Vai chover na minha roça?
+- Tem muita chuva no radar?
+- A chuva passa de 20mm?
+- Preciso saber se vai chover.
+- A chuva vem forte?
+- Vai ser só garoa ou chuva grossa?
+- Tem risco de granizo?
+- Vai chover a noite?
+- A previsão marca chuva?
+- Se chover, avisa.
+
+## Previsão Estendida 
+- Como fica o tempo nos próximos 3 dias?
+- Previsão pra semana toda.
+- O tempo vai mudar até sexta?
+- Manda a previsão estendida.
+- Como vai ser o clima no fim de semana?
+- Vai esfriar na próxima semana?
+- Me dá um resumo do tempo pros próximos dias.
+- Qual a tendência do clima?
+- A previsão marca sol a semana toda?
+- Tem alguma frente fria chegando?
+- O clima vai estabilizar?
+- Previsão pros próximos 5 dias.
+- Manda o boletim meteorológico da semana.
+- Vai ter geada semana que vem?
+- Como vai se comportar o tempo?
+- Previsão de longo prazo.
+- O que esperar do tempo até domingo?
+- Vai chover no fim de semana?
+- Qual a temperatura máxima prevista pra semana?
+- O tempo segue seco?
+- Me dá a previsão completa.
+- Como fica a umidade nos próximos dias?
+- Tem mudança brusca de tempo prevista?
+- Manda a previsão pro feriado.
+- O que os meteorologistas estão dizendo da nossa região?
+
+## Janela de Pulverização 
+- Quando é melhor pulverizar?
+- Tem janela de aplicação pra hoje?
+- O vento tá bom pra aplicar veneno?
+- Qual o melhor horário pra bater veneno amanhã?
+- Dá pra pulverizar agora à tarde?
+- As condições tão boas pra aplicar?
+- Vê uma janela de pulverização pra mim.
+- Tá ventando muito pra aplicar herbicida?
+- Quando eu aplico o fungicida?
+- Me acha um horário bom pra pulverizar.
+- O clima ajuda na aplicação hoje?
+- Tem risco de deriva se eu aplicar agora?
+- Qual a melhor hora pra entrar com a máquina?
+- Dá pra bater defensivo amanhã cedo?
+- Verifica a umidade pro veneno.
+- O vento vai parar a que horas?
+- Janela de aplicação ideal.
+- Acha um buraco no tempo pra eu pulverizar.
+- Posso aplicar agora?
+- O tempo tá propício pra pulverização?
+- Recomenda um horário pra aplicação.
+- Qual a previsão de vento pras próximas horas?
+- Tá muito seco pra aplicar?
+- A chuva vai lavar o veneno se eu bater hoje?
+- Me dá a janela perfeita de aplicação.
+
+## Status dos Sensores 
+- Como estão os sensores?
+- Sensores online.
+- Tem algum sensor fora do ar?
+- Resumo da IoT.
+- Os equipamentos tão conectados?
+- Faz um check-up nos sensores.
+- Tudo certo com a telemetria?
+- Qual o status da rede de sensores?
+- Os nós tão comunicando?
+- Tem algum alarme nos sensores?
+- Me dá um relatório da IoT.
+- Quantos sensores tão ativos?
+- O sinal dos sensores tá bom?
+- Tem bateria fraca em algum sensor?
+- Verifica a saúde dos dispositivos.
+- Manda o status geral da instrumentação.
+- A estação meteorológica tá transmitindo?
+- Tem algum equipamento offline?
+- Como tá a rede LoRa?
+- Lista os sensores pra mim.
+- Faz um diagnóstico dos sensores.
+- Qual sensor não manda dado faz tempo?
+- Tudo verdinho no painel de sensores?
+- Resumo dos equipamentos.
+- Os sensores tão marcando certo?
+
+## Última Leitura de Sensor 
+- Qual a última leitura do sensor de umidade?
+- Quanto tá marcando a sonda 2?
+- Me dá a temperatura do silo.
+- Qual foi o último dado que chegou da estação?
+- Lê o nível da caixa d'água.
+- Quanto choveu no pluviômetro?
+- Qual a umidade do solo agora?
+- O que o sensor de temperatura tá dizendo?
+- Puxa a última leitura do pivô.
+- Qual o nível do rio no sensor?
+- A temperatura na estufa tá quanto?
+- Verifica o pH do tanque.
+- Qual a condutividade elétrica atual?
+- O sensor de vento marcou rajada?
+- Me passa o dado mais recente do sensor X.
+- Qual a radiação solar de agora?
+- A pressão atmosférica caiu?
+- Quanto marca o sensor de chuva?
+- Pega a leitura do sensor de folha molhada.
+- A temperatura da água tá em quanto?
+- Verifica o oxigênio do tanque.
+- Qual o nível de combustível no tanque?
+- O sensor de intrusão detectou algo?
+- Me dá a leitura instantânea.
+- Atualiza o valor do sensor aí.
+
+## Controle de Irrigação - Ligar 
+- Liga o irrigador.
+- Pode ligar o pivô.
+- Abre a válvula 3.
+- Aciona a bomba de água.
+- Ligar irrigação do talhão sul.
+- Dá partida no pivô central.
+- Manda água pras plantas.
+- Inicia o ciclo de irrigação.
+- Liga a fita de gotejo.
+- Abre o registro da roça.
+- Liga a aspersão.
+- Põe o irrigador pra rodar.
+- Libera a água.
+- Liga a fertirrigação.
+- Ativa o setor 1 de irrigação.
+- Ligar sistema de rega.
+- Manda o comando de ligar a bomba.
+- Inicia a molhação.
+- Abre a eletroválvula.
+- Liga o motor da irrigação.
+- Pode molhar o pasto.
+- Ligar gotejamento.
+- Acionar irrigador.
+- Manda ligar o equipamento de rega.
+- Libera a irrigação no setor norte.
+
+## Controle de Irrigação - Desligar 
+- Desliga o irrigador.
+- Para o pivô.
+- Fecha a válvula 3.
+- Desliga a bomba de água.
+- Parar irrigação do talhão sul.
+- Desliga o pivô central.
+- Corta a água.
+- Encerra o ciclo de irrigação.
+- Desliga a fita de gotejo.
+- Fecha o registro.
+- Desliga a aspersão.
+- Para o irrigador.
+- Bloqueia a água.
+- Desliga a fertirrigação.
+- Desativa o setor 1 de irrigação.
+- Parar sistema de rega.
+- Manda o comando de desligar a bomba.
+- Para a molhação.
+- Fecha a eletroválvula.
+- Desliga o motor.
+- Chega de água por hoje.
+- Desligar gotejamento.
+- Parar irrigador.
+- Manda desligar o equipamento.
+- Corta a irrigação no setor norte.
+
+## Resumo da Propriedade 
+- Qual o tamanho da minha fazenda?
+- Me dá os dados da propriedade.
+- Onde fica minha fazenda?
+- Resumo da minha área.
+- Quantos hectares eu tenho?
+- Qual a área total?
+- Manda o perfil da fazenda.
+- Informações da propriedade.
+- O que tem cadastrado na minha fazenda?
+- Quantas culturas a gente roda aqui?
+- Qual o tamanho da área agricultável?
+- Me mostra os dados gerais da fazenda.
+- De quem é essa fazenda?
+- Qual a localização exata daqui?
+- Resumo da minha roça.
+- Quantos talhões tem aqui?
+- Qual o CAR da propriedade?
+- Me dá um panorama da fazenda.
+- Qual o município da fazenda?
+- Qual a área de reserva legal?
+- Informações de cadastro rural.
+- Mostra o tamanho total da terra.
+- Manda as métricas gerais da propriedade.
+- Dados do sítio.
+- Qual a área produtiva total?
+
+## Resumo de Talhões 
+- Quantos talhões eu tenho?
+- Me dá o resumo das áreas.
+- Qual a área plantada total?
+- Quantos hectares tem em cada talhão?
+- Lista meus talhões.
+- Como estão divididos os talhões?
+- Manda o mapa de talhões.
+- Qual o maior talhão?
+- Resumo das roças.
+- Quantos talhões tão ativos?
+- Me mostra a distribuição de área.
+- Qual a área média dos talhões?
+- Tem talhão em pousio?
+- Lista os nomes dos talhões.
+- Resumo espacial da fazenda.
+- Como tá a ocupação do solo?
+- Quantos talhões tem soja?
+- Me dá a lista de glebas.
+- Qual a situação de cada talhão?
+- Mapeamento das áreas.
+- Área plantada por talhão.
+- Resumo de áreas.
+- Quantos talhões de milho?
+- Mostra a configuração das áreas.
+- Tamanho total de área agricultável.
+
+## Histórico de Talhão 
+- O que foi plantado no talhão sul ano passado?
+- Me dá o histórico daquela área.
+- O que aplicamos lá recentemente?
+- Puxa a ficha do talhão 1.
+- Qual a rotação de cultura desse talhão?
+- Histórico de produtividade dessa gleba.
+- O que a gente colheu ali antes?
+- Mostra o que já fizemos no talhão.
+- Pega o passado desse pedaço de terra.
+- Qual foi o último veneno que bateu no talhão norte?
+- Histórico de manejo da área.
+- O que plantou na safra passada aqui?
+- Me lembra o que tinha nesse talhão.
+- Faz um resumo do que aconteceu nesse talhão.
+- Puxa os dados antigos da roça.
+- Quando foi a última calagem aqui?
+- Qual o histórico de doenças desse talhão?
+- Manda o dossiê do talhão.
+- Qual adubo jogou lá ano passado?
+- Histórico de operações.
+- O que foi registrado nesse talhão?
+- Verifica a rotação dessa área.
+- Qual a cultura antecessora?
+- Manda os registros dessa gleba.
+- Puxa a memória desse talhão.
+
+## Culturas Atuais 
+- O que a gente tá plantando agora?
+- Quais culturas tem na fazenda?
+- Qual a nossa safra atual?
+- O que tem no campo hoje?
+- Lista as culturas plantadas.
+- Estamos cultivando o que?
+- O que tem de verde aí?
+- Quais são as culturas dessa safra?
+- Me mostra o portfólio de plantio.
+- Plantamos o que esse ano?
+- Qual a variedade de soja que tá lá?
+- Tem milho plantado?
+- Quais as culturas de inverno?
+- Resumo das culturas.
+- O que tá na terra?
+- O que a gente colhe esse ano?
+- Lista o que foi semeado.
+- Cultivos ativos.
+- Qual a área de cada cultura?
+- O que tem plantado no momento?
+- Manda a relação de culturas.
+- Quais grãos estamos produzindo?
+- Tem feijão na safra?
+- O que tá vegetando?
+- Lista de plantio atual.
+
+## Resumo de Safra 
+- Como tá a safra esse ano?
+- Qual a estimativa de colheita?
+- Resumo da safra de soja.
+- Quanto a gente vai produzir?
+- Como tá indo a roça?
+- Me dá os números da safra.
+- Qual a expectativa de produtividade?
+- Quantas sacas por hectare a gente espera?
+- Resumo do ano agrícola.
+- O clima ajudou a safra?
+- Como tá o desenvolvimento da lavoura?
+- Manda o balanço da safra.
+- Qual o status do plantio?
+- A colheita vai ser boa?
+- Me atualiza sobre a safra.
+- Qual a projeção de quebra de safra?
+- Resumo das atividades da safra.
+- Como foi o andamento da safra?
+- Qual o rendimento esperado?
+- Manda um parecer da lavoura.
+- Como tá a saúde da safra?
+- Qual o fechamento da safra passada?
+- Expectativa de produção total.
+- Resumo do ciclo atual.
+- Como a safra se comportou?
+
+## Contagem de Animais 
+- Quantos bois eu tenho?
+- Qual o tamanho do rebanho?
+- Conta o gado pra mim.
+- Tem quantas cabeças no pasto?
+- Me dá o inventário de animais.
+- Quantas vacas tem no lote 2?
+- Qual a população do curral?
+- Quantos garrotes foram comprados?
+- Resumo da pecuária.
+- Qual o total de cabeças de gado?
+- Quantos bezerros nasceram?
+- Faz a contagem do rebanho.
+- Manda o número de animais.
+- Tem quantos animais no confinamento?
+- Qual o estoque de gado?
+- Quantas fêmeas em reprodução?
+- Qual a lotação do pasto?
+- Resumo do plantel.
+- Quantas cabeças tem no total?
+- Me dá os números da boiada.
+- Quantos suínos no galpão?
+- Conta as matrizes.
+- Qual o censo animal?
+- Tamanho da criação.
+- Quantos bichos tem na fazenda?
+
+## Resumo Aquático / Piscicultura 
+- Como tão os peixes?
+- Resumo dos tanques.
+- Qual a biometria dos tilápias?
+- Quantos peixes tem no viveiro?
+- Me dá o status da piscicultura.
+- Qual a conversão alimentar dos peixes?
+- Tem muito peixe no tanque rede?
+- Como tá a qualidade da água dos peixes?
+- Resumo da produção de peixe.
+- Qual o peso médio dos peixes?
+- Quando é a despesca?
+- Manda os números da aquicultura.
+- Qual a taxa de mortalidade no tanque?
+- Tem ração suficiente pros peixes?
+- Status dos alevinos.
+- Como tá o crescimento da tilápia?
+- Resumo do tanque escavado.
+- Qual a estimativa de despesca?
+- Me atualiza sobre os peixes.
+- A água tá boa pros peixes?
+- Resumo do cultivo de camarão.
+- Como tá a biomassa do tanque?
+- Manda um relatorio dos peixes.
+- Tudo certo nos viveiros?
+- Qual o ciclo atual dos peixes?
+
+## Resumo Financeiro 
+- Como tão as contas?
+- Qual o lucro do mês?
+- Me dá o balanço financeiro.
+- Tem muita conta pra pagar?
+- Qual o fluxo de caixa?
+- Resumo financeiro da fazenda.
+- Quanto a gente faturou?
+- Qual o custo de produção?
+- Mostra as despesas do mês.
+- O saldo tá positivo?
+- Puxa o DRE da fazenda.
+- Quanto a gente gastou com insumo?
+- Me dá a posição financeira.
+- Qual a margem de lucro?
+- Resumo de pagamentos e recebimentos.
+- Tem boleto vencendo hoje?
+- Qual o resultado financeiro?
+- Manda o resumo das finanças.
+- Como tá o caixa da fazenda?
+- Qual o custo por hectare?
+- Me mostra o financeiro geral.
+- Quanto sobrou no fim das contas?
+- Resumo de receitas.
+- Puxa o extrato da roça.
+- A fazenda tá dando lucro?
+
+## Consulta de Estoque 
+- O que tem no galpão?
+- Tem ureia no estoque?
+- Qual a quantidade de semente?
+- O estoque de veneno tá acabando?
+- Me dá a lista do almoxarifado.
+- Tem diesel na bomba?
+- Consulta o estoque de fungicida.
+- Quanto tem de adubo ainda?
+- O que falta comprar?
+- Lista os insumos que a gente tem.
+- Faz um inventário do galpão.
+- Tem peça de reposição do trator?
+- Me mostra o saldo de estoque.
+- O estoque de ração tá baixo?
+- Verifica o que tem armazenado.
+- Qual o volume de grãos no silo?
+- Tem calcário sobrando?
+- Resumo dos defensivos.
+- Puxa a ficha de estoque do glifosato.
+- O que tem na prateleira?
+- Me passa a posição do estoque.
+- Falta algum insumo pra amanhã?
+- O estoque tá em dia?
+- Lista o que tem no barracão.
+- Qual a quantidade de sacaria vazia?
+
+## Listagem de Funcionários / Equipe 
+- Quem trabalha hoje?
+- Quais são os mecânicos?
+- Lista a equipe da fazenda.
+- Quem tá de folga?
+- Me dá a relação de funcionários.
+- Quais os tratoristas que temos?
+- Quantas pessoas trabalham aqui?
+- Quem é o responsável pelo pivô?
+- Mostra a lista de peões.
+- Tem alguém de férias?
+- Quais os operadores de máquina?
+- Puxa a equipe de colheita.
+- Quem é o agrônomo responsável?
+- Lista os vaqueiros.
+- Quantos funcionários registrados?
+- Me passa o nome da equipe.
+- Quem tá escalado pra pulverizar?
+- Lista os diaristas.
+- Quem tá na lida hoje?
+- Resumo da mão de obra.
+- Mostra o quadro de funcionários.
+- Quem bate o ponto hoje?
+- Tem alguém afastado?
+- Lista os campeiros.
+- Quais os gerentes da fazenda?
+
+## Criação de Tarefa 
+- Cria uma tarefa pra consertar a cerca.
+- Agenda a pulverização pra amanhã.
+- Anota aí: comprar adubo.
+- Faz uma OS pra revisar o trator.
+- Marca pra vacinar o gado sexta.
+- Associa a tarefa de plantar milho.
+- Cria uma atividade pra colher soja.
+- Coloca na agenda: regular plantadeira.
+- Avisa o João pra olhar o pivô.
+- Gera uma ordem de serviço pra roçar o pasto.
+- Nova tarefa: aplicar herbicida.
+- Agenda a aplicação de fungicida.
+- Cria um lembrete pra pagar o boleto.
+- Marca de arrumar a bomba d'água.
+- Associa tarefa pro mecânico.
+- Cria uma atividade no cronograma.
+- Põe na lista: revisar motor.
+- Faz uma tarefa pra limpar o barracão.
+- Agenda a entrega de sementes.
+- Cria OS de manutenção preventiva.
+- Anota: abastecer tratores.
+- Nova atividade: recolher embalagens.
+- Agenda vistoria no campo.
+- Cria tarefa de contagem de gado.
+- Marca de aplicar uréia.
+
+## Listagem de Tarefas 
+- O que tem pra fazer hoje?
+- Quais as tarefas pendentes?
+- Me mostra a lista de serviços.
+- O que o João tem que fazer?
+- Lista as ordens de serviço abertas.
+- Tem tarefa atrasada?
+- Qual a programação da semana?
+- O que a equipe tá fazendo?
+- Puxa a agenda de hoje.
+- Mostra as atividades planejadas.
+- Quais as OS de manutenção?
+- Lista o que falta pulverizar.
+- Tem serviço pro trator hoje?
+- O que precisa ser feito urgente?
+- Me dá o cronograma da safra.
+- Lista as tarefas de colheita.
+- O que tá programado pra amanhã?
+- Tem atividade pro fim de semana?
+- Quais os afazeres da equipe?
+- Mostra o painel de tarefas.
+- O que a peãozada tá fazendo?
+- Lista as obrigações de hoje.
+- Quais as tarefas do lote 2?
+- Tem vacinação agendada?
+- O que tá na fila de serviços?
+
+## Conclusão de Tarefa 
+- Concluí a pulverização.
+- Marca o trator como revisado.
+- A cerca tá pronta.
+- Terminamos de plantar o talhão 1.
+- Dá baixa na OS do pivô.
+- A tarefa de adubação foi feita.
+- Finaliza a ordem de serviço 10.
+- Já vacinamos o gado.
+- Pode fechar a tarefa da bomba.
+- Anota que o herbicida foi aplicado.
+- A colheita acabou.
+- Serviço da roçadeira concluído.
+- Marca como feito o conserto.
+- Dá a tarefa como terminada.
+- Já compramos o adubo.
+- A manutenção foi finalizada.
+- Fecha a OS de lubrificação.
+- Terminamos a lida do gado.
+- Pode riscar da lista a limpeza do silo.
+- A semente chegou, tarefa concluída.
+- Dá baixa no plantio.
+- Finaliza a atividade no sistema.
+- A vistoria tá feita.
+- Concluí o abastecimento.
+- Já entregamos os grãos.
+
+## Ajuda / Capacidades 
+- O que você sabe fazer?
+- Como você pode me ajudar?
+- Quais comandos você aceita?
+- O que eu posso te pedir?
+- Me dá uma lista de opções.
+- Pra que você serve?
+- Como funciona esse chat?
+- O que o sistema faz?
+- Quais as suas funcionalidades?
+- Me ajuda a usar o sistema.
+- O que você responde?
+- Dá pra fazer o que por aqui?
+- Me mostra um exemplo de pergunta.
+- Quais informações você tem?
+- Você faz o que?
+- Qual o seu limite?
+- Me ensina a falar com você.
+- O que mais você faz?
+- Lista tuas habilidades.
+- Tem algum manual seu?
+- Como eu pergunto as coisas?
+- Você consegue me dar relatórios?
+- O que tá programado em você?
+- Me mostra o menu de ajuda.
+- Do que você é capaz?
+
+## Edição de Safra [AINDA NAO EXISTENTE]
+- Muda a data de início da safra.
+- Edita a expectativa de colheita.
+- Altera a variedade plantada no talhão.
+- Corrige a área plantada da safra de milho.
+- Atualiza o custo estimado da safra.
+- Muda o nome da safra pra Safrinha 2026.
+- Ajusta os dados do plantio.
+- Modifica a data fim da safra.
+- Edita o registro da safra passada.
+- Altera a cultura principal da safra.
+- Corrige o estande de plantas.
+- Atualiza a previsão de colheita.
+- Muda o espaçamento do plantio.
+- Edita as informações da lavoura.
+- Altera o ano da safra.
+- Muda o talhão vinculado à safra.
+- Edita o responsável técnico da safra.
+- Corrige o número da ART.
+- Modifica o objetivo de produtividade.
+- Edita o custo por hectare planejado.
+- Altera o cultivar de algodão.
+- Atualiza a quantidade de semente usada.
+- Muda a previsão de fim do plantio.
+- Corrige a data de dessecagem.
+- Edita o ciclo da cultura.
+
+## Exclusão de Safra [AINDA NAO EXISTENTE]
+- Deleta a safra de feijão que criei errado.
+- Apaga o registro da safrinha.
+- Cancela a safra 2025 no sistema.
+- Remove a safra duplicada.
+- Exclui aquela safra teste.
+- Tira do sistema a safra que perdi.
+- Limpa o histórico de safra de 2020.
+- Apaga os dados dessa colheita.
+- Deleta a safra abortada.
+- Remove o plantio de sorgo.
+- Exclui a safra ativa.
+- Cancela o registro dessa lavoura.
+- Tira a safra de algodão da lista.
+- Apaga a safra de inverno.
+- Deleta o ciclo passado.
+- Exclui a safra que foi sobreposta.
+- Cancela o plano safra 22.
+- Apaga a safra cancelada.
+- Remove a segunda safra de milho.
+- Deleta o trigo da safra de inverno.
+- Limpa os dados do plantio abortado.
+- Exclui as informações da safra teste.
+- Apaga permanentemente a safra 2021.
+- Remove a safra de cobertura.
+- Cancela a safra de feijão guandu.
+
+## Cadastro de Máquinas/Equipamentos [AINDA NAO EXISTENTE]
+- Cadastra um trator novo.
+- Adiciona a colheitadeira no sistema.
+- Cria o registro do pulverizador.
+- Insere o caminhão na frota.
+- Cadastra a plantadeira John Deere.
+- Adiciona a carreta agrícola.
+- Registra a moto niveladora.
+- Cadastra o gerador de energia.
+- Cria a ficha do quadriciclo.
+- Adiciona o drone de pulverização.
+- Registra a bomba de água nova.
+- Cadastra o trator Valtra.
+- Insere a pá carregadeira.
+- Adiciona o distribuidor de calcário.
+- Cadastra a bazuca graneleira.
+- Cadastra o pivô central novo.
+- Adiciona a ensiladeira.
+- Insere o rolo faca no sistema.
+- Registra o guincho bag.
+- Cadastra o misturador de ração.
+- Adiciona o distribuidor de esterco.
+- Cria o registro do escarificador.
+- Cadastra a roçadeira.
+- Adiciona a subsoladora.
+- Insere o tanque de combustível móvel.
+
+## Manutenção de Máquinas [AINDA NAO EXISTENTE]
+- Registra a troca de óleo do trator.
+- Anota que arrumou o pneu da colheitadeira.
+- Qual a próxima revisão do pulverizador?
+- Aponta a manutenção do caminhão.
+- Gera relatório de custo de manutenção da frota.
+- Anota a troca de correia.
+- Quando vence a revisão da plantadeira?
+- Registra a lubrificação geral.
+- Anota o conserto do motor.
+- Qual o horímetro do trator azul?
+- Lança a peça comprada pra máquina.
+- Avisa que a colheitadeira quebrou.
+- Registra a manutenção preventiva.
+- Anota a troca de filtros.
+- Qual o custo de oficina desse mês?
+- Aponta o serviço de solda.
+- Registra a troca de rolamentos do pivô.
+- Anota o reparo hidráulico do trator.
+- Lança o conserto do ar condicionado da máquina.
+- Registra a troca de disco da plantadeira.
+- Anota a calibragem dos bicos do pulverizador.
+- Quando foi a última troca de correia dentada?
+- Gera o histórico de manutenção da pá carregadeira.
+- Anota o gasto com eletricista.
+- Registra a substituição da bateria.
+
+## Relatório de Lucratividade por Talhão [AINDA NAO EXISTENTE]
+- Qual talhão deu mais lucro?
+- Me dá a rentabilidade por hectare.
+- Mostra o DRE do talhão sul.
+- Qual a área que deu prejuízo?
+- Gera o relatório de margem líquida da soja.
+- Qual o ROI da safrinha?
+- Compara o lucro do talhão 1 e 2.
+- Quanto sobrou livre por saco colhido?
+- Manda o balanço do pivô.
+- Qual o custo de produção do talhão da sede?
+- Faz a viabilidade econômica do plantio.
+- Qual área pagou a conta?
+- Me dá a rentabilidade da fazenda toda.
+- Qual o lucro bruto da colheita?
+- Gera a análise financeira dos talhões.
+- Qual a margem bruta por cultura?
+- Calcula o ponto de equilíbrio do talhão.
+- Qual gleba foi a mais eficiente?
+- Mostra a relação custo/benefício da adubação por talhão.
+- Gera o mapa de lucratividade.
+- Qual a taxa interna de retorno do plantio?
+- Faz um comparativo financeiro entre safras no talhão sul.
+- Quanto cada talhão gerou de receita?
+- Qual o impacto do frete no lucro do talhão?
+- Me dá o resultado operacional por área.
+
+## Cotação/Preço de Commodities [AINDA NAO EXISTENTE]
+- Quanto tá a saca de soja hoje?
+- Qual a cotação do milho em Chicago?
+- Qual o preço da arroba do boi?
+- Me dá o valor do bezerro.
+- Quanto tá o dólar agrícola?
+- A soja subiu ou caiu?
+- Qual o preço futuro do café?
+- Cotação do algodão na bolsa.
+- Me mostra o preço do calcário.
+- Quanto tão pagando na saca de trigo?
+- Qual o indicador CEPEA do boi gordo?
+- Preço da tonelada de adubo.
+- Qual o valor do frete hoje?
+- Cotação do suíno vivo.
+- Me dá a análise de mercado do agro.
+- Quanto tá valendo o bezerro desmamado?
+- Qual o preço da saca de feijão?
+- Cotação da vaca gorda.
+- Qual o valor da tonelada de cana?
+- Me mostra o preço da ureia.
+- Quanto tá o MAP no mercado?
+- Qual a cotação do cloreto de potássio?
+- Qual a tendência de preço da soja?
+- Mostra o gráfico da B3 pro milho.
+- Qual o preço base pro algodão pluma?
+
+## Alertas de Pragas/Doenças [AINDA NAO EXISTENTE]
+- Tem alerta de ferrugem asiática?
+- Qual a incidência de percevejo na região?
+- Identificou alguma doença pelo satélite?
+- Tem risco de cigarrinha do milho?
+- Avisa se tiver foco de lagarta.
+- Qual o nível de infestação da mosca branca?
+- Tem relato de nematoide por aqui?
+- Alerta de praga na vizinhança.
+- Risco de requeima na batata.
+- Monitoramento de doenças fúngicas.
+- Como tá a pressão de pragas?
+- Tem alerta fitossanitário?
+- Qual a praga mais comum agora?
+- Verifica risco de bicudo do algodoeiro.
+- Tem esporo de ferrugem no ar?
+- Tem alerta de mofo branco?
+- O clima favorece mancha alvo?
+- Qual o risco de pulgão essa semana?
+- Gera alerta de broca da cana.
+- Tem previsão de revoada da cigarrinha?
+- Qual o status de antracnose na região?
+- Monitoramento de lagarta do cartucho.
+- Tem surto de ácaro reportado?
+- Alerta de ferrugem no café.
+- Avisa se detectar podridão no talhão.
+
+## Recomendação de Adubação [AINDA NAO EXISTENTE]
+- Calcula a adubação de cobertura.
+- Quanto eu jogo de calcário nesse talhão?
+- Faz a recomendação de NPK.
+- Lê a análise de solo e recomenda o adubo.
+- Quanto de ureia vai na safrinha?
+- Recomenda gesso agrícola.
+- Qual a dose de fósforo pra plantar?
+- Calcula a extração de potássio.
+- Faz o balanço nutricional do solo.
+- Recomenda adubação foliar.
+- Quanto de boro eu aplico?
+- Gera a receita agronômica de adubação.
+- Qual a necessidade de nitrogênio?
+- Calcula a calagem.
+- Recomenda corretivo de solo.
+- Calcula a fosfatagem corretiva.
+- Qual a necessidade de zinco pro milho?
+- Recomenda adubação orgânica.
+- Calcula a necessidade de calcário pelo método V%.
+- Recomenda micronutrientes foliares.
+- Quanto aplico de cloreto de potássio?
+- Gera o plano de fertirrigação.
+- Recomenda adubação de plantio da soja.
+- Qual o momento ideal de aplicar N no milho?
+- Calcula a reposição de nutrientes pós colheita.
+
+## Gestão de Ponto/Férias de Funcionário [AINDA NAO EXISTENTE]
+- O João bateu o ponto hoje?
+- Quantas horas extras o tratorista tem?
+- Agenda as férias da Maria.
+- Registra a falta do José.
+- Gera a folha de pagamento da quinzena.
+- Quem tem férias vencendo?
+- Anota o atestado médico do peão.
+- Qual o banco de horas da equipe?
+- Registra a entrada do turno da noite.
+- Fecha o ponto da semana.
+- Calcula o adicional noturno.
+- Lança o vale do funcionário.
+- Quem tá de atestado?
+- Aprova as horas do mecânico.
+- Resumo do relógio de ponto.
+- Anota a folga compensatória do vaqueiro.
+- Quem faltou ontem?
+- Gera o espelho de ponto mensal.
+- Calcula o DSR dos horistas.
+- Registra a licença paternidade do Pedro.
+- Altera a escala de folga do domingo.
+- Qual o limite de horas extras da colheita?
+- Aprova as férias do gerente.
+- Mostra o absenteísmo do mês.
+- Lança adiantamento salarial.
+
+## Edição de Lançamento Financeiro [AINDA NAO EXISTENTE]
+- Altera o valor daquela nota fiscal.
+- Muda a data de vencimento do boleto da semente.
+- Edita o centro de custo da despesa.
+- Corrige o valor pago no diesel.
+- Muda o status do pagamento pra atrasado.
+- Atualiza o recibo do frete.
+- Altera a categoria do gasto.
+- Edita o lançamento do banco.
+- Corrige o fornecedor da nota.
+- Muda a conta corrente do pagamento.
+- Altera a parcela do trator.
+- Atualiza o juros do empréstimo.
+- Edita o desconto da venda.
+- Corrige a data de emissão.
+- Muda o lançamento de despesa pra receita.
+- Divide o lançamento em dois centros de custo.
+- Altera a taxa de juros do financiamento.
+- Corrige a observação do recibo.
+- Muda a competência da despesa.
+- Altera o histórico do lançamento.
+- Corrige o CPF do prestador de serviço.
+- Atualiza o código de barras do boleto.
+- Edita a forma de pagamento pra Pix.
+- Altera o plano de contas da despesa.
+- Corrige o valor dos impostos retidos.
+
+## Emissão de NFe [AINDA NAO EXISTENTE]
+- Emite a nota fiscal da carga de soja.
+- Gera a NFe de produtor rural.
+- Cancela a nota fiscal 123.
+- Consulta o status da NFe na Sefaz.
+- Tira a nota de remessa de gado.
+- Emite contra-nota.
+- Gera o XML e o Danfe.
+- Manda a nota por email pro cliente.
+- Imprime a nota fiscal da venda.
+- Inutiliza o número da nota.
+- Faz carta de correção pra NFe.
+- Emite nota de devolução de semente.
+- Gera MDF-e pro transporte.
+- Qual a alíquota de ICMS?
+- Autoriza a nota na receita estadual.
+- Emite NFe de transferência de gado.
+- Gera nota fiscal de venda de trator.
+- Tira nota de simples remessa.
+- Envia o lote de NFe pendentes.
+- Consulta chave de acesso da NFe.
+- Faz o download do XML da NFe.
+- Gera nota de produtor avulsa.
+- Consulta o cadastro de contribuinte do fornecedor.
+- Cancela a NFe que saiu errada.
+- Emite nota de entrada de grãos.
+
+## Controle de Vacinação do Rebanho [AINDA NAO EXISTENTE]
+- Gera o relatório de vacinação contra aftosa.
+- Quais animais faltam vacinar de brucelose?
+- Anota que o lote 3 foi vacinado.
+- Quando é a campanha de vacinação?
+- Registra a aplicação de vermífugo.
+- Qual o custo da vacina por cabeça?
+- Emite a declaração de vacinação do Indea.
+- Controla a carência do antibiótico.
+- Registra a vacina da clostridiose.
+- Quais vacinas tão vencendo no estoque?
+- Lança a vacinação da bezerrada.
+- Gera o calendário sanitário.
+- Anota a dose de ivermectina.
+- Controla a vacina de raiva.
+- Verifica o status sanitário do rebanho.
+- Anota a vacinação do gado de leite.
+- Qual foi o último dia que aplicou vacina?
+- Registra a reação à vacina do boi.
+- Lança a vacinação das matrizes.
+- Quando revacina os bezerros?
+- Gera o comprovante pro ministério da agricultura.
+- Lista os bezerros não imunizados.
+- Verifica as datas do manejo sanitário.
+- Aprova a compra de mais vacina de brucelose.
+- Anota que o protocolo sanitário foi cumprido.
+
+## Transferência de Animais entre Lotes [AINDA NAO EXISTENTE]
+- Transfere o gado do pasto 1 pro pasto 2.
+- Muda os bezerros de lote.
+- Registra a desmama e separa o gado.
+- Lança a morte de um animal.
+- Muda a categoria do boi magro pra gordo.
+- Movimenta a boiada pro confinamento.
+- Registra a venda do lote de matrizes.
+- Transfere os peixes do berçário pra engorda.
+- Separa o lote de abate.
+- Une os lotes pequenos num só.
+- Move as vacas secas de pasto.
+- Registra a entrada de gado comprado.
+- Faz o manejo de pastagem da tropa.
+- Transfere os reprodutores.
+- Controla a movimentação de brincos.
+- Lança a pesagem e muda o lote.
+- Transfere vacas leiteiras de piquete.
+- Move os cordeiros pro pasto novo.
+- Gera a GTA de transferência interna.
+- Separa o lote doente em quarentena.
+- Registra o nascimento e cria novo lote.
+- Transfere touros entre propriedades.
+- Junta o gado novo com o antigo.
+- Move o lote de suínos pra creche.
+- Reorganiza os lotes de boi gordo.
+
+## Compra de Insumos/Pedidos [AINDA NAO EXISTENTE]
+- Gera pedido de compra de glifosato.
+- Aprova a ordem de compra de peças.
+- Cota o preço do adubo nos fornecedores.
+- Registra o recebimento da semente.
+- Faz o pedido de diesel.
+- Acompanha a entrega do calcário.
+- Cancela o pedido de compra 45.
+- Envia a ordem de compra pro gerente aprovar.
+- Consulta o status do pedido de ração.
+- Gera a requisição de materiais.
+- Compara os orçamentos de defensivo.
+- Faz o pedido de embalagens.
+- Registra a compra de vacinas.
+- Acompanha o faturamento do trator.
+- Finaliza a cotação de seguro.
+- Autoriza a compra de mais arame.
+- Lança a cotação da cooperativa.
+- Solicita o fornecimento de sementes híbridas.
+- Confirma a entrega do fungicida.
+- Verifica a compra de sal mineral.
+- Encerra a ordem de pedido 10.
+- Altera a quantidade no pedido do adubo.
+- Consulta quem tem o menor preço de EPI.
+- Pede mais sal proteinado.
+- Gera a ordem de compra de calcário dolomítico.
+
+## Exportação de Relatórios (PDF/Excel) [AINDA NAO EXISTENTE]
+- Gera um PDF do mapa da fazenda.
+- Exporta o fluxo de caixa pro Excel.
+- Manda o relatório de safra pro meu email.
+- Baixa o inventário em CSV.
+- Imprime o histórico do talhão.
+- Gera o DRE em PDF.
+- Exporta a lista de funcionários pra Excel.
+- Gera relatório pra contabilidade.
+- Baixa o extrato de sensores.
+- Cria um PDF com as OS concluídas.
+- Exporta o mapa NDVI da área.
+- Gera o relatório gerencial do mês.
+- Manda os dados do rebanho por Whatsapp.
+- Exporta a ficha de EPIs.
+- Imprime o receituário agronômico.
+- Exporta os dados climáticos pra CSV.
+- Gera o relatório de produtividade em PDF.
+- Imprime o controle de frota.
+- Baixa os resultados da despesca em Excel.
+- Manda o balancete em PDF pro sócio.
+- Gera um dashboard em Excel.
+- Exporta a lista de fornecedores.
+- Cria PDF da última análise de solo.
+- Imprime a ficha de cada funcionário.
+- Gera relatório de horas extras em Excel.
+
+## Integração com Contabilidade [AINDA NAO EXISTENTE]
+- Gera o arquivo do Livro Caixa Digital do Produtor Rural.
+- Exporta os dados pro sistema contábil.
+- Envia as notas fiscais pro contador.
+- Faz a conciliação bancária automática.
+- Gera o SPED rural.
+- Integra com o banco do brasil.
+- Importa o extrato bancário OFX.
+- Gera o balancete de verificação.
+- Calcula o imposto de renda da fazenda.
+- Envia o XML da folha pro eSocial.
+- Gera o relatório de depreciação de máquinas.
+- Faz o fechamento contábil do mês.
+- Exporta os impostos retidos.
+- Integra com o sistema ERP.
+- Calcula o Funrural.
+- Gera os arquivos do eFinanceira.
+- Envia relatórios do ITR.
+- Importa dados da secretaria da fazenda.
+- Gera o demonstrativo de resultado rural.
+- Faz conciliação contábil do mês passado.
+- Manda os comprovantes de retenção INSS.
+- Integra com a plataforma Dominio.
+- Gera informe de rendimentos.
+- Importa faturamento pra contabilidade.
+- Valida o LCDPR do ano passado.
+
+## Monitoramento de Satélite/NDVI avançado [AINDA NAO EXISTENTE]
+- Puxa a imagem de satélite de hoje.
+- Gera o índice NDVI do talhão.
+- Qual a biomassa média pelo satélite?
+- Mostra a mancha de estresse hídrico no mapa.
+- Calcula o NDRE da cultura.
+- Compara as imagens de satélite da semana passada.
+- Detecta anomalia de crescimento pelo satélite.
+- Gera o mapa de prescrição em taxa variável.
+- Faz a análise multiespectral da folha.
+- Puxa a imagem do Sentinel-2.
+- Calcula o índice de vegetação.
+- Mostra o mapa de produtividade da colheitadeira.
+- Cruza o NDVI com a chuva.
+- Gera alerta de falha de plantio pelo drone.
+- Monitora o vigor da planta.
+- Gera o mapa clorofila do milho.
+- Detecta plantas invasoras pelo drone.
+- Mede a temperatura da folha via satélite.
+- Identifica áreas de seca no pasto.
+- Mostra o balanço de radiação solar do talhão.
+- Compara o NDVI deste mês com o passado.
+- Gera imagem infravermelho do cultivo.
+- Calcula a reflectância do solo nu.
+- Detecta acamamento no trigo.
+- Gera alerta de estresse térmico por satélite.
+
+## Controle de Combustível [AINDA NAO EXISTENTE]
+- Qual o consumo médio do trator Valtra?
+- Quanto diesel gastamos essa semana?
+- Controla o abastecimento da bomba.
+- Gera o relatório de eficiência de combustível.
+- Lança o abastecimento do caminhão.
+- O tanque de diesel tá acabando?
+- Qual máquina gastou mais óleo?
+- Calcula litros por hectare plantado.
+- Anota o recebimento de diesel no tanque base.
+- Verifica desvio de combustível.
+- Qual o custo de diesel por saco colhido?
+- Lança a aferição da bomba de combustível.
+- Gera o controle de frota.
+- Abastece a colheitadeira no sistema.
+- Faz a média de km/l da caminhonete.
+- Quanto foi gasto com Arla 32?
+- Registra a compra de 1000L de S10.
+- Lança a quilometragem da picape.
+- Qual o consumo do pulverizador autopropelido?
+- Gera o log de cada bomba.
+- Identifica a máquina que consome mais combustível.
+- Calcula o consumo em l/h de motor.
+- Anota abastecimento do gerador.
+- Verifica o estoque do posto interno.
+- Fecha a planilha de combustível mensal.
+
+## Rastreabilidade/Certificação [AINDA NAO EXISTENTE]
+- Gera o QR code de rastreabilidade da soja.
+- Prepara os dados pra auditoria Global GAP.
+- Imprime o caderno de campo digital.
+- Gera o relatório de sustentabilidade.
+- Certifica o lote de algodão.
+- Puxa a rastreabilidade do boi abatido.
+- Gera o laudo de resíduo de agroquímico.
+- Mostra o histórico rastreável do talhão.
+- Exporta os dados pra certificadora.
+- Gera o balanço de carbono da fazenda.
+- Prepara o relatório do selo verde.
+- Puxa o histórico de desmatamento da área.
+- Gera o passaporte do produto.
+- Mostra a pegada hídrica da produção.
+- Imprime o certificado de origem.
+- Verifica conformidade ambiental do CAR.
+- Gera declaração de manejo sustentável.
+- Exporta relatórios RTRS pra soja.
+- Cria laudo de cumprimento trabalhista.
+- Manda o registro de aplicação pra fiscalização.
+- Gera relatório ESG da fazenda.
+- Emite o certificado de café orgânico.
+- Rastreia a origem do lote de sementes.
+- Verifica a validade da licença ambiental.
+- Gera o bloco de rastreabilidade do Sisbov.
+

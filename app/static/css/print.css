@@ -1,0 +1,75 @@
+/*
+ * Print CSS
+ * Otimiza a visualização para impressão (Ctrl+P)
+ */
+
+@media print {
+  /* Ocultar elementos desnecessários na impressão */
+  nav,
+  .sidebar,
+  .widget-bar,
+  .toast-container,
+  #toast-container,
+  .fab,
+  footer,
+  .pitch-nav,
+  .pitch-ctas,
+  .pitch-demo,
+  .pitch-footer,
+  .btn,
+  .modal-backdrop,
+  [role='dialog'] {
+    display: none !important;
+  }
+
+  /* Resetar corpo e fundo */
+  body,
+  #content,
+  .main-content {
+    font-size: 12pt;
+    color: #000 !important;
+    background: #fff !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+  }
+
+  /* Ajustar cards para evitar quebras e tirar sombras */
+  .card,
+  .stat-card,
+  .content-card,
+  .widget-box,
+  .fundo-card {
+    break-inside: avoid;
+    border: 1px solid #ccc !important;
+    box-shadow: none !important;
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  /* Mostrar URLs reais em links impressos */
+  a[href]::after {
+    content: ' (' attr(href) ')';
+    font-size: 0.8em;
+    color: #555;
+  }
+
+  /* Mas não para links internos de javascript ou âncoras locais */
+  a[href^='javascript:']::after,
+  a[href^='#']::after {
+    content: '';
+  }
+
+  /* Tabelas */
+  .table th,
+  .table td {
+    border: 1px solid #ccc !important;
+    color: #000 !important;
+  }
+
+  .table th {
+    background: #eee !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

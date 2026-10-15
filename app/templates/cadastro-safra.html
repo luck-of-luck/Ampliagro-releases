@@ -1,0 +1,298 @@
+{% extends "partials/_premium_cadastro_base.html" %}
+{% load static agro_icons %}
+
+{% block title %}Ampliagro - Cadastro de Safras{% endblock %}
+
+{% block cadastro_icon %}bi bi-calendar3{% endblock %}
+{% block cadastro_title %}Cadastro de Safras{% endblock %}
+{% block cadastro_novo_title %}Nova Safra{% endblock %}
+{% block cadastro_lista_title %}Safras Cadastradas{% endblock %}
+
+{% block cadastro_subtabs %}
+<div class="pcrud-subtabs" id="cadastroSubTabs">
+    <button class="pcrud-subtab active" data-tab="novo">Nova Safra</button>
+    <button class="pcrud-subtab" data-tab="lista">Safras Cadastradas</button>
+    <button class="pcrud-subtab" data-tab="resumo">Resumo por Cultura</button>
+</div>
+{% endblock %}
+
+{% block cadastro_stats %}
+<div class="pcrud-stats" id="cadastroStats">
+    <div class="pcrud-stat"><div class="pcrud-stat-label">Total Safras</div><div class="pcrud-stat-value" id="statTotalSafras">{{ safras|length }}</div></div>
+    <div class="pcrud-stat"><div class="pcrud-stat-label">Área Total (ha)</div><div class="pcrud-stat-value" id="statAreaTotal">{{ area_total|floatformat:2 }}</div></div>
+    <div class="pcrud-stat"><div class="pcrud-stat-label">Produção Total</div><div class="pcrud-stat-value" id="statProducao">{{ producao_total|floatformat:0 }}</div></div>
+    <div class="pcrud-stat"><div class="pcrud-stat-label">Receita Estimada</div><div class="pcrud-stat-value" id="statReceita">R$ {{ receita_total|floatformat:2 }}</div></div>
+</div>
+{% endblock %}
+
+{% block cadastro_form_novo %}
+<form id="safra-form" onsubmit="return submitSafra(event)">
+    {% csrf_token %}
+    <div class="pcrud-form-grid">
+        <div class="pcrud-form-group">
+            <label>Propriedade *</label>
+            <select name="propriedade" required onchange="carregarTalhoes(this)" onblur="validateField(this)">
+                <option value="">Selecione...</option>
+                {% for p in propriedades %}
+                <option value="{{ p.id }}">{{ p.nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="pcrud-form-group">
+            <label>Talhão</label>
+            <select name="talhao" id="id_talhao" onblur="validateField(this)">
+                <option value="">Selecione a propriedade primeiro</option>
+            </select>
+        </div>
+        <div class="pcrud-form-group">
+            <label>Cultura *</label>
+            <select name="cultura" required onchange="onSafraCulturaChange(this)" onblur="validateField(this)">
+                <option value="">Selecione...</option>
+                {% for c in culturas %}
+                <option value="{{ c.id }}">{{ c.nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="pcrud-form-group cultura-type-group" id="safra-cultura-type-group" style="display:none;">
+            <label>Tipo/Variedade da Cultura</label>
+            <select name="cultura_type" id="id_safra_cultura_type">
+                <option value="">Selecione...</option>
+            </select>
+        </div>
+        <div class="pcrud-form-group">
+            <label>Nome da Safra</label>
+            <input type="text" name="safra_nome" placeholder="Ex: Safra 2025/2026">
+        </div>
+        <div class="pcrud-form-group">
+            <label>Ano *</label>
+            <select name="ano" required onblur="validateField(this)">
+                <option value="">Selecione...</option>
+                {% for y in anos %}
+                <option value="{{ y }}" {% if y == ano_atual %}selected{% endif %}>{{ y }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="pcrud-form-group">
+            <label>Data de Plantio</label>
+            <input type="date" name="data_plantio">
+        </div>
+        <div class="pcrud-form-group">
+            <label>Previsão de Colheita</label>
+            <input type="date" name="data_colheita">
+        </div>
+        <div class="pcrud-form-group">
+            <label>Área Plantada (ha) *</label>
+            <input type="number" step="0.01" name="area_plantada" required placeholder="0,00" onblur="validateField(this)">
+        </div>
+        <div class="pcrud-form-group">
+            <label>Área Colhida (ha)</label>
+            <input type="number" step="0.01" name="area_colhida" placeholder="0,00">
+        </div>
+        <div class="pcrud-form-group">
+            <label>Produção Total</label>
+            <input type="number" step="0.01" name="producao_total" placeholder="0">
+        </div>
+        <div class="pcrud-form-group">
+            <label>Receita Estimada (R$)</label>
+            <input type="number" step="0.01" name="receita_estimada" placeholder="0,00">
+        </div>
+        <div class="pcrud-form-group">
+            <label>Produtividade (sc/ha ou kg/ha)</label>
+            <input type="number" step="0.01" name="produtividade" placeholder="0,00">
+        </div>
+        <div class="pcrud-form-group" style="grid-column:span 2;">
+            <label>Observação</label>
+            <textarea name="observacao" rows="2" placeholder="Observações sobre a safra..."></textarea>
+        </div>
+    </div>
+    <div class="pcrud-form-actions">
+        <button type="submit" class="pcrud-btn pcrud-btn-primary"><i class="bi bi-check-lg"></i> Salvar Safra</button>
+        <button type="reset" class="pcrud-btn pcrud-btn-secondary">Limpar</button>
+    </div>
+</form>
+{% endblock %}
+
+{% block cadastro_tab_lista %}
+{% if safras %}
+<div class="pcrud-table-wrap">
+    <table class="pcrud-table">
+        <thead>
+            <tr>
+                <th>Safra</th>
+                <th>Cultura</th>
+                <th>Tipo/Variedade</th>
+                <th>Talhão</th>
+                <th>Ano</th>
+                <th>Área Plant. (ha)</th>
+                <th>Área Colh. (ha)</th>
+                <th>Produção</th>
+                <th>Produtividade</th>
+                <th>Receita Est.</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in safras %}
+            <tr>
+                <td><strong>{{ s.safra_nome|default:s.cultura.nome }}</strong></td>
+                <td>{{ s.cultura.nome }}</td>
+                <td style="font-size:.75rem;color:var(--cor-texto-medio);">
+                    {% if s.observacao and s.observacao|slice:":12" == "cultura_type" %}
+                    <span style="background:var(--cor-primaria-suave);color:var(--cor-primaria);padding:2px 8px;border-radius:999px;font-weight:600;">{{ s.observacao|cut:"cultura_type:" }}</span>
+                    {% else %}—{% endif %}
+                </td>
+                <td>{{ s.talhao.nome|default:"—" }}</td>
+                <td>{{ s.ano }}</td>
+                <td>{{ s.area_plantada|floatformat:2 }}</td>
+                <td>{{ s.area_colhida|floatformat:2|default:"—" }}</td>
+                <td>{{ s.producao_total|floatformat:0|default:"—" }}</td>
+                <td>{{ s.produtividade|floatformat:2|default:"—" }}</td>
+                <td>R$ {{ s.receita_estimada|floatformat:2|default:"—" }}</td>
+                <td>
+                    <div class="action-cell">
+                        <button class="pcrud-btn pcrud-btn-secondary pcrud-btn-sm" onclick="editarSafra({{ s.id }})"><i class="bi bi-pencil"></i> Editar</button>
+                        <button class="pcrud-btn pcrud-btn-secondary pcrud-btn-sm" onclick="duplicateRecord('/api/safras/', {{ s.id }}, 'safra-form', submitSafra)"><i class="bi bi-copy"></i> Duplicar</button>
+                        <button class="pcrud-btn pcrud-btn-danger pcrud-btn-sm" onclick="excluirSafra({{ s.id }})"><i class="bi bi-trash"></i> Excluir</button>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+{% include "partials/_empty_state_cta.html" with empty_icone="bi bi-calendar3" empty_titulo="Nenhuma safra cadastrada" empty_descricao="Cadastre a primeira safra para fechar área plantada, custo e produtividade por talhão." empty_acao="Cadastrar safra" empty_aba="novo" %}
+{% endif %}
+{% endblock %}
+
+{% block cadastro_extra_tabs %}
+<!-- Tab: Resumo por Cultura -->
+<div class="pcrud-tab" id="tab-resumo">
+    <h2><i class="bi bi-bar-chart"></i> Resumo por Cultura</h2>
+    <div class="pcrud-form-card" style="padding:0;">
+        {% if resumo_culturas %}
+        <div class="pcrud-table-wrap">
+            <table class="pcrud-table">
+                <thead>
+                    <tr>
+                        <th>Cultura</th>
+                        <th>Safras</th>
+                        <th>Área Total (ha)</th>
+                        <th>Produção Total</th>
+                        <th>Produtividade Média</th>
+                        <th>Receita Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in resumo_culturas %}
+                    <tr>
+                        <td><strong>{{ r.cultura__nome }}</strong></td>
+                        <td>{{ r.count }}</td>
+                        <td>{{ r.area_total|floatformat:2 }}</td>
+                        <td>{{ r.producao_total|floatformat:0 }}</td>
+                        <td>{{ r.produtividade_media|floatformat:2 }}</td>
+                        <td style="color:var(--cor-primaria);font-weight:600;">R$ {{ r.receita_total|floatformat:2 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="pcrud-empty"><i class="bi bi-bar-chart"></i>Sem dados para resumo por cultura.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+(function() {
+    window.carregarTalhoes = function(sel) {
+        const propId = sel.value;
+        const targetSel = document.getElementById('id_talhao');
+        targetSel.innerHTML = '<option value="">Carregando...</option>';
+        if (!propId) {
+            targetSel.innerHTML = '<option value="">Selecione a propriedade primeiro</option>';
+            return;
+        }
+        fetch('/api/talhoes-por-propriedade/?propriedade_id=' + propId)
+            .then(r => r.json())
+            .then(data => {
+                targetSel.innerHTML = '<option value="">Selecione...</option>';
+                data.forEach(t => {
+                    targetSel.innerHTML += '<option value="' + t.id + '">' + t.nome + ' (' + t.area_hectare + ' ha)</option>';
+                });
+            })
+            .catch(() => {
+                targetSel.innerHTML = '<option value="">Erro ao carregar</option>';
+            });
+    };
+
+    window.onSafraCulturaChange = function(sel) {
+        var group = document.getElementById('safra-cultura-type-group');
+        var typeSel = document.getElementById('id_safra_cultura_type');
+        typeSel.innerHTML = '<option value="">Selecione...</option>';
+        if (!sel.value) { group.style.display = 'none'; return; }
+        var nome = sel.options[sel.selectedIndex].text;
+        if (window.CulturesLoader && window.CULTURE_GROUPS) {
+            var found = null;
+            for (var gi = 0; gi < window.CULTURE_GROUPS.length; gi++) {
+                var g = window.CULTURE_GROUPS[gi];
+                for (var ci = 0; ci < g.cultures.length; ci++) {
+                    var c = g.cultures[ci];
+                    if (c.title && (c.title.toLowerCase() === nome.toLowerCase() ||
+                        c.django_nome && c.django_nome.toLowerCase() === nome.toLowerCase())) {
+                        found = c; break;
+                    }
+                }
+                if (found) break;
+            }
+            if (found && found.types && Object.keys(found.types).length) {
+                Object.keys(found.types).forEach(function(key) {
+                    var t = found.types[key];
+                    typeSel.innerHTML += '<option value="' + key + '">' + t.label + '</option>';
+                });
+                group.style.display = 'block';
+            } else { group.style.display = 'none'; }
+        }
+    };
+
+    window.submitSafra = async function(event) {
+        event.preventDefault();
+        if (!validateForm('safra-form')) { showToast('Corrija os campos em destaque', 'error'); return false; }
+        const f = document.getElementById('safra-form');
+        const culturaType = document.getElementById('id_safra_cultura_type').value;
+        const data = {
+            propriedade: parseInt(f.propriedade.value),
+            cultura: parseInt(f.cultura.value),
+            talhao: parseInt(f.talhao.value) || null,
+            ano: parseInt(f.ano.value),
+            safra_nome: f.safra_nome.value || '',
+            data_plantio: f.data_plantio.value || null,
+            data_colheita: f.data_colheita.value || null,
+            area_plantada: parseFloat(f.area_plantada.value),
+            area_colhida: parseFloat(f.area_colhida.value) || null,
+            producao_total: parseFloat(f.producao_total.value) || null,
+            receita_estimada: parseFloat(f.receita_estimada.value) || null,
+            produtividade: parseFloat(f.produtividade.value) || null,
+        };
+        if (culturaType) data.observacao = 'cultura_type:' + culturaType;
+        const btn = f.querySelector('.pcrud-btn-primary'); showLoading(btn);
+        try {
+            const resp = await fetch('/api/safras/', { method:'POST', headers:{'Content-Type':'application/json','X-CSRFToken':getCSRFToken()}, body: JSON.stringify(data) });
+            if (resp.ok) { showToast('Safra cadastrada!','success'); setTimeout(() => location.reload(), 800); }
+            else { const err = await resp.json(); showToast('Erro: '+JSON.stringify(err),'error'); }
+        } catch(e) { showToast('Erro: '+e.message,'error'); } finally { hideLoading(btn); }
+        return false;
+    };
+
+    window.excluirSafra = function(id) {
+        if (!confirm('Excluir esta safra?')) return;
+        fetch('/api/safras/'+id+'/', { method:'DELETE', headers:{'X-CSRFToken':getCSRFToken()} })
+            .then(r => { if(r.ok){ showToast('Excluída','success'); setTimeout(() => location.reload(), 500); } else showToast('Erro','error'); });
+    };
+
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,347 @@
+{% extends base_template %}
+{% load static agro_icons %}
+
+{% block title %}Ampliagro - Cadastro de Aquáticos{% endblock %}
+
+{% block extra_css %}
+{% include "partials/_premium_cadastro_styles.html" %}
+{% endblock %}
+
+{% block dashboard_appbar %}{% endblock %}
+
+{% block content %}
+<div class="pcrud-container">
+    <div class="pcrud-header">
+        <h1 class="pcrud-title"><i class="bi bi-water"></i> Cadastro de Aquáticos</h1>
+        <a href="{% url 'index_spa' %}" class="pcrud-btn pcrud-btn-secondary pcrud-btn-sm"><i class="bi bi-speedometer2"></i> Dashboard</a>
+    </div>
+
+    <div class="pcrud-subtabs" id="cadastroSubTabs">
+        <button class="pcrud-subtab active" data-tab="novo">Novo Lote</button>
+        <button class="pcrud-subtab" data-tab="lista">Lotes Cadastrados</button>
+        <button class="pcrud-subtab" data-tab="despesca">Despescas</button>
+    </div>
+
+    <!-- Stats -->
+    <div class="pcrud-stats" id="cadastroStats">
+        <div class="pcrud-stat"><div class="pcrud-stat-label">Total de Indivíduos</div><div class="pcrud-stat-value" id="statTotalIndividuos">—</div></div>
+        <div class="pcrud-stat"><div class="pcrud-stat-label">Espécies Diferentes</div><div class="pcrud-stat-value" id="statEspecies">—</div></div>
+        <div class="pcrud-stat"><div class="pcrud-stat-label">Despesca Mês (kg)</div><div class="pcrud-stat-value" id="statDespescaMes">—</div></div>
+        <div class="pcrud-stat"><div class="pcrud-stat-label">Valor Estimado</div><div class="pcrud-stat-value" id="statValorEstimado">—</div></div>
+    </div>
+    {{ aquaticos_stats|json_script:"aquaticosStatsData" }}
+
+    <!-- Tab: Novo Lote -->
+    <div class="pcrud-tab active" id="tab-novo">
+        <h2><i class="bi bi-plus-circle"></i> Novo Lote</h2>
+        <div class="pcrud-form-card">
+            <form id="lote-form" onsubmit="return submitLote(event)">
+                {% csrf_token %}
+                <div class="pcrud-form-grid">
+                    <div class="pcrud-form-group">
+                        <label>Propriedade</label>
+                        <select name="propriedade" required onblur="validateField(this)">
+                            <option value="">Selecione...</option>
+                            {% for p in propriedades %}
+                            <option value="{{ p.id }}">{{ p.nome }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="pcrud-form-group">
+                        <label>Espécie</label>
+                        <select name="especie" required onblur="validateField(this)">
+                            <option value="">Selecione...</option>
+                            <option value="TILAPIA">Tilápia</option>
+                            <option value="TAMBAQUI">Tambaqui</option>
+                            <option value="CARPA">Carpa</option>
+                            <option value="PINTADO">Pintado</option>
+                            <option value="PIRARUCU">Pirarucu</option>
+                            <option value="TRUTA">Truta</option>
+                            <option value="CAMARAO">Camarão</option>
+                            <option value="OUTRO_PEIXE">Outro peixe</option>
+                            <option value="OUTRO_CRUSTACEO">Outro crustáceo</option>
+                        </select>
+                    </div>
+                    <div class="pcrud-form-group">
+                        <label>Sistema de Cultivo</label>
+                        <select name="sistema">
+                            <option value="VIVEIRO_ESCAVADO">Viveiro escavado</option>
+                            <option value="TANQUE_REDE">Tanque-rede</option>
+                            <option value="TANQUE_ELEVADO">Tanque elevado / caixa d'água</option>
+                            <option value="AQUAPONIA">Aquaponia</option>
+                            <option value="BIOFLOCOS">Bioflocos (BFT)</option>
+                            <option value="OUTRO">Outro</option>
+                        </select>
+                    </div>
+                    <div class="pcrud-form-group">
+                        <label>Ambiente (viveiro/tanque)</label>
+                        <input type="text" name="ambiente" placeholder="Ex: Viveiro 3, Tanque-rede 1">
+                    </div>
+                    <div class="pcrud-form-group">
+                        <label>Quantidade de Indivíduos</label>
+                        <input type="number" name="quantidade" required placeholder="0" min="1" onblur="validateField(this)">
+                    </div>
+                    <div class="pcrud-form-group">
+                        <label>Biomassa Média (g/indivíduo)</label>
+                        <input type="number" step="0.1" name="biomassa_media" placeholder="0,0">
+                    </div>
+                    <div class="pcrud-form-group">
+                        <label>Data de Povoamento</label>
+                        <input type="date" name="data_povoamento" value="{{ today|date:'Y-m-d' }}">
+                    </div>
+                    <div class="pcrud-form-group">
+                        <label>Observação</label>
+                        <textarea name="observacao" rows="2" placeholder="Observações adicionais..."></textarea>
+                    </div>
+                </div>
+                <div class="pcrud-form-actions">
+                    <button type="submit" class="pcrud-btn pcrud-btn-primary"><i class="bi bi-check-lg"></i> Salvar Lote</button>
+                    <button type="reset" class="pcrud-btn pcrud-btn-secondary">Limpar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tab: Lista de Lotes -->
+    <div class="pcrud-tab" id="tab-lista">
+        <h2><i class="bi bi-list-ul"></i> Lotes Cadastrados</h2>
+        <div class="pcrud-form-card" style="padding:0;">
+            {% if lotes %}
+            <div class="pcrud-table-wrap">
+                <table class="pcrud-table">
+                    <thead>
+                        <tr>
+                            <th>Espécie</th>
+                            <th>Sistema</th>
+                            <th>Ambiente</th>
+                            <th>Quantidade</th>
+                            <th>Biomassa Média</th>
+                            <th>Povoamento</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for l in lotes %}
+                        <tr>
+                            <td><strong>{{ l.get_especie_display }}</strong></td>
+                            <td>{{ l.get_sistema_display }}</td>
+                            <td>{{ l.ambiente|default:"-" }}</td>
+                            <td>{{ l.quantidade }}</td>
+                            <td>{{ l.biomassa_media|floatformat:1|default:"-" }} g</td>
+                            <td>{{ l.data_povoamento|date:"d/m/Y"|default:"-" }}</td>
+                            <td>
+                                <div class="action-cell">
+                                    <button class="pcrud-btn pcrud-btn-secondary pcrud-btn-sm" onclick="editarLote({{ l.id }})"><i class="bi bi-pencil"></i> Editar</button>
+                                    <button class="pcrud-btn pcrud-btn-danger pcrud-btn-sm" onclick="excluirLote({{ l.id }})"><i class="bi bi-trash"></i> Excluir</button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            {% include "partials/_empty_state_cta.html" with empty_icone="bi bi-water" empty_titulo="Nenhum lote cadastrado" empty_descricao="Cadastre o primeiro lote para registrar consumo de ração, biometria e despesca." empty_acao="Cadastrar lote" empty_aba="novo" %}
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Tab: Despescas -->
+    <div class="pcrud-tab" id="tab-despesca">
+        <h2><i class="bi bi-graph-up"></i> Despescas</h2>
+        <div class="pcrud-form-card">
+            <form id="despesca-form" onsubmit="return submitDespesca(event)">
+                {% csrf_token %}
+                <div class="pcrud-form-grid">
+                    <div class="pcrud-form-group">
+                        <label>Lote</label>
+                        <select name="lote" required onblur="validateField(this)">
+                            <option value="">Selecione...</option>
+                            {% for l in lotes %}
+                            <option value="{{ l.id }}">{{ l.get_especie_display }} - {{ l.ambiente|default:"-" }} ({{ l.quantidade }} un)</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="pcrud-form-group">
+                        <label>Data</label>
+                        <input type="date" name="data" value="{{ today|date:'Y-m-d' }}" required onblur="validateField(this)">
+                    </div>
+                    <div class="pcrud-form-group">
+                        <label>Quantidade (kg)</label>
+                        <input type="number" step="0.01" name="quantidade_kg" required placeholder="0,00" min="0" onblur="validateField(this)">
+                    </div>
+                    <div class="pcrud-form-group">
+                        <label>Valor Estimado (R$)</label>
+                        <input type="number" step="0.01" name="valor_estimado" placeholder="0,00">
+                    </div>
+                    <div class="pcrud-form-group">
+                        <label>Observação</label>
+                        <textarea name="observacao" rows="2" placeholder="Observações..."></textarea>
+                    </div>
+                </div>
+                <div class="pcrud-form-actions">
+                    <button type="submit" class="pcrud-btn pcrud-btn-primary"><i class="bi bi-check-lg"></i> Registrar Despesca</button>
+                    <button type="reset" class="pcrud-btn pcrud-btn-secondary">Limpar</button>
+                </div>
+            </form>
+        </div>
+
+        {% if despescas %}
+        <h2 style="margin-top:28px;"><i class="bi bi-clock-history"></i> Histórico de Despescas</h2>
+        <div class="pcrud-form-card" style="padding:0;">
+            <div class="pcrud-table-wrap">
+                <table class="pcrud-table">
+                    <thead>
+                        <tr>
+                            <th>Lote</th>
+                            <th>Data</th>
+                            <th>Quantidade</th>
+                            <th>Valor Estimado</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for d in despescas %}
+                        <tr>
+                            <td>{{ d.lote.get_especie_display }} - {{ d.lote.ambiente|default:"-" }}</td>
+                            <td>{{ d.data|date:"d/m/Y" }}</td>
+                            <td>{{ d.quantidade_kg|floatformat:2 }} kg</td>
+                            <td>{{ d.valor_estimado|floatformat:2|default:"-" }}</td>
+                            <td><button class="pcrud-btn pcrud-btn-danger pcrud-btn-sm" onclick="excluirDespesca({{ d.id }})"><i class="bi bi-trash"></i></button></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div id="toast" class="pcrud-toast"></div>
+{% include "partials/_confirm_modal.html" %}
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="{% static 'js/cadastro.js' %}"></script>
+<script>
+(function() {
+    // Sub-tabs
+    const tabs = document.querySelectorAll('.pcrud-subtab');
+    const tabContents = document.querySelectorAll('.pcrud-tab');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => t.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
+            tab.classList.add('active');
+            document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+        });
+    });
+
+    // Stats from JSON
+    const statsEl = document.getElementById('aquaticosStatsData');
+    if (statsEl) {
+        const stats = JSON.parse(statsEl.textContent || '{}');
+        document.getElementById('statTotalIndividuos').textContent = stats.total_individuos || '—';
+        document.getElementById('statEspecies').textContent = stats.total_especies || '—';
+        document.getElementById('statDespescaMes').textContent = stats.despesca_mes || '—';
+        document.getElementById('statValorEstimado').textContent = 'R$ ' + (stats.valor_estimado || '—');
+    }
+
+    // Validation
+    window.validateField = function(el) {
+        const val = (el.value || '').trim();
+        if (el.hasAttribute('required') && !val) {
+            el.classList.add('error');
+            return false;
+        }
+        el.classList.remove('error');
+        return true;
+    };
+    window.validateForm = function(formId) {
+        const form = document.getElementById(formId);
+        let ok = true;
+        form.querySelectorAll('[required]').forEach(el => { if (!validateField(el)) ok = false; });
+        return ok;
+    };
+    window.showToast = function(msg, type='success') {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.className = 'pcrud-toast show pcrud-toast-' + type;
+        clearTimeout(t._hide);
+        t._hide = setTimeout(() => t.classList.remove('show'), 3500);
+    };
+    window.showLoading = function(btn) {
+        btn.disabled = true;
+        btn.dataset.txt = btn.innerHTML;
+        btn.innerHTML = '<span class="pcrud-spinner"></span> Salvando...';
+    };
+    window.hideLoading = function(btn) {
+        btn.disabled = false;
+        btn.innerHTML = btn.dataset.txt || 'Salvar';
+    };
+    window.getCSRFToken = function() {
+        return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+    };
+
+    // Lote CRUD
+    window.submitLote = async function(event) {
+        event.preventDefault();
+        if (!validateForm('lote-form')) { showToast('Corrija os campos em destaque', 'error'); return false; }
+        const f = document.getElementById('lote-form');
+        const data = {
+            propriedade: parseInt(f.propriedade.value),
+            especie: f.especie.value,
+            sistema: f.sistema.value,
+            ambiente: f.ambiente.value || '',
+            quantidade: parseInt(f.quantidade.value),
+            biomassa_media: parseFloat(f.biomassa_media.value) || null,
+            data_povoamento: f.data_povoamento.value || null,
+            observacao: f.observacao.value || '',
+        };
+        const btn = f.querySelector('.pcrud-btn-primary'); showLoading(btn);
+        try {
+            const r = await fetch('/api/lotes-aquaticos/', { method:'POST', headers:{'Content-Type':'application/json','X-CSRFToken':getCSRFToken()}, body: JSON.stringify(data) });
+            if (r.ok) { showToast('Lote cadastrado!','success'); setTimeout(() => location.reload(), 800); }
+            else { const e=await r.json(); showToast('Erro: '+JSON.stringify(e),'error'); }
+        } catch(e) { showToast('Erro: '+e.message,'error'); } finally { hideLoading(btn); }
+        return false;
+    };
+
+
+    window.excluirLote = function(id) {
+        if (!confirm('Excluir este lote?')) return;
+        fetch('/api/lotes-aquaticos/'+id+'/', { method:'DELETE', headers:{'X-CSRFToken':getCSRFToken()} })
+            .then(r => { if(r.ok){ showToast('Excluído','success'); setTimeout(() => location.reload(), 500); } else showToast('Erro ao excluir','error'); });
+    };
+
+    // Despesca CRUD
+    window.submitDespesca = async function(event) {
+        event.preventDefault();
+        if (!validateForm('despesca-form')) { showToast('Corrija os campos em destaque', 'error'); return false; }
+        const f = document.getElementById('despesca-form');
+        const data = {
+            lote: parseInt(f.lote.value),
+            data: f.data.value,
+            quantidade_kg: parseFloat(f.quantidade_kg.value),
+            valor_estimado: parseFloat(f.valor_estimado.value) || null,
+            observacao: f.observacao.value || '',
+        };
+        const btn = f.querySelector('.pcrud-btn-primary'); showLoading(btn);
+        try {
+            const r = await fetch('/api/despescas/', { method:'POST', headers:{'Content-Type':'application/json','X-CSRFToken':getCSRFToken()}, body: JSON.stringify(data) });
+            if (r.ok) { showToast('Despesca registrada!','success'); setTimeout(() => location.reload(), 800); }
+            else { const e=await r.json(); showToast('Erro: '+JSON.stringify(e),'error'); }
+        } catch(e) { showToast('Erro: '+e.message,'error'); } finally { hideLoading(btn); }
+        return false;
+    };
+
+    window.excluirDespesca = function(id) {
+        if (!confirm('Excluir este registro de despesca?')) return;
+        fetch('/api/despescas/'+id+'/', { method:'DELETE', headers:{'X-CSRFToken':getCSRFToken()} })
+            .then(r => { if(r.ok){ showToast('Excluído','success'); setTimeout(() => location.reload(), 500); } else showToast('Erro ao excluir','error'); });
+    };
+})();
+</script>
+{% endblock %}

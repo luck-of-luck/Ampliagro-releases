@@ -1,0 +1,599 @@
+/* ==========================================================================
+   AMPLIAGRO GLOBAL — CSS Centralizado do Sistema
+   ─────────────────────────────────────────────────────────────────────────
+   Baseado no dashboard, usado por TODA página.
+   Cores e descrições no início, funções de modo claro/escuro generalizadas.
+   Qualquer arquivo que puxar este CSS já herda o tema.
+   API: /api/theme/ retorna este mesmo mapa como JSON para JS.
+   ========================================================================== */
+
+/* ========== 1. CORES E DESCRIÇÕES — MAPA CENTRAL ========== */
+:root {
+  /* --- Base — Claro (default) --- */
+  /* Fundo geral do sistema (body, page-wrap) */
+  --cor-fundo: #fdfefe;
+  /* Texto principal */
+  --cor-texto: #1d2421;
+  /* Primária — esmeralda Ampliagro (botões, destaques, brand) */
+  --cor-primaria: #0f9d6e;
+  /* Secundária — quase preto (navbar escura, contraste) */
+  --cor-secundaria: #1d2421;
+  /* Acento — esmeralda clara (hover, ícones) */
+  --cor-acento: #3ec48f;
+  /* Bordas suaves */
+  --cor-borda: #e5e7eb;
+  /* Hover translúcido (12% da primária) */
+  --cor-hover: rgba(15, 157, 110, 0.1);
+  /* Fundo suave (cards aninhados, hover) */
+  --cor-suave: #f3f7f5;
+  /* Texto suave (labels, descrições) */
+  --cor-texto-suave: #5f6b66;
+  /* Texto fraco (placeholders, disabled) */
+  --cor-texto-fraco: #8b9792;
+  /* Sombra suave */
+  --cor-sombra: rgba(29, 36, 33, 0.12);
+  /* Fundo navbar */
+  --cor-fundo-navbar: #fdfefe;
+  /* Fundo cards */
+  --cor-fundo-card: #fdfefe;
+  /* Fundo cards aninhados */
+  --cor-fundo-card-aninhado: #f3f7f5;
+  /* Estados */
+  --cor-sucesso: #0f9d6e;
+  --cor-alerta: #c98a24;
+  --cor-erro: #d93a3a;
+
+  /* --- Culturas — por grupo (mantém esmeralda como base) --- */
+  --cor-cultura-graos: #0f9d6e;
+  --cor-cultura-frutas: #e67e22;
+  --cor-cultura-hortalicas: #27ae60;
+  --cor-cultura-tuberculos: #8e44ad;
+  --cor-cultura-ervas: #16a085;
+  --cor-cultura-citricos: #f39c12;
+  --cor-cultura-oleaginosas: #2980b9;
+
+  /* --- Design — raios, sombras, transições (do dashboard) --- */
+  --raio-premium: 28px;
+  --raio-medio: 16px;
+  --raio-suave: 12px;
+  --raio-pilula: 999px;
+  --sombra-premium: 0 8px 32px rgba(15, 157, 110, 0.12);
+  --sombra-suave: 0 4px 16px rgba(15, 157, 110, 0.08);
+  --sombra-card: 0 1px 3px var(--cor-sombra);
+  --transicao-fluida: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transicao-rapida: 0.15s ease;
+  --transicao-tema: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+
+  /* --- Tipografia (do dashboard) --- */
+  --fonte-display: 'Sora', sans-serif;
+  --fonte-corpo: 'Inter', system-ui, -apple-system, sans-serif;
+  --fonte-mono: 'JetBrains Mono', monospace;
+
+  /* --- Dashboard — específicos (gradientes, brand) --- */
+  --brand: var(--cor-primaria);
+  --brand-deep: #0a7d56;
+  --brand-50: #ecfdf5;
+  --brand-100: #d7f5e9;
+  --dashboard-bg-from: var(--brand-50);
+  --dashboard-bg-to: #eef2ff;
+}
+
+/* ========== 2. MODO ESCURO — sobrescreve só o que muda ========== */
+html.dark {
+  --cor-fundo: #0b0f0e;
+  --cor-texto: #e9eeec;
+  --cor-primaria: #3ec48f;
+  --cor-secundaria: #0b0f0e;
+  --cor-acento: #57d7a0;
+  --cor-borda: #33413f;
+  --cor-hover: rgba(62, 196, 143, 0.1);
+  --cor-suave: #131917;
+  --cor-texto-suave: #8b9792;
+  --cor-texto-fraco: #5f6b66;
+  --cor-sombra: rgba(0, 0, 0, 0.5);
+  --cor-fundo-navbar: #131917;
+  --cor-fundo-card: #151b19;
+  --cor-fundo-card-aninhado: #1a211f;
+  --cor-sucesso: #3ec48f;
+  --cor-alerta: #e0a84e;
+  --cor-erro: #ef6a6a;
+
+  --cor-cultura-graos: #3ec48f;
+  --cor-cultura-frutas: #f39c12;
+  --sombra-premium: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --brand-deep: #065f46;
+  --dashboard-bg-from: rgba(15, 157, 110, 0.12);
+  --dashboard-bg-to: rgba(99, 102, 241, 0.08);
+}
+
+/* ========== 3. APLICAÇÃO BASE — toda página herda ========== */
+html {
+  color-scheme: light dark;
+}
+body {
+  background-color: var(--cor-fundo);
+  color: var(--cor-texto);
+  font-family: var(--fonte-corpo);
+  min-height: 100vh;
+  transition: var(--transicao-tema);
+}
+
+/* ========== 4. FUNÇÕES — modo claro/escuro generalizadas ========== */
+/* Uso: qualquer arquivo que importar este CSS já responde a html.dark */
+/* JS pode chamar: document.documentElement.classList.toggle('dark') + window.applyThemeVars() */
+/* API JS: fetch('/api/theme/').then(r=>r.json()).then(t=>Object.entries(t.light).forEach(([k,v])=>document.documentElement.style.setProperty(k,v))) */
+
+/* Utilitários semânticos — funcionam em claro e escuro */
+.cor-primaria {
+  color: var(--cor-primaria) !important;
+}
+.cor-texto-suave {
+  color: var(--cor-texto-suave) !important;
+}
+.fundo-card {
+  background-color: var(--cor-fundo-card) !important;
+}
+.borda-suave {
+  border-color: var(--cor-borda) !important;
+}
+.card-padrao {
+  background-color: var(--cor-fundo-card);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-medio);
+  box-shadow: var(--sombra-card);
+  transition: var(--transicao-tema);
+}
+
+/* Dashboard — gradiente usado em page-wrap e panels */
+.dashboard-bg {
+  background-color: var(--cor-fundo);
+  background-image: radial-gradient(
+      1100px 700px at 12% -8%,
+      var(--dashboard-bg-from) 0%,
+      transparent 60%
+    ),
+    radial-gradient(900px 650px at 108% 6%, var(--dashboard-bg-to) 0%, transparent 55%);
+  background-repeat: no-repeat, no-repeat;
+  background-attachment: fixed, fixed;
+}
+/* ========== 6. UTILITÁRIOS ========== */
+.ampliagro-escondido {
+  display: none !important;
+}
+
+/* ==========================================================================
+   LIQUID CRYSTAL DESIGN SYSTEM (Premium UI)
+   ========================================================================== */
+
+/* -- LC Tokens (Light) -- */
+:root {
+  --lc-shell-bg: #e6ede8;
+  --lc-shell-grid: rgba(19, 122, 89, 0.1);
+  --lc-shell-shadow: rgba(0, 0, 0, 0.1);
+  --lc-panel-bg: rgba(255, 255, 255, 0.65);
+  --lc-panel-border: rgba(19, 122, 89, 0.2);
+  --lc-panel-border-top: rgba(19, 122, 89, 0.4);
+  --lc-input-bg: rgba(255, 255, 255, 0.5);
+  --lc-text-color: #18221e;
+  --lc-placeholder: rgba(24, 34, 30, 0.5);
+  --lc-btn-gradient-a: rgba(19, 122, 89, 0.1);
+  --lc-btn-gradient-b: rgba(19, 122, 89, 0.3);
+}
+
+/* -- LC Tokens (Dark) -- */
+html.dark {
+  --lc-shell-bg: #030605;
+  --lc-shell-grid: rgba(84, 201, 150, 0.04);
+  --lc-shell-shadow: rgba(0, 0, 0, 0.9);
+  --lc-panel-bg: rgba(15, 20, 18, 0.6);
+  --lc-panel-border: rgba(84, 201, 150, 0.15);
+  --lc-panel-border-top: rgba(84, 201, 150, 0.4);
+  --lc-input-bg: rgba(255, 255, 255, 0.03);
+  --lc-text-color: #fff;
+  --lc-placeholder: rgba(255, 255, 255, 0.4);
+  --lc-btn-gradient-a: rgba(84, 201, 150, 0.2);
+  --lc-btn-gradient-b: rgba(15, 157, 110, 0.4);
+}
+
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes rotate-border {
+  to {
+    --angle: 360deg;
+  }
+}
+
+.lc-panel {
+  position: relative;
+  background: var(--lc-panel-bg);
+  border-radius: 20px;
+  color: var(--lc-text-color);
+  box-shadow:
+    0 25px 60px var(--lc-shell-shadow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  isolation: isolate;
+}
+.lc-panel::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  border-radius: inherit;
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  -webkit-filter: url(#container-glass);
+  filter: url(#container-glass);
+  overflow: hidden;
+  isolation: isolate;
+}
+.lc-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: linear-gradient(
+    var(--angle),
+    var(--lc-panel-border) 0%,
+    var(--lc-panel-border-top) 50%,
+    var(--lc-panel-border) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 10;
+  animation: rotate-border 4s linear infinite;
+  animation-play-state: paused;
+}
+.lc-panel:hover::before {
+  animation-play-state: running;
+}
+.lc-input {
+  width: 100%;
+  padding: 14px 16px;
+  background: var(--lc-input-bg);
+  border: 1px solid var(--lc-panel-border);
+  border-radius: 12px;
+  color: var(--lc-text-color);
+  font-size: 15px;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.lc-input:focus {
+  outline: none;
+  border-color: var(--cor-acento);
+  box-shadow: 0 0 0 3px rgba(84, 201, 150, 0.15);
+  background: rgba(255, 255, 255, 0.08);
+}
+.lc-input::placeholder {
+  color: var(--lc-placeholder);
+}
+
+.lc-btn {
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(135deg, var(--lc-btn-gradient-a), var(--lc-btn-gradient-b));
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+.lc-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(19, 122, 89, 0.25);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+.lc-btn-secondary {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--lc-text-color);
+  border: 1px solid var(--lc-panel-border);
+}
+.lc-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+.lc-btn-danger {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+.lc-btn-danger:hover {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+
+/* ========== TEMA GLASS ========== */
+.tema-glass {
+  position: relative;
+  border-radius: 30px;
+  background: transparent !important;
+  isolation: isolate;
+}
+
+.tema-glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  -webkit-box-shadow:
+    inset 2px 2px 0px -2px rgba(255, 255, 255, 0.7),
+    inset 0 0 3px 1px rgba(255, 255, 255, 0.7);
+  box-shadow:
+    inset 2px 2px 0px -2px rgba(255, 255, 255, 0.7),
+    inset 0 0 3px 1px rgba(255, 255, 255, 0.7);
+  pointer-events: none;
+}
+
+.tema-glass::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  border-radius: inherit;
+  -webkit-backdrop-filter: blur(0px);
+  backdrop-filter: blur(0px);
+  -webkit-filter: url(#container-glass);
+  filter: url(#container-glass);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.tema-glass-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: transparent;
+  border-radius: 9999px;
+  outline: none;
+  border: none;
+  z-index: 0;
+}
+
+.tema-glass-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  border-radius: 9999px;
+  -webkit-box-shadow:
+    inset 2px 2px 0px -2px rgba(255, 255, 255, 0.7),
+    inset 0 0 3px 1px rgba(255, 255, 255, 0.7);
+  box-shadow:
+    inset 2px 2px 0px -2px rgba(255, 255, 255, 0.7),
+    inset 0 0 3px 1px rgba(255, 255, 255, 0.7);
+  background-color: rgba(255, 255, 255, 0.1);
+  pointer-events: none;
+}
+
+.tema-glass-btn::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  border-radius: 9999px;
+  -webkit-backdrop-filter: blur(0px);
+  backdrop-filter: blur(0px);
+  -webkit-filter: url(#btn-glass);
+  filter: url(#btn-glass);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* ========== TEMA GLASS PRESETS ========== */
+.glass-switcher-panel {
+  --c-glass: #bbbbbc;
+  --c-light: #fff;
+  --c-dark: #000;
+  --glass-reflex-dark: 1;
+  --glass-reflex-light: 1;
+  --saturation: 150%;
+
+  font-family: 'DM Sans', sans-serif;
+  align-items: center;
+  gap: 8px !important;
+  padding: 8px 12px 10px !important;
+  border: none;
+  border-radius: 99em !important;
+  background-color: color-mix(in srgb, var(--c-glass, #bbbbbc) 12%, transparent) !important;
+  backdrop-filter: blur(8px) url(#container-glass) saturate(var(--saturation, 150%));
+  -webkit-backdrop-filter: blur(8px) saturate(var(--saturation, 150%));
+  box-shadow:
+    inset 0 0 0 1px
+      color-mix(in srgb, var(--c-light, #fff) calc(var(--glass-reflex-light, 1) * 10%), transparent),
+    inset 1.8px 3px 0px -2px color-mix(in srgb, var(--c-light, #fff)
+          calc(var(--glass-reflex-light, 1) * 90%), transparent),
+    inset -2px -2px 0px -2px color-mix(in srgb, var(--c-light, #fff)
+          calc(var(--glass-reflex-light, 1) * 80%), transparent),
+    inset -3px -8px 1px -6px color-mix(in srgb, var(--c-light, #fff)
+          calc(var(--glass-reflex-light, 1) * 60%), transparent),
+    inset -0.3px -1px 4px 0px
+      color-mix(in srgb, var(--c-dark, #000) calc(var(--glass-reflex-dark, 1) * 12%), transparent),
+    inset -1.5px 2.5px 0px -2px
+      color-mix(in srgb, var(--c-dark, #000) calc(var(--glass-reflex-dark, 1) * 20%), transparent),
+    inset 0px 3px 4px -2px color-mix(in srgb, var(--c-dark, #000)
+          calc(var(--glass-reflex-dark, 1) * 20%), transparent),
+    inset 2px -6.5px 1px -4px
+      color-mix(in srgb, var(--c-dark, #000) calc(var(--glass-reflex-dark, 1) * 10%), transparent),
+    0px 1px 5px 0px
+      color-mix(in srgb, var(--c-dark, #000) calc(var(--glass-reflex-dark, 1) * 10%), transparent),
+    0px 6px 16px 0px
+      color-mix(in srgb, var(--c-dark, #000) calc(var(--glass-reflex-dark, 1) * 8%), transparent);
+  position: relative;
+  z-index: 100;
+  transition: all 400ms cubic-bezier(1, 0, 0.4, 1);
+}
+
+.glass-switcher-panel::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 4px;
+  display: block;
+  width: calc(100% - 8px);
+  height: calc(100% - 10px);
+  border-radius: 99em;
+  background-color: color-mix(in srgb, var(--c-glass, #bbbbbc) 36%, transparent);
+  z-index: -1;
+  box-shadow:
+    inset 0 0 0 1px
+      color-mix(in srgb, var(--c-light, #fff) calc(var(--glass-reflex-light, 1) * 10%), transparent),
+    inset 2px 1px 0px -1px color-mix(in srgb, var(--c-light, #fff)
+          calc(var(--glass-reflex-light, 1) * 90%), transparent),
+    inset -1.5px -1px 0px -1px color-mix(in srgb, var(--c-light, #fff)
+          calc(var(--glass-reflex-light, 1) * 80%), transparent),
+    inset -2px -6px 1px -5px color-mix(in srgb, var(--c-light, #fff)
+          calc(var(--glass-reflex-light, 1) * 60%), transparent),
+    inset -1px 2px 3px -1px
+      color-mix(in srgb, var(--c-dark, #000) calc(var(--glass-reflex-dark, 1) * 20%), transparent),
+    inset 0px -4px 1px -2px
+      color-mix(in srgb, var(--c-dark, #000) calc(var(--glass-reflex-dark, 1) * 10%), transparent),
+    0px 3px 6px 0px
+      color-mix(in srgb, var(--c-dark, #000) calc(var(--glass-reflex-dark, 1) * 8%), transparent);
+  pointer-events: none;
+}
+
+.glass-pill {
+  position: relative !important;
+  border-radius: 9999px !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  padding: 0 12px !important;
+  height: 40px !important;
+  width: auto !important;
+  border: 1px double rgba(51, 51, 51, 0.08) !important;
+  box-shadow:
+    inset 2px -2px 1px -1px rgba(255, 255, 255, 0.9),
+    inset -2px 2px 1px -1px rgba(255, 255, 255, 0.9),
+    inset 6px -6px 1px -6px rgba(255, 255, 255, 0.55),
+    inset -6px 6px 1px -6px rgba(255, 255, 255, 0.55),
+    inset 0 0 2px rgba(0, 0, 0, 0.8),
+    0 4px 8px rgba(0, 0, 0, 0.2) !important;
+  background: rgba(0, 0, 0, 0.02) !important;
+  backdrop-filter: blur(2px) !important;
+  -webkit-backdrop-filter: blur(2px) !important;
+  cursor: pointer !important;
+  filter: brightness(0.9) !important;
+  color: #3e3e3e !important;
+  font-weight: 600 !important;
+  font-family: inherit !important;
+  transition: 0.25s !important;
+  z-index: 500 !important;
+}
+
+.glass-pill::before {
+  content: '' !important;
+  position: absolute !important;
+  z-index: -1 !important;
+  top: 35% !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: calc(100% - 8px) !important;
+  height: calc(100% - 8px) !important;
+  border-radius: 9999px !important;
+  border: 1px solid rgba(0, 0, 0, 0.9) !important;
+  filter: blur(8px) !important;
+  pointer-events: none !important;
+}
+
+.glass-pill::after {
+  z-index: 10 !important;
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 9999px !important;
+  filter: blur(7px) !important;
+  background: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.8) 0%,
+    transparent 25%,
+    transparent 75%,
+    rgba(255, 255, 255, 0.8) 100%
+  ) !important;
+  pointer-events: none !important;
+}
+
+.glass-pill i,
+.glass-pill svg {
+  width: 24px !important;
+  height: 24px !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  background: #3e3e3e !important;
+  color: #f5f5f5 !important;
+  border-radius: 50% !important;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.3) !important;
+  transition: 0.25s !important;
+  font-size: 12px !important;
+  position: relative !important;
+  z-index: 501 !important;
+  margin: 0 !important;
+}
+
+.glass-pill span {
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  color: var(--c-content, #224) !important;
+  line-height: 1 !important;
+  overflow: visible !important;
+  white-space: nowrap !important;
+  max-width: 60px !important;
+  filter: drop-shadow(0 25px 3px rgba(102, 102, 102, 0.15)) !important;
+  position: relative !important;
+  z-index: 501 !important;
+}
+
+.glass-pill:hover {
+  background: rgba(0, 0, 0, 0) !important;
+  transform: translateY(-3px) !important;
+}
+
+.glass-pill:hover i,
+.glass-pill:hover svg {
+  transform: scale(1.1) !important;
+}
+
+.glass-pill:active {
+  transform: scale(0.94) !important;
+}
+
+.glass-pill:active span {
+  color: #000 !important;
+}
+
+.glass-pill:active i,
+.glass-pill:active svg {
+  transform: scale(0.94) !important;
+}
+
+.glass-pill.danger i,
+.glass-pill.danger svg {
+  background: #ef4444 !important;
+}
+
+.glass-pill.restore i,
+.glass-pill.restore svg {
+  background: #0f9d6e !important;
+}

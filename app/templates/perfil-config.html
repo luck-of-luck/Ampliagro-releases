@@ -1,0 +1,549 @@
+{% extends base_template %}
+{% load static %}
+
+{% block title %}Ampliagro - Perfil e Configurações{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Multiselect de culturas. Inline e não em `css/paginas/`: é usado em DOIS
+   ecrãs (este e o onboarding) e o do onboarding já vive em
+   `css/paginas/onboarding.css`. Um ficheiro novo seria uma terceira
+   folha de estilo do mesmo componente. A lista reimplementa o JS de lá em
+   vez de o importar — o JS do onboarding é inline num template e não é um
+   módulo importável. Duplicar 40 linhas de desenho de lista é mais barato
+   do que transformar o onboarding num include partial só por isto. */
+.cfg-grupo {
+    border: 1px solid var(--lc-panel-border, #e2e8f0);
+    border-radius: 10px;
+    margin-bottom: 0.35rem;
+    background: var(--lc-panel-bg, #fff);
+}
+.cfg-grupo > summary {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 0.5rem; padding: 0.55rem 0.75rem; cursor: pointer;
+    font-size: 0.85rem; font-weight: 600; list-style: none;
+}
+.cfg-grupo > summary::-webkit-details-marker { display: none; }
+.cfg-grupo > summary::before {
+    content: "▸"; margin-right: 0.45rem; color: #64748b;
+    transition: transform 0.15s ease;
+}
+.cfg-grupo[open] > summary::before { transform: rotate(90deg); }
+.cfg-grupo-contador {
+    font-size: 0.72rem; font-weight: 400; color: #64748b;
+    background: rgba(100,116,139,.12); border-radius: 999px;
+    padding: 0.1rem 0.5rem;
+}
+.cfg-grupo-grade {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 0.15rem 0.5rem; padding: 0.35rem 0.75rem 0.7rem;
+}
+.cfg-cultura {
+    display: flex; align-items: center; gap: 0.45rem;
+    padding: 0.25rem 0.3rem; border-radius: 7px; cursor: pointer;
+    font-size: 0.82rem;
+}
+.cfg-cultura:hover { background: rgba(100,116,139,.10); }
+.cfg-cultura input[type="checkbox"] { flex: none; accent-color: #16a34a; cursor: pointer; }
+/* O nome é dado de outra pessoa: corta, não estica a linha. */
+.cfg-cultura-nome { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+</style>
+{% endblock %}
+
+{% block dashboard_appbar %}{% endblock %}
+
+{% block content %}
+<div class="section-container">
+    <div class="section-header">
+        <h1 class="section-title"><i class="bi bi-person-gear me-2"></i>Perfil e Configurações</h1>
+    </div>
+
+    <div class="content-card">
+        <h2 class="section-subtitle"><i class="bi bi-person me-2"></i>Dados do Perfil</h2>
+        <form id="perfil-form">
+            {% csrf_token %}
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="id_nome">Nome</label>
+                    <input type="text" id="id_nome" name="nome" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="id_email">Email</label>
+                    <input type="email" id="id_email" name="email" placeholder="seu@email.com">
+                </div>
+                <div class="form-group">
+                    <label for="id_idioma">Idioma</label>
+                    <select id="id_idioma" name="idioma">
+                        <option value="pt-br">Português (Brasil)</option>
+                        <option value="en">English</option>
+                        <option value="es">Español</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="id_tema">Tema</label>
+                    <select id="id_tema" name="tema">
+                        <option value="light">Claro</option>
+                        <option value="dark">Escuro</option>
+                        <option value="system">Sistema</option>
+                    </select>
+                </div>
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="id_notificacoes" name="notificacoes">
+                <label for="id_notificacoes">Receber notificações por email</label>
+            </div>
+            <div style="margin-top:1.25rem;">
+                <button type="submit" class="btn-primary"><i class="bi bi-check-lg"></i> Salvar Alterações</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- ── Culturas da propriedade ──
+         A promessa do cadastro ("dá para mudar depois nas configurações")
+         mora aqui. Sem este cartão o produtor escolhe uma vez no onboarding e
+         fica preso, o que é o pior resultado possível numa decisão que decide
+         tudo o que ele vê.
+
+         O payload vem por `json_script`, e o nome entra por `textContent`.
+         `Cultura.nome` é gravável por qualquer autenticado sobre a tabela
+         global PARTILHADA, então `innerHTML` aqui é XSS armazenado
+         cross-tenant. Ver `app/tests_onboarding.py::OnboardingXSSTest`, que
+         guarda a mesma ameaça no cadastro. -->
+    <div class="content-card" style="margin-top:1.5rem;" id="cartao-culturas">
+        <h2 class="section-subtitle"><i class="bi bi-flower1 me-2"></i>Culturas que produz</h2>
+        <p style="font-size:0.813rem;color:#64748b;margin-bottom:1rem;">
+            É isto que decide o que aparece: guias, widgets e perguntas da IA
+            só mostram o que serve às culturas que marcar aqui.
+        </p>
+
+        <div class="form-group" style="max-width:420px;">
+            <label for="sel-propriedade-culturas">Fazenda</label>
+            <select id="sel-propriedade-culturas"></select>
+        </div>
+
+        <div style="margin-top:1rem;">
+            <input type="search" id="busca-culturas-cfg" placeholder="Buscar cultura…"
+                   autocomplete="off" aria-label="Buscar cultura"
+                   style="width:100%;max-width:420px;padding:0.6rem 0.9rem;">
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;
+                    gap:0.6rem;margin:0.7rem 0;font-size:0.813rem;color:#64748b;">
+            <span id="contador-culturas-cfg">A carregar…</span>
+            <button type="button" id="limpar-culturas-cfg" class="btn-secondary"
+                    style="padding:0.25rem 0.6rem;font-size:0.75rem;" hidden>Limpar</button>
+        </div>
+
+        <div id="lista-culturas-cfg" role="group" aria-label="Culturas"></div>
+        <p id="vazio-culturas-cfg" hidden style="font-size:0.813rem;color:#64748b;">
+            Nenhuma cultura encontrada. Tente outro termo.
+        </p>
+
+        <div style="margin-top:1.25rem;">
+            <button type="button" id="salvar-culturas-cfg" class="btn-primary">
+                <i class="bi bi-check-lg"></i> Salvar culturas
+            </button>
+        </div>
+        <p id="msg-culturas-cfg" style="font-size:0.813rem;margin-top:0.6rem;"></p>
+    </div>
+
+    {{ culturas|json_script:"culturas-cfg" }}
+    {# `json_script` escreve o elemento com o id - nao o embrulhes num div, que criaria um `div#culturas-cfg` que o `getElementById` nao encontra quando procura o `<script>`. MEDIDO 14/10/2026: este comentario tinha tres linhas, e o `tag_re` do Django nao leva `re.DOTALL`. Sem DOTALL o ponto nao cruza a mudanca de linha, portanto um comentario `aberto-e-fechado-aqui` em varias linhas NAO e comentario: sai literal na pagina, e o `<script>` la dentro e lido pelo navegador. Nao se escreve o delimitador de fecho dentro do proprio comentario: fecha-o a meio e o resto sai literal outra vez. #}
+    {{ propriedades_simples|json_script:"cfg-propriedades" }}
+
+    <div class="content-card" style="margin-top:1.5rem;">
+        <h2 class="section-subtitle"><i class="bi bi-bell me-2"></i>Pontos de Alerta</h2>
+        <p style="font-size:0.813rem;color:#64748b;margin-bottom:1rem;">Escolha o alerta no dropdown e configure o ponto de disparo. Desmarcado = regra desligada.</p>
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="id_alerta_regra">Alerta</label>
+                <select id="id_alerta_regra"></select>
+            </div>
+            <div class="form-group" id="grp_alerta_dias">
+                <label for="id_alerta_dias" id="lbl_alerta_dias">Dias</label>
+                <input type="number" id="id_alerta_dias" min="0" max="365" step="1">
+            </div>
+            <div class="form-group" id="grp_alerta_limite">
+                <label for="id_alerta_limite" id="lbl_alerta_limite">Limite</label>
+                <input type="number" id="id_alerta_limite" min="0" step="any">
+            </div>
+        </div>
+        <div class="checkbox-group">
+            <input type="checkbox" id="id_alerta_ativo" checked>
+            <label for="id_alerta_ativo">Regra ativa</label>
+        </div>
+        <div style="margin-top:1.25rem;display:flex;gap:0.5rem;align-items:center;">
+            <button type="button" class="btn-primary" onclick="salvarAlerta()"><i class="bi bi-check-lg"></i> Salvar Alerta</button>
+            <span id="alerta-msg" style="font-size:0.813rem;"></span>
+        </div>
+    </div>
+</div>
+
+<div id="toast" class="toast"></div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+    const API_URL = '/api/perfil/';
+
+    function showToast(msg, type) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.className = 'toast toast-' + type + ' show';
+        setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    function getCSRFToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+    }
+
+    async function carregarPerfil() {
+        try {
+            const resp = await fetch(API_URL);
+            if (!resp.ok) throw new Error('Falha ao carregar');
+            const data = await resp.json();
+            document.getElementById('id_nome').value = data.nome || '';
+            document.getElementById('id_email').value = data.email || '';
+            document.getElementById('id_idioma').value = data.idioma || 'pt-br';
+            document.getElementById('id_tema').value = data.tema || 'system';
+            document.getElementById('id_notificacoes').checked = !!data.notificacoes;
+        } catch (e) {
+            console.error('Erro ao carregar perfil:', e);
+        }
+    }
+
+    document.getElementById('perfil-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const data = {
+            email: document.getElementById('id_email').value,
+            idioma: document.getElementById('id_idioma').value,
+            tema: document.getElementById('id_tema').value,
+            notificacoes: document.getElementById('id_notificacoes').checked,
+        };
+        try {
+            const resp = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() },
+                body: JSON.stringify(data),
+            });
+            if (resp.ok) {
+                showToast('Perfil atualizado com sucesso!', 'success');
+            } else {
+                const err = await resp.json();
+                showToast('Erro: ' + JSON.stringify(err), 'error');
+            }
+        } catch (e) {
+            showToast('Erro de conexão: ' + e.message, 'error');
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', carregarPerfil);
+    document.addEventListener('DOMContentLoaded', carregarAlertas);
+
+    const ALERTAS_URL = '/api/alertas-config/';
+    let _regrasAlerta = [];
+
+    async function carregarAlertas() {
+        try {
+            const resp = await fetch(ALERTAS_URL);
+            if (!resp.ok) return;
+            const data = await resp.json();
+            _regrasAlerta = data.regras || [];
+            const sel = document.getElementById('id_alerta_regra');
+            sel.innerHTML = '';
+            _regrasAlerta.forEach(function (r) {
+                const o = document.createElement('option');
+                o.value = r.regra;
+                o.textContent = (r.ativo ? '' : '⏸ ') + r.nome;
+                o.title = r.descricao;
+                sel.appendChild(o);
+            });
+            sel.addEventListener('change', mostrarAlerta);
+            mostrarAlerta();
+        } catch (e) {
+            console.error('Erro ao carregar alertas:', e);
+        }
+    }
+
+    function mostrarAlerta() {
+        const chave = document.getElementById('id_alerta_regra').value;
+        const r = _regrasAlerta.find(function (x) { return x.regra === chave; });
+        if (!r) return;
+        document.getElementById('id_alerta_ativo').checked = !!r.ativo;
+        const gd = document.getElementById('grp_alerta_dias');
+        const gl = document.getElementById('grp_alerta_limite');
+        gd.style.display = r.tem_dias ? '' : 'none';
+        gl.style.display = r.tem_limite ? '' : 'none';
+        if (r.tem_dias) {
+            document.getElementById('lbl_alerta_dias').textContent = 'Dias (' + (r.un_dias || '') + ', padrão ' + r.dias_padrao + ')';
+            document.getElementById('id_alerta_dias').value = r.dias ?? '';
+        }
+        if (r.tem_limite) {
+            document.getElementById('lbl_alerta_limite').textContent = 'Ponto (' + (r.un_limite || '') + ', padrão ' + r.limite_padrao + ')';
+            document.getElementById('id_alerta_limite').value = r.limite ?? '';
+        }
+        document.getElementById('alerta-msg').textContent = r.descricao;
+    }
+
+    async function salvarAlerta() {
+        const chave = document.getElementById('id_alerta_regra').value;
+        const r = _regrasAlerta.find(function (x) { return x.regra === chave; });
+        const body = { regra: chave, ativo: document.getElementById('id_alerta_ativo').checked };
+        if (r && r.tem_dias) {
+            const v = document.getElementById('id_alerta_dias').value;
+            if (v !== '') body.dias = parseInt(v, 10);
+        }
+        if (r && r.tem_limite) {
+            const v = document.getElementById('id_alerta_limite').value;
+            if (v !== '') body.limite = parseFloat(v);
+        }
+        const msg = document.getElementById('alerta-msg');
+        try {
+            const resp = await fetch(ALERTAS_URL, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() },
+                body: JSON.stringify(body),
+            });
+            const data = await resp.json();
+            if (data.ok) {
+                msg.textContent = 'Ponto de alerta salvo!';
+                showToast('Ponto de alerta salvo!', 'success');
+                carregarAlertas();
+            } else {
+                msg.textContent = 'Erro: ' + (data.erro || 'falha');
+            }
+        } catch (e) {
+            msg.textContent = 'Erro de conexão: ' + e.message;
+        }
+    }
+    // ══ CULTURAS DA PROPRIEDADE ══
+    //
+    // `textContent` em todo o lado onde entra um nome de cultura. `Cultura`
+    // é a tabela global partilhada e `nome` é gravável por qualquer
+    // autenticado: um `innerHTML` aqui é XSS armazenado que atinge todos os
+    // que abrirem as configurações, e não só quem o escreveu.
+    var _cfgGrupos = [];
+    var _cfgMarcadas = {};   // { id: nome }
+    var _cfgCaixas = [];
+    var _cfgProps = [];
+
+    function _cfgGruposDados() {
+        var el = document.getElementById('culturas-cfg');
+        if (!el) return [];
+        try { return JSON.parse(el.textContent) || []; }
+        catch (e) { return []; }
+    }
+
+    function _cfgIds() {
+        return Object.keys(_cfgMarcadas).map(Number);
+    }
+
+    function _cfgContador() {
+        var n = _cfgIds().length;
+        document.getElementById('contador-culturas-cfg').textContent =
+            n === 0 ? 'Nenhuma marcada'
+            : n === 1 ? '1 cultura marcada'
+            : n + ' culturas marcadas';
+        document.getElementById('limpar-culturas-cfg').hidden = n === 0;
+    }
+
+    function _cfgSemAcento(t) {
+        // MEDIDO 14/10/2026: esta funcao estava sem as duas primeiras linhas
+        // do corpo — sobrava `.replace(.).toLowerCase();` a beginar a
+        // declaracao. E' um SyntaxError, e um SyntaxError num <script> nao
+        // falla SO a funcao: impede o bloco INTEIRO de compilar. Ou seja, a
+        // lista de culturas nao montava, a busca nao existia e o botao de
+        // guardar nao respondia. O `tests/test_editar_culturas.py` passava
+        // na mesma, porque le HTML do servidor e nunca corre o JavaScript.
+        //
+        // Copiada de `onboarding.html:442`, que e' o mesmo filtro e esta
+        // certo. O range vai escrito com escapes e' nao com os caracteres
+        // combinantes literais: em UTF-8 eles somem a olhos nulos e o filtro
+        // passa a deixar entrar "Café" quando o produtor escreveu "cafe".
+        return String(t || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/['-?]/g, '')
+            .toLowerCase();
+    }
+
+
+    function _cfgMontar() {
+        var dados = _cfgGruposDados();
+        var lista = document.getElementById('lista-culturas-cfg');
+        if (!lista) return;
+
+        for (var i = 0; i < dados.length; i++) {
+            var g = dados[i];
+
+            var det = document.createElement('details');
+            det.className = 'cfg-grupo';
+
+            var sum = document.createElement('summary');
+            var lbl = document.createElement('span');
+            lbl.textContent = g.rotulo || g.grupo;
+            var cnt = document.createElement('span');
+            cnt.className = 'cfg-grupo-contador';
+            cnt.textContent = String(g.total);
+            sum.appendChild(lbl);
+            sum.appendChild(cnt);
+
+            var grade = document.createElement('div');
+            grade.className = 'cfg-grupo-grade';
+
+            for (var j = 0; j < g.culturas.length; j++) {
+                var c = g.culturas[j];
+                var lab = document.createElement('label');
+                lab.className = 'cfg-cultura';
+                var cx = document.createElement('input');
+                cx.type = 'checkbox';
+                cx.value = String(c.id);
+                cx.addEventListener('change', (function (dado) {
+                    return function () {
+                        if (this.checked) _cfgMarcadas[dado.id] = dado.nome;
+                        else delete _cfgMarcadas[dado.id];
+                        _cfgContador();
+                    };
+                })(c));
+                var nome = document.createElement('span');
+                nome.className = 'cfg-cultura-nome';
+                nome.textContent = c.nome;
+                lab.appendChild(cx);
+                lab.appendChild(nome);
+                grade.appendChild(lab);
+                _cfgCaixas.push({ dado: c, el: lab, grupo: g.grupo });
+            }
+
+            det.appendChild(sum);
+            det.appendChild(grade);
+            lista.appendChild(det);
+            _cfgGrupos.push({ el: det, contador: cnt, culturas: g.culturas, grupo: g.grupo });
+        }
+    }
+
+    function _cfgBuscar(termo) {
+        var alvo = _cfgSemAcento(termo).trim();
+        var visiveis = 0;
+        for (var i = 0; i < _cfgCaixas.length; i++) {
+            var cx = _cfgCaixas[i];
+            var passa = !alvo || _cfgSemAcento(cx.dado.nome).indexOf(alvo) >= 0;
+            cx.el.hidden = !passa;
+            if (passa) visiveis++;
+        }
+        for (var j = 0; j < _cfgGrupos.length; j++) {
+            // Compara-se com `_cfgGrupos[j].grupo`, e nao com
+            // `_cfgGrupos[j].culturas[0].grupo`: as culturas sao
+            // `{id, nome}` e nao tem `.grupo`. MEDIDO 14/10/2026: comparar
+            // com o atributo inexistente dava `dentro === 0` em TODOS os
+            // grupos, e `el.hidden = dentro === 0` escondia a lista inteira.
+            // Escrever "soja" na busca deixava a tela em branco — e sem a
+            // mensagem de "nada encontrado", porque `visiveis` contava a
+            // caixa que tinha sido encontrada. Um campo de busca que apaga o
+            // que procurou.
+            var dentro = _cfgCaixas.filter(function (c) {
+                return c.grupo === _cfgGrupos[j].grupo && !c.el.hidden;
+            }).length;
+            _cfgGrupos[j].el.hidden = dentro === 0;
+            _cfgGrupos[j].contador.textContent = dentro === _cfgGrupos[j].culturas.length
+                ? String(_cfgGrupos[j].culturas.length)
+                : dentro + ' de ' + _cfgGrupos[j].culturas.length;
+            if (alvo && dentro) _cfgGrupos[j].el.open = true;
+        }
+        document.getElementById('vazio-culturas-cfg').hidden = visiveis > 0;
+    }
+
+    async function _cfgCarregarPropriedade() {
+        var sel = document.getElementById('sel-propriedade-culturas');
+        var id = sel.value;
+        if (!id) return;
+        try {
+            const resp = await fetch('/perfil/culturas/' + id + '/');
+            if (!resp.ok) { showToast('Não consegui ler as culturas', 'error'); return; }
+            const data = await resp.json();
+            _cfgMarcadas = {};
+            // Desmarcar TUDO antes de marcar o que veio. MEDIDO 14/10/2026:
+            // so se marcava o que a propriedade tinha, e nunca se limpava o
+            // resto. Trocar de uma propriedade com 20 culturas para uma com 3
+            // deixava as 20 caixas marcadas na tela, e `_cfgMarcadas` ja nao
+            // as tinha: o produtor via culturas seleccionadas que nao estavam
+            // guardadas. Ao salvar, o servidor recebia a lista certa e ele via
+            // outra — e nao sabia qual das duas era a verdade.
+            _cfgCaixas.forEach(function (cx) {
+                cx.el.querySelector('input').checked = false;
+            });
+            (data.ids || []).forEach(function (cid) {
+                _cfgCaixas.forEach(function (cx) {
+                    if (String(cx.dado.id) === String(cid)) {
+                        _cfgMarcadas[cx.dado.id] = cx.dado.nome;
+                        cx.el.querySelector('input').checked = true;
+                    }
+                });
+            });
+            _cfgContador();
+            // Diz explicitamente quando o produtor NUNCA foi perguntado: sem
+            // isto, uma conta antiga e uma conta que respondeu "nenhuma" são
+            // a mesma tela, e a diferença é que a segunda filtra as guias.
+            document.getElementById('msg-culturas-cfg').textContent = data.perguntada
+                ? ''
+                : 'Ainda não escolheste culturas. As guias mostram o catálogo inteiro até escolheres.';
+        } catch (e) {
+            showToast('Erro de conexão: ' + e.message, 'error');
+        }
+    }
+
+    async function _cfgSalvar() {
+        var sel = document.getElementById('sel-propriedade-culturas');
+        if (!sel.value) return;
+        try {
+            const resp = await fetch('/perfil/culturas/' + sel.value + '/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() },
+                body: JSON.stringify({ culturas: _cfgIds() }),
+            });
+            const data = await resp.json();
+            if (data.ok) {
+                showToast('Culturas salvas: ' + data.n_marcadas, 'success');
+                document.getElementById('msg-culturas-cfg').textContent = '';
+            } else {
+                showToast('Erro: ' + (data.erro || 'falha'), 'error');
+            }
+        } catch (e) {
+            showToast('Erro de conexão: ' + e.message, 'error');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', async function () {
+        var sel = document.getElementById('sel-propriedade-culturas');
+        if (!sel) return;
+        // As propriedades chegam pelo próprio template, com o mesmo
+        // `json_script` das culturas. Um fetch para lista que o servidor já
+        // tinha na mão seria uma segunda fonte — e a segunda fonte é
+        // sempre a que fica errada.
+        var elProps = document.getElementById('cfg-propriedades');
+        _cfgProps = elProps ? (JSON.parse(elProps.textContent || '[]')) : [];
+        _cfgProps.forEach(function (p) {
+            var o = document.createElement('option');
+            o.value = p.id;
+            o.textContent = p.nome;
+            sel.appendChild(o);
+        });
+        _cfgMontar();
+        _cfgContador();
+        await _cfgCarregarPropriedade();
+        sel.addEventListener('change', _cfgCarregarPropriedade);
+        document.getElementById('salvar-culturas-cfg')
+            .addEventListener('click', _cfgSalvar);
+        document.getElementById('busca-culturas-cfg')
+            .addEventListener('input', function () { _cfgBuscar(this.value); });
+        document.getElementById('limpar-culturas-cfg')
+            .addEventListener('click', function () {
+                _cfgMarcadas = {};
+                _cfgCaixas.forEach(function (cx) {
+                    cx.el.querySelector('input').checked = false;
+                });
+                _cfgContador();
+            });
+    });
+</script>
+{% endblock %}

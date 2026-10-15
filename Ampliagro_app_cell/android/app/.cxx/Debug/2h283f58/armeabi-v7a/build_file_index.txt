@@ -1,0 +1,2 @@
+C:\Trabalho\Projetos\Ativos\Ampliagro2\Ampliagro_app_cell\node_modules\react-native-safe-area-context\android\src\main\jni\CMakeLists.txt
+C:\Trabalho\Projetos\Ativos\Ampliagro2\Ampliagro_app_cell\node_modules\react-native\ReactAndroid\cmake-utils\default-app-setup\CMakeLists.txt

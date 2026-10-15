@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ampliagro - Do Campo à Cooperativa</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000000;
+            color: #ffffff;
+            overflow: hidden; /* Trava o scroll durante o vídeo/animação */
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Container da animação */
+        #anim-container {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+            transition: opacity 1s ease-in-out;
+        }
+
+        /* Estilo comum a todos os painéis verticais */
+        .panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            overflow: hidden;
+            width: 0; /* Inicia escondido por padrão */
+            transition: width 1.2s cubic-bezier(0.25, 0.8, 0.25, 1); /* Curva suave cinematográfica */
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+        }
+
+        .panel:last-child {
+            border-right: none;
+        }
+
+        /* Cores de fundo específicas para dar peso a cada setor */
+        #p-campo { background-color: #064e3b; width: 100%; } /* Verde Escuro - Inicia 100% */
+        #p-tudo { background-color: #006b68; } /* Verde Ampliagro */
+        #p-logistica { background-color: #0f172a; } /* Slate/Blue escuro */
+        #p-feito { background-color: #b45309; } /* Âmbar escuro */
+        #p-cooperativa { background-color: #1e293b; } /* Slate */
+
+        /* Estilos dos Textos (Títulos) */
+        .title {
+            font-size: clamp(1.2rem, 3vw, 3rem);
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            text-align: center;
+            white-space: nowrap;
+            padding: 0 1rem;
+            opacity: 0;
+            transition: opacity 0.8s ease 0.3s;
+        }
+        
+        /* O título do painel 1 inicia visível */
+        #p-campo .title { opacity: 1; }
+
+        /* Estilo dos Subtextos que irão desaparecer */
+        .subtext {
+            position: absolute;
+            bottom: 15%;
+            font-size: clamp(1rem, 1.5vw, 1.5rem);
+            font-weight: 300;
+            text-align: center;
+            color: rgba(255,255,255,0.7);
+            max-width: 80%;
+            opacity: 1;
+            transition: opacity 0.8s ease-in-out;
+            pointer-events: none;
+        }
+
+        /* Tela do Logotipo Central (Fase 2) */
+        #title-phase {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1s ease;
+            z-index: 50;
+        }
+        
+        #title-phase h1 {
+            font-size: clamp(3rem, 10vw, 10rem);
+            font-weight: 800;
+            letter-spacing: 0.2em;
+            color: #ffffff;
+            text-shadow: 0 0 40px rgba(0, 107, 104, 0.5);
+            transform: scale(0.9);
+            transition: transform 4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        #title-phase.active h1 {
+            transform: scale(1.1); /* Efeito de Zoom In Lento */
+        }
+
+        /* Tela de Conversão Final (Fase 3) */
+        #final-phase {
+            opacity: 0;
+            transition: opacity 1.5s ease;
+            display: none;
+            background-color: #0a0a0a; /* Fundo base extremamente escuro */
+            background-image: radial-gradient(circle at 50% 0%, #006b6822 0%, transparent 70%);
+            min-height: 100vh;
+        }
+
+        /* Barra de rolagem refinada */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #000000; }
+        ::-webkit-scrollbar-thumb { background: #333333; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #006b68; }
+
+        /* Componentes de UI - Botões e Cards */
+        .btn-download {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            width: 100%;
+            padding: 1.25rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .btn-download:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+            border-color: rgba(255,255,255,0.3);
+        }
+
+        .review-card {
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease;
+        }
+        .review-card:hover {
+            transform: translateX(5px);
+            border-color: rgba(0, 107, 104, 0.4);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="anim-container">
+        <!-- P1: Extremo Esquerdo -->
+        <div id="p-campo" class="panel">
+            <h2 class="title">Do campo</h2>
+            <p class="subtext" id="sub-campo">Onde o dado nasce. Culturas e maquinário.</p>
+        </div>
+        
+        <!-- P2: Painel Central 1 -->
+        <div id="p-tudo" class="panel">
+            <h2 class="title">Tudo em um</h2>
+        </div>
+        
+        <!-- P3: Painel Central 2 -->
+        <div id="p-logistica" class="panel">
+            <h2 class="title">A Logística</h2>
+        </div>
+
+        <!-- P4: Painel Central 3 -->
+        <div id="p-feito" class="panel">
+            <h2 class="title">Feito p/ você</h2>
+        </div>
+
+        <!-- P5: Extremo Direito -->
+        <div id="p-cooperativa" class="panel">
+            <h2 class="title">À cooperativa</h2>
+        </div>
+    </div>
+
+    <div id="title-phase">
+        <h1>AMPLIAGRO</h1>
+    </div>
+
+    <div id="final-phase">
+        <div class="max-w-7xl mx-auto px-6 py-20 min-h-screen flex flex-col justify-center">
+            
+            <div class="text-center mb-20">
+                <h2 class="text-5xl md:text-6xl font-extrabold text-white mb-6 tracking-tight">O motor do agronegócio.</h2>
+                <p class="text-gray-400 text-xl max-w-3xl mx-auto font-light">Uma única plataforma offline-first. Sem conexões perdidas, sem planilhas quebradas. Baixe agora e instale a governança absoluta na sua operação.</p>
+            </div>
+
+            <!-- Layout 50/50 em Desktop, Empilhado em Mobile -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 xl:gap-24 items-start">
+                
+                <!-- LADO ESQUERDO: Opções de Download -->
+                <div class="flex flex-col gap-10 w-full">
+                    
+                    <!-- Dispositivos Móveis -->
+                    <div class="bg-gray-900/50 p-8 rounded-2xl border border-gray-800">
+                        <div class="flex items-center gap-4 mb-8">
+                            <div class="bg-emerald-900/50 p-3 rounded-lg text-emerald-400">
+                                <i class="bi bi-phone-fill text-2xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-white">Dispositivos Móveis</h3>
+                                <p class="text-gray-400 text-sm mt-1">Para o talhão, trator e trabalho de campo.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <button class="btn-download bg-white text-black hover:bg-gray-200">
+                                <i class="bi bi-android2 text-2xl"></i>
+                                Android
+                            </button>
+                            <button class="btn-download bg-black text-white hover:bg-zinc-900">
+                                <i class="bi bi-apple text-2xl mb-1"></i>
+                                iOS / iPad
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Escritório e Estações -->
+                    <div class="bg-gray-900/50 p-8 rounded-2xl border border-gray-800">
+                        <div class="flex items-center gap-4 mb-8">
+                            <div class="bg-blue-900/50 p-3 rounded-lg text-blue-400">
+                                <i class="bi bi-display-fill text-2xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-white">Escritório e Estações</h3>
+                                <p class="text-gray-400 text-sm mt-1">Visão panorâmica para gestores e contadores.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <button class="btn-download bg-[#0078D4] text-white hover:bg-blue-600 flex-1">
+                                <i class="bi bi-windows text-xl"></i>
+                                Windows
+                            </button>
+                            <button class="btn-download bg-zinc-800 text-white hover:bg-zinc-700 flex-1">
+                                <i class="bi bi-apple text-xl mb-1"></i>
+                                macOS
+                            </button>
+                            <button class="btn-download bg-amber-600 text-white hover:bg-amber-500 flex-1">
+                                <i class="bi bi-ubuntu text-xl"></i>
+                                Linux
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LADO DIREITO: Prova Social (Avaliações) -->
+                <div class="flex flex-col gap-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <i class="bi bi-star-fill text-amber-400 text-2xl"></i>
+                        <h3 class="text-3xl font-bold text-white tracking-tight">O que diz quem produz.</h3>
+                    </div>
+                    
+                    <!-- Card 1 -->
+                    <div class="review-card p-8 rounded-2xl">
+                        <div class="flex gap-1 text-amber-400 mb-4 text-lg">
+                            <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                        </div>
+                        <p class="text-gray-300 text-lg italic mb-6 leading-relaxed">"O Ampliagro fez o que parecia impossível. Abandonei os 4 softwares que usava. A NF-e bate, o estoque diminui e o arquivo fiscal LCDPR sai pronto. Um nível de governança que nunca tivemos."</p>
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full bg-emerald-800 flex items-center justify-center text-xl font-bold border-2 border-emerald-500">CT</div>
+                            <div>
+                                <p class="text-white font-bold">Carlos Teixeira</p>
+                                <p class="text-emerald-400 text-sm">Produtor de Grãos (1.200 ha)</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="review-card p-8 rounded-2xl">
+                        <div class="flex gap-1 text-amber-400 mb-4 text-lg">
+                            <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                        </div>
+                        <p class="text-gray-300 text-lg italic mb-6 leading-relaxed">"Sinal no talhão é mito. Mas com esse aplicativo offline, eu lanço as medições do rebanho e finalizo a Ordem de Serviço na hora. O painel sincroniza tudo automático na sede."</p>
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full bg-blue-800 flex items-center justify-center text-xl font-bold border-2 border-blue-500">MR</div>
+                            <div>
+                                <p class="text-white font-bold">Marcos Ribeiro</p>
+                                <p class="text-blue-400 text-sm">Gestor de Maquinário</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            
+            <div class="text-center mt-20 text-gray-500 text-sm">
+                <p>&copy; 2026 Ampliagro OS. O Sistema Operacional Livre do Agronegócio.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Referências do DOM
+            const pCampo = document.getElementById('p-campo');
+            const pTudo = document.getElementById('p-tudo');
+            const pLogistica = document.getElementById('p-logistica');
+            const pFeito = document.getElementById('p-feito');
+            const pCooperativa = document.getElementById('p-cooperativa');
+            
+            const subCampo = document.getElementById('sub-campo');
+            
+            const animPhase = document.getElementById('anim-container');
+            const titlePhase = document.getElementById('title-phase');
+            const finalPhase = document.getElementById('final-phase');
+
+            // Arrays dinâmicos para gerenciar a largura facilmente
+            let activePanels = [pCampo];
+
+            const updateWidths = () => {
+                const percentage = 100 / activePanels.length;
+                activePanels.forEach(p => {
+                    p.style.width = `${percentage}%`;
+                });
+            };
+
+            // Roteiro Cinemático (Timers)
+
+            // T=2.0s: Passo 2 - Divide em 2 (Aparece a Cooperativa na direita). Subtexto some.
+            setTimeout(() => {
+                // Esconde Subtextos
+                subCampo.style.opacity = '0';
+                
+                // Adiciona Cooperativa ao array ativo
+                activePanels.push(pCooperativa);
+                
+                // Exibe título da cooperativa
+                pCooperativa.querySelector('.title').style.opacity = '1';
+                
+                updateWidths();
+            }, 2000);
+
+            // T=3.5s: Passo 3.1 - Surge "Tudo em um" espremendo entre os dois. (Array vira 3 partes)
+            setTimeout(() => {
+                // Insere Tudo em um no meio
+                activePanels = [pCampo, pTudo, pCooperativa];
+                pTudo.querySelector('.title').style.opacity = '1';
+                updateWidths();
+            }, 3500);
+
+            // T=4.8s: Passo 3.2 - Surge "A logística". (Array vira 4 partes)
+            setTimeout(() => {
+                activePanels = [pCampo, pTudo, pLogistica, pCooperativa];
+                pLogistica.querySelector('.title').style.opacity = '1';
+                updateWidths();
+            }, 4800);
+
+            // T=6.0s: Passo 3.3 - Surge "Feito p/ você". (Array vira 5 partes)
+            setTimeout(() => {
+                activePanels = [pCampo, pTudo, pLogistica, pFeito, pCooperativa];
+                pFeito.querySelector('.title').style.opacity = '1';
+                updateWidths();
+            }, 6000);
+
+            // T=8.5s: Passo 4 - A tela pisca para o preto
+            setTimeout(() => {
+                animPhase.style.opacity = '0';
+            }, 8500);
+
+            // T=9.5s: Passo 5 - Surge apenas AMPLIAGRO no centro com zoom lento
+            setTimeout(() => {
+                animPhase.style.display = 'none'; // Remove os painéis do dom visual
+                titlePhase.style.opacity = '1';
+                titlePhase.classList.add('active'); // Aciona o Scale(1.1) lento
+            }, 9500);
+
+            // T=12.5s: Começa a apagar o AMPLIAGRO
+            setTimeout(() => {
+                titlePhase.style.opacity = '0';
+            }, 12500);
+
+            // T=13.5s: Passo 6 - A tela final da Landing Page aparece
+            setTimeout(() => {
+                titlePhase.style.display = 'none';
+                document.body.style.overflow = 'auto'; // Libera o Scroll do mouse
+                finalPhase.style.display = 'block';
+                
+                // Força um reflow sutil antes da opacidade para a transição funcionar
+                setTimeout(() => {
+                    finalPhase.style.opacity = '1';
+                }, 50);
+            }, 13500);
+        });
+    </script>
+</body>
+</html>

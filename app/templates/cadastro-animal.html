@@ -1,0 +1,438 @@
+{% extends base_template %}
+{% load static agro_icons %}
+
+{% block title %}Ampliagro - Cadastro de Animais{% endblock %}
+
+{% block extra_css %}
+{% include "partials/_premium_cadastro_styles.html" %}
+{% endblock %}
+
+{% block dashboard_appbar %}{% endblock %}
+
+{% block content %}
+<div class="pcrud-container">
+    <div class="pcrud-header">
+        <h1 class="pcrud-title"><i class="bi bi-cow"></i> Cadastro de Animais</h1>
+        <a href="{% url 'index_spa' %}" class="pcrud-btn pcrud-btn-secondary pcrud-btn-sm"><i class="bi bi-speedometer2"></i> Dashboard</a>
+    </div>
+
+    <div class="pcrud-subtabs" id="cadastroSubTabs">
+        <button class="pcrud-subtab active" data-tab="novo">Novo Animal</button>
+        <button class="pcrud-subtab" data-tab="lista">Animais Cadastrados</button>
+        <button class="pcrud-subtab" data-tab="producao">Produção Animal</button>
+        <button class="pcrud-subtab" data-tab="racoes">Rações & Nutrição</button>
+    </div>
+
+    <!-- Stats -->
+    <div class="pcrud-stats" id="cadastroStats">
+        <div class="pcrud-stat"><div class="pcrud-stat-label">Total de Cabeças</div><div class="pcrud-stat-value" id="statTotalCabecas">—</div></div>
+        <div class="pcrud-stat"><div class="pcrud-stat-label">Espécies Diferentes</div><div class="pcrud-stat-value" id="statEspecies">—</div></div>
+        <div class="pcrud-stat"><div class="pcrud-stat-label">Produção Mês (kg/L)</div><div class="pcrud-stat-value" id="statProducaoMes">—</div></div>
+        <div class="pcrud-stat"><div class="pcrud-stat-label">Valor Estimado</div><div class="pcrud-stat-value" id="statValorEstimado">—</div></div>
+    </div>
+    {{ animais_stats|json_script:"animaisStatsData" }}
+
+    <!-- Tab: Novo Animal -->
+    <div class="pcrud-tab active" id="tab-novo">
+        <h2><i class="bi bi-plus-circle"></i> Novo Animal</h2>
+        <div class="pcrud-form-card">
+            <form id="animal-form" onsubmit="return submitAnimal(event)">
+                {% csrf_token %}
+                <div class="pcrud-form-grid">
+                    <div class="pcrud-form-group">
+                        <label>Propriedade</label>
+                        <select name="propriedade" required onblur="validateField(this)">
+                            <option value="">Selecione...</option>
+                            {% for p in propriedades %}
+                            <option value="{{ p.id }}">{{ p.nome }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="pcrud-form-group">
+                        <label>Espécie</label>
+                        <select name="especie" required onblur="validateField(this)">
+                            <option value="">Selecione...</option>
+                            <option value="BOVINO">Bovino</option>
+                            <option value="SUINO">Suíno</option>
+                            <option value="OVINO">Ovino</option>
+                            <option value="CAPRINO">Caprino</option>
+                            <option value="EQUINO">Equino</option>
+                            <option value="BUFALO">Búfalo</option>
+                            <option value="AVES">Aves</option>
+                            <option value="COELHO">Coelho</option>
+                            <option value="PEIXE">Peixe</option>
+                        </select>
+                    </div>
+                    <div class="pcrud-form-group">
+                        <label>Tipo de Produção</label>
+                        <select name="tipo_producao">
+                            <option value="CORTE">Corte</option>
+                            <option value="LEITE">Leite</option>
+                            <option value="OVOS">Ovos</option>
+                            <option value="MISTO">Misto</option>
+                            <option value="MEL">Mel</option>
+                            <option value="OUTRO">Outro</option>
+                        </select>
+                    </div>
+                    <div class="pcrud-form-group">
+                        <label>Raça</label>
+                        <input type="text" name="raca" placeholder="Ex: Nelore, Holstein, Angus">
+                    </div>
+                    <div class="pcrud-form-group">
+                        <label>Quantidade de Cabeças</label>
+                        <input type="number" name="quantidade" required placeholder="0" min="1" onblur="validateField(this)">
+                    </div>
+                    <div class="pcrud-form-group">
+                        <label>Peso Médio (kg)</label>
+                        <input type="number" step="0.1" name="peso_medio" placeholder="0,0">
+                    </div>
+                    <div class="pcrud-form-group">
+                        <label>Data de Entrada</label>
+                        <input type="date" name="data_entrada" value="{{ today|date:'Y-m-d' }}">
+                    </div>
+                    <div class="pcrud-form-group">
+                        <label>Observação</label>
+                        <textarea name="observacao" rows="2" placeholder="Observações adicionais..."></textarea>
+                    </div>
+                </div>
+                <div class="pcrud-form-actions">
+                    <button type="submit" class="pcrud-btn pcrud-btn-primary"><i class="bi bi-check-lg"></i> Salvar Animal</button>
+                    <button type="reset" class="pcrud-btn pcrud-btn-secondary">Limpar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tab: Lista de Animais -->
+    <div class="pcrud-tab" id="tab-lista">
+        <h2><i class="bi bi-list-ul"></i> Animais Cadastrados</h2>
+        <div class="pcrud-form-card" style="padding:0;">
+            {% if animais %}
+            <div class="pcrud-table-wrap">
+                <table class="pcrud-table">
+                    <thead>
+                        <tr>
+                            <th>Espécie</th>
+                            <th>Produção</th>
+                            <th>Raça</th>
+                            <th>Quantidade</th>
+                            <th>Peso Médio</th>
+                            <th>Entrada</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for a in animais %}
+                        <tr>
+                            <td><strong>{{ a.get_especie_display }}</strong></td>
+                            <td>{{ a.get_tipo_producao_display }}</td>
+                            <td>{{ a.raca|default:"-" }}</td>
+                            <td>{{ a.quantidade }}</td>
+                            <td>{{ a.peso_medio|floatformat:1|default:"-" }} kg</td>
+                            <td>{{ a.data_entrada|date:"d/m/Y"|default:"-" }}</td>
+                            <td>
+                                <div class="action-cell">
+                                    <button class="pcrud-btn pcrud-btn-secondary pcrud-btn-sm" onclick="editarAnimal({{ a.id }})"><i class="bi bi-pencil"></i> Editar</button>
+                                    <button class="pcrud-btn pcrud-btn-danger pcrud-btn-sm" onclick="excluirAnimal({{ a.id }})"><i class="bi bi-trash"></i> Excluir</button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            {% include "partials/_empty_state_cta.html" with empty_icone="bi bi-cow" empty_titulo="Nenhum animal cadastrado" empty_descricao="Cadastre o primeiro animal para acompanhar pesagem, reprodução e sanidade." empty_acao="Cadastrar animal" empty_aba="novo" %}
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Tab: Produção Animal -->
+    <div class="pcrud-tab" id="tab-producao">
+        <h2><i class="bi bi-graph-up"></i> Produção Animal</h2>
+        <div class="pcrud-form-card">
+            <form id="producao-form" onsubmit="return submitProducao(event)">
+                {% csrf_token %}
+                <div class="pcrud-form-grid">
+                    <div class="pcrud-form-group">
+                        <label>Animal</label>
+                        <select name="animal" required onblur="validateField(this)">
+                            <option value="">Selecione...</option>
+                            {% for a in animais %}
+                            <option value="{{ a.id }}">{{ a.get_especie_display }} - {{ a.raca|default:"-" }} ({{ a.quantidade }} cab)</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="pcrud-form-group">
+                        <label>Data</label>
+                        <input type="date" name="data" value="{{ today|date:'Y-m-d' }}" required onblur="validateField(this)">
+                    </div>
+                    <div class="pcrud-form-group">
+                        <label>Quantidade Produzida</label>
+                        <input type="number" step="0.01" name="quantidade_produzida" required placeholder="0,00" min="0" onblur="validateField(this)">
+                    </div>
+                    <div class="pcrud-form-group">
+                        <label>Unidade</label>
+                        <select name="unidade" required>
+                            <option value="L">Litros (L)</option>
+                            <option value="kg">Quilogramas (kg)</option>
+                            <option value="un">Unidades</option>
+                            <option value="dz">Dúzias</option>
+                        </select>
+                    </div>
+                    <div class="pcrud-form-group">
+                        <label>Valor Estimado (R$)</label>
+                        <input type="number" step="0.01" name="valor_estimado" placeholder="0,00">
+                    </div>
+                    <div class="pcrud-form-group">
+                        <label>Observação</label>
+                        <textarea name="observacao" rows="2" placeholder="Observações..."></textarea>
+                    </div>
+                </div>
+                <div class="pcrud-form-actions">
+                    <button type="submit" class="pcrud-btn pcrud-btn-primary"><i class="bi bi-check-lg"></i> Registrar Produção</button>
+                    <button type="reset" class="pcrud-btn pcrud-btn-secondary">Limpar</button>
+                </div>
+            </form>
+        </div>
+
+        {% if producoes %}
+        <h2 style="margin-top:28px;"><i class="bi bi-clock-history"></i> Histórico de Produção</h2>
+        <div class="pcrud-form-card" style="padding:0;">
+            <div class="pcrud-table-wrap">
+                <table class="pcrud-table">
+                    <thead>
+                        <tr>
+                            <th>Animal</th>
+                            <th>Data</th>
+                            <th>Quantidade</th>
+                            <th>Unidade</th>
+                            <th>Valor Estimado</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in producoes %}
+                        <tr>
+                            <td>{{ p.animal.get_especie_display }} - {{ p.animal.raca|default:"-" }}</td>
+                            <td>{{ p.data|date:"d/m/Y" }}</td>
+                            <td>{{ p.quantidade_produzida|floatformat:2 }} {{ p.unidade }}</td>
+                            <td>{{ p.unidade }}</td>
+                            <td>{{ p.valor_estimado|floatformat:2|default:"-" }}</td>
+                            <td><button class="pcrud-btn pcrud-btn-danger pcrud-btn-sm" onclick="excluirProducao({{ p.id }})"><i class="bi bi-trash"></i></button></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Tab: Rações -->
+    <div class="pcrud-tab" id="tab-racoes">
+        <h2><i class="bi bi-basket"></i> Rações & Nutrição</h2>
+        <div class="pcrud-form-card">
+            <form id="racao-form" onsubmit="return submitRacao(event)">
+                {% csrf_token %}
+                <div class="pcrud-form-grid">
+                    <div class="pcrud-form-group">
+                        <label>Fazenda *</label>
+                        <select name="propriedade" required>{% for p in propriedades %}<option value="{{ p.id }}">{{ p.nome }}</option>{% endfor %}</select>
+                    </div>
+                    <div class="pcrud-form-group">
+                        <label>Nome da Ração</label>
+                        <input type="text" name="nome" required placeholder="Ex: Ração Crescimento Bovinos" onblur="validateField(this)">
+                    </div>
+                    <div class="pcrud-form-group">
+                        <label>Espécie Alvo</label>
+                        <select name="especie_alvo" required>
+                            <option value="">Selecione...</option>
+                            <option value="BOVINO">Bovino</option>
+                            <option value="SUINO">Suíno</option>
+                            <option value="OVINO">Ovino</option>
+                            <option value="CAPRINO">Caprino</option>
+                            <option value="AVES">Aves</option>
+                            <option value="PEIXE">Peixe</option>
+                        </select>
+                    </div>
+                    <div class="pcrud-form-group">
+                        <label>Fase</label>
+                        <select name="fase">
+                            <option value="CRESCIMENTO">Crescimento</option>
+                            <option value="TERMINACAO">Terminação</option>
+                            <option value="LACTACAO">Lactação</option>
+                            <option value="REPRODUCAO">Reprodução</option>
+                            <option value="MANUTENCAO">Manutenção</option>
+                        </select>
+                    </div>
+                    <div class="pcrud-form-group">
+                        <label>Composição (JSON)</label>
+                        <textarea name="composicao" rows="3" placeholder='Ex: {"milho": 60, "farelo_soja": 30, "mineral": 10}'></textarea>
+                    </div>
+                    <div class="pcrud-form-group">
+                        <label>Custo por kg (R$)</label>
+                        <input type="number" step="0.01" name="custo_kg" placeholder="0,00">
+                    </div>
+                </div>
+                <div class="pcrud-form-actions">
+                    <button type="submit" class="pcrud-btn pcrud-btn-primary"><i class="bi bi-check-lg"></i> Salvar Ração</button>
+                    <button type="reset" class="pcrud-btn pcrud-btn-secondary">Limpar</button>
+                </div>
+            </form>
+        </div>
+        <div class="pcrud-table-wrap" style="margin-top:12px;"><table class="pcrud-table"><thead><tr><th>Nome</th><th>Espécie</th><th>Fase</th><th>Custo/kg</th><th>Ações</th></tr></thead><tbody>
+{% for r in racoes %}<tr><td>{{ r.nome }}</td><td>{{ r.get_especie_alvo_display|default:"—" }}</td><td>{{ r.get_fase_display|default:"—" }}</td><td>{% if r.custo_kg %}R$ {{ r.custo_kg }}{% else %}—{% endif %}</td><td><button class="pcrud-btn pcrud-btn-secondary pcrud-btn-sm" onclick="editarRacao({{ r.id }})"><i class="bi bi-pencil"></i></button> <button class="pcrud-btn pcrud-btn-danger pcrud-btn-sm" onclick="excluirRacao({{ r.id }})"><i class="bi bi-trash"></i></button></td></tr>
+{% empty %}<tr><td colspan="5" style="text-align:center;color:#888;">Nenhuma ração cadastrada.</td></tr>
+{% endfor %}
+</tbody></table></div>
+    </div>
+</div>
+
+<div id="toast" class="pcrud-toast"></div>
+{% include "partials/_confirm_modal.html" %}
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="{% static 'js/cadastro.js' %}"></script>
+<script>
+(function() {
+    // Sub-tabs
+    const tabs = document.querySelectorAll('.pcrud-subtab');
+    const tabContents = document.querySelectorAll('.pcrud-tab');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => t.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
+            tab.classList.add('active');
+            document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+        });
+    });
+
+    // Stats from JSON
+    const statsEl = document.getElementById('animaisStatsData');
+    if (statsEl) {
+        const stats = JSON.parse(statsEl.textContent || '{}');
+        document.getElementById('statTotalCabecas').textContent = stats.total_cabecas || '—';
+        document.getElementById('statEspecies').textContent = stats.total_especies || '—';
+        document.getElementById('statProducaoMes').textContent = stats.producao_mes || '—';
+        document.getElementById('statValorEstimado').textContent = 'R$ ' + (stats.valor_estimado || '—');
+    }
+
+    // Validation
+    window.validateField = function(el) {
+        const val = (el.value || '').trim();
+        if (el.hasAttribute('required') && !val) {
+            el.classList.add('error');
+            return false;
+        }
+        el.classList.remove('error');
+        return true;
+    };
+    window.validateForm = function(formId) {
+        const form = document.getElementById(formId);
+        let ok = true;
+        form.querySelectorAll('[required]').forEach(el => { if (!validateField(el)) ok = false; });
+        return ok;
+    };
+    window.showToast = function(msg, type='success') {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.className = 'pcrud-toast show pcrud-toast-' + type;
+        clearTimeout(t._hide);
+        t._hide = setTimeout(() => t.classList.remove('show'), 3500);
+    };
+    window.showLoading = function(btn) {
+        btn.disabled = true;
+        btn.dataset.txt = btn.innerHTML;
+        btn.innerHTML = '<span class="pcrud-spinner"></span> Salvando...';
+    };
+    window.hideLoading = function(btn) {
+        btn.disabled = false;
+        btn.innerHTML = btn.dataset.txt || 'Salvar';
+    };
+    window.getCSRFToken = function() {
+        return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+    };
+
+    // Animal CRUD
+    window.submitAnimal = async function(event) {
+        event.preventDefault();
+        if (!validateForm('animal-form')) { showToast('Corrija os campos em destaque', 'error'); return false; }
+        const f = document.getElementById('animal-form');
+        const data = {
+            propriedade: parseInt(f.propriedade.value),
+            especie: f.especie.value,
+            tipo_producao: f.tipo_producao.value,
+            raca: f.raca.value || '',
+            quantidade: parseInt(f.quantidade.value),
+            peso_medio: parseFloat(f.peso_medio.value) || null,
+            data_entrada: f.data_entrada.value || null,
+            observacao: f.observacao.value || '',
+        };
+        const btn = f.querySelector('.pcrud-btn-primary'); showLoading(btn);
+        try {
+            const r = await fetch('/api/animais/', { method:'POST', headers:{'Content-Type':'application/json','X-CSRFToken':getCSRFToken()}, body: JSON.stringify(data) });
+            if (r.ok) { showToast('Animal cadastrado!','success'); setTimeout(() => location.reload(), 800); }
+            else { const e=await r.json(); showToast('Erro: '+JSON.stringify(e),'error'); }
+        } catch(e) { showToast('Erro: '+e.message,'error'); } finally { hideLoading(btn); }
+        return false;
+    };
+
+
+    window.excluirAnimal = function(id) {
+        if (!confirm('Excluir este animal?')) return;
+        fetch('/api/animais/'+id+'/', { method:'DELETE', headers:{'X-CSRFToken':getCSRFToken()} })
+            .then(r => { if(r.ok){ showToast('Excluído','success'); setTimeout(() => location.reload(), 500); } else showToast('Erro ao excluir','error'); });
+    };
+
+    // Produção CRUD
+    window.submitProducao = async function(event) {
+        event.preventDefault();
+        if (!validateForm('producao-form')) { showToast('Corrija os campos em destaque', 'error'); return false; }
+        const f = document.getElementById('producao-form');
+        const data = {
+            animal: parseInt(f.animal.value),
+            data: f.data.value,
+            quantidade_produzida: parseFloat(f.quantidade_produzida.value),
+            unidade: f.unidade.value,
+            valor_estimado: parseFloat(f.valor_estimado.value) || null,
+            observacao: f.observacao.value || '',
+        };
+        const btn = f.querySelector('.pcrud-btn-primary'); showLoading(btn);
+        try {
+            const r = await fetch('/api/producao-animal/', { method:'POST', headers:{'Content-Type':'application/json','X-CSRFToken':getCSRFToken()}, body: JSON.stringify(data) });
+            if (r.ok) { showToast('Produção registrada!','success'); setTimeout(() => location.reload(), 800); }
+            else { const e=await r.json(); showToast('Erro: '+JSON.stringify(e),'error'); }
+        } catch(e) { showToast('Erro: '+e.message,'error'); } finally { hideLoading(btn); }
+        return false;
+    };
+
+    window.excluirProducao = function(id) {
+        if (!confirm('Excluir este registro de produção?')) return;
+        fetch('/api/producao-animal/'+id+'/', { method:'DELETE', headers:{'X-CSRFToken':getCSRFToken()} })
+            .then(r => { if(r.ok){ showToast('Excluído','success'); setTimeout(() => location.reload(), 500); } else showToast('Erro ao excluir','error'); });
+    };
+
+    window.submitRacao = async function(event) {
+        event.preventDefault();
+        var f = document.getElementById('racao-form');
+        var fd = new FormData(f);
+        var data = {};
+        fd.forEach(function (v, k) { if (k !== 'csrfmiddlewaretoken') data[k] = v === '' ? null : v; });
+        try {
+            const r = await fetch('/api/racoes/', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() }, body: JSON.stringify(data) });
+            if (r.ok) { showToast('Ração salva', 'success'); setTimeout(() => location.reload(), 600); }
+            else { const e = await r.json(); showToast('Erro: ' + JSON.stringify(e), 'error'); }
+        } catch (e) { showToast('Erro: ' + e.message, 'error'); }
+        return false;
+    };
+    window.excluirRacao = function(id) {
+        if (!confirm('Excluir esta ração?')) return;
+        fetch('/api/racoes/' + id + '/', { method: 'DELETE', headers: { 'X-CSRFToken': getCSRFToken() } })
+            .then(r => { if (r.ok) { showToast('Excluída', 'success'); setTimeout(() => location.reload(), 500); } else showToast('Erro ao excluir', 'error'); });
+    };
+})();
+</script>
+{% endblock %}

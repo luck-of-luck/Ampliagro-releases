@@ -1,0 +1,446 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Ampliagro — Telemetria IoT{% endblock %}
+
+{% block extra_css %}
+{% include "partials/_premium_cadastro_styles.html" %}
+
+<script src="{% static 'vendor/chart.umd-4.4.7.min.js' %}"></script>
+{% endblock %}
+
+{% block dashboard_appbar %}{% endblock %}
+
+{% block content %}
+<div class="pcrud-container">
+  <div class="pcrud-header">
+    <h1 class="pcrud-title"><i class="bi bi-broadcast"></i> Telemetria IoT — Tempo Real</h1>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <a href="{% url 'index_spa' %}" class="pcrud-btn pcrud-btn-secondary pcrud-btn-sm"><i class="bi bi-speedometer2"></i> Dashboard</a>
+      <button class="pcrud-btn pcrud-btn-primary pcrud-btn-sm" onclick="location.reload()"><i class="bi bi-arrow-clockwise"></i> Atualizar</button>
+      <span class="badge-online" id="liveDot"><i class="bi bi-circle-fill" style="font-size:.6rem"></i> LIVE</span>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="pcrud-stats">
+    <div class="pcrud-stat"><div class="pcrud-stat-label">Gateways Online</div><div class="pcrud-stat-value">{{ online_gateways }}/{{ gateways|length }}</div></div>
+    <div class="pcrud-stat"><div class="pcrud-stat-label">Devices Ativos</div><div class="pcrud-stat-value">{{ devices|length }}</div></div>
+    <div class="pcrud-stat"><div class="pcrud-stat-label">Leituras 24h</div><div class="pcrud-stat-value">{{ leituras_24h }}</div></div>
+    <div class="pcrud-stat"><div class="pcrud-stat-label">Alertas Pendentes</div><div class="pcrud-stat-value" style="color:#dc2626">{{ alertas|length }}</div></div>
+  </div>
+
+  <!-- Propriedade selector -->
+  <div class="pcrud-form-card" style="margin-bottom:16px">
+    <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+      <label style="font-weight:600">Propriedade:</label>
+      <select id="propSelect" onchange="onPropChange()" style="padding:8px 12px;border-radius:8px;border:1px solid var(--cor-borda)">
+        {% for p in propriedades %}
+        <option value="{{ p.id }}">{{ p.nome }} — {{ p.uf }}</option>
+        {% endfor %}
+      </select>
+      <label style="font-weight:600;margin-left:12px">Device:</label>
+      <select id="deviceSelect" onchange="loadChart()" style="padding:8px 12px;border-radius:8px;border:1px solid var(--cor-borda);min-width:220px">
+        {% for d in devices %}
+        <option value="{{ d.device_eui }}" data-tipo="{{ d.tipo }}">{{ d.nome }} [{{ d.tipo }}] ({{ d.device_eui|slice:":8" }})</option>
+        {% endfor %}
+      </select>
+      <label style="font-weight:600;margin-left:12px">Métrica:</label>
+      <select id="metricSelect" onchange="loadChart()" style="padding:8px 12px;border-radius:8px;border:1px solid var(--cor-borda)">
+        <option value="temperatura">Temperatura (°C)</option>
+        <option value="umidade_ar">Umidade Ar (%)</option>
+        <option value="pressao">Pressão (hPa)</option>
+        <option value="chuva">Chuva (mm)</option>
+        <option value="vento_vel">Vento (m/s)</option>
+        <option value="radiacao">Radiação (W/m²)</option>
+        <option value="umidade_solo">Umidade Solo (%)</option>
+        <option value="temp_solo">Temp Solo (°C)</option>
+        <option value="nivel">Nível (m)</option>
+        <option value="bateria">Bateria (%)</option>
+        <option value="potencia">Potência (W)</option>
+        <option value="combustivel">Combustível (%)</option>
+        <option value="passos">Passos</option>
+      </select>
+      <button class="pcrud-btn pcrud-btn-secondary pcrud-btn-sm" onclick="loadChart()"><i class="bi bi-graph-up"></i> Carregar</button>
+    </div>
+  </div>
+
+  <!-- Adicionar Sensor + Histórico/Estatísticas -->
+  <div class="grid-2col" style="gap:16px;margin-bottom:16px">
+    <!-- ESQUERDA: consulta por ID + cadastro -->
+    <div class="chart-card">
+      <h3 style="font-weight:700;margin-bottom:8px"><i class="bi bi-plus-circle"></i> Adicionar Sensor / Consultar ID</h3>
+      <label style="font-weight:600">ID do sensor (Device EUI)</label>
+      <div style="display:flex;gap:8px;margin:6px 0 10px">
+        <input id="lookupEui" type="text" placeholder="Ex: A8610F..." style="flex:1;padding:8px;border:1px solid var(--cor-borda);border-radius:8px;font-family:monospace">
+        <button class="pcrud-btn pcrud-btn-secondary pcrud-btn-sm" onclick="lookupSensor()"><i class="bi bi-search"></i> Buscar na API</button>
+      </div>
+      <div id="lookupResult" style="font-size:.85rem;background:#f8fafc;padding:10px;border-radius:8px;min-height:44px;margin-bottom:12px">Digite o ID e clique em Buscar — mostro nome, tipo e o último dado recebido.</div>
+      <details>
+        <summary style="cursor:pointer;font-weight:600">Cadastrar novo sensor</summary>
+        <form id="device-form" onsubmit="return submitDevice(event)" class="grid-2col" style="gap:10px;margin-top:10px">
+          {% csrf_token %}
+          <div><label style="font-weight:600">Propriedade</label>
+            <select name="propriedade" required style="width:100%;padding:8px;border:1px solid var(--cor-borda);border-radius:8px">
+              {% for p in propriedades %}<option value="{{ p.id }}">{{ p.nome }}</option>{% endfor %}
+            </select></div>
+          <div><label style="font-weight:600">Nome do sensor</label>
+            <input name="nome" required placeholder="Ex: Solo Talhão 3" style="width:100%;padding:8px;border:1px solid var(--cor-borda);border-radius:8px"></div>
+          <div><label style="font-weight:600">Device EUI / ID</label>
+            <input name="device_eui" required placeholder="ID único do hardware" style="width:100%;padding:8px;border:1px solid var(--cor-borda);border-radius:8px;font-family:monospace"></div>
+          <div><label style="font-weight:600">Tipo</label>
+            <select name="tipo" style="width:100%;padding:8px;border:1px solid var(--cor-borda);border-radius:8px">
+              <option value="METEO">Estação Meteorológica</option>
+              <option value="SOLO">Sensor de Solo</option>
+              <option value="NIVEL">Nível / Vazão</option>
+              <option value="MAQUINARIO">Rastreador Maquinário</option>
+              <option value="ANIMAL">Colar Animal</option>
+              <option value="DRONE">Drone</option>
+              <option value="ENERGIA">Medidor Energia</option>
+              <option value="SILAGEM">Sensor Silo/Silagem</option>
+              <option value="GENERIC">Genérico</option>
+            </select></div>
+          <div><label style="font-weight:600">Protocolo</label>
+            <select name="protocolo" style="width:100%;padding:8px;border:1px solid var(--cor-borda);border-radius:8px">
+              <option value="MQTT">MQTT</option>
+              <option value="HTTP">HTTP/HTTPS</option>
+              <option value="LORAWAN">LoRaWAN</option>
+              <option value="COAP">CoAP</option>
+            </select></div>
+          <div><label style="font-weight:600">Gateway</label>
+            <select name="gateway" style="width:100%;padding:8px;border:1px solid var(--cor-borda);border-radius:8px">
+              <option value="">Sem gateway</option>
+              {% for g in gateways %}<option value="{{ g.id }}">{{ g.nome }}</option>{% endfor %}
+            </select></div>
+          <div style="grid-column:span 2;display:flex;gap:8px;margin-top:4px">
+            <button type="submit" class="pcrud-btn pcrud-btn-primary"><i class="bi bi-check-lg"></i> Cadastrar Sensor</button>
+          </div>
+        </form>
+      </details>
+    </div>
+    <!-- DIREITA: histórico acumulado + média/máx/mín -->
+    <div class="chart-card">
+      <h3 style="font-weight:700;margin-bottom:8px"><i class="bi bi-clock-history"></i> Histórico e Estatísticas</h3>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:end;margin-bottom:10px">
+        <div><label style="font-weight:600">Sensor</label><br>
+          <select id="statsDevice" style="padding:8px;border:1px solid var(--cor-borda);border-radius:8px;min-width:180px">
+            {% for d in devices %}<option value="{{ d.device_eui }}">{{ d.nome }} ({{ d.device_eui|slice:":8" }})</option>{% endfor %}
+          </select></div>
+        <div><label style="font-weight:600">Métrica</label><br>
+          <select id="statsMetric" style="padding:8px;border:1px solid var(--cor-borda);border-radius:8px">
+            <option value="">Todas</option>
+            <option value="temperatura">Temperatura</option>
+            <option value="umidade_ar">Umidade Ar</option>
+            <option value="umidade_solo">Umidade Solo</option>
+            <option value="chuva">Chuva</option>
+            <option value="bateria">Bateria</option>
+            <option value="nivel">Nível</option>
+          </select></div>
+        <div><label style="font-weight:600">Período</label><br>
+          <select id="statsDays" onchange="loadSensorStats()" style="padding:8px;border:1px solid var(--cor-borda);border-radius:8px">
+            <option value="1">24h</option>
+            <option value="7" selected>7 dias</option>
+            <option value="30">30 dias</option>
+          </select></div>
+        <button class="pcrud-btn pcrud-btn-secondary pcrud-btn-sm" onclick="loadSensorStats()"><i class="bi bi-graph-up"></i> Carregar</button>
+      </div>
+      <div id="sensorStatsGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;margin-bottom:10px"></div>
+      <div style="max-height:220px;overflow:auto">
+        <table class="pcrud-table">
+          <thead><tr><th>Quando</th><th>Métrica</th><th>Valor</th></tr></thead>
+          <tbody id="sensorHistoryBody"><tr><td colspan="3" style="color:var(--cor-texto-medio)">Escolha o sensor e clique em Carregar.</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart -->
+  <div class="chart-card" style="margin-bottom:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <h3 style="font-weight:700"><i class="bi bi-activity"></i> Série Temporal — <span id="chartTitle">temperatura</span></h3>
+      <div style="display:flex;gap:6px">
+        <button class="pcrud-btn pcrud-btn-secondary pcrud-btn-sm" onclick="setRange(24)">24h</button>
+        <button class="pcrud-btn pcrud-btn-secondary pcrud-btn-sm" onclick="setRange(72)">72h</button>
+        <button class="pcrud-btn pcrud-btn-secondary pcrud-btn-sm" onclick="setRange(168)">7d</button>
+      </div>
+    </div>
+    <canvas id="telemetryChart" height="110"></canvas>
+    <div id="chartStats" style="font-size:.85rem;color:var(--cor-texto-medio);margin-top:8px"></div>
+  </div>
+
+  <!-- Devices + Gateways + Alerts Grid -->
+  <div class="grid-2col" style="gap:16px;margin-bottom:16px">
+    <!-- Devices -->
+    <div class="chart-card">
+      <h3 style="font-weight:700;margin-bottom:8px"><i class="bi bi-cpu"></i> Devices ({{ devices|length }})</h3>
+      <div style="max-height:360px;overflow:auto">
+        <table class="pcrud-table">
+          <thead><tr><th>Device</th><th>Tipo</th><th>Bateria</th><th>Último Push</th><th>Status</th></tr></thead>
+          <tbody>
+            {% for d in devices %}
+            <tr>
+              <td><strong>{{ d.nome }}</strong><br><small style="color:var(--cor-texto-medio)">{{ d.device_eui }}</small><br><small>Tópico: <code style="font-size:.7rem">{{ d.topic }}</code></small></td>
+              <td><span style="font-size:.75rem;background:var(--cor-primaria-suave);padding:2px 6px;border-radius:6px">{{ d.get_tipo_display }}</span></td>
+              <td>{% if d.bateria_pct %}{{ d.bateria_pct }}%{% else %}—{% endif %}</td>
+              <td>{% if d.ultimo_push %}{{ d.ultimo_push|date:"d/m H:i" }}{% else %}<span style="color:#dc2626">nunca</span>{% endif %}</td>
+              <td>{% if d.ativo %}<span class="badge-online">ativo</span>{% else %}<span class="badge-offline">inativo</span>{% endif %}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <!-- Gateways + Alertas -->
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="chart-card">
+        <h3 style="font-weight:700;margin-bottom:8px"><i class="bi bi-router"></i> Gateways ({{ gateways|length }})</h3>
+        <table class="pcrud-table">
+          <thead><tr><th>Gateway</th><th>Tipo</th><th>API Key</th><th>Status</th></tr></thead>
+          <tbody>
+            {% for g in gateways %}
+            <tr>
+              <td><strong>{{ g.nome }}</strong><br><small>{{ g.gateway_eui }}</small></td>
+              <td>{{ g.get_tipo_display }}</td>
+              <td><code style="font-size:.7rem">{{ g.api_key|slice:":12" }}...</code> <button class="pcrud-btn pcrud-btn-secondary pcrud-btn-sm" style="padding:2px 6px" onclick="navigator.clipboard.writeText('{{ g.api_key }}');showToast('API key copiada')">copiar</button></td>
+              <td>{% if g.status == "online" %}<span class="badge-online">online</span>{% else %}<span class="badge-offline">{{ g.status }}</span>{% endif %}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <small style="color:var(--cor-texto-medio)">Use o <code>X-API-Key</code> no header para pushes: <code>curl -H "X-API-Key: &lt;gateway key&gt;" -d '{"temperatura":27.3}' /api/iot/push/&lt;device_eui&gt;/</code></small>
+      </div>
+      <div class="chart-card">
+        <h3 style="font-weight:700;margin-bottom:8px"><i class="bi bi-exclamation-triangle"></i> Alertas Pendentes ({{ alertas|length }})</h3>
+        {% if alertas %}
+          {% for a in alertas %}
+          <div class="alert-row {% if a.severidade == 'critical' %}alert-critical{% elif a.severidade == 'warning' %}alert-warning{% endif %}">
+            <strong>[{{ a.severidade|upper }}]</strong> {{ a.mensagem }}<br>
+            <small>{{ a.metric }} = {{ a.valor }} — {{ a.timestamp|date:"d/m H:i" }} {% if a.device %}• {{ a.device.nome }}{% endif %}</small>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div style="color:var(--cor-texto-medio);font-size:.9rem">Nenhum alerta pendente — sistema ok <i class="bi bi-check-circle" style="color:#16a34a"></i></div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Simulador de Push (todos protocolos para todo o sistema) -->
+  <div class="chart-card">
+    <h3 style="font-weight:700;margin-bottom:8px"><i class="bi bi-send"></i> Simulador de Push — Teste qualquer device / protocolo para todo o sistema</h3>
+    <p style="color:var(--cor-texto-medio);font-size:.85rem">Envia dados reais para o pipeline completo (parsers JSON/SenML/Cayenne/TTN → TelemetryData → alertas → cultura business engine). Use em campo para validar sensores ou integrar firmware.</p>
+    <div class="grid-2col" style="gap:12px;margin-top:12px">
+      <div>
+        <label style="font-weight:600">Device EUI</label>
+        <select id="simDevice" style="width:100%;padding:8px;border:1px solid var(--cor-borda);border-radius:8px">
+          {% for d in devices %}<option value="{{ d.device_eui }}">{{ d.device_eui }} — {{ d.nome }}</option>{% endfor %}
+        </select>
+      </div>
+      <div>
+        <label style="font-weight:600">Gateway API Key</label>
+        <input id="simKey" type="text" placeholder="Cole o X-API-Key do gateway" style="width:100%;padding:8px;border:1px solid var(--cor-borda);border-radius:8px">
+      </div>
+      <div>
+        <label style="font-weight:600">Formato</label>
+        <select id="simFormat" onchange="fillSimExample()" style="width:100%;padding:8px;border:1px solid var(--cor-borda);border-radius:8px">
+          <option value="json">JSON simples</option>
+          <option value="senml">SenML (array)</option>
+          <option value="cayenne">Cayenne LPP hex</option>
+          <option value="ttn">TTN uplink_message</option>
+          <option value="csv">CSV</option>
+        </select>
+      </div>
+      <div style="display:flex;align-items:end;gap:8px">
+        <button class="pcrud-btn pcrud-btn-primary" onclick="doSimPush()"><i class="bi bi-send"></i> Enviar Push</button>
+        <button class="pcrud-btn pcrud-btn-secondary" onclick="fillSimExample()">Exemplo</button>
+      </div>
+      <div style="grid-column:span 2">
+        <label style="font-weight:600">Payload</label>
+        <textarea id="simPayload" rows="6" style="width:100%;padding:10px;border:1px solid var(--cor-borda);border-radius:8px;font-family:monospace;font-size:.85rem"></textarea>
+      </div>
+      <div id="simResult" style="grid-column:span 2;font-family:monospace;font-size:.85rem;background:#f8fafc;padding:10px;border-radius:8px;min-height:40px"></div>
+    </div>
+    <details style="margin-top:12px">
+      <summary style="cursor:pointer;font-weight:600">Pushes reais por tipo de device (copiar para firmware)</summary>
+      <div style="font-size:.82rem;line-height:1.6;margin-top:8px">
+        <strong>METEO (estação):</strong> <code>{"temperatura":27.3,"umidade_ar":82,"pressao":1012,"chuva":0.2,"vento_vel":3.4,"radiacao":850}</code><br>
+        <strong>SOLO:</strong> <code>{"umidade_solo":42.5,"temp_solo":22.1,"condutividade":0.45,"ph_solo":5.8,"npk_n":12}</code><br>
+        <strong>MAQUINARIO:</strong> <code>{"gps_lat":-15.79,"gps_lon":-47.88,"velocidade":8.5,"rpm":2100,"combustivel":62,"horimetro":1240.5}</code><br>
+        <strong>ANIMAL:</strong> <code>{"gps_lat":-15.791,"gps_lon":-47.882,"temp_corporal":38.6,"passos":320}</code><br>
+        <strong>ENERGIA:</strong> <code>{"potencia":2450,"tensao":220,"corrente":11.2,"energia_dia":18.5}</code><br>
+        <strong>TTN LoRaWAN:</strong> gateway encaminha para <code>POST /api/iot/mqtt/webhook/</code> com <code>uplink_message.decoded_payload</code><br>
+        <strong>MQTT direto:</strong> publique em <code>ampliagro/{prop}/{gw}/{dev}/telemetry</code> no broker Mosquitto (1883) ou via <code>python manage.py mqtt_listener</code><br>
+      </div>
+    </details>
+  </div>
+
+  <!-- Últimas leituras -->
+  <div class="chart-card" style="margin-top:16px">
+    <h3 style="font-weight:700;margin-bottom:8px"><i class="bi bi-clock-history"></i> Últimas leituras (todas propriedades)</h3>
+    <table class="pcrud-table">
+      <thead><tr><th>Quando</th><th>Device</th><th>Métrica</th><th>Valor</th><th>Qualidade</th></tr></thead>
+      <tbody>
+        {% for r in recentes %}
+        <tr><td>{{ r.timestamp|date:"d/m H:i:s" }}</td><td>{{ r.device.nome|default:"VIRT" }}</td><td>{{ r.metric }}</td><td><strong>{{ r.value }}</strong> {{ r.unit }}</td><td>{{ r.qualidade }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<div id="toast" class="pcrud-toast"></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let chart;
+let currentRange = 24;
+
+function getCSRFToken(){return document.querySelector('[name=csrfmiddlewaretoken]')?.value||''}
+function showToast(m,t='success'){const e=document.getElementById('toast');e.textContent=m;e.className='pcrud-toast show pcrud-toast-'+t;clearTimeout(e._h);e._h=setTimeout(()=>e.classList.remove('show'),3500)}
+
+async function loadChart(){
+  const prop = document.getElementById('propSelect').value;
+  const dev = document.getElementById('deviceSelect').value;
+  const metric = document.getElementById('metricSelect').value;
+  document.getElementById('chartTitle').textContent = metric;
+  const from = new Date(Date.now() - currentRange*3600*1000).toISOString();
+  const url = `/api/iot/telemetry/?propriedade=${prop}&device=${dev}&metric=${metric}&from=${from}&limit=2000`;
+  try{
+    const r = await fetch(url);
+    const j = await r.json();
+    const labels = j.data.map(d=> new Date(d.timestamp).toLocaleString('pt-BR',{hour:'2-digit',minute:'2-digit',month:'short',day:'numeric'}));
+    const values = j.data.map(d=> d.value);
+    const ctx = document.getElementById('telemetryChart').getContext('2d');
+    if(chart) chart.destroy();
+    chart = new Chart(ctx, {
+      type:'line',
+      data:{labels, datasets:[{label:metric, data:values, borderColor:'#0f9d6e', backgroundColor:'rgba(15,157,110,0.12)', tension:0.3, fill:true, pointRadius:0}]},
+      options:{responsive:true, plugins:{legend:{display:false}}, scales:{x:{display:true, ticks:{maxTicksLimit:12}}, y:{beginAtZero:false}}}
+    });
+    if(values.length){
+      const avg=(values.reduce((a,b)=>a+b,0)/values.length).toFixed(2);
+      const mx=Math.max(...values).toFixed(2), mn=Math.min(...values).toFixed(2);
+      document.getElementById('chartStats').textContent=`${values.length} pontos • média ${avg} • min ${mn} • max ${mx}`;
+    } else document.getElementById('chartStats').textContent='Sem dados para este filtro — envie um push ou rode sync_inmet';
+  }catch(e){showToast('Erro ao carregar gráfico: '+e,'error')}
+}
+function setRange(h){currentRange=h;loadChart()}
+function fillSimExample(){
+  const fmt=document.getElementById('simFormat').value;
+  const ex={
+    json: JSON.stringify({temperatura:27.3, umidade_ar:82, pressao:1012, chuva:0.2, vento_vel:3.4, radiacao:850},null,2),
+    senml: JSON.stringify([{n:"temperatura",v:27.3},{n:"umidade_ar",v:82},{n:"pressao",v:1012}],null,2),
+    cayenne: "01670110026864027303E8",
+    ttn: JSON.stringify({uplink_message:{decoded_payload:{temperatura:26.1, umidade_ar:85}, rx_metadata:[{rssi:-72,snr:7.5}], f_port:2, received_at:new Date().toISOString()}, end_device_ids:{dev_eui:document.getElementById('simDevice').value}},null,2),
+    csv: "timestamp,temperatura,umidade_ar,pressao\n2026-08-27T12:00:00Z,27.3,82,1012\n2026-08-27T13:00:00Z,28.1,78,1011"
+  };
+  document.getElementById('simPayload').value=ex[fmt]||ex.json;
+}
+async function doSimPush(){
+  const dev=document.getElementById('simDevice').value;
+  const key=document.getElementById('simKey').value.trim();
+  const payload=document.getElementById('simPayload').value.trim();
+  if(!dev) return showToast('Selecione device','error');
+  if(!key) return showToast('Cole o API key do gateway (ver tabela Gateways)','error');
+  if(!payload) return showToast('Payload vazio','error');
+  const isJson = payload.startsWith('{')||payload.startsWith('[');
+  const body = payload;
+  const headers={'X-API-Key':key, 'Content-Type': isJson?'application/json':'text/plain'};
+  document.getElementById('simResult').textContent='Enviando...';
+  try{
+    const r=await fetch(`/api/iot/push/${dev}/`, {method:'POST', headers, body});
+    const j=await r.json();
+    document.getElementById('simResult').textContent=JSON.stringify(j,null,2);
+    showToast(r.ok?`Push ok: ${j.ingested} métricas, ${j.alerts} alertas`:'Erro: '+(j.error||r.status), r.ok?'success':'error');
+    if(r.ok) loadChart();
+  }catch(e){document.getElementById('simResult').textContent='Erro: '+e; showToast(String(e),'error')}
+}
+document.addEventListener('DOMContentLoaded', ()=>{
+  fillSimExample();
+  // tenta pegar do primeiro gateway visível — usuário pode copiar botão
+  loadChart();
+  if(document.getElementById('statsDevice').options.length) loadSensorStats();
+  // Auto-refresh a cada 60s. O handle vive em `window` e o anterior e'
+  // limpo ANTES de criar outro.
+  //
+  // MEDIDO 2026-10-06: `setInterval(loadChart, 60000)` solto criava um timer
+  // NOVO a cada visita a esta pagina pela SPA, sem cancelar o anterior.
+  // Cinco visitas = cinco timers a redesenhar o grafico de 60 em 60
+  // segundos, e cada timer mantem vivos aclosure e o `document` da pagina
+  // que ja saiu. E' lentidao que cresce sem que nada no codigo tenha mudado.
+  if (window._telemetriaTimer) clearInterval(window._telemetriaTimer);
+  window._telemetriaTimer = setInterval(loadChart, 60000);
+});
+
+// --- Consulta de sensor por ID (nome/dado via API) ---
+async function lookupSensor(){
+  const eui = document.getElementById('lookupEui').value.trim();
+  const box = document.getElementById('lookupResult');
+  if(!eui){ showToast('Digite o ID do sensor','error'); return; }
+  box.textContent = 'Buscando...';
+  try{
+    const r = await fetch(`/api/iot/sensor-lookup/?device_eui=${encodeURIComponent(eui)}`);
+    const j = await r.json();
+    if(j.found){
+      const d = j.device;
+      const latest = Object.entries(j.latest||{}).map(([m,v])=>`${m}: <strong>${v.value}${v.unit||''}</strong> <small>(${new Date(v.timestamp).toLocaleString('pt-BR')})</small>`).join('<br>') || 'sem dados ainda';
+      box.innerHTML = `<strong>${d.nome}</strong> <small>[${d.tipo_display}]</small><br>`+
+        `<small>ID: <code>${d.device_eui}</code> • protocolo ${d.protocolo} • ${d.ativo?'ativo':'inativo'} • último push ${d.ultimo_push?new Date(d.ultimo_push).toLocaleString('pt-BR'):'nunca'}</small><br>`+
+        `<small>tópico <code>${d.topic}</code></small><br><div style="margin-top:6px">${latest}</div>`+
+        `<small style="color:var(--cor-texto-medio)">${j.total_leituras} leituras no total</small>`;
+      showToast('Sensor encontrado: '+d.nome);
+    } else {
+      box.innerHTML = `<span style="color:#b45309">ID <code>${eui}</code> ainda não cadastrado.</span> Preencha abaixo em "Cadastrar novo sensor" para adicionar.`;
+      const f = document.getElementById('device-form');
+      if(f && !f.device_eui.value) f.device_eui.value = eui;
+      showToast('Sensor não encontrado — cadastre abaixo','error');
+    }
+  }catch(e){ box.textContent = 'Erro: '+e; showToast(String(e),'error'); }
+}
+
+// --- Cadastro de sensor (POST /api/iot/devices/) ---
+async function submitDevice(event){
+  event.preventDefault();
+  const f = document.getElementById('device-form');
+  const data = {
+    propriedade: parseInt(f.propriedade.value),
+    nome: f.nome.value.trim(),
+    device_eui: f.device_eui.value.trim(),
+    tipo: f.tipo.value,
+    protocolo: f.protocolo.value,
+    gateway: f.gateway.value ? parseInt(f.gateway.value) : null,
+  };
+  if(!data.nome || !data.device_eui){ showToast('Nome e ID são obrigatórios','error'); return false; }
+  try{
+    const r = await fetch('/api/iot/devices/', {method:'POST', headers:{'Content-Type':'application/json','X-CSRFToken':getCSRFToken()}, body: JSON.stringify(data)});
+    const j = await r.json().catch(()=>({}));
+    if(r.ok){ showToast('Sensor cadastrado!','success'); setTimeout(()=>location.reload(), 900); }
+    else showToast('Erro: '+JSON.stringify(j.detail||j),'error');
+  }catch(e){ showToast('Erro: '+e.message,'error'); }
+  return false;
+}
+
+// --- Histórico + média/máx/mín (painel lateral) ---
+async function loadSensorStats(){
+  const eui = document.getElementById('statsDevice').value;
+  const metric = document.getElementById('statsMetric').value;
+  const days = document.getElementById('statsDays').value;
+  const grid = document.getElementById('sensorStatsGrid');
+  const body = document.getElementById('sensorHistoryBody');
+  if(!eui){ grid.innerHTML=''; body.innerHTML='<tr><td colspan="3">Nenhum sensor.</td></tr>'; return; }
+  try{
+    const r = await fetch(`/api/iot/sensor-stats/?device_eui=${encodeURIComponent(eui)}&metric=${encodeURIComponent(metric)}&days=${days}`);
+    const j = await r.json();
+    if(!r.ok){ grid.innerHTML=''; body.innerHTML=`<tr><td colspan="3">${j.error||'Erro'}</td></tr>`; return; }
+    const fmt = v => (v===null||v===undefined) ? '—' : Number(v).toFixed(2);
+    const cards = [
+      ['Média', fmt(j.media)], ['Máxima', fmt(j.maxima)], ['Mínima', fmt(j.minima)],
+      ['Leituras', j.total], ['Última', j.ultima?`${fmt(j.ultima.value)}${j.ultima.unit||''}`:'—'],
+    ];
+    grid.innerHTML = cards.map(([k,v])=>`<div style="background:#f8fafc;border:1px solid var(--cor-borda);border-radius:10px;padding:8px;text-align:center"><div style="font-size:.7rem;color:var(--cor-texto-medio);font-weight:600">${k}</div><div style="font-size:1.05rem;font-weight:800">${v}</div></div>`).join('');
+    body.innerHTML = (j.historico||[]).slice(0,20).map(h=>`<tr><td>${new Date(h.timestamp).toLocaleString('pt-BR')}</td><td>${h.metric}</td><td><strong>${fmt(h.value)}</strong> ${h.unit||''}</td></tr>`).join('') || '<tr><td colspan="3">Sem leituras no período.</td></tr>';
+  }catch(e){ showToast('Erro stats: '+e,'error'); }
+}
+</script>
+{% endblock %}

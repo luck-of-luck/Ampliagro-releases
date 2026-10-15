@@ -1,0 +1,374 @@
+{% extends "lcdpr/base.html" %}
+{% load static %}
+
+{% block title %}Diagnóstico LCDPR — Livro Caixa Digital do Produtor Rural{% endblock %}
+
+{% block content %}
+<div class="lcdpr-page-header">
+    <div class="lcdpr-page-header-content">
+        <div class="lcdpr-page-header-main">
+            <div class="lcdpr-page-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    <path d="M9 9h6v6H9z"/>
+                </svg>
+            </div>
+            <div>
+                <h1 class="lcdpr-page-title">Diagnóstico LCDPR</h1>
+                <p class="lcdpr-page-subtitle">Verifique as pendências antes de gerar o arquivo</p>
+            </div>
+        </div>
+        <div class="lcdpr-page-actions">
+            <a href="{% url 'central-gestao' %}" class="lcdpr-btn lcdpr-btn--ghost">Central de Gestão</a>
+        </div>
+    </div>
+</div>
+
+<div class="lcdpr-grid lcdpr-grid--1 lcdpr-mt-6">
+    <div class="lcdpr-card">
+        <div class="lcdpr-card__header">
+            <h2 class="lcdpr-card__title">Configuração do Diagnóstico</h2>
+            <p class="lcdpr-card__subtitle">Verifique pendências antes de gerar o arquivo</p>
+        </div>
+        <div class="lcdpr-card__body">
+            <form id="lcdpr-diag-form" class="lcdpr-form">
+                <div class="lcdpr-form-row lcdpr-form-row--2">
+                    <div class="lcdpr-form-group">
+                        <label for="ano" class="lcdpr-label lcdpr-label--required">Ano-calendário</label>
+                        <input type="number" id="ano" name="ano" class="lcdpr-input" min="2019" max="9999" required>
+                        <p class="lcdpr-help-text">Ano-calendário do LCDPR (leiaute 1.3 válido a partir de 2019)</p>
+                    </div>
+                    <div class="lcdpr-form-group">
+                        <label for="escopo" class="lcdpr-label lcdpr-label--required">Escopo</label>
+                        <select id="escopo" name="escopo" class="lcdpr-select" required>
+                            <option value="propriedade">Propriedade selecionada</option>
+                            <option value="contribuinte">Todas as propriedades do contribuinte (consolidado)</option>
+                        </select>
+                        <p class="lcdpr-help-text">Propriedade única ou consolidação de todas as propriedades do mesmo CPF</p>
+                    </div>
+                </div>
+                
+                <div class="lcdpr-form-group">
+                    <label for="propriedade" class="lcdpr-label lcdpr-label--required">Propriedade</label>
+                    <select id="propriedade" name="propriedade_id" class="lcdpr-select" required>
+                        <option value="">Selecione uma propriedade...</option>
+                        {% for prop in propriedades %}
+                        <option value="{{ prop.pk }}">{{ prop.nome }} ({{ prop.cad_itr|default:"sem ITR" }})</option>
+                        {% empty %}
+                        <option value="" disabled>Nenhuma propriedade cadastrada</option>
+                        {% endfor %}
+                    </select>
+                    <p class="lcdpr-help-text">Selecione a propriedade para diagnosticar</p>
+                </div>
+                
+                <div class="lcdpr-btn-group lcdpr-mt-6">
+                    <button type="submit" class="lcdpr-btn lcdpr-btn--primary lcdpr-btn--lg" id="btn-diagnostico">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                        <span>Executar Diagnóstico</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Área de resultado/diagnóstico -->
+    <div id="lcdpr-result" class="lcdpr-grid lcdpr-grid--1 lcdpr-mt-6" style="display: none;"></div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+    'use strict';
+    
+    const form = document.getElementById('lcdpr-diag-form');
+    const resultDiv = document.getElementById('lcdpr-result');
+    
+    // Configurar ano padrão
+    const anoInput = document.getElementById('ano');
+    if (anoInput && !anoInput.value) {
+        anoInput.value = new Date().getFullYear();
+    }
+    
+    // Preencher propriedades do usuário
+    async function carregarPropriedades() {
+        try {
+            const res = await fetch('/api/propriedades/');
+            if (res.ok) {
+                const data = await res.json();
+                const select = document.getElementById('propriedade');
+                select.innerHTML = '<option value="">Selecione uma propriedade...</option>';
+                data.forEach(p => {
+                    const opt = document.createElement('option');
+                    opt.value = p.id;
+                    opt.textContent = `${p.nome} (${p.cad_itr || 'sem ITR'})`;
+                    select.appendChild(opt);
+                });
+            }
+        } catch (e) {
+            console.warn('Erro ao carregar propriedades:', e);
+        }
+    }
+    
+    function showResult(html, isError = false) {
+        const resultDiv = document.getElementById('lcdpr-result');
+        resultDiv.style.display = 'block';
+        resultDiv.innerHTML = `
+            <div class="lcdpr-card">
+                <div class="lcdpr-card__header">
+                    <h2 class="lcdpr-card__title">${isError ? 'Erro' : 'Diagnóstico do LCDPR'}</h2>
+                </div>
+                <div class="lcdpr-card__body">
+                    ${html}
+                </div>
+            </div>
+        `;
+        resultDiv.scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    function renderDiagnostico(data) {
+        let html = '';
+        if (data.pendencias && data.pendencias.length > 0) {
+            html += `
+                <div class="lcdpr-alert lcdpr-alert--warning lcdpr-mb-4">
+                    <div class="lcdpr-alert__icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+                    </div>
+                    <div class="lcdpr-alert__content">
+                        <p class="lcdpr-alert__title">${data.pendencias.length} pendência(s) encontrada(s)</p>
+                        <p class="lcdpr-alert__message">Preencha os dados abaixo antes de gerar o LCDPR.</p>
+                    </div>
+                </div>
+            `;
+            data.pendencias.forEach(p => {
+                html += `
+                    <div class="lcdpr-alert lcdpr-alert--danger lcdpr-mb-3">
+                        <div class="lcdpr-alert__icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6"/><path d="M9 9l6 6"/></svg>
+                        </div>
+                        <div class="lcdpr-alert__content">
+                            <p class="lcdpr-alert__title"><strong>${p.nome}</strong> (Registro ${p.registo})</p>
+                            <p class="lcdpr-alert__message">${p.porque}</p>
+                            ${p.campo ? `<p class="lcdpr-alert__message"><small>Campo: ${p.campo}</small></p>` : ''}
+                            ${p.lancamento_id ? `<p class="lcdpr-alert__message"><small><a href="/central-gestao/?lancamento=${p.lancamento_id}" class="lcdpr-btn lcdpr-btn--ghost lcdpr-btn--sm">Revisar lançamento</a></small></p>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+        
+        if (data.avisos && data.avisos.length > 0) {
+            data.avisos.forEach(a => {
+                html += `
+                    <div class="lcdpr-alert lcdpr-alert--warning lcdpr-mb-3">
+                        <div class="lcdpr-alert__icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+                        </div>
+                        <div class="lcdpr-alert__content">
+                            <p class="lcdpr-alert__title">Aviso: ${a.codigo}</p>
+                            <p class="lcdpr-alert__message">${a.mensagem}</p>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+        
+        if (data.resumo) {
+            html += `
+                <div class="lcdpr-card lcdpr-mt-4">
+                    <div class="lcdpr-card__header">
+                        <h3 class="lcdpr-card__title">Resumo do Período</h3>
+                    </div>
+                    <div class="lcdpr-card__body">
+                        <div class="lcdpr-grid lcdpr-grid--4 lcdpr-gap-4">
+                            <div class="lcdpr-card">
+                                <div class="lcdpr-card__body lcdpr-text-center">
+                                    <p class="lcdpr-text-muted lcdpr-text-sm">Lançamentos incluídos</p>
+                                    <p class="lcdpr-text-2xl lcdpr-font-bold lcdpr-text-primary">${data.resumo.lancamentos_incluidos}</p>
+                                </div>
+                            </div>
+                            <div class="lcdpr-card">
+                                <div class="lcdpr-card__body lcdpr-text-center">
+                                    <p class="lcdpr-text-muted lcdpr-text-sm">Entradas</p>
+                                    <p class="lcdpr-text-2xl lcdpr-font-bold text-green-600">${data.resumo.entradas}</p>
+                                </div>
+                            </div>
+                            <div class="lcdpr-card">
+                                <div class="lcdpr-card__body lcdpr-text-center">
+                                    <p class="lcdpr-text-muted lcdpr-text-sm">Saídas</p>
+                                    <p class="lcdpr-text-2xl lcdpr-font-bold text-red-600">${data.resumo.saidas}</p>
+                                </div>
+                            </div>
+                            <div class="lcdpr-card">
+                                <div class="lcdpr-card__body lcdpr-text-center">
+                                    <p class="lcdpr-text-muted lcdpr-text-sm">Saldo</p>
+                                    <p class="lcdpr-text-2xl lcdpr-font-bold ${parseFloat(data.resumo.saldo) >= 0 ? 'text-green-600' : 'text-red-600'}">${data.resumo.saldo}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        if (data.fontes) {
+            html += `
+                <div class="lcdpr-mt-4">
+                    <h4 class="lcdpr-text-sm lcdpr-font-semibold lcdpr-text-secondary lcdpr-mb-2">Referências</h4>
+                    <ul class="lcdpr-space-y-2">
+                        ${data.fontes.map(f => `<li><a href="${f.url}" target="_blank" rel="noopener" class="lcdpr-text-sm text-primary hover:underline">${f.titulo}</a></li>`).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+        
+        if (data.transmissao) {
+            html += `
+                <div class="lcdpr-alert lcdpr-alert--info lcdpr-mt-4">
+                    <div class="lcdpr-alert__icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                    </div>
+                    <div class="lcdpr-alert__content">
+                        <p class="lcdpr-alert__title">${data.transmissao.mensagem}</p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        if (!html) {
+            html = `
+                <div class="lcdpr-alert lcdpr-alert--success">
+                    <div class="lcdpr-alert__icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>
+                    </div>
+                    <div class="lcdpr-alert__content">
+                        <p class="lcdpr-alert__title">Tudo pronto!</p>
+                        <p class="lcdpr-alert__message">Nenhuma pendência encontrada. O LCDPR pode ser gerado.</p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        return html;
+    }
+    
+    async function handleSubmit(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(e.target);
+        const params = new URLSearchParams();
+        
+        for (const [key, value] of formData.entries()) {
+            if (value) params.append(key, value);
+        }
+        
+        const url = `/api/financeiro/lcdpr/diagnostico/?${params.toString()}`;
+        
+        const btn = document.querySelector('button[type="submit"]');
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="lcdpr-spinner"></span> Processando...';
+        
+        try {
+            const response = await fetch(url, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                const html = renderDiagnostico(data);
+                showResult(html);
+            } else {
+                const data = await response.json();
+                const html = `
+                    <div class="lcdpr-alert lcdpr-alert--danger">
+                        <p class="lcdpr-alert__message">${data.erro || 'Erro desconhecido'}</p>
+                    </div>
+                `;
+                showResult(html, true);
+            }
+        } catch (error) {
+            showError('Erro de conexão: ' + error.message);
+        } finally {
+            btn.disabled = false;
+        }
+    }
+    
+    function showResult(html) {
+        const resultDiv = document.getElementById('lcdpr-result');
+        resultDiv.style.display = 'block';
+        resultDiv.innerHTML = `
+            <div class="lcdpr-card">
+                <div class="lcdpr-card__header">
+                    <h2 class="lcdpr-card__title">Diagnóstico do LCDPR</h2>
+                </div>
+                <div class="lcdpr-card__body">
+                    ${html}
+                </div>
+            </div>
+        `;
+        resultDiv.scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    function showError(message) {
+        const html = `
+            <div class="lcdpr-alert lcdpr-alert--danger">
+                <div class="lcdpr-alert__icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6"/><path d="M9 9l6 6"/></svg>
+                </div>
+                <div class="lcdpr-alert__content">
+                    <p class="lcdpr-alert__title">Erro</p>
+                    <p class="lcdpr-alert__message">${message}</p>
+                </div>
+            </div>
+        `;
+        showResult(html);
+    }
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('lcdpr-diag-form');
+        if (form) {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const params = new URLSearchParams();
+                for (const [key, value] of formData.entries()) {
+                    if (value) params.append(key, value);
+                }
+                const url = `/api/financeiro/lcdpr/diagnostico/?${params.toString()}`;
+                
+                const btn = document.querySelector('button[type="submit"]');
+                const originalText = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = '<span class="lcdpr-spinner"></span> Processando...';
+                
+                try {
+                    const response = await fetch(url, {
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        const html = renderDiagnostico(data);
+                        showResult(html);
+                    } else {
+                        const data = await response.json();
+                        showResult(`
+                            <div class="lcdpr-alert lcdpr-alert--danger">
+                                <p class="lcdpr-alert__message">${data.erro || 'Erro desconhecido'}</p>
+                            </div>
+                        `, true);
+                    }
+                } catch (error) {
+                    showError('Erro de conexão: ' + error.message);
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = 'Executar Diagnóstico';
+                }
+            });
+        });
+    }
+})();
+</script>
+{% endblock %}

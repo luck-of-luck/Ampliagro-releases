@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Ampliagro - Compliance Ambiental{% endblock %}
+
+{% block extra_css %}
+
+{% endblock %}
+
+{% block content %}
+<div class="section-container">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h1 class="section-title">Compliance Ambiental</h1>
+        <a href="{% url 'index_spa' %}" class="btn-primary" style="padding:0.5rem 1rem; border-radius:0.5rem; text-decoration:none;">Dashboard</a>
+    </div>
+
+    <div class="content-card">
+        <div id="loadingState" style="text-align:center; padding: 2rem;">
+            <i class="bi bi-arrow-repeat" style="font-size:2rem; color:var(--cor-primaria); animation: spin 1s linear infinite;"></i>
+            <p style="margin-top:1rem; color:var(--cor-texto-secundario);">Calculando conformidade...</p>
+        </div>
+
+        <div id="complianceContent" style="display:none;">
+            <div id="statusBanner" class="status-banner">
+                <i class="bi" id="statusIcon" style="font-size:1.5rem;"></i>
+                <span id="statusText">Status</span>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-label">Área Total</div>
+                    <div class="stat-value" id="valAreaTotal">0 ha</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Reserva Legal (RL)</div>
+                    <div class="stat-value" id="valAreaRL">0 ha</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Área de Preserv. Perm. (APP)</div>
+                    <div class="stat-value" id="valAreaAPP">0 ha</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Exigência Bioma</div>
+                    <div class="stat-value" id="valExigido">0%</div>
+                </div>
+            </div>
+
+            <div style="margin-top: 2rem;">
+                <h3 style="font-weight:600; margin-bottom: 0.5rem;">Progresso de Reserva Legal</h3>
+                <div class="progress-bar-bg">
+                    <div id="progressBar" class="progress-bar-fill" style="width: 0%;">0%</div>
+                </div>
+                <p id="recomendacaoText" style="margin-top:0.5rem; font-size:0.875rem; color:var(--cor-texto-secundario);"></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        const res = await fetch('/api/agronomia/compliance/');
+        if(!res.ok) throw new Error('Erro na API');
+        const data = await res.json();
+
+        if (data.error) throw new Error(data.error);
+
+        document.getElementById('valAreaTotal').textContent = data.area_total_ha + ' ha';
+        document.getElementById('valAreaRL').textContent = data.area_reserva_legal_ha + ' ha';
+        document.getElementById('valAreaAPP').textContent = data.area_app_ha + ' ha';
+        document.getElementById('valExigido').textContent = data.percentual_rl_exigido + '%';
+
+        const banner = document.getElementById('statusBanner');
+        const icon = document.getElementById('statusIcon');
+        const sText = document.getElementById('statusText');
+
+        if (data.status_compliance === 'Regular') {
+            banner.className = 'status-banner regular';
+            icon.className = 'bi bi-check-circle-fill';
+            sText.textContent = 'Propriedade Regular (Reserva Legal Atingida)';
+        } else {
+            banner.className = 'status-banner deficit';
+            icon.className = 'bi bi-exclamation-triangle-fill';
+            sText.textContent = 'Déficit de Reserva Legal Encontrado';
+        }
+
+        const bar = document.getElementById('progressBar');
+        const p = data.percentual_rl_atual;
+        bar.style.width = Math.min(p, 100) + '%';
+        bar.textContent = p + '%';
+
+        if (p < data.percentual_rl_exigido) {
+            bar.classList.add('deficit');
+        }
+
+        document.getElementById('recomendacaoText').textContent = data.recomendacao;
+
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('complianceContent').style.display = 'block';
+    } catch(e) {
+        document.getElementById('loadingState').innerHTML = '<p class="text-danger">Erro ao carregar dados de compliance: ' + e.message + '</p>';
+    }
+});
+</script>
+{% endblock %}

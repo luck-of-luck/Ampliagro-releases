@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Central de Gestão · Ampliagro{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/central-gestao.css' %}">{% endblock %}
+{% block content %}
+<main class="central-agro">
+  <header><p class="central-eyebrow">DA NOTA AO LIVRO CAIXA</p><h1>Central de Gestão</h1><p>Documentos, movimentações e revisão fiscal da sua propriedade, no mesmo lugar.</p></header>
+  <form method="get" class="central-filtros">
+    <label>Propriedade<select name="propriedade" required>{% for item in propriedades %}<option value="{{ item.pk }}" {% if item.pk == propriedade.pk %}selected{% endif %}>{{ item.nome }}</option>{% endfor %}</select></label>
+    <label>Ano<input name="ano" type="number" min="2019" max="9998" value="{{ ano }}" required></label>
+    <label>Escopo do LCDPR<select name="escopo"><option value="propriedade" {% if escopo == 'propriedade' %}selected{% endif %}>Propriedade selecionada</option><option value="contribuinte" {% if escopo == 'contribuinte' %}selected{% endif %}>Propriedades autorizadas do mesmo CPF</option></select></label>
+    <button type="submit">Atualizar</button>
+  </form>
+  {% if propriedade %}
+  <nav class="central-atalhos" aria-label="Etapas da gestão"><a href="#documentos">01 · Documentos</a><a href="#movimentos">02 · Movimentações</a><a href="#fiscal">03 · Revisão fiscal</a><a href="#integracoes">04 · Integrações</a></nav>
+  <section id="documentos"><h2>01 · Entrada de documentos</h2><p>Importe o XML de uma NF-e de compra para registrar os itens no estoque e a despesa no financeiro. O pagamento e a classificação fiscal precisam ser conferidos.</p>
+    <form action="{% url 'nfe-import' %}" method="post" enctype="multipart/form-data" data-central-upload>
+      {% csrf_token %}<input type="hidden" name="propriedade" value="{{ propriedade.pk }}">
+      <label>XML da nota fiscal<input type="file" name="xml" accept=".xml,application/xml,text/xml" required></label><button type="submit">Importar na propriedade selecionada</button>
+      <p role="status" aria-live="polite" data-upload-status></p>
+    </form>
+    <details><summary>Últimas notas emitidas em {{ ano }}</summary><ul>{% for nota in notas %}<li>NF-e {{ nota.numero }} · {{ nota.fornecedor_nome }} · R$ {{ nota.total|floatformat:2 }}</li>{% empty %}<li>Nenhuma nota importada neste período.</li>{% endfor %}</ul></details>
+    {% if pode_editar_cadastro %}
+    {% include "gestao/_estoque_documento.html" %}
+    <details {% if formulario_importacao.is_bound %}open{% endif %}><summary>Trazer lançamentos de outro sistema ou planilha</summary>
+      <p>CSV UTF-8, até 5 MB. Colunas obrigatórias: <code>id;data;valor;descricao</code>. O id deve ser estável no sistema de origem. Opcionais: <code>tipo;documento</code>; tipo aceita RECEITA ou DESPESA. Sem tipo, valor negativo indica despesa.</p>
+      <p>Use sempre o mesmo nome de origem ao reenviar. Os lançamentos entram sem pagamento confirmado e aguardam revisão fiscal. Este formato é genérico, sem integração oficial com fornecedores.</p>
+      <form method="post" enctype="multipart/form-data" action="?propriedade={{ propriedade.pk }}&amp;ano={{ ano }}&amp;escopo={{ escopo }}#documentos">
+        {% csrf_token %}<input type="hidden" name="secao" value="importacao_csv">
+        {{ formulario_importacao.non_field_errors }}
+        {% for campo in formulario_importacao %}<div class="central-campo">{{ campo.label_tag }}{{ campo }}{{ campo.errors }}</div>{% endfor %}
+        <button type="submit">Importar lançamentos no financeiro</button>
+      </form>
+    </details>
+    {% endif %}
+    <h3>Extrato bancário</h3>
+    {% if contas %}<form method="post" enctype="multipart/form-data" data-central-upload data-extrato>
+      {% csrf_token %}<label>Conta de destino<select name="conta" required>{% for conta in contas %}<option value="{{ conta.pk }}">{{ conta.banco }} · {{ conta.agencia }}/{{ conta.conta }}</option>{% endfor %}</select></label>
+      <label>Arquivo OFX ou CSV<input type="file" name="arquivo" accept=".ofx,.csv" required></label><button type="submit">Importar extrato</button><p role="status" aria-live="polite" data-upload-status></p>
+    </form>{% else %}<p>Cadastre uma conta bancária no financeiro para importar extratos.</p>{% endif %}
+    <div class="central-atalhos"><a href="{% url 'estoque-geral' %}">Conferir estoque</a><a href="{% url 'cadastro-financeiro' %}">Abrir financeiro</a><a href="{% url 'cadastro-safra' %}">Acompanhar safras</a></div>
+  </section>
+  <section id="movimentos"><h2>02 · Movimentações para conferir</h2><p>Pagamentos de {{ ano }}, lançamentos em aberto do ano e pagamentos sem data. Mostrando {{ pagina_movimentos.start_index }}–{{ pagina_movimentos.end_index }} de {{ total_lancamentos }} registros.</p>
+    <div class="central-tabela"><table><caption>Movimentações de {{ propriedade.nome }}</caption><thead><tr><th>Data</th><th>Descrição</th><th>Valor</th><th>Pagamento</th><th>Classificação LCDPR</th><th>Revisão</th></tr></thead><tbody>
+    {% for item in lancamentos %}<tr><td>{{ item.data|date:"d/m/Y" }}</td><td>{{ item.descricao|default:item.get_categoria_display }}{% if item.linhafinanceiraimportada %}<small>Declarado · {{ item.linhafinanceiraimportada.origem }} · ID {{ item.linhafinanceiraimportada.id_externo }}</small>{% endif %}<small>{{ item.get_tipo_display }}{% if item.safra %} · {{ item.safra }}{% endif %}</small></td><td>R$ {{ item.valor|floatformat:2 }}</td><td>{% if item.pago %}{{ item.data_pagamento|date:"d/m/Y"|default:"Conferir data" }}{% else %}Em aberto{% endif %}</td><td>{{ item.get_tipo_lancamento_lcdpr_display|default:"Revisão necessária" }}</td><td>{% if pode_editar_cadastro %}<a href="{% url 'central-gestao' %}?propriedade={{ propriedade.pk }}&amp;ano={{ ano }}&amp;escopo={{ escopo }}&amp;pagina={{ pagina }}&amp;lancamento={{ item.pk }}#revisar-lancamento" aria-label="Revisar lançamento {{ item.pk }}">Revisar</a>{% else %}Consulta{% endif %}</td></tr>{% empty %}<tr><td colspan="6">Nenhuma movimentação neste período.</td></tr>{% endfor %}
+    </tbody></table></div>
+    {% if pagina_movimentos.has_other_pages %}<nav class="central-atalhos" aria-label="Páginas das movimentações">
+      {% if pagina_movimentos.has_previous %}<a rel="prev" href="{% url 'central-gestao' %}?propriedade={{ propriedade.pk }}&amp;ano={{ ano }}&amp;escopo={{ escopo }}&amp;pagina={{ pagina_movimentos.previous_page_number }}#movimentos">← Anterior</a>{% endif %}
+      <span>Página {{ pagina_movimentos.number }} de {{ pagina_movimentos.paginator.num_pages }}</span>
+      {% if pagina_movimentos.has_next %}<a rel="next" href="{% url 'central-gestao' %}?propriedade={{ propriedade.pk }}&amp;ano={{ ano }}&amp;escopo={{ escopo }}&amp;pagina={{ pagina_movimentos.next_page_number }}#movimentos">Próxima →</a>{% endif %}
+    </nav>{% endif %}
+    <a href="{% url 'cadastro-financeiro' %}">Conferir e editar lançamentos no financeiro →</a>
+  </section>
+  {% if formulario_lancamento and pode_editar_cadastro %}
+  <section id="revisar-lancamento" aria-labelledby="titulo-revisao-lancamento">
+    <h2 id="titulo-revisao-lancamento">Revisar lançamento {{ lancamento_revisao.pk }}</h2>
+    <p>{{ propriedade.nome }} · R$ {{ lancamento_revisao.valor|floatformat:2 }} · Data do lançamento: {{ lancamento_revisao.data|date:"d/m/Y" }}.</p>
+    <p>Confirme a data em que o dinheiro entrou ou saiu. A classificação vazia mantém o movimento pendente e fora do LCDPR. Sem conta selecionada, o exportador utiliza numerário em trânsito.</p>
+    <form method="post" action="{% url 'central-gestao' %}?propriedade={{ propriedade.pk }}&amp;ano={{ ano }}&amp;escopo={{ escopo }}&amp;pagina={{ pagina }}&amp;lancamento={{ lancamento_revisao.pk }}#revisar-lancamento">
+      {% csrf_token %}<input type="hidden" name="secao" value="lancamento">{{ formulario_lancamento.non_field_errors }}
+      {% for campo in formulario_lancamento %}<div class="central-campo"><label for="{{ campo.id_for_label }}">{{ campo.label }}</label>{{ campo }}{{ campo.errors }}</div>{% endfor %}
+      <button type="submit">Salvar revisão do lançamento</button>
+      <a href="{% url 'central-gestao' %}?propriedade={{ propriedade.pk }}&amp;ano={{ ano }}&amp;escopo={{ escopo }}&amp;pagina={{ pagina }}#movimentos">Cancelar</a>
+    </form>
+  </section>
+  {% endif %}
+  <section id="fiscal"><h2>03 · Revisão do LCDPR</h2>{% for message in messages %}<p class="central-confirmacao" role="status">{{ message }}</p>{% endfor %}<p>Diagnóstico local do leiaute {{ diagnostico.leiaute }}. A geração não assina nem transmite a declaração.</p>
+    {% if diagnostico.propriedades_incluidas %}<h3>Imóveis incluídos no consolidado</h3><ul>{% for imovel in diagnostico.propriedades_incluidas %}<li>{{ imovel.codigo }} · {{ imovel.nome }}</li>{% endfor %}</ul><p>Os formulários abaixo editam a propriedade selecionada. Troque a seleção para corrigir pendências de outro imóvel.</p>{% endif %}
+    {% if pode_editar_cadastro %}<details {% if formulario_fiscal.errors %}open{% endif %}><summary>Dados fiscais do contribuinte</summary>
+      <p>Informe os dados da pessoa física declarante. O endereço pode ser diferente do imóvel rural. É possível salvar o preenchimento parcial para continuar depois.</p>
+      <form method="post" action="{% url 'central-gestao' %}?propriedade={{ propriedade.pk }}&amp;ano={{ ano }}&amp;escopo={{ escopo }}&amp;pagina={{ pagina }}#fiscal">
+        {% csrf_token %}{{ formulario_fiscal.non_field_errors }}
+        {% for campo in formulario_fiscal %}<label>{{ campo.label }}{{ campo }}{{ campo.errors }}</label>{% endfor %}
+        <button type="submit">Salvar dados do contribuinte</button>
+      </form></details>{% endif %}
+    {% if pode_editar_cadastro %}
+    <details {% if formulario_contador.errors %}open{% endif %}><summary>Contador responsável (opcional)</summary>
+      <form method="post" action="{% url 'central-gestao' %}?propriedade={{ propriedade.pk }}&amp;ano={{ ano }}&amp;escopo={{ escopo }}&amp;pagina={{ pagina }}#fiscal">
+        {% csrf_token %}<input type="hidden" name="secao" value="contador">{{ formulario_contador.non_field_errors }}
+        {% for campo in formulario_contador %}<label>{{ campo.label }}{{ campo }}{{ campo.errors }}</label>{% endfor %}
+        <button type="submit">Salvar dados do contador</button>
+      </form>
+    </details>
+    <details {% if formulario_contrapartes.is_bound %}open{% endif %}><summary>Terceiros ligados à exploração</summary>
+      <p>Cadastre as partes da exploração e suas participações. Fornecedores de compras são informados nos lançamentos. Para remover uma pessoa, marque Excluir e salve.</p>
+      <form method="post" action="{% url 'central-gestao' %}?propriedade={{ propriedade.pk }}&amp;ano={{ ano }}&amp;escopo={{ escopo }}&amp;pagina={{ pagina }}#fiscal" data-contrapartes>
+        {% csrf_token %}<input type="hidden" name="secao" value="contrapartes">{{ formulario_contrapartes.management_form }}{{ formulario_contrapartes.non_form_errors }}
+        <div data-contrapartes-lista>{% for formulario in formulario_contrapartes %}<fieldset><legend>Terceiro {{ forloop.counter }}</legend>{{ formulario.non_field_errors }}{% for campo in formulario %}<label>{{ campo.label }}{{ campo }}{{ campo.errors }}</label>{% endfor %}</fieldset>{% endfor %}</div>
+        <template data-contraparte-modelo><fieldset><legend>Novo terceiro</legend>{% for campo in formulario_contrapartes.empty_form %}<label>{{ campo.label }}{{ campo }}</label>{% endfor %}</fieldset></template>
+        <button type="button" data-adicionar-contraparte>Adicionar pessoa</button><button type="submit">Salvar terceiros</button>
+      </form>
+    </details>{% endif %}
+    <dl class="central-resumo"><div><dt>Entradas classificadas</dt><dd>R$ {{ diagnostico.resumo.entradas|floatformat:2 }}</dd></div><div><dt>Saídas classificadas</dt><dd>R$ {{ diagnostico.resumo.saidas|floatformat:2 }}</dd></div><div><dt>Saldo do período</dt><dd>R$ {{ diagnostico.resumo.saldo|floatformat:2 }}</dd></div></dl>
+    {% if diagnostico.pendencias %}<h3>{{ diagnostico.pendencias|length }} pendência(s) para revisar</h3><ul>{% for item in diagnostico.pendencias %}<li><strong>{{ item.nome }}</strong>{% if item.propriedade_nome %} ({{ item.propriedade_nome }}){% endif %}: {{ item.porque }}{% if item.lancamento_id %} <a href="{% url 'central-gestao' %}?propriedade={{ item.propriedade_id|default:propriedade.pk }}&amp;ano={{ ano }}&amp;escopo={{ escopo }}&amp;pagina={{ pagina }}&amp;lancamento={{ item.lancamento_id }}#revisar-lancamento">Revisar lançamento {{ item.lancamento_id }}</a>{% endif %}</li>{% endfor %}</ul><p>Preencha os dados do contribuinte acima e revise o cadastro do imóvel e os lançamentos apontados.</p>{% else %}<a class="central-botao" href="{% url 'exportar-lcdpr' %}?propriedade_id={{ propriedade.pk }}&amp;ano={{ ano }}&amp;escopo={{ escopo }}&amp;pagina={{ pagina }}">Baixar LCDPR para conferência</a>{% endif %}
+    {% for aviso in diagnostico.avisos %}<p>{{ aviso.mensagem }}</p>{% endfor %}
+    <a href="{% url 'cadastro-propriedade' %}">Revisar cadastro da propriedade</a>
+  </section>
+  {% else %}<section><h2>Cadastre sua primeira propriedade</h2><p>A central usa os dados da propriedade selecionada.</p><a href="{% url 'cadastro-propriedade' %}">Cadastrar propriedade →</a></section>{% endif %}
+  <section id="integracoes"><h2>04 · Conexões externas</h2><p>Os serviços abaixo dependem de configuração e habilitação. As alternativas locais continuam disponíveis.</p>{% for item in integracoes %}<details><summary>{{ item.nome }} · {{ item.get_estado_display|default:item.estado }}</summary><p>{{ item.mensagem }}</p><ul>{% for requisito in item.requisitos %}<li>{{ requisito }}</li>{% endfor %}</ul><p><strong>Disponível hoje:</strong> {{ item.alternativa }}</p></details>{% endfor %}</section>
+</main>
+{% endblock %}
+{% block extra_js %}<script src="{% static 'js/central-gestao.js' %}" defer></script><script src="{% static 'js/central-estoque.js' %}" defer></script>{% endblock %}

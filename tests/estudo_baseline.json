@@ -1,0 +1,15 @@
+{
+ "ficheiros": 1980,
+ "bytes": 270363997,
+ "por_subpasta": {
+  "v2": 1980
+ },
+ "unicidade_exemplo": {
+  "ficheiro": "ANALISE-1001-2400-PROXIMO.md",
+  "linhas_totais": 26606,
+  "linhas_unicas": 3037,
+  "unicidade": 0.114,
+  "medido_em": "2026-10-03",
+  "nota": "89% de repeticao. A meta de 1.000.000 de linhas equivale, a esta taxa, a ~114.000 linhas de conhecimento real. O proprio SISTEMA-TOP1-INTEGRACAO.md admite 'vs repeticao atual para bater 1M'."
+ }
+}

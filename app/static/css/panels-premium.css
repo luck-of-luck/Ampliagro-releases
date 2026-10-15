@@ -1,0 +1,773 @@
+/* ═════════════════════════════════════════════════════════════
+   PAINÉIS PREMIUM — Add/Edit Widgets, menu de edição e Culture Mini.
+   Dashboard e Preset Modal NÃO são alterados.
+   Preset Modal usa seu próprio liquid glass (preset-modal-liquid.css)
+
+   Este arquivo é a ÚNICA fonte de estilo desses painéis: os overrides
+   duplicados em dashboard-index.css e no <style> inline de index.html
+   foram removidos para não piratesarem o light mode.
+   ═════════════════════════════════════════════════════════════ */
+
+/* Variáveis de superfície dos painéis — light é o padrão, `html.dark` inverte.
+   Usar as variáveis evita repetir o par de regras em cada seletor. */
+:root {
+  --pnl-bg-a: #ffffff;
+  --pnl-bg-b: #f4f8fb;
+  --pnl-border: #0b5e3f;
+  --pnl-ring: rgba(11, 94, 63, 0.06);
+  --pnl-shadow: 0 20px 60px rgba(11, 94, 63, 0.18);
+  --pnl-text: #1e293b;
+  --pnl-text-soft: #475569;
+  --pnl-surface: rgba(255, 255, 255, 0.9);
+  --pnl-surface-hover: rgba(15, 157, 110, 0.08);
+  --pnl-grid-line: rgba(255, 255, 255, 0.6);
+  --pnl-header-tint: rgba(11, 94, 63, 0.06);
+  --pnl-header-line: rgba(11, 94, 63, 0.12);
+  --pnl-glow-1: rgba(59, 130, 246, 0.35);
+  --pnl-glow-2: rgba(16, 185, 129, 0.3);
+  --pnl-glow-3: rgba(6, 182, 212, 0.35);
+  --pnl-glow-4: rgba(139, 92, 246, 0.2);
+  --pnl-tab-bg: rgba(255, 255, 255, 0.7);
+  --pnl-tab-text: #5e635e;
+}
+html.dark {
+  --pnl-bg-a: #1e293b;
+  --pnl-bg-b: #0b1120;
+  --pnl-border: #0b5e3f;
+  --pnl-ring: rgba(59, 130, 246, 0.12);
+  --pnl-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+  --pnl-text: #e2e8f0;
+  --pnl-text-soft: #a7b0a8;
+  --pnl-surface: rgba(37, 46, 42, 0.9);
+  --pnl-surface-hover: rgba(79, 204, 160, 0.1);
+  --pnl-grid-line: rgba(255, 255, 255, 0.08);
+  --pnl-header-tint: rgba(79, 204, 160, 0.08);
+  --pnl-header-line: rgba(79, 204, 160, 0.14);
+  --pnl-glow-1: rgba(59, 130, 246, 0.25);
+  --pnl-glow-2: rgba(16, 185, 129, 0.2);
+  --pnl-glow-3: rgba(6, 182, 212, 0.25);
+  --pnl-glow-4: rgba(139, 92, 246, 0.15);
+  --pnl-tab-bg: rgba(37, 46, 42, 0.6);
+  --pnl-tab-text: #a7b0a8;
+}
+
+/* Painéis-alvo — fundo mesh do design system, força sobre qualquer classe posterior */
+#add-widget-modal-panel,
+#add-widget-modal-panel.widget-modal-box,
+#add-widget-modal-panel.lc-panel,
+#add-widget-modal-panel.widget-modal-box.lc-panel,
+.edit-dropdown,
+#culture-mini-panel,
+#font-size-dropdown {
+  background-color: var(--pnl-bg-b) !important;
+  background-image:
+    radial-gradient(circle at 10% 20%, var(--pnl-glow-1), transparent 55%),
+    radial-gradient(circle at 90% 10%, var(--pnl-glow-2), transparent 50%),
+    radial-gradient(circle at 30% 80%, var(--pnl-glow-3), transparent 60%),
+    radial-gradient(circle at 80% 90%, var(--pnl-glow-4), transparent 55%),
+    linear-gradient(180deg, var(--pnl-bg-a) 0%, var(--pnl-bg-b) 100%) !important;
+  background-attachment: fixed !important;
+  border: 1.5px solid var(--pnl-border) !important;
+  box-shadow:
+    var(--pnl-shadow),
+    0 0 0 1px var(--pnl-ring) !important;
+  color: var(--pnl-text) !important;
+}
+
+/* Regras antigas por painel — mantidas só para o que o bloco acima não cobre
+   (raio de canto e posicionamento do menu flutuante). */
+#add-widget-modal-panel {
+  border-radius: 20px !important;
+}
+.edit-dropdown {
+  border-radius: 12px !important;
+  padding: 8px !important;
+  position: absolute !important;
+  z-index: 99999 !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+/* Pills de categoria dentro dos painéis */
+#add-widget-modal-panel .subgroup-pill,
+#culture-mini-panel .subgroup-pill {
+  background: var(--pnl-surface) !important;
+  border: 1.5px solid var(--pnl-border) !important;
+  color: var(--pnl-text) !important;
+}
+#add-widget-modal-panel .subgroup-pill.active,
+#add-widget-modal-panel .subgroup-pill:hover,
+#culture-mini-panel .subgroup-pill.active,
+#culture-mini-panel .subgroup-pill:hover {
+  background: var(--pnl-surface-hover) !important;
+  border-color: var(--pnl-border) !important;
+  color: var(--pnl-text) !important;
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  #add-widget-modal-panel,
+  .edit-dropdown,
+  #culture-mini-panel {
+    background-image: none !important;
+    background-color: var(--pnl-bg-a) !important;
+  }
+}
+
+/* Textos e controles dentro dos painéis — antes fixos em branco sobre vidro
+   escuro, agora seguem o token do tema (=#1e293b no light). */
+#add-widget-modal-panel .text-slate-800,
+#add-widget-modal-panel .text-slate-700,
+#add-widget-modal-panel .text-slate-600,
+.edit-dropdown-header,
+.edit-dropdown label,
+.edit-dropdown span,
+.edit-dropdown .text-xs,
+.edit-dropdown .text-sm,
+#culture-mini-panel .text-slate-800,
+#culture-mini-panel .text-slate-700,
+#culture-mini-panel .text-slate-600 {
+  color: var(--pnl-text) !important;
+}
+
+#add-widget-modal-panel .text-slate-500,
+#add-widget-modal-panel .text-slate-400,
+#culture-mini-panel .text-slate-500,
+#culture-mini-panel .text-slate-400 {
+  color: var(--pnl-text-soft) !important;
+}
+
+/* Slots que venham com utilitários de fundo do Tailwind ficavam opacos e
+   "buracos" dentro do vidro — usam a cor de superfície do painel. */
+#add-widget-modal-panel .bg-slate-100,
+#add-widget-modal-panel .bg-slate-50,
+#add-widget-modal-panel .bg-white,
+#culture-mini-panel .bg-slate-100,
+#culture-mini-panel .bg-slate-50,
+#culture-mini-panel .bg-white {
+  background: var(--pnl-surface) !important;
+  color: var(--pnl-text) !important;
+  border: 1px solid var(--pnl-grid-line) !important;
+}
+
+/* Inputs do menu flutuante */
+.edit-dropdown input[type='number'],
+.edit-dropdown input[type='text'],
+.edit-dropdown button {
+  background: var(--pnl-surface) !important;
+  border: 1px solid var(--pnl-border) !important;
+  color: var(--pnl-text) !important;
+}
+.edit-dropdown button:hover {
+  background: var(--pnl-surface-hover) !important;
+}
+
+/* Cards dos widgets dentro dos painéis */
+#add-widget-modal-panel .widget-card,
+#culture-mini-panel .widget-card {
+  background: var(--pnl-surface) !important;
+  border: 1.5px solid var(--pnl-border) !important;
+  color: var(--pnl-text) !important;
+}
+#add-widget-modal-panel .widget-card:hover,
+#culture-mini-panel .widget-card:hover {
+  background: var(--pnl-surface-hover) !important;
+}
+/* Só dentro dos painéis: fora deles (favorite-widgets-grid,
+   suggested-widgets-grid) o card usa a cor do dashboard. */
+#add-widget-modal-panel .widget-card-label,
+#culture-mini-panel .widget-card-label {
+  color: var(--pnl-text) !important;
+}
+
+/* Culture Mini Panel — só o layout (superfície vem do bloco de tokens). */
+#culture-mini-panel {
+  border-radius: 12px;
+  margin-top: 8px;
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+}
+
+/* Header dos painéis com leve gradiente */
+#add-widget-modal-panel #widget-modal-header,
+#culture-mini-panel .culture-mini-header {
+  background: linear-gradient(180deg, var(--pnl-header-tint), transparent) !important;
+  border-bottom-color: var(--pnl-header-line) !important;
+}
+
+/* Abas — barra neon no selecionado */
+#widget-modal-tabs .widget-modal-tab,
+#culture-mini-panel .culture-mini-tab {
+  position: relative;
+  border: 1.5px solid transparent !important;
+  border-radius: 8px !important;
+  background: var(--pnl-tab-bg) !important;
+  color: var(--pnl-tab-text) !important;
+  font-weight: 600 !important;
+  transition: all 0.15s ease !important;
+}
+#widget-modal-tabs .widget-modal-tab:hover {
+  border-color: var(--pnl-border) !important;
+  color: var(--pnl-border) !important;
+}
+
+#widget-modal-tabs .widget-modal-tab.active-tab,
+#widget-modal-tabs .widget-modal-tab.is-active,
+#widget-modal-tabs .widget-modal-tab[aria-selected='true'] {
+  background: #0b5e3f !important;
+  color: #fff !important;
+  border-color: #0b5e3f !important;
+  box-shadow: 0 4px 14px rgba(11, 94, 63, 0.22) !important;
+}
+/* barrinha neon embaixo do selecionado */
+#widget-modal-tabs .widget-modal-tab.active-tab::after,
+#widget-modal-tabs .widget-modal-tab.is-active::after {
+  content: '';
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: -9px;
+  height: 3px;
+  background: linear-gradient(90deg, #0b5e3f, #14d49a);
+  border-radius: 9999px;
+  box-shadow:
+    0 0 10px rgba(20, 212, 154, 0.85),
+    0 0 20px rgba(11, 94, 63, 0.35);
+}
+html.dark #widget-modal-tabs .widget-modal-tab.active-tab::after {
+  box-shadow:
+    0 0 10px rgba(79, 204, 160, 0.9),
+    0 0 22px rgba(79, 204, 160, 0.35);
+}
+
+/* Botões dos painéis — borda verde + premium */
+#add-widget-modal-panel .btn-primary,
+#add-widget-modal-panel button.bg-emerald-600,
+#culture-mini-panel .btn-primary,
+#culture-mini-panel button.bg-emerald-600 {
+  background: linear-gradient(135deg, #0b5e3f 0%, #0f7a52 55%, #14a06b 100%) !important;
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  border-radius: 9999px !important;
+  box-shadow:
+    0 6px 18px rgba(11, 94, 63, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22) !important;
+}
+#add-widget-modal-panel .btn-secondary,
+#culture-mini-panel .btn-secondary {
+  background: var(--pnl-surface) !important;
+  border: 1.5px solid var(--pnl-border) !important;
+  color: var(--pnl-border) !important;
+  border-radius: 9999px !important;
+}
+
+/* Footer dos painéis */
+#add-widget-modal-panel #widget-modal-footer {
+  background: linear-gradient(180deg, transparent, var(--pnl-header-tint)) !important;
+  border-top-color: var(--pnl-header-line) !important;
+}
+
+/* ==========================================================================
+   8. PRESET MODAL — Estilo consolidado com tokens --pnl-*
+      Substitui as variáveis liquid glass hardcoded em preset-modal-liquid.css
+      para garantir light/dark consistência a partir de um único fonte.
+   ========================================================================== */
+
+/* Variáveis do preset modal — light é o padrão, `html.dark` inverte */
+:root {
+  --preset-item-bg: rgba(255, 255, 255, 0.12);
+  --preset-item-hover: rgba(255, 255, 255, 0.22);
+  --preset-glass-bg: rgba(255, 255, 255, 0.15);
+  --preset-primary: #0f9d6e;
+  --preset-primary-glow: rgba(15, 157, 110, 0.35);
+  --preset-input-bg: rgba(255, 255, 255, 0.08);
+  --preset-subtext: rgba(24, 34, 30, 0.75);
+  --preset-text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+  --preset-icon-shadow: drop-shadow(0 1px 1px rgba(255, 255, 255, 0.5));
+}
+html.dark {
+  --preset-item-bg: rgba(255, 255, 255, 0.06);
+  --preset-item-hover: rgba(255, 255, 255, 0.12);
+  --preset-glass-bg: rgba(255, 255, 255, 0.08);
+  --preset-primary: #14d49a;
+  --preset-primary-glow: rgba(20, 212, 154, 0.3);
+  --preset-input-bg: rgba(255, 255, 255, 0.04);
+  --preset-subtext: rgba(255, 255, 255, 0.7);
+  --preset-text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  --preset-icon-shadow: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+}
+
+/* Container e overlay — totalmente transparentes (já definidos globalmente,
+   mas reforçamos aqui para o preset modal) */
+#preset-modal-overlay,
+#preset-modal {
+  background-color: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Painel modal — gradiente mesh do sistema
+   Regras com alta especificidade + !important para vencer navbar-premium.css e liquid-glass.css */
+.preset-modal-box.lc-panel,
+.widget-modal-box.lc-panel,
+#preset-modal-box.preset-modal-box.lc-panel,
+#preset-modal-box {
+  display: flex !important;
+  flex-direction: column !important;
+  position: relative !important;
+  isolation: auto !important;
+  overflow: hidden !important;
+
+  background:
+    radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.25), transparent 55%),
+    radial-gradient(circle at 90% 10%, rgba(16, 185, 129, 0.2), transparent 50%),
+    radial-gradient(circle at 30% 80%, rgba(6, 182, 212, 0.25), transparent 60%),
+    radial-gradient(circle at 80% 90%, rgba(139, 92, 246, 0.15), transparent 55%),
+    linear-gradient(rgb(30, 41, 59) 0%, rgb(11, 17, 32) 100%) !important;
+  background-color: rgb(11, 17, 32) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 20px !important;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(59, 130, 246, 0.12) !important;
+
+  background-blend-mode: overlay, normal !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  filter: none !important;
+
+  transition:
+    box-shadow 0.2s ease !important,
+    border-color 0.2s ease !important,
+    transform 0.15s ease !important;
+
+  width: 100% !important;
+  padding: 1.5rem !important;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif !important;
+  color: #e2e8f0 !important;
+}
+
+/* Light mode — fundo claro com mesh verde do sistema */
+html:not(.dark):not(body.dark-mode) #preset-modal-box,
+html:not(.dark):not(body.dark-mode) .preset-modal-box.lc-panel,
+html:not(.dark):not(body.dark-mode) .widget-modal-box.lc-panel,
+html:not(.dark) #preset-modal-box {
+  background:
+    radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.12), transparent 55%),
+    radial-gradient(circle at 90% 10%, rgba(16, 185, 129, 0.1), transparent 50%),
+    radial-gradient(circle at 30% 80%, rgba(6, 182, 212, 0.12), transparent 60%),
+    radial-gradient(circle at 80% 90%, rgba(139, 92, 246, 0.08), transparent 55%),
+    linear-gradient(#ffffff 0%, #f4f8fb 100%) !important;
+  background-color: #f4f8fb !important;
+  border: 1.5px solid #0b5e3f !important;
+  border-radius: 20px !important;
+  box-shadow:
+    0 20px 60px rgba(11, 94, 63, 0.18),
+    0 0 0 1px rgba(11, 94, 63, 0.06) !important;
+  color: #1e293b !important;
+}
+
+/* Dark mode — mesmos valores do light mode (fundo fixo escuro) */
+html.dark .preset-modal-box.lc-panel,
+html.dark .widget-modal-box.lc-panel,
+body.dark-mode .preset-modal-box.lc-panel,
+body.dark-mode .widget-modal-box.lc-panel,
+.dark .preset-modal-box.lc-panel,
+.dark .widget-modal-box.lc-panel,
+html.dark #preset-modal-box,
+.dark #preset-modal-box {
+  background:
+    radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.25), transparent 55%),
+    radial-gradient(circle at 90% 10%, rgba(16, 185, 129, 0.2), transparent 50%),
+    radial-gradient(circle at 30% 80%, rgba(6, 182, 212, 0.25), transparent 60%),
+    radial-gradient(circle at 80% 90%, rgba(139, 92, 246, 0.15), transparent 55%),
+    linear-gradient(rgb(30, 41, 59) 0%, rgb(11, 17, 32) 100%) !important;
+  background-color: rgb(11, 17, 32) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 20px !important;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(59, 130, 246, 0.12) !important;
+}
+
+/* Regras explícitas para .preset-modal-box (sem .lc-panel) */
+.preset-modal-box,
+.widget-modal-box,
+#preset-modal-box.preset-modal-box,
+#preset-modal-box {
+  background:
+    radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.25), transparent 55%),
+    radial-gradient(circle at 90% 10%, rgba(16, 185, 129, 0.2), transparent 50%),
+    radial-gradient(circle at 30% 80%, rgba(6, 182, 212, 0.25), transparent 60%),
+    radial-gradient(circle at 80% 90%, rgba(139, 92, 246, 0.15), transparent 55%),
+    linear-gradient(rgb(30, 41, 59) 0%, rgb(11, 17, 32) 100%) !important;
+  background-color: rgb(11, 17, 32) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 20px !important;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(59, 130, 246, 0.12) !important;
+}
+
+/* Dark mode para .preset-modal-box (sem .lc-panel) — mesmos valores */
+html.dark .preset-modal-box,
+html.dark .widget-modal-box,
+body.dark-mode .preset-modal-box,
+body.dark-mode .widget-modal-box,
+.dark .preset-modal-box,
+.dark .widget-modal-box,
+html.dark #preset-modal-box,
+.dark #preset-modal-box {
+  background:
+    radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.25), transparent 55%),
+    radial-gradient(circle at 90% 10%, rgba(16, 185, 129, 0.2), transparent 50%),
+    radial-gradient(circle at 30% 80%, rgba(6, 182, 212, 0.25), transparent 60%),
+    radial-gradient(circle at 80% 90%, rgba(139, 92, 246, 0.15), transparent 55%),
+    linear-gradient(rgb(30, 41, 59) 0%, rgb(11, 17, 32) 100%) !important;
+  background-color: rgb(11, 17, 32) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 20px !important;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(59, 130, 246, 0.12) !important;
+}
+
+/* Foco ring verde ao focar inputs dentro do modal */
+.preset-modal-box.lc-panel:focus-within,
+.widget-modal-box.lc-panel:focus-within {
+  box-shadow:
+    0 4px 24px rgba(15, 157, 110, 0.12),
+    0 1px 3px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    0 0 0 3px var(--pnl-border) !important;
+}
+
+html.dark .preset-modal-box.lc-panel:focus-within,
+html.dark .widget-modal-box.lc-panel:focus-within,
+body.dark-mode .preset-modal-box.lc-panel:focus-within,
+body.dark-mode .widget-modal-box.lc-panel:focus-within {
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.35),
+    0 1px 3px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 0 0 3px var(--pnl-border) !important;
+}
+
+/* Linha sutil no topo do painel para profundidade */
+.preset-modal-box.lc-panel::before,
+.widget-modal-box.lc-panel::before {
+  content: '' !important;
+  display: block !important;
+  position: absolute !important;
+  top: -1.5px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: 90% !important;
+  height: 2px !important;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--pnl-border) 50%,
+    transparent 100%
+  ) !important;
+  opacity: 0.6 !important;
+  border-radius: 16px 16px 0 0 !important;
+  pointer-events: none !important;
+  z-index: 10 !important;
+}
+
+html.dark .preset-modal-box.lc-panel::before,
+html.dark .widget-modal-box.lc-panel::before,
+body.dark-mode .preset-modal-box.lc-panel::before,
+body.dark-mode .widget-modal-box.lc-panel::before {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--pnl-border) 50%,
+    transparent 100%
+  ) !important;
+}
+
+/* Inputs internos — usando tokens do painel */
+.preset-modal-box .lc-input,
+.widget-modal-box .lc-input {
+  background: var(--preset-input-bg) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  border-radius: 14px !important;
+  color: var(--pnl-text) !important;
+  box-shadow:
+    inset 0 2px 6px rgba(0, 0, 0, 0.1),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.02) !important;
+  transition: all 0.3s !important;
+}
+
+html.dark .preset-modal-box .lc-input,
+body.dark-mode .preset-modal-box .lc-input,
+html.dark .widget-modal-box .lc-input,
+body.dark-mode .widget-modal-box .lc-input {
+  box-shadow:
+    inset 0 2px 6px rgba(0, 0, 0, 0.3),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+}
+
+.preset-modal-box .lc-input::placeholder,
+.widget-modal-box .lc-input::placeholder {
+  color: var(--preset-subtext) !important;
+  opacity: 0.6 !important;
+}
+
+.preset-modal-box .lc-input:focus,
+.widget-modal-box .lc-input:focus {
+  outline: none !important;
+  background: var(--preset-item-bg) !important;
+  box-shadow:
+    inset 0 2px 8px rgba(0, 0, 0, 0.2),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+    0 0 0 3px var(--preset-primary-glow) !important;
+}
+
+/* Tabs de categoria de ícone */
+.preset-tab-btn {
+  padding: 0.5rem 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--preset-subtext);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+.preset-tab-btn:hover {
+  color: var(--pnl-text) !important;
+  background: transparent !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+.preset-tab-btn.active {
+  color: var(--preset-primary) !important;
+  border-bottom: 2px solid var(--preset-primary) !important;
+  text-shadow: 0 0 10px var(--preset-primary-glow) !important;
+}
+
+/* Grid de ícones compacto */
+.icon-category-wrapper {
+  margin-bottom: 0.75rem;
+}
+.icon-category-wrapper label {
+  font-size: 0.65rem;
+  color: var(--preset-subtext);
+  font-weight: 500;
+  text-transform: none;
+  text-shadow: var(--preset-text-shadow);
+}
+
+/* Opção de ícone */
+.preset-icon-option {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--pnl-text);
+  filter: var(--preset-icon-shadow);
+  cursor: pointer;
+  transition: all 0.3s;
+  flex-shrink: 0;
+  border: none;
+}
+.preset-icon-option:hover {
+  background: var(--preset-item-bg) !important;
+  transform: scale(1.05) !important;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3)) !important;
+}
+.preset-icon-option.selected {
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: var(--pnl-text) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.05),
+    inset 0 1px 1px rgba(255, 255, 255, 0.3) !important;
+  filter: drop-shadow(0 2px 5px var(--preset-primary-glow)) !important;
+}
+
+/* Gotas de cor */
+.preset-color-grid {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+.preset-color-option {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.15),
+    inset 0 2px 3px rgba(255, 255, 255, 0.4);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  flex-shrink: 0;
+}
+.preset-color-option:hover {
+  transform: scale(1.15) !important;
+}
+.preset-color-option.selected {
+  transform: scale(1.2) !important;
+  box-shadow:
+    0 4px 10px rgba(0, 0, 0, 0.2),
+    inset 0 2px 3px rgba(255, 255, 255, 0.5),
+    0 0 0 2px var(--pnl-border) !important;
+}
+
+/* ==========================================================================
+   9. LIXEIRA DE PRESET — Espaço e arrastar solto (fix de sobreposição)
+   ========================================================================== */
+
+/* Lixeira — cores e tamanho base */
+.preset-trash-zone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(11, 94, 63, 0.05) !important;
+  border: 1px dashed rgba(11, 94, 63, 0.3) !important;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+  transition: all 0.3s;
+  cursor: pointer;
+  color: #0b5e3f !important;
+}
+.preset-trash-zone span {
+  display: none;
+  white-space: nowrap;
+  font-size: 0.65rem;
+  font-weight: 500;
+}
+.preset-trash-zone:hover,
+.preset-trash-zone.drag-over {
+  background: rgba(11, 94, 63, 0.15) !important;
+  color: #0b5e3f !important;
+  transform: scale(1.1) !important;
+  border: 2px solid #0b5e3f !important;
+  box-shadow:
+    0 0 15px rgba(11, 94, 63, 0.4) !important,
+    inset 0 0 10px rgba(11, 94, 63, 0.2) !important;
+}
+.preset-trash-zone:hover span,
+.preset-trash-zone.drag-over span {
+  display: inline !important;
+}
+
+/* ==========================================================================
+   10. PAINEL DE COR DE FUNDO DOS WIDGETS
+   ========================================================================== */
+
+/* Dropdown de cor de fundo do widget — usando tokens do painel */
+#bg-color-dropdown {
+  width: 200px;
+}
+#bg-color-dropdown .dropdown-item {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  color: var(--pnl-text) !important;
+  background: var(--pnl-surface) !important;
+  border: 1px solid var(--pnl-grid-line) !important;
+  border-radius: 8px !important;
+}
+#bg-color-dropdown .dropdown-item:hover,
+#bg-color-dropdown .dropdown-item.active,
+#bg-color-dropdown .dropdown-item:focus {
+  background: var(--pnl-surface-hover) !important;
+  color: var(--pnl-border) !important;
+}
+#bg-color-dropdown .dropdown-divider {
+  border-color: var(--pnl-grid-line) !important;
+}
+
+/* ==========================================================================
+   11. PAINEL DE TAMANHO DO TEXTO DOS WIDGETS
+   ========================================================================== */
+
+/* Controle de escala automática do texto — explicitação na UI */
+.widget-text-scale {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  background: var(--pnl-surface) !important;
+  border: 1px solid var(--pnl-grid-line) !important;
+  border-radius: 6px !important;
+  font-size: 0.75rem;
+  color: var(--pnl-text) !important;
+  font-family: inherit;
+  white-space: nowrap;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+.widget-text-scale:hover {
+  background: var(--pnl-surface-hover) !important;
+}
+
+/* Label de exemplo do tamanho */
+.widget-text-scale-value {
+  display: inline-block;
+  padding: 0 0.25rem;
+  background: var(--pnl-surface-hover) !important;
+  border-radius: 4px !important;
+  font-size: 0.875rem;
+  color: var(--pnl-text) !important;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+}
+
+/* Centraliza o painel de tamanho do texto na tela — mesma base dos outros paineis */
+#font-size-dropdown {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  margin: 0 !important;
+  bottom: auto !important;
+  right: auto !important;
+  z-index: 2147483647 !important;
+  border-radius: 20px !important;
+  padding: 1rem !important;
+}
+
+/* Centraliza o seletor de tamanho da fonte dentro do seu container */
+.toggle-row:has(#tamanho-fonte) {
+  justify-content: center !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+}
+.toggle-row:has(#tamanho-fonte) > div:first-child {
+  text-align: center !important;
+  width: 100% !important;
+}
+#tamanho-fonte,
+#tamanho-fonte.form-select {
+  width: 100% !important;
+  max-width: 200px !important;
+  display: block !important;
+}
+
+/* Quando o dialog de configurações for aberto, centraliza-o na tela */
+@media (max-width: 768px) {
+  .section-container {
+    padding: 1rem !important;
+  }
+  .toggle-row:last-child .form-select {
+    width: 100% !important;
+  }
+}
+
+/* O widgetTextAutoScale já está em pagina-index.js (linha 17638).
+   A UI pode chamar: widgetTextAutoScale(config) para obter o valor escala.
+*/

@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'"
+    />
+    <title>Preparar seu Ampliagro</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20133%20133%22%20fill%3D%22none%22%20role%3D%22img%22%20aria-labelledby%3D%22logo-title%22%3E%0A%20%20%3Ctitle%20id%3D%22logo-title%22%3EAmpliagro%3C%2Ftitle%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22ampliagro-green%22%20x1%3D%220%22%20y1%3D%2266.5%22%20x2%3D%22133%22%20y2%3D%2266.5%22%20gradientUnits%3D%22userSpaceOnUse%22%3E%0A%20%20%20%20%20%20%3Cstop%20stop-color%3D%22%230e9d78%22%2F%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%221%22%20stop-color%3D%22%233bb68f%22%2F%3E%0A%20%20%20%20%3C%2FlinearGradient%3E%0A%20%20%3C%2Fdefs%3E%0A%20%20%3Crect%20width%3D%22133%22%20height%3D%22133%22%20rx%3D%2221%22%20fill%3D%22url%28%23ampliagro-green%29%22%2F%3E%0A%20%20%3Cpath%20d%3D%22M18%20105%2049%2022%2061.5%2055.5%2045%20105Z%22%20fill%3D%22%23fff%22%2F%3E%0A%20%20%3Cpath%20d%3D%22M52%2018H80L115%20105H86L82.5%2095.5H53L59.5%2078H75L52%2018Z%22%20fill%3D%22%23fff%22%2F%3E%0A%3C%2Fsvg%3E%0A" />
+    <link rel="stylesheet" href="app/static/vendor/fontes.css" />
+    <link rel="stylesheet" href="installer.css" />
+    <script src="installer.js" defer></script>
+  </head>
+  <body>
+    <main class="shell">
+      <aside>
+        <div class="brand">
+          <img src="app/static/img/ampliagro-logo.svg" alt="" width="44" height="44" /><span
+            >ampliagro<small>FEITO PARA A SUA PRODUÇÃO</small></span
+          >
+        </div>
+        <div class="intro">
+          <span class="eyebrow">SEU CAMPO. SEU CONTROLE.</span>
+          <h1>Produzir melhor.<br /><em>Desperdiçar menos.</em></h1>
+          <p>Comece com o que faz sentido para a sua propriedade.</p>
+        </div>
+        <ol class="steps" aria-label="Etapas da configuração">
+          <li aria-current="step">
+            <b>01</b><span>Termos de uso<small>Conheça antes de aceitar</small></span>
+          </li>
+          <li>
+            <b>02</b><span>Onde ficam seus dados<small>Você escolhe como usar</small></span>
+          </li>
+          <li>
+            <b>03</b><span>Sua produção<small>As culturas que você escolheu</small></span>
+          </li>
+          <li>
+            <b>04</b><span>Tudo pronto<small>Comece a organizar seu campo</small></span>
+          </li>
+        </ol>
+        <footer>Planejamento · Insumos · Atividades</footer>
+      </aside>
+      <article>
+        <header>
+          <span>CONFIGURAÇÃO INICIAL</span
+          ><button id="theme" type="button" aria-label="Alternar tema">Modo claro</button>
+        </header>
+        <p id="status" role="status">Preparando o servidor local e o catálogo…</p>
+        <section id="step-0" hidden>
+          <span class="eyebrow">01 / BOAS-VINDAS</span>
+          <h2>Vamos começar<br />com transparência.</h2>
+          <p>Leia a licença de uso do Ampliagro antes de continuar.</p>
+          <pre id="terms" tabindex="0" aria-label="Licença de uso"></pre>
+          <label class="accept"
+            ><input type="checkbox" id="accepted" /><span
+              >Li e aceito os termos de uso apresentados acima.</span
+            ></label
+          >
+        </section>
+        <section id="step-1" hidden>
+          <span class="eyebrow">02 / SEUS DADOS</span>
+          <h2>Seu jeito de trabalhar.</h2>
+          <p>Escolha onde usar o Ampliagro.</p>
+          <label class="choice"
+            ><input type="radio" name="mode" value="local" checked /><span
+              ><strong>Neste computador</strong
+              ><small>Banco de dados local. Seus registros ficam neste dispositivo.</small
+              ><span class="tag">Disponível agora</span></span
+            ></label
+          >
+          <label class="choice"
+            ><input type="radio" name="mode" value="cloud" disabled /><span
+              ><strong>Servidor web do Ampliagro</strong
+              ><small
+                >Conta e dados acessíveis em diferentes dispositivos quando o serviço estiver
+                disponível.</small
+              ><span class="tag" id="cloud-status">Em preparação</span></span
+            ></label
+          >
+          <div class="notice">
+            <strong>Sobre o modo local</strong>
+            <p>
+              O servidor funciona enquanto o aplicativo está aberto. Esta versão atende apenas este
+              computador: ainda não recebe alterações de outros dispositivos nem sincroniza pela
+              internet. Consultas como clima podem usar serviços externos quando houver conexão.
+              Faça backup dos seus dados.
+            </p>
+          </div>
+        </section>
+        <section id="step-2" hidden>
+          <span class="eyebrow">03 / SUA PRODUÇÃO</span>
+          <h2>O que você produz?</h2>
+          <p>
+            Marque suas culturas. A seleção será usada no cadastro da propriedade, sem perguntar
+            novamente no modo local.
+          </p>
+          <input
+            id="search"
+            type="search"
+            placeholder="Buscar: café, soja, bovinos…"
+            aria-label="Buscar cultura"
+          />
+          <div class="selection">
+            <span id="count" aria-live="polite">Nenhuma selecionada</span
+            ><button id="clear" type="button">Limpar</button>
+          </div>
+          <div id="cultures" aria-label="Culturas disponíveis"></div>
+          <p id="empty" hidden>Nenhuma cultura encontrada.</p>
+          <p class="fine">
+            Prepararemos os perfis escolhidos a partir do catálogo desta instalação. Os recursos
+            comuns já fazem parte do aplicativo.
+          </p>
+        </section>
+        <section id="step-3" hidden>
+          <div class="done" aria-hidden="true">✓</div>
+          <span class="eyebrow">04 / PRONTO PARA COMEÇAR</span>
+          <h2>Seu Ampliagro.<br />Do seu jeito.</h2>
+          <p id="summary"></p>
+          <div id="selected-summary" class="chips"></div>
+          <div class="notice">
+            <strong>Agora, crie sua conta e sua propriedade.</strong>
+            <p>A seleção de culturas já está salva neste computador.</p>
+          </div>
+        </section>
+        <p id="error" role="alert" hidden></p>
+        <nav>
+          <button id="back" type="button" hidden>Voltar</button
+          ><button id="next" class="primary" type="button" disabled>Continuar →</button>
+        </nav>
+      </article>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,330 @@
+<nav class="nav-premium" id="nav-premium">
+  <div class="nav-glass">
+  <div class="nav-main">
+    <a href="{% url 'index_spa' %}" class="nav-brand">
+      <span class="nav-brand-text">ampliagro</span>
+    </a>
+
+    <div class="nav-pills" id="nav-pills">
+      <a href="{% url 'index_spa' %}" class="nav-pill is-active" data-pill="dashboard">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+        Dashboard
+      </a>
+
+      <a href="{% url 'guia-vegetal' %}" class="nav-pill" data-pill="vegetal" data-glow>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.9C15.5 4.9 17 3.5 19 2c1 2 2 4.5 2 8 0 5-3 10-7 10"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
+        Vegetal
+      </a>
+
+      <a href="{% url 'guia-animal' %}" class="nav-pill" data-pill="animal" data-glow>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="4" cy="10" r="1"/><circle cx="20" cy="10" r="1"/><path d="M8 16c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2"/><path d="M6 20c.44 2.2 2.4 3 6 3s5.56-.8 6-3"/><path d="M12 13c0-3 3-5 3-5s1 4 6 5c-1.5 2.5-3 5-9 5s-7.5-2.5-9-5c5-1 6-5 6-5s3 2 3 5"/></svg>
+        Animal
+      </a>
+
+      <a href="{% url 'guia-aquatica' %}" class="nav-pill" data-pill="aquatica" data-glow>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/></svg>
+        Aquática
+      </a>
+
+      <a href="{% url 'guia-sistemas' %}" class="nav-pill" data-pill="sistemas" data-glow>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Sistemas
+      </a>
+
+      <div class="nav-pill-group">
+        <span class="nav-pill" onclick="toggleMega('mega-cadastros')" data-mega-trigger>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
+          Cadastros
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="chevron"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+        <div class="nav-mega" id="mega-cadastros">
+          <div class="nav-mega-col">
+            <div class="nav-mega-col-title">Produção</div>
+            <a href="{% url 'cadastro-safra' %}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 22h20"/><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18"/></svg>Safras</a>
+            <a href="{% url 'cadastro-talhao' %}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Talhões</a>
+            <a href="{% url 'cadastro-animal' %}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 13c0-3 3-5 3-5s1 4 6 5c-1.5 2.5-3 5-9 5s-7.5-2.5-9-5c5-1 6-5 6-5s3 2 3 5"/></svg>Animais</a>
+            <a href="{% url 'cadastro-apiario' %}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16z"/><path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/></svg>Apiário</a>
+          </div>
+          <div class="nav-mega-col">
+            <div class="nav-mega-col-title">Gestão</div>
+            <a href="{% url 'cadastro-insumo' %}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/></svg>Insumos</a>
+            <a href="{% url 'cadastro-maquinario' %}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="17" r="3"/><circle cx="19" cy="17" r="3"/><path d="M8 17h8"/><path d="M2 7v6a2 2 0 0 0 2 2h4l3-3 1 3 4-3 2 3h1a2 2 0 0 0 2-2V7"/></svg>Maquinários</a>
+            <a href="{% url 'cadastro-funcionario' %}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 18v-2a4 4 0 0 0-4-4h-4a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Funcionários</a>
+            <a href="{% url 'cadastro-propriedade' %}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Propriedades</a>
+          </div>
+          <div class="nav-mega-col">
+            <div class="nav-mega-col-title">Financeiro</div>
+            <a href="{% url 'cadastro-financeiro' %}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Financeiro</a>
+            <a href="{% url 'cadastro-estoque' %}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>Estoque</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-pill-group">
+        <span class="nav-pill" onclick="toggleMega('mega-ferramentas')" data-mega-trigger>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+          Ferramentas
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="chevron"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+        <div class="nav-mega" id="mega-ferramentas" style="min-width:620px">
+          <div class="nav-mega-col">
+            <div class="nav-mega-col-title">Calculadoras &amp; Simuladores</div>
+            <a href="#" onclick="event.preventDefault();openCalculatorModal();"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="12" y2="12"/><line x1="12" y1="16" x2="16" y2="16"/></svg>Calculadoras Agronomicas</a>
+            <a href="{% url 'simulador-financeiro' %}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16z"/><polyline points="9 9 12 6 15 9"/><path d="M12 6v12"/></svg>Simulador Financeiro</a>
+            <a href="{% url 'simulador-colheita' %}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 22h20"/><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18"/><path d="M12 12v6"/><path d="M9 9l3-3 3 3"/></svg>Simulador Colheita</a>
+            <a href="{% url 'previsao-clima' %}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>Previsao do Tempo</a>
+            <div class="nav-divider"></div>
+            <div class="nav-mega-col-title">Instrumentos</div>
+            <a href="#" onclick="event.preventDefault();openFieldNotebook();"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>Caderno de Campo</a>
+            <a href="#" onclick="event.preventDefault();openQuickSpreadsheet();"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>Entrada Rapida (Planilha)</a>
+            <a href="#" onclick="event.preventDefault();gerarQRCode('propriedade','dashboard','Ampliagro');"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><line x1="3" y1="21" x2="3" y2="17"/><line x1="7" y1="21" x2="7" y2="20"/><line x1="17" y1="21" x2="17" y2="17"/><line x1="21" y1="21" x2="21" y2="14"/></svg>QR Code Rastreabilidade</a>
+          </div>
+          <div class="nav-mega-col">
+            <div class="nav-mega-col-title">Produtos &amp; Precificacao</div>
+            <a href="#" onclick="event.preventDefault();openProductRegistry();"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>Cadastro de Produtos <span class="nav-badge-new">novo</span></a>
+            <a href="#" onclick="event.preventDefault();openProductRegistry();showProductTab('precos');"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Tabela de Precos <span class="nav-badge-new">novo</span></a>
+            <a href="#" onclick="event.preventDefault();openQuickSpreadsheet();document.getElementById('qs-type').value='produto';rebuildQuickSheet();"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M12 22V12"/><path d="M9 10l3-3 3 3"/></svg>Importar Produtos em Lote</a>
+            <div class="nav-divider"></div>
+            <a href="{% url 'cadastro-insumo' %}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/></svg>Insumos (Sistema)</a>
+            <a href="{% url 'estoque-geral' %}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>Estoque Geral</a>
+          </div>
+          <div class="nav-mega-col">
+            <div class="nav-mega-col-title">Monitoramento &amp; IoT</div>
+            <a href="{% url 'sensores' %}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 9l4 4-4 4"/><path d="M11 11l-2 2 2 2"/><path d="M23 9l-4 4 4 4"/><path d="M15 5l-6 14"/></svg>Sensores IoT</a>
+            <a href="{% url 'dispositivos' %}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>Dispositivos</a>
+            <div class="nav-divider"></div>
+            <div class="nav-mega-col-title">Sistema</div>
+            <a href="#" onclick="event.preventDefault();exportSystemSnapshot();"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Exportar Snapshot (.agro)</a>
+            <a href="#" onclick="event.preventDefault();importSystemSnapshot();"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Importar Snapshot (.agro)</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-pill-group">
+        <span class="nav-pill" onclick="toggleMega('mega-relatorios')" data-mega-trigger>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          Relatórios
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="chevron"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+        <div class="nav-mega" id="mega-relatorios">
+          <div class="nav-mega-col">
+            <a href="{% url 'dashboard-os' %}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16z"/><polyline points="9 12 11 14 15 10"/></svg>Dashboard OS</a>
+            <a href="{% url 'resumo-gerencial' %}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 16l4-8 4 4 4-6"/></svg>Resumo Gerencial</a>
+            <a href="{% url 'estoque-geral' %}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>Estoque Geral</a>
+            <a href="{% url 'logistica-caminhao' %}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="17" r="3"/><circle cx="19" cy="17" r="3"/><path d="M8 17h8"/><path d="M2 7v6a2 2 0 0 0 2 2h4l3-3 1 3 4-3 2 3h1a2 2 0 0 0 2-2V7"/></svg>Logística</a>
+            <a href="{% url 'previsao-safra' %}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 22h20"/><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18"/><path d="M8 12h8"/><path d="M8 8h8"/></svg>Previsão Safra</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-pill-group">
+        <span class="nav-pill" onclick="toggleMega('mega-gestao')" data-mega-trigger>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Gestão
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="chevron"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+        <div class="nav-mega" id="mega-gestao">
+          <div class="nav-mega-col">
+            <a href="{% url 'equipe-agenda' %}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Agenda Geral</a>
+            <a href="{% url 'equipe-empregados' %}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Empregados</a>
+            <a href="{% url 'agenda-agricola' %}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 20A7 7 0 0 1 9.8 6.9C15.5 4.9 17 3.5 19 2c1 2 2 4.5 2 8 0 5-3 10-7 10"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>Agenda Agrícola</a>
+            <a href="{% url 'agenda-pecuaria' %}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="4" cy="10" r="1"/><circle cx="20" cy="10" r="1"/><path d="M8 16c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2"/><path d="M6 20c.44 2.2 2.4 3 6 3s5.56-.8 6-3"/><path d="M12 13c0-3 3-5 3-5s1 4 6 5c-1.5 2.5-3 5-9 5s-7.5-2.5-9-5c5-1 6-5 6-5s3 2 3 5"/></svg>Agenda Pecuária</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-right">
+      <div class="nav-mode" id="nav-mode">
+        <button type="button" class="nav-mode-btn" id="nav-mode-btn" onclick="toggleModeDropdown(event); return false;" aria-expanded="false" title="Tema">
+          <svg class="nav-mode-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.563-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
+          <span class="nav-mode-label">Claro</span>
+          <svg class="nav-mode-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="nav-mode-dropdown nav-mode-panel" id="mode-dropdown" role="menu" aria-labelledby="nav-mode-btn">
+          <div class="nav-mode-panel-grid" id="mode-panel-grid"></div>
+          <div class="mode-dropdown-footer">
+            <button type="button" class="btn-personalizar-mode" onclick="openPersonalizarMode(event)">
+              Personalizar
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="nav-user" onclick="toggleUserDropdown(event)">
+        <div class="nav-avatar" title="{% if user.is_authenticated %}{{ user.get_full_name|default:user.username }}{% else %}Visitante{% endif %}">
+          {% if user.is_authenticated %}{{ user.get_full_name|default:user.username|first|upper }}{% else %}?{% endif %}
+          {% if user.is_authenticated %}<span class="nav-avatar-badge"></span>{% endif %}
+        </div>
+        <div class="nav-user-dropdown" id="user-dropdown">
+          <div class="dropdown-header">
+            <div class="name">{% if user.is_authenticated %}{{ user.get_full_name|default:user.username }}{% else %}Visitante{% endif %}</div>
+            <div class="email">{% if user.is_authenticated %}{{ user.email }}{% endif %}</div>
+          </div>
+          <a href="{% url 'perfil-config' %}">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            Configurações
+          </a>
+          <a href="{% url 'config-sistema' %}">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            Sistema
+          </a>
+          <a href="{% url 'erro-report' %}">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            Reportar Erro
+          </a>
+          <div class="dropdown-divider"></div>
+          <a href="{% url 'logout' %}" class="text-danger" onclick="logoutUser(event)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Sair
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+</nav>
+
+
+
+<script>
+/* ═══ Global Theme Init (navbar) ═══ */
+(function() {
+  /* Restaura SEMPRE o tema a partir do JSON do usuário.
+     Modos válidos: claro (dia) | escuro (noite) | custom (personalizado). */
+  try {
+    if (typeof window.restaurarTemaDoUsuario === 'function') {
+      window.restaurarTemaDoUsuario();
+      return;
+    }
+    /* Fallback caso o theme-system.js não tenha carregado */
+    var _base = 'ampliagro-preferences';
+    var _key = (window.AMPLIAGRO_USER_ID != null) ? _base + '_u' + window.AMPLIAGRO_USER_ID : _base;
+    var raw = localStorage.getItem(_key) || localStorage.getItem(_base);
+    var prefs = raw ? JSON.parse(raw) : null;
+    if (prefs && prefs.theme && prefs.theme.mode) {
+      var mapa = { claro:'claro', dia:'claro', light:'claro', escuro:'escuro', noite:'escuro', dark:'escuro', custom:'custom', personalizado:'custom' };
+      var modo = mapa[String(prefs.theme.mode).toLowerCase()] || 'claro';
+      var isDark = modo === 'escuro' || (modo === 'custom' && prefs.theme.custom && prefs.theme.custom.dark);
+      document.documentElement.classList.toggle('dark', !!isDark);
+    }
+  } catch(e) {}
+})();
+
+/* ═══ Navbar Init ═══ */
+document.addEventListener('DOMContentLoaded', function() {
+  if(typeof updateConnectionStatus === 'function'){ try { updateConnectionStatus(); } catch(e){} }
+  initNavPremium();
+
+
+});
+
+
+
+
+
+
+
+function initNavPremium() {
+  if (typeof window.updateNavActive === 'function') {
+    window.updateNavActive();
+  } else {
+    var path = window.location.pathname;
+    var pills = document.querySelectorAll('.nav-pill[data-pill]');
+    pills.forEach(function(p) { p.classList.remove('is-active'); });
+    pills.forEach(function(p) {
+      var pill = p.getAttribute('data-pill');
+      if ((pill === 'dashboard' && (path === '/' || path.indexOf('index') > -1 || path === '')) ||
+          (path.indexOf(pill) > -1)) {
+        p.classList.add('is-active');
+      }
+    });
+  }
+}
+
+/* ── Mode Dropdown ── */
+function toggleModeDropdown(e) {
+  e.stopPropagation();
+  var dd = document.getElementById('mode-dropdown');
+  if (!dd) return;
+  var isOpen = dd.classList.contains('is-open');
+  if (isOpen) { dd.classList.remove('is-open'); dd.classList.add('hidden'); }
+  else {
+    dd.classList.remove('hidden', 'open');
+    dd.classList.add('is-open');
+    if (window.refreshModePanel) window.refreshModePanel();
+    var ud = document.getElementById('user-dropdown');
+    if (ud) ud.classList.remove('is-open');
+  }
+}
+
+function closeModeDropdown() {
+  var dd = document.getElementById('mode-dropdown');
+  if (dd) dd.classList.remove('is-open');
+}
+
+window.selectMode = function(mode, e) {
+  if (e) e.stopPropagation();
+  closeModeDropdown();
+  if (typeof window.setTheme === 'function') window.setTheme(mode);
+};
+
+document.addEventListener('click', function(e) {
+  var dd = document.getElementById('mode-dropdown');
+  if (dd && !e.target.closest('.nav-mode')) { dd.classList.remove('is-open'); }
+});
+
+/* ── Mega Menus ── */
+function toggleMega(id) {
+  var menu = document.getElementById(id);
+  if (!menu) return;
+  var isOpen = menu.classList.contains('is-open');
+  document.querySelectorAll('.nav-mega.is-open').forEach(function(m) { m.classList.remove('is-open'); });
+  if (!isOpen) { menu.classList.add('is-open'); }
+}
+document.addEventListener('click', function(e) {
+  var group = e.target.closest('.nav-pill-group');
+  if (!group) {
+    document.querySelectorAll('.nav-mega.is-open').forEach(function(m) { m.classList.remove('is-open'); });
+  } else {
+    var mega = e.target.closest('.nav-mega');
+    if (mega) {
+      mega.classList.remove('is-open');
+    }
+  }
+});
+
+/* ── User Dropdown ── */
+function toggleUserDropdown(e) {
+  e.stopPropagation();
+  var dd = document.getElementById('user-dropdown');
+  if (!dd) return;
+  var isOpen = dd.classList.contains('is-open');
+  if (isOpen) { dd.classList.remove('is-open'); dd.classList.add('hidden'); }
+  else {
+    dd.classList.remove('hidden', 'open');
+    dd.classList.add('is-open');
+    var md = document.getElementById('mode-dropdown');
+    if (md) md.classList.remove('is-open');
+  }
+}
+document.addEventListener('click', function(e) {
+  var dd = document.getElementById('user-dropdown');
+  if (dd && !e.target.closest('.nav-user')) { dd.classList.remove('is-open'); }
+});
+
+window.logoutUser = function(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  var form = document.createElement('form');
+  form.method = 'POST';
+  form.action = '{% url "logout" %}';
+  var csrf = document.createElement('input');
+  csrf.type = 'hidden';
+  csrf.name = 'csrfmiddlewaretoken';
+  csrf.value = (typeof getCookie === 'function' && getCookie('csrftoken')) || '';
+  form.appendChild(csrf);
+  document.body.appendChild(form);
+  form.submit();
+};
+</script>

@@ -1,0 +1,15 @@
+# ninja log v5
+6	66	0	C:/Trabalho/Projetos/Ativos/Ampliagro2/Ampliagro_app_cell/android/app/.cxx/Debug/2h283f58/x86/CMakeFiles/cmake.verify_globs	48e1c0f2d3a25b53
+118	6766	8137745216496245	safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/a3b23c39db05eda91450652e4d070172/components/safeareacontext/States.cpp.o	5c95efda32fa6b4c
+46	8368	8137745232293098	safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/b10cf0a8109d6825e7a971ccec658cab/safeareacontext/EventEmitters.cpp.o	97e65f1eed9203fc
+102	9729	8137745245974749	safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/55cd713fcfa2e55a36476ee5032ec955/codegen/jni/safeareacontext-generated.cpp.o	402d8e82ab3612eb
+12	11600	8137745264821967	CMakeFiles/appmodules.dir/OnLoad.cpp.o	ea6815eb3e9ba63e
+34	13363	8137745282509374	safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/03a722bdd9714b91e151fa410f35030f/safeareacontext/RNCSafeAreaViewState.cpp.o	6220fd1320d89d7e
+89	13801	8137745286891711	safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/b10cf0a8109d6825e7a971ccec658cab/safeareacontext/ShadowNodes.cpp.o	94ac188bc3d033b5
+60	14573	8137745294403059	safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/a3b23c39db05eda91450652e4d070172/components/safeareacontext/Props.cpp.o	8cde1f5eac263e84
+75	15984	8137745308471344	safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/b10cf0a8109d6825e7a971ccec658cab/safeareacontext/ComponentDescriptors.cpp.o	54a59451c4871444
+22	17370	8137745322543625	safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/505cb015ac4cf6ddf9c5d28e6f64136a/RNCSafeAreaViewShadowNode.cpp.o	39a89785c727996b
+2	17490	8137745323583089	CMakeFiles/appmodules.dir/C_/Trabalho/Projetos/Ativos/Ampliagro2/Ampliagro_app_cell/android/app/build/generated/autolinking/src/main/jni/autolinking.cpp.o	6201637ea201ae90
+17371	17591	8137745324862674	C:/Trabalho/Projetos/Ativos/Ampliagro2/Ampliagro_app_cell/android/app/build/intermediates/cxx/Debug/2h283f58/obj/x86/libreact_codegen_safeareacontext.so	84004680d6865cfa
+17592	17774	8137745326759934	C:/Trabalho/Projetos/Ativos/Ampliagro2/Ampliagro_app_cell/android/app/build/intermediates/cxx/Debug/2h283f58/obj/x86/libappmodules.so	d9869eb26163529
+7	62	0	C:/Trabalho/Projetos/Ativos/Ampliagro2/Ampliagro_app_cell/android/app/.cxx/Debug/2h283f58/x86/CMakeFiles/cmake.verify_globs	48e1c0f2d3a25b53

@@ -1,0 +1,38 @@
+{% extends "partials/_premium_cadastro_base.html" %}
+{% block title %}Ampliagro - Receituário{% endblock %}
+{% block cadastro_icon %}bi bi-file-earmark-medical{% endblock %}
+{% block cadastro_title %}Receituário Agronômico{% endblock %}
+{% block cadastro_novo_title %}Novo Receituário{% endblock %}
+{% block cadastro_lista_title %}Receituários{% endblock %}
+{% block cadastro_subtabs %}
+<div class="pcrud-subtabs"><button class="pcrud-subtab active" data-tab="novo">Novo</button><button class="pcrud-subtab" data-tab="lista">Lista</button></div>
+{% endblock %}
+{% block cadastro_stats %}
+<div class="pcrud-stats"><div class="pcrud-stat"><div class="pcrud-stat-label">Total</div><div class="pcrud-stat-value">{{ receituarios|length }}</div></div><div class="pcrud-stat"><div class="pcrud-stat-label">Com ART</div><div class="pcrud-stat-value">{{ receituarios|length }}</div></div></div>
+{% endblock %}
+{% block cadastro_form_novo %}
+<form id="receituario-form" onsubmit="return submitReceituario(event)" enctype="multipart/form-data">
+{% csrf_token %}
+<div class="pcrud-form-grid">
+<div class="pcrud-form-group"><label>Safra *</label><select name="safra" required>{% for s in safras %}<option value="{{ s.id }}">{{ s.safra_nome|default:s.cultura.nome }} ({{ s.ano }})</option>{% endfor %}</select></div>
+<div class="pcrud-form-group"><label>Talhão</label><select name="talhao">{% for t in talhoes %}<option value="{{ t.id }}">{{ t.nome }}</option>{% endfor %}<option value="">—</option></select></div>
+<div class="pcrud-form-group"><label>ART Agrônomo</label><input type="text" name="art" placeholder="Ex: 123456"></div>
+<div class="pcrud-form-group"><label>Praga/Alvo</label><input type="text" name="praga" placeholder="Ex: Lagarta"></div>
+<div class="pcrud-form-group" style="grid-column:span 2;"><label>Diagnóstico</label><textarea name="diagnostico" rows="2" placeholder="Diagnóstico..."></textarea></div>
+<div class="pcrud-form-group" style="grid-column:span 2;"><label>Prescrição (JSON)</label><textarea name="prescricao" rows="2" placeholder='{"produto":"Glifosato","dose":"2L/ha"}'></textarea></div>
+<div class="pcrud-form-group"><label>Foto</label><input type="file" name="foto" accept="image/*"></div>
+<div class="pcrud-form-group"><label>Geo</label><input type="text" name="geo" placeholder="lat,lon auto" id="id_geo"></div>
+</div>
+<div class="pcrud-form-actions"><button type="submit" class="pcrud-btn pcrud-btn-primary"><i class="bi bi-check-lg"></i> Salvar</button></div>
+</form>
+{% endblock %}
+{% block cadastro_tab_lista %}
+<div class="pcrud-table-wrap"><table class="pcrud-table"><thead><tr><th>Data</th><th>Safra</th><th>Talhão</th><th>Praga</th><th>ART</th><th>Ações</th></tr></thead><tbody>
+{% for r in receituarios %}<tr><td>{{ r.criado_em|date:"d/m/Y" }}</td><td>{{ r.safra.safra_nome }}</td><td>{{ r.talhao.nome|default:"—" }}</td><td>{{ r.praga|default:"—" }}</td><td>{{ r.art|default:"—" }}</td><td><button class="pcrud-btn pcrud-btn-sm" onclick="window.open('/media/{{ r.foto }}','_blank')">Foto</button> <button class="pcrud-btn pcrud-btn-danger pcrud-btn-sm" onclick="excluirRec({{ r.id }})"><i class="bi bi-trash"></i></button></td></tr>{% endfor %}
+</tbody></table></div>
+{% endblock %}
+{% block scripts %}{{ block.super }}<script>
+function submitReceituario(e){ e.preventDefault(); var f=document.getElementById('receituario-form'); var fd=new FormData(f); fetch('/api/receituarios/', {method:'POST', headers:{'X-CSRFToken':getCSRFToken()}, body: fd}).then(r=>{ if(r.ok){ showToast('Salvo','success'); setTimeout(()=>location.reload(),600);} else r.json().then(j=>showToast(JSON.stringify(j),'error'));}); return false; }
+function excluirRec(id){ if(!confirm('Excluir?'))return; fetch('/api/receituarios/'+id+'/',{method:'DELETE',headers:{'X-CSRFToken':getCSRFToken()}}).then(r=>{ if(r.ok) location.reload();});}
+if(navigator.geolocation){ navigator.geolocation.getCurrentPosition(p=>{ var el=document.getElementById('id_geo'); if(el) el.value=p.coords.latitude.toFixed(6)+','+p.coords.longitude.toFixed(6); });}
+</script>{% endblock %}

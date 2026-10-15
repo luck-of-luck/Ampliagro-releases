@@ -1,0 +1,282 @@
+name: CD - Deploy Production
+
+on:
+  workflow_run:
+    # Tem que bater EXATO com o `name:` do workflow de CI. O nome antigo
+    # aqui era "Ampliagro CI/CD" e o ci.yml se chama "CI/CD Pipeline" —
+    # o workflow_run nunca casava e o deploy nunca rodava sozinho.
+    workflows: ["CI/CD Pipeline"]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      skip_tests:
+        description: 'Skip tests and deploy directly'
+        required: false
+        default: 'false'
+        type: boolean
+
+env:
+  REGISTRY: ghcr.io
+
+concurrency:
+  group: production
+  cancel-in-progress: false
+
+jobs:
+  # ──────────────────────────────────────────────────────────
+  # Gate: só deploya se CI passou (ou skip_tests=true)
+  # ──────────────────────────────────────────────────────────
+  gate:
+    runs-on: ubuntu-latest
+    outputs:
+      should_deploy: ${{ steps.check.outputs.should_deploy }}
+    steps:
+      - id: check
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ github.event.inputs.skip_tests }}" == "true" ]]; then
+            echo "should_deploy=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          if [[ "${{ github.event_name }}" == "workflow_run" ]]; then
+            if [[ "${{ github.event.workflow_run.conclusion }}" == "success" ]]; then
+              echo "should_deploy=true" >> $GITHUB_OUTPUT
+            else
+              echo "CI failed (${{ github.event.workflow_run.conclusion }}) — skipping deploy"
+              echo "should_deploy=false" >> $GITHUB_OUTPUT
+            fi
+            exit 0
+          fi
+          echo "should_deploy=true" >> $GITHUB_OUTPUT
+
+  # ──────────────────────────────────────────────────────────
+  # Build & Push (imagem do Dockerfile.prod → GHCR)
+  # ──────────────────────────────────────────────────────────
+  build:
+    runs-on: ubuntu-latest
+    needs: gate
+    if: needs.gate.outputs.should_deploy == 'true'
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      image_ref: ${{ steps.image.outputs.ref }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+      - uses: docker/setup-buildx-action@v3
+
+      # GHCR exige nome de repositorio em minusculas; github.repository
+      # preserva o "Ampliagro" com A maiusculo e o push era rejeitado.
+      - name: Normalizar nome da imagem
+        id: image
+        run: |
+          repo="${{ github.repository }}"
+          lower=$(echo "$repo" | tr '[:upper:]' '[:lower:]')
+          echo "repo=$lower" >> $GITHUB_OUTPUT
+          echo "ref=ghcr.io/$lower:${{ github.sha }}" >> $GITHUB_OUTPUT
+
+      - name: Validar docker-compose.prod.yml
+        env:
+          # O compose agora exige essas variaveis (`:?`) para nao subir
+          # container quebrado; na validacao passamos valores ficticios.
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+          SECRET_KEY: ci
+          ALLOWED_HOSTS: localhost
+          APP_IMAGE: ghcr.io/ampliagro:ci
+        run: |
+          docker compose -f docker-compose.prod.yml config > /dev/null
+          echo "✓ docker-compose.prod.yml valido"
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ steps.image.outputs.repo }}
+          tags: |
+            type=sha
+            type=sha,format=short
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=ref,event=branch
+
+      - name: Build & Push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.prod
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64
+
+  # ──────────────────────────────────────────────────────────
+  # Deploy via SSH (docker compose pull + up)
+  # ──────────────────────────────────────────────────────────
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment: production
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - name: Deploy to server via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          # O segredo chega remoto como SECRETS_GITHUB_TOKEN. O resto tem
+          # valor inlinado pelo proprio Actions: env de step nao e repassado.
+          envs: GITHUB_TOKEN
+          script: |
+            set -eu
+            cd '${{ secrets.DEPLOY_PATH || '/opt/ampliagro' }}'
+            APP_IMAGE='${{ needs.build.outputs.image_ref }}'
+
+            if [ ! -f .env ]; then
+              echo "::error::sem .env no servidor — faltam POSTGRES_USER, POSTGRES_PASSWORD, SECRET_KEY, ALLOWED_HOSTS"
+              exit 1
+            fi
+
+            echo "→ Git pull (compose/Caddyfile/init-scripts)"
+            git fetch origin main
+            git reset --hard origin/main
+
+            # Guarda a imagem em producao ANTES de trocar, para o rollback
+            # ter o que restaurar (o rollback antigo fazia git reset, que
+            # nao muda imagem nenhuma — o deploy nao builda no servidor).
+            prev=$(docker inspect -f '{{.Config.Image}}' ampliagro-app 2>/dev/null || true)
+            if [ -n "$prev" ] && [ "$prev" != "$APP_IMAGE" ]; then
+              echo "$prev" > .prev_image
+            fi
+
+            echo "→ Docker login ${{ env.REGISTRY }}"
+            echo "${SECRETS_GITHUB_TOKEN}" | docker login ${{ env.REGISTRY }} -u '${{ github.actor }}' --password-stdin
+
+            echo "→ Pull images"
+            export APP_IMAGE
+            docker compose -f docker-compose.prod.yml pull
+
+            echo "→ Migrate (antes de expor trafego)"
+            docker compose -f docker-compose.prod.yml run --rm --entrypoint python app manage.py migrate --noinput
+
+            echo "→ Up (recreate)"
+            docker compose -f docker-compose.prod.yml up -d --remove-orphans
+
+            echo "→ Wait for health"
+            ok=0
+            i=1
+            while [ $i -le 45 ]; do
+              code=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8000/healthz/ || true)
+              if [ "$code" = "200" ]; then ok=1; break; fi
+              echo "  waiting web ($code)... $i/45"
+              sleep 2
+              i=$((i + 1))
+            done
+            if [ "$ok" != "1" ]; then
+              echo "::error::app nao ficou saudavel (/healthz/)"
+              docker compose -f docker-compose.prod.yml ps
+              docker compose -f docker-compose.prod.yml logs --tail=80 app
+              exit 1
+            fi
+            echo "✓ web healthz OK"
+
+            echo "→ Prune old images"
+            docker image prune -f || true
+
+            echo "✓ Deploy done"
+            docker compose -f docker-compose.prod.yml ps
+
+  # ──────────────────────────────────────────────────────────
+  # Health Check externo (Caddy + Django)
+  # ──────────────────────────────────────────────────────────
+  healthcheck:
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+      - name: Wait for Caddy to be ready
+        run: sleep 10
+
+      - name: Check /healthz/ (Caddy → Django)
+        run: |
+          APP_URL="${{ secrets.APP_URL || 'http://localhost' }}"
+          echo "→ Checking $APP_URL/healthz/"
+          curl -fsS "$APP_URL/healthz/" | head -c 400
+          echo ""
+          echo "✓ /healthz/ OK"
+
+      - name: Check /api/healthz/ (db + redis)
+        run: |
+          APP_URL="${{ secrets.APP_URL || 'http://localhost' }}"
+          curl -fsS "$APP_URL/api/healthz/" -o /tmp/healthz.json || {
+            echo "✗ /api/healthz/ indisponivel"; exit 1;
+          }
+          cat /tmp/healthz.json
+          # O JSON sai como {"status": "ok", ...} (com espaco) — o grep por
+          # '"status":"ok"' do script antigo nunca casava e dava falso vermelho.
+          python3 -c "import json,sys; d=json.load(open('/tmp/healthz.json')); sys.exit(0 if d.get('status')=='ok' else 1)" \
+            || { echo "✗ /api/healthz/ degradado"; exit 1; }
+          echo "✓ /api/healthz/ OK"
+
+      - name: Check a pagina inicial
+        run: |
+          APP_URL="${{ secrets.APP_URL || 'http://localhost' }}"
+          code=$(curl -s -o /dev/null -w '%{http_code}' "$APP_URL/")
+          echo "→ / => $code"
+          # 200 (render) ou 302 (login/redirect) sao aceitaveis; 5xx nao.
+          if [ "$code" -ge 500 ]; then
+            echo "✗ / respondeu $code"
+            exit 1
+          fi
+          echo "✓ / OK ($code)"
+
+  # ──────────────────────────────────────────────────────────
+  # Rollback automático se healthcheck falhar
+  # ──────────────────────────────────────────────────────────
+  rollback:
+    runs-on: ubuntu-latest
+    needs: healthcheck
+    if: failure()
+    steps:
+      - name: Rollback to previous image
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          envs: GITHUB_TOKEN
+          script: |
+            set -eu
+            cd '${{ secrets.DEPLOY_PATH || '/opt/ampliagro' }}'
+            echo "✗ Healthcheck falhou — rollback"
+            docker compose -f docker-compose.prod.yml ps || true
+            docker compose -f docker-compose.prod.yml logs --tail=80 app || true
+
+            PREV=$(cat .prev_image 2>/dev/null || true)
+            if [ -z "$PREV" ]; then
+              echo "::error::nenhuma imagem anterior registrada em .prev_image — rollback manual necessario"
+              exit 1
+            fi
+
+            echo "→ Voltando para $PREV"
+            echo "${SECRETS_GITHUB_TOKEN}" | docker login ${{ env.REGISTRY }} -u '${{ github.actor }}' --password-stdin
+            export APP_IMAGE="$PREV"
+            docker compose -f docker-compose.prod.yml pull
+            docker compose -f docker-compose.prod.yml up -d --remove-orphans
+            docker compose -f docker-compose.prod.yml ps
+            echo "✓ Rollback feito — confira manualmente"

@@ -1,0 +1,104 @@
+{% extends base_template %}
+{% load static %}
+
+{% block title %}Ampliagro - Registros da IA{% endblock %}
+
+{% block extra_css %}
+{% include "partials/_premium_cadastro_styles.html" %}
+
+{% endblock %}
+
+{% block dashboard_appbar %}{% endblock %}
+
+{% block content %}
+<div class="pcrud-container">
+    <div class="pcrud-header">
+        <h1 class="pcrud-title"><i class="bi bi-journal-text"></i> Registros da IA — console de testes</h1>
+        <a href="{% url 'index_spa' %}" class="pcrud-btn pcrud-btn-secondary pcrud-btn-sm"><i class="bi bi-speedometer2"></i> Dashboard</a>
+    </div>
+    <p style="color:var(--cor-texto-medio);font-size:.85rem;margin-bottom:12px">Toda interação com a IA e tudo que ela fez: texto de entrada, como entendeu (scores), passos, fontes, flags, resposta e feedback.</p>
+
+    <div class="pcrud-stats">
+        <div class="pcrud-stat"><div class="pcrud-stat-label">Interações</div><div class="pcrud-stat-value">{{ stats.total }}</div></div>
+        <div class="pcrud-stat"><div class="pcrud-stat-label">OK</div><div class="pcrud-stat-value">{{ stats.ok }}</div></div>
+        <div class="pcrud-stat"><div class="pcrud-stat-label">Latência média</div><div class="pcrud-stat-value">{{ stats.ms_medio }} ms</div></div>
+        <div class="pcrud-stat"><div class="pcrud-stat-label">Satisfeito / Não</div><div class="pcrud-stat-value">{{ stats.satisfeito }} / {{ stats.insatisfeito }}</div></div>
+    </div>
+
+    <form method="get" class="pcrud-form-card">
+        <div class="reg-filters">
+            <div><label>Intent</label><br>
+                <select name="intent">
+                    <option value="">Todas</option>
+                    {% for i in intents %}<option value="{{ i.intent }}" {% if i.intent == f_intent %}selected{% endif %}>{{ i.intent }} ({{ i.n }})</option>{% endfor %}
+                </select></div>
+            <div><label>Status</label><br>
+                <select name="ok">
+                    <option value="">Todos</option>
+                    <option value="1" {% if f_ok == '1' %}selected{% endif %}>OK</option>
+                    <option value="0" {% if f_ok == '0' %}selected{% endif %}>Erro</option>
+                </select></div>
+            <div><label>Tipo evento</label><br>
+                <select name="tipo">
+                    <option value="">Todos</option>
+                    {% for v,l in tipos_evento %}<option value="{{ v }}" {% if v == f_tipo %}selected{% endif %}>{{ l }}</option>{% endfor %}
+                </select></div>
+            <div><label>Buscar texto</label><br><input type="text" name="q" value="{{ f_q }}" placeholder="texto de entrada ou resposta..."></div>
+            <div><br><button class="pcrud-btn pcrud-btn-primary pcrud-btn-sm" type="submit"><i class="bi bi-search"></i> Filtrar</button></div>
+        </div>
+    </form>
+
+    <h2 style="margin:18px 0 8px;"><i class="bi bi-lightning"></i> Execuções ({{ execucoes|length }})</h2>
+    <div class="pcrud-form-card" style="padding:0;">
+        <div class="pcrud-table-wrap"><table class="pcrud-table">
+            <thead><tr><th>Quando</th><th>Entrada</th><th>Intent</th><th>Status</th><th>Latência</th><th>Detalhe</th></tr></thead>
+            <tbody>
+            {% for e in execucoes %}
+            <tr>
+                <td style="white-space:nowrap;">{{ e.criado_em|date:"d/m H:i:s" }}</td>
+                <td>{{ e.entrada|truncatechars:70|default:"—" }}</td>
+                <td><strong>{{ e.intent }}</strong>{% if e.satisfeito %} 👍{% elif e.satisfeito == False %} 👎{% endif %}</td>
+                <td>{% if e.ok %}<span class="reg-ok">OK</span>{% else %}<span class="reg-erro">ERRO</span>{% endif %}</td>
+                <td>{{ e.duracao_ms }} ms</td>
+                <td><button class="pcrud-btn pcrud-btn-secondary pcrud-btn-sm" onclick="document.getElementById('det-{{ e.id }}').classList.toggle('open')">ver tudo</button></td>
+            </tr>
+            <tr><td colspan="6" style="padding:0;border:none;">
+                <div class="reg-det" id="det-{{ e.id }}">
+                    <strong>📝 Entrada:</strong> {{ e.entrada|default:"(via direta, sem texto)" }}<br>
+                    <strong>🧠 Detecção:</strong> método={{ e.deteccao.metodo|default:"—" }} escolhido={{ e.deteccao.escolhido|default:"—" }}<br>
+                    {% if e.deteccao.scores %}<div style="margin:4px 0;">{% for k,v in e.deteccao.scores.items %}<span class="reg-score">{{ k }}: {{ v }}</span>{% endfor %}</div>{% endif %}
+                    <strong>⚙️ Flags:</strong> {{ e.flags|join:", "|default:"—" }} &nbsp; <strong>🔌 Fontes:</strong> {{ e.fontes|join:", "|default:"—" }} &nbsp; <strong>Via:</strong> {{ e.via }}<br>
+                    <strong>👣 Passos (tudo que a IA fez):</strong>
+                    {% for p in e.passos %}<div class="reg-passo"><strong>{{ p.etapa }}</strong> <small>(+{{ p.ms }} ms)</small><br>{{ p.detalhe }}</div>{% empty %}<div>—</div>{% endfor %}
+                    <strong>💬 Resposta:</strong> {{ e.resposta|default:e.erro }}<br>
+                    {% if e.artefato %}<strong>📦 Artefato:</strong> {{ e.artefato.chave }} ({{ e.artefato.tipo }})<br>{% endif %}
+                    <strong>📎 Params:</strong> <pre>{{ e.params }}</pre>
+                </div>
+            </td></tr>
+            {% empty %}
+            <tr><td colspan="6"><div class="pcrud-empty"><i class="bi bi-inbox"></i>Nenhuma execução ainda. Converse com a IA e volte aqui.</div></td></tr>
+            {% endfor %}
+            </tbody>
+        </table></div>
+    </div>
+
+    <h2 style="margin:18px 0 8px;"><i class="bi bi-list-ul"></i> Eventos ({{ eventos|length }})</h2>
+    <div class="pcrud-form-card" style="padding:0;">
+        <div class="pcrud-table-wrap"><table class="pcrud-table">
+            <thead><tr><th>Quando</th><th>Tipo</th><th>Resumo</th><th>Dados</th></tr></thead>
+            <tbody>
+            {% for v in eventos %}
+            <tr>
+                <td style="white-space:nowrap;">{{ v.criado_em|date:"d/m H:i:s" }}</td>
+                <td><strong>{{ v.get_tipo_display }}</strong>{% if v.execucao %} <small>(#{{ v.execucao_id }})</small>{% endif %}</td>
+                <td>{{ v.resumo }}</td>
+                <td><pre style="max-width:420px;overflow:auto;font-size:.72rem;">{{ v.dados }}</pre></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4"><div class="pcrud-empty"><i class="bi bi-inbox"></i>Nenhum evento.</div></td></tr>
+            {% endfor %}
+            </tbody>
+        </table></div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,193 @@
+# Ampliagro - Production Dependencies
+# Core Django
+# A serie instalada e testada e' 5.1 (5.1.15 no ambiente de desenvolvimento).
+# O pin anterior era `>=5.0,<5.1`, que e' o que o pip instalaria — e nao o que
+# corre. Um `pip install -r requirements.txt` numa maquina nova fazia DOWNGRADE
+# do Django e punha o CI a correr uma serie diferente da que o produtor tem,
+# sem nenhum sinal: o job ficava verde, mas testava outro codigo.
+# A serie maior tambem explica o README dizer 5.2 e o badge dizer 5.0+ — tres
+# numero para a mesma dependencia. A fonte de verdade e' aqui.
+Django>=5.1,<5.2
+djangorestframework>=3.14,<3.15
+django-filter>=23.0,<24
+django-cors-headers>=4.0,<5
+# django-csp: a UNICA defence contra XSS injectado, e a defence principal do
+# projecto. `csp.middleware.CSPMiddleware` esta no MIDDLEWARE
+# (config/settings/base.py:120) — sem esta linha, uma maquina limpa instala o
+# requirements, o Django resolve o MIDDLEWARE no boot, encontra `csp.middleware`
+# inexistente, e **nao arranca**. Ja aconteceu: o pacote estava instalado a mao
+# numa maquina de desenvolvimento e o manifesto de dependencias nunca o disse.
+# Como `test_csp.py` passa em CI com o pacote presente, este teste **nao**
+# apanha a falta — so a declaracao apanha.
+django-csp>=4.0,<5.0
+# whitenoise: mesma classe de bug, achada pelo guarda
+# `tests/test_dependencias_declaradas.py`. TWO lugares, nao um:
+#   base.py:119  "whitenoise.middleware.WhiteNoiseMiddleware"  (resolve no boot)
+#   base.py:216  STATICFILES_STORAGE = "whitenoise.storage...." (avaliado em
+#                CADA acesso a ficheiro estatico)
+# Instalado 6.12.0 na maquina, declarado em manifesto nenhum. O primeiro caso
+# impede o arranque; o segundo quebra os estaticos em producao.
+whitenoise>=6.6,<7.0
+django-redis>=5.0,<5.1
+django-celery-beat>=2.5,<2.6
+django-celery-results>=2.5,<2.6
+django-auditlog>=3.0,<3.1
+django-axes>=6.0,<6.1
+django-health-check>=3.0,<3.1
+django-environ>=0.11,<0.12
+django-storages>=1.14,<1.15
+django-compressor>=4.0,<4.1
+django-debug-toolbar>=4.0,<5.0
+django-extensions>=3.2,<3.3
+django-vite>=3.0,<3.1
+django-cors-headers>=4.0,<5
+django-allauth>=0.57,<0.58
+django-rest-framework-simplejwt>=5.0,<5.3
+drf-spectacular>=0.27,<0.28
+django-prometheus>=2.3,<2.4
+
+# Parsear XML de fonte nao-confiavel. `xml.etree.ElementTree` nao resolve
+# entidades externas, mas processa entidades internas: um "billion laughs"
+# craftado pelo utilizador rebenta a memoria. A NF-e chega por upload
+# (`app/views/nfe_auto.py`), portanto o input e' controlado por um
+# autenticado e nao pela Receita Federal — que e' exatamente a situacao em que
+# o parser tem de recusar. Defendido aqui; confirmado por teste.
+defusedxml>=0.7.1,<0.8
+
+# Database
+psycopg2-binary>=2.9,<2.10
+psycopg2-pool>=1.0,<2.0
+
+# Redis & Celery
+redis>=5.0,<5.1
+celery>=5.3,<5.4
+redis-py-cluster>=2.1,<3.0
+
+# Web Server
+gunicorn>=21.0,<22.0
+uvicorn>=0.25,<0.26
+
+# Async
+asgiref>=3.7,<3.8
+channels>=4.0,<5.0
+daphne>=4.0,<5.0
+channels-redis>=4.0,<5.0
+
+# Scientific & Data
+numpy>=1.24,<1.25
+pandas>=2.0,<2.1
+geopandas>=0.14,<0.15
+shapely>=2.0,<2.1
+rasterio>=1.3,<1.4
+gdal>=3.8,<3.9
+pyproj>=3.5,<3.6
+
+# Scientific computing
+scipy>=1.11,<1.12
+scikit-learn>=1.3,<1.4
+scikit-image>=0.21,<0.22
+
+# HTTP & API
+requests>=2.31,<2.32
+httpx>=0.25,<0.26
+aiohttp>=3.9,<3.10
+aiofiles>=23.0,<24.0
+
+# Serialization
+orjson>=3.9,<3.10
+ujson>=5.8,<5.9
+msgpack>=1.0,<1.1
+PyYAML>=6.0,<6.1
+
+# Authentication & Security
+cryptography>=41.0,<42.0
+PyJWT>=2.8,<2.9
+passlib>=1.7,<1.8
+bcrypt>=4.0,<4.1
+cryptography>=41.0,<42.0
+
+# Document Processing
+openpyxl>=3.1,<3.2
+xlrd>=2.0,<2.1
+pdfplumber>=0.10,<0.11
+python-docx>=1.0,<1.1
+pypdf>=3.0,<3.1
+
+# Image Processing
+Pillow>=10.0,<10.1
+opencv-python-headless>=4.8,<4.9
+
+# GIS
+fiona>=1.9,<1.10
+pyogrio>=0.6,<0.7
+
+# Monitoring & Observability
+prometheus-client>=0.18,<0.19
+structlog>=23.0,<24.0
+sentry-sdk>=1.38,<1.39
+opentelemetry-api>=1.20,<1.21
+opentelemetry-sdk>=1.20,<1.21
+opentelemetry-exporter-otlp>=1.20,<1.21
+
+# Message Queues
+kombu>=5.3,<5.4
+pika>=1.3,<1.4
+
+# Caching
+django-redis>=5.0,<5.1
+redis>=5.0,<5.1
+
+# Task Queue
+celery>=5.3,<5.4
+django-celery-beat>=2.5,<2.6
+django-celery-results>=2.5,<2.6
+
+# Scheduling
+APScheduler>=3.10,<3.11
+
+# XML/HTML
+lxml>=4.9,<4.10
+beautifulsoup4>=4.12,<4.13
+html5lib>=1.1,<1.2
+
+# Validation
+pydantic>=2.5,<2.6
+pydantic-settings>=2.0,<2.1
+email-validator>=2.1,<2.2
+
+# Utilities
+python-dateutil>=2.8,<2.9
+pytz>=2023.3,<2024.0
+tzdata>=2023.3,<2024.0
+pytz-deprecation-shim>=0.1,<0.2
+
+# Testing
+pytest>=7.4,<7.5
+pytest-django>=4.5,<4.6
+pytest-cov>=4.1,<4.2
+pytest-mock>=3.11,<3.12
+pytest-xdist>=3.3,<3.4
+factory-boy>=3.3,<3.4
+pytest-cov>=4.1,<4.2
+
+# Linting & Type Checking
+ruff>=0.1.0,<0.2.0
+mypy>=1.5,<1.6
+types-requests>=2.31,<2.32
+types-PyYAML>=6.0,<6.1
+types-pytz>=2023.3,<2024.0
+
+# Frontend
+vite>=5.0,<5.1
+vite-plugin-django>=0.5,<0.6
+
+# Build
+wheel>=0.40,<0.41
+setuptools>=68.0,<69.0
+pip>=23.0,<24.0
+
+# MQTT - telemetria de sensores (opcional, mas o manifesto promete)
+paho-mqtt>=2.0,<3.0
+
+# Testes - property-based testing
+hypothesis>=6.0,<7.0

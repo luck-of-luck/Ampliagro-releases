@@ -1,0 +1,706 @@
+/* LOGIN PAGE — tema claro e escuro.
+ *
+ * Dois grupos de token, por preocupação, não por conflito:
+ *   --auth-*  identidade/cores (tinta, acento, destaque)
+ *   --lc-*    superfícies e estrutura (fundo, painel, borda)
+ * Nenhum grupo referencia o outro; ambos mudam em html.dark. */
+
+/* ── Auth tokens ── */
+:root {
+  --auth-bg-a: #f4f7f2;
+  --auth-ink: #18221e;
+  --auth-muted: #48524d;
+  --auth-line: rgba(24, 34, 30, 0.13);
+  --auth-accent: #137a59;
+  --auth-accent-hover: #13b57f;
+  --auth-water: #1e6f82;
+
+  /* Liquid Crystal Theme Vars - Light */
+  --lc-shell-bg: #e6ede8;
+  --lc-shell-grid: rgba(19, 122, 89, 0.1);
+  --lc-shell-shadow: rgba(0, 0, 0, 0.1);
+  --lc-panel-bg: rgba(255, 255, 255, 0.65);
+  /* Versão opaca do painel. O modal usa esta: com --lc-panel-bg ele deixava
+     os campos e o autofill do navegador aparecerem através do cartão. */
+  --lc-panel-solid: #f7faf7;
+  --lc-panel-border: rgba(19, 122, 89, 0.2);
+  --lc-panel-border-top: rgba(19, 122, 89, 0.4);
+  --lc-input-bg: rgba(255, 255, 255, 0.5);
+  --lc-text-color: #18221e;
+  --lc-placeholder: rgba(24, 34, 30, 0.5);
+  --lc-btn-gradient-a: rgba(19, 122, 89, 0.1);
+  --lc-btn-gradient-b: rgba(19, 122, 89, 0.3);
+}
+html.dark {
+  --auth-bg-a: #08100d;
+  --auth-ink: #edf3ef;
+  --auth-muted: #a1aaa5;
+  --auth-line: rgba(237, 243, 239, 0.14);
+  --auth-accent: #54c996;
+  --auth-water: #6bb7c4;
+
+  /* Liquid Crystal Theme Vars - Dark */
+  --lc-shell-bg: #030605;
+  --lc-shell-grid: rgba(84, 201, 150, 0.04);
+  --lc-shell-shadow: rgba(0, 0, 0, 0.9);
+  --lc-panel-bg: rgba(15, 20, 18, 0.6);
+  --lc-panel-solid: #101614;
+  --lc-panel-border: rgba(84, 201, 150, 0.15);
+  --lc-panel-border-top: rgba(84, 201, 150, 0.4);
+  --lc-input-bg: rgba(255, 255, 255, 0.03);
+  --lc-text-color: #fff;
+  --lc-placeholder: rgba(255, 255, 255, 0.4);
+  --lc-btn-gradient-a: rgba(84, 201, 150, 0.2);
+  --lc-btn-gradient-b: rgba(15, 157, 110, 0.4);
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden !important;
+  height: 100vh !important;
+  font-family: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+  color: var(--auth-ink);
+  background-color: var(--auth-bg-a);
+  background-image: radial-gradient(circle at 15% 50%, rgba(19, 122, 89, 0.15), transparent 25%),
+    radial-gradient(circle at 85% 30%, rgba(30, 111, 130, 0.15), transparent 25%);
+  /* Só a cor. Era `transition: background`, que animava também o
+     background-image — e gradiente não interpola: o browser refazia a pilha de
+     radial-gradients a cada quadro, era o atraso perceived no toggle de tema. */
+  transition: background-color 0.2s ease;
+}
+
+html.dark body {
+  background-color: var(--auth-bg-a) !important;
+  background-image: radial-gradient(circle at 15% 50%, rgba(84, 201, 150, 0.08), transparent 25%),
+    radial-gradient(circle at 85% 30%, rgba(107, 183, 196, 0.08), transparent 25%) !important;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Título e botão dizem explicitamente o próprio espaçamento. Antes o topo do
+   arquivo fazia `letter-spacing: 0 !important` no universo e o botão tentava
+   revidar com `1px !important` — mesma propriedade, duas !important.
+   `.auth-title` declara o seu mais abaixo, junto do resto da regra. */
+.device-mockup h1 {
+  letter-spacing: -0.5px;
+}
+
+.login-layout {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+}
+
+/* ── Left Side (Showcase) ── */
+.showcase-container {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: transparent;
+}
+
+.showcase-item {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  /* Só opacidade, quase instantânea. Sem `scale`: escal forçaria re-rasterizar o
+     título (background-clip:text + text-shadow) a cada quadro. E `visibility`
+     sai em 0s para os dois showcases não ficarem sobrepostos durante o fade. */
+  transition:
+    opacity 0.12s linear,
+    visibility 0s;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.showcase-item.active {
+  opacity: 1;
+  visibility: visible;
+  z-index: 2;
+}
+
+.device-mockup {
+  position: relative;
+  z-index: 3;
+  text-align: center;
+  pointer-events: none;
+  padding: 2rem;
+  transform: translateY(-20px);
+  transition: transform 0.12s linear;
+  width: 100%;
+}
+.showcase-item.active .device-mockup {
+  transform: translateY(0);
+}
+
+.device-mockup h1 {
+  font-family: 'Sora', sans-serif;
+  font-size: 3.5rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--auth-ink) 0%, var(--auth-muted) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0 0 1rem 0;
+  text-shadow: 0 15px 35px rgba(0, 0, 0, 0.8);
+  line-height: 1.1;
+}
+.device-mockup p {
+  font-size: 1.2rem;
+  color: var(--auth-muted);
+  max-width: 500px;
+  margin: 0 auto 3rem auto;
+  text-shadow: 0 4px 10px rgba(0, 0, 0, 0.8);
+}
+
+/* Fake devices for preview */
+.devices-wrapper {
+  position: relative;
+  width: 720px; /* Aumentado para dar espaço */
+  height: 340px;
+  margin: 0 auto;
+}
+.mock-laptop {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 500px;
+  height: 310px;
+  border-radius: 12px 12px 0 0;
+  border: 4px solid #333;
+  border-bottom: 12px solid #222;
+  background: rgba(0, 0, 0, 0.8);
+  box-shadow:
+    0 30px 60px rgba(0, 0, 0, 0.8),
+    inset 0 0 0 2px #000;
+  overflow: hidden;
+}
+.mock-laptop::after {
+  content: '';
+  position: absolute;
+  bottom: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 4px;
+  background: #444;
+  border-radius: 4px 4px 0 0;
+}
+.mock-mobile {
+  position: absolute;
+  right: 0; /* Fica na borda direita do wrapper de 720px */
+  bottom: 0; /* Mesma altura que o laptop (que está em bottom 0) */
+  width: 160px;
+  height: 310px; /* Igualar altura se quiser, mas 310/320 está bom */
+
+  border-radius: 24px;
+  border: 6px solid #222;
+  background: rgba(0, 0, 0, 0.9);
+  box-shadow:
+    -20px 20px 40px rgba(0, 0, 0, 0.9),
+    inset 0 0 0 2px #111;
+  overflow: hidden;
+  z-index: 4;
+}
+.mock-screen {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.85;
+  background-image: linear-gradient(45deg, #111, #222); /* Placeholder se não tiver imagem */
+}
+.mock-screen-produtor-laptop {
+  background: url('https://images.unsplash.com/photo-1586771107445-d3ca888129ff?q=80&w=1000&auto=format&fit=crop')
+    center/cover;
+}
+.mock-screen-produtor-mobile {
+  background: url('https://images.unsplash.com/photo-1512314889357-e157c22f938d?q=80&w=600&auto=format&fit=crop')
+    center/cover;
+}
+
+.mock-screen-servidor-laptop {
+  background: url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1000&auto=format&fit=crop')
+    center/cover;
+}
+.mock-screen-servidor-mobile {
+  background: url('https://images.unsplash.com/photo-1555421689-491a97ff2040?q=80&w=600&auto=format&fit=crop')
+    center/cover;
+}
+
+/* ── Right Side (Auth Shell) ── */
+.auth-shell {
+  width: 480px;
+  padding: 3rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  z-index: 10;
+  background: var(--lc-shell-bg);
+  /* Era uma grade de 30px (duas linear-gradient tileadas). Trocada por um
+     brilho suave em dois cantos: sem repetição, sem serrilhado nas bordas, e
+     reaproveita o mesmo verde de acento que já existe no sistema. */
+  background-image: radial-gradient(120% 80% at 100% 0%, var(--lc-btn-gradient-a), transparent 60%),
+    radial-gradient(90% 60% at 0% 100%, var(--lc-btn-gradient-a), transparent 55%);
+  border-left: 1px solid var(--lc-shell-grid);
+  box-shadow:
+    -30px 0 80px var(--lc-shell-shadow),
+    inset 30px 0 60px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  color: var(--lc-text-color);
+  /* Só as propriedades que mudam no toggle de tema. `transition: all` aqui
+     animava sombra e fundo de 60px a cada quadro da troca de modo. */
+  transition:
+    color 0.3s ease,
+    background-color 0.3s ease;
+}
+
+#painelLogin,
+#painelCadastro {
+  position: relative;
+  border-radius: 20px;
+  border: 1px solid var(--lc-panel-border);
+  border-top: 1px solid var(--lc-panel-border-top);
+  border-left: 1px solid var(--lc-panel-border);
+  box-shadow:
+    0 25px 50px var(--lc-shell-shadow),
+    inset 0 0 30px var(--lc-panel-border);
+  /* Sem backdrop-filter: o fundo atrás do painel é OPACO (--lc-shell-bg é hex
+     sólido nos dois temas), então desfocar esse fundo não mudava um pixel e
+     custava um blur de 30px reamostrado a cada quadro da troca de modo. */
+  background: var(--lc-panel-bg);
+  padding: 2.2rem 2rem;
+  overflow: hidden;
+  /* Sem `transition: all`: o painel não muda de aparência entre os estados
+     (a troca é display:none), então isso só forçava repaint sem efeito visível. */
+}
+
+/* Borda com acento — volta a girar no hover, como estava. */
+@property --angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+@keyframes borderRotate {
+  to {
+    --angle: 360deg;
+  }
+}
+#painelLogin::after,
+#painelCadastro::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  padding: 1.5px;
+  background: conic-gradient(
+    from var(--angle),
+    transparent 0deg,
+    transparent 90deg,
+    var(--auth-water) 180deg,
+    var(--auth-accent) 270deg,
+    transparent 360deg
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  z-index: 5;
+  opacity: 0.8;
+  pointer-events: none;
+  animation: borderRotate 3s linear infinite;
+  animation-play-state: paused;
+}
+#painelLogin:hover::after,
+#painelCadastro:hover::after {
+  animation-play-state: running;
+}
+#painelLogin:hover::after,
+#painelCadastro:hover::after {
+  opacity: 1;
+}
+
+.auth-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--lc-text-color);
+  opacity: 0.85;
+}
+
+#painelLogin input,
+#painelLogin select,
+#painelCadastro input,
+#painelCadastro select {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid var(--lc-panel-border);
+  border-top: 1px solid var(--lc-panel-border-top);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  background: var(--lc-input-bg);
+  color: var(--lc-text-color);
+  padding: 0.85rem 1.2rem;
+  font-size: 1rem;
+  letter-spacing: 0.3px;
+  transition:
+    border-color 0.25s ease,
+    background-color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.25s ease;
+  box-shadow: inset 0 3px 6px var(--lc-shell-shadow);
+}
+#painelLogin input::placeholder,
+#painelCadastro input::placeholder {
+  color: var(--lc-placeholder);
+  font-size: 0.9rem;
+}
+#painelLogin input:focus,
+#painelCadastro input:focus {
+  outline: none;
+  border-color: var(--auth-accent);
+  background: var(--lc-panel-bg);
+  box-shadow:
+    0 0 20px var(--lc-btn-gradient-b),
+    inset 0 3px 6px var(--lc-shell-shadow);
+  transform: translateY(-1px);
+}
+
+.auth-btn-submit {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--lc-panel-border-top);
+  border-top: 1px solid var(--lc-panel-border-top);
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, var(--auth-accent), var(--auth-water));
+  box-shadow:
+    0 0 15px var(--lc-panel-border),
+    inset 0 2px 5px rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    background 0.25s ease,
+    border-color 0.25s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 0.5rem;
+}
+.auth-btn-submit:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 0 25px var(--auth-accent),
+    inset 0 2px 5px rgba(255, 255, 255, 0.4);
+  background: linear-gradient(135deg, var(--auth-accent-hover), var(--auth-water));
+  border-color: var(--auth-accent);
+}
+
+.mini-navbar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+.mini-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid var(--lc-panel-border);
+  background: var(--lc-input-bg);
+  color: var(--lc-text-color);
+  opacity: 0.8;
+  cursor: pointer;
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    color 0.25s ease,
+    box-shadow 0.25s ease,
+    opacity 0.25s ease;
+  /* Sem backdrop-filter: o fundo atrás é opaco, desfocar não mudava nada. */
+}
+.mini-btn.icon-only {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  justify-content: center;
+}
+.mini-btn:hover {
+  background: var(--lc-btn-gradient-a);
+  border-color: var(--lc-panel-border-top);
+  color: var(--lc-text-color);
+  opacity: 1;
+  box-shadow: 0 0 10px var(--lc-panel-border);
+}
+.mini-btn.accent {
+  background: var(--lc-btn-gradient-a);
+  color: var(--auth-accent);
+  border-color: var(--lc-panel-border-top);
+  box-shadow: 0 0 10px var(--lc-shell-grid);
+  opacity: 1;
+}
+.mini-btn.accent:hover {
+  background: var(--lc-btn-gradient-b);
+  border-color: var(--auth-accent);
+  box-shadow: 0 0 15px var(--lc-panel-border);
+}
+
+.auth-forgot {
+  font-size: 0.85rem;
+  font-weight: 500;
+  /* Era rgba(255,255,255,0.5): branco sobre o painel claro deixava o link
+     praticamente invisível. Agora segue o tema. */
+  color: var(--auth-muted);
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--auth-line);
+  transition: color 0.2s ease;
+}
+.auth-forgot:hover {
+  color: var(--auth-accent);
+}
+
+.auth-error {
+  background: rgba(225, 29, 72, 0.15);
+  border: 1px solid rgba(225, 29, 72, 0.3);
+  color: #fb7185;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-align: center;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.auth-title {
+  font-family: 'Sora', sans-serif;
+  font-weight: 700;
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+  /* Era #fff: o "Criar Conta" ficava branco sobre painel claro. */
+  color: var(--lc-text-color);
+  letter-spacing: -0.2px;
+}
+.auth-subtitle {
+  font-size: 0.9rem;
+  color: var(--auth-muted);
+  margin-bottom: 1.5rem;
+}
+
+/* Erro de campo: a classe é usada 3x no formulário de cadastro e não tinha
+   NENHUMA regra — a validação aparecia como texto solto, sem cor. */
+.auth-field-error {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.75rem;
+  color: #d64545;
+}
+
+/* .actions existia no HTML agrupando os botões do topo, sem regra nenhuma:
+   os dois botões ficavam colados, sem o gap de 0.5rem dos outros. */
+.mini-navbar .actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* ── Modal "Esqueci minha senha" ──
+   O cartão era #0f1412 fixo: um retângulo escuro chapado no meio da página,
+   ignorando o tema. O título usava seletor `h5` e o HTML tem `h2` (título sem
+   estilo nenhum), e o botão × (`.modal-close`) não tinha regra nenhuma. */
+#modalEsqueciSenha {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: rgba(8, 16, 13, 0.55);
+  /* Sem backdrop-filter: cobria a tela inteira e repintava a cada quadro. */
+}
+#modalEsqueciSenha.flex {
+  display: flex;
+}
+#modalEsqueciSenha .modal-card {
+  border-radius: 20px;
+  border: 1px solid var(--lc-panel-border);
+  border-top: 1px solid var(--lc-panel-border-top);
+  /* Sólido, não translúcido: em --lc-panel-bg os campos de trás apareciam
+     através do cartão. */
+  background: var(--lc-panel-solid);
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.45);
+  padding: 2rem 2.2rem;
+  width: min(92vw, 420px);
+  color: var(--lc-text-color);
+}
+#modalEsqueciSenha .modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+#modalEsqueciSenha .modal-header h2 {
+  margin: 0;
+  font-family: 'Sora', sans-serif;
+  font-weight: 700;
+  font-size: 1.15rem;
+  line-height: 1.3;
+  color: var(--lc-text-color);
+}
+#modalEsqueciSenha .modal-body p {
+  margin: 0 0 1.25rem;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--auth-muted);
+}
+#modalEsqueciSenha .modal-field {
+  margin-bottom: 1rem;
+}
+#modalEsqueciSenha .modal-field label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--lc-text-color);
+}
+#modalEsqueciSenha .modal-field input {
+  width: 100%;
+  padding: 0.75rem 0.9rem;
+  border-radius: 12px;
+  border: 1px solid var(--lc-panel-border);
+  border-top: 1px solid var(--lc-panel-border-top);
+  background: var(--lc-input-bg);
+  color: var(--lc-text-color);
+  font-size: 0.95rem;
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+#modalEsqueciSenha .modal-field input::placeholder {
+  color: var(--lc-placeholder);
+}
+#modalEsqueciSenha .modal-field input:focus {
+  outline: none;
+  border-color: var(--auth-accent);
+  box-shadow: 0 0 0 3px var(--lc-btn-gradient-b);
+}
+#modalEsqueciSenha .modal-code {
+  text-align: center;
+}
+#modalEsqueciSenha .modal-code input {
+  width: 100%;
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid var(--lc-panel-border);
+  background: var(--lc-input-bg);
+  color: var(--auth-accent);
+  font-size: 1.5rem;
+  text-align: center;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+}
+#modalEsqueciSenha .modal-code input:focus {
+  outline: none;
+  border-color: var(--auth-accent);
+  box-shadow: 0 0 0 3px var(--lc-btn-gradient-b);
+}
+
+/* O × não tinha NENHUMA regra: saía como botão nativo do navegador. */
+.modal-close {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: none;
+  color: var(--auth-muted);
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+.modal-close:hover {
+  background: var(--lc-btn-gradient-a);
+  color: var(--lc-text-color);
+}
+
+#modalEsqueciSenha .modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  margin-top: 1.5rem;
+}
+.modal-btn-cancel,
+.modal-btn-submit {
+  padding: 0.6rem 1.2rem;
+  border-radius: 10px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+.modal-btn-cancel {
+  background: none;
+  border: 1px solid var(--lc-panel-border);
+  color: var(--auth-muted);
+}
+.modal-btn-cancel:hover {
+  border-color: var(--lc-panel-border-top);
+  color: var(--lc-text-color);
+}
+.modal-btn-submit {
+  background: var(--auth-accent);
+  color: #fff;
+}
+.modal-btn-submit:hover {
+  background: var(--auth-accent-hover);
+}
+.modal-btn-submit:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+@media (max-width: 900px) {
+  .login-layout {
+    flex-direction: column;
+  }
+  .showcase-container {
+    display: none;
+  }
+  .auth-shell {
+    width: 100%;
+    max-width: 100%;
+    border-left: none;
+    padding: 2rem 1.5rem;
+  }
+}
+.login-hidden {
+  display: none !important;
+}

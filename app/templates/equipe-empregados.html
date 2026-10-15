@@ -1,0 +1,141 @@
+{% extends base_template %}
+{% load static %}
+
+{% block title %}Ampliagro - Equipe de Empregados{% endblock %}
+
+{% block extra_css %}
+
+{% endblock %}
+
+{% block dashboard_appbar %}{% endblock %}
+
+{% block content %}
+<div class="section-container">
+    <div class="section-header">
+        <h1 class="section-title">Equipe de Empregados</h1>
+        <div>
+            <a href="{% url 'adicionar-funcionario' %}" class="btn-primary btn-sm"><i class="bi bi-person-plus"></i> Novo Funcionario</a>
+            <a href="{% url 'equipe-agenda' %}" class="btn-secondary btn-sm"><i class="bi bi-calendar"></i> Agenda</a>
+            <a href="{% url 'index_spa' %}" class="btn-secondary btn-sm">Voltar ao Dashboard</a>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon" style="color:#15803d;"><i class="bi bi-people"></i></div>
+            <div class="stat-value" style="color:#15803d;" id="total-funcionarios">{{ total_funcionarios|default:"0" }}</div>
+            <div class="stat-label">Total Funcionarios</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="color:#1d4ed8;"><i class="bi bi-person-check"></i></div>
+            <div class="stat-value" style="color:#1d4ed8;" id="total-ativos">{{ total_ativos|default:"0" }}</div>
+            <div class="stat-label">Ativos</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="color:#b45309;"><i class="bi bi-cash-stack"></i></div>
+            <div class="stat-value" style="color:#b45309;" id="custo-total">R$ {{ custo_total_salarios|default:"0,00" }}</div>
+            <div class="stat-label">Custo Total Salarios</div>
+        </div>
+    </div>
+
+    <div class="content-card">
+        <div class="search-bar">
+            <input type="text" id="search-func" placeholder="Buscar por nome ou cargo..." oninput="filtrarFuncionarios()">
+            <span style="font-size:0.75rem;color:#94a3b8;" id="result-count"></span>
+        </div>
+        <div id="func-table-wrap">
+            <div class="empty-state"><i class="bi bi-hourglass" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>Carregando funcionarios...</div>
+        </div>
+    </div>
+</div>
+<div id="toast" class="toast"></div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+function getCSRFToken() { return document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''; }
+function showToast(msg, type) { const t = document.getElementById('toast'); t.textContent = msg; t.className = 'toast toast-' + type + ' show'; setTimeout(() => t.classList.remove('show'), 3000); }
+
+let funcionariosData = [];
+
+function renderTabela(lista) {
+    const wrap = document.getElementById('func-table-wrap');
+    document.getElementById('result-count').textContent = lista.length + ' registro(s)';
+    if (lista.length === 0) {
+        wrap.innerHTML = '<div class="empty-state"><i class="bi bi-inbox" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>Nenhum funcionario encontrado.</div>';
+        return;
+    }
+    wrap.innerHTML =
+        '<div class="table-wrap"><table>' +
+            '<thead><tr>' +
+                '<th>Nome</th><th>Cargo</th><th>Salario</th><th>Admissao</th><th>Ativo</th><th>Acoes</th>' +
+            '</tr></thead><tbody>' +
+            lista.map(function(f) {
+                var ativo = f.ativo ? '<span class="badge badge-yes">Sim</span>' : '<span class="badge badge-no">Nao</span>';
+                var salario = 'R$ ' + (f.salario ? parseFloat(f.salario).toFixed(2) : '0,00');
+                var adm = f.data_admissao ? new Date(f.data_admissao).toLocaleDateString("pt-BR") : '-';
+                var cargo = f.cargo_display || f.cargo || '-';
+                return '<tr>' +
+                    '<td><strong>' + (f.nome || '') + '</strong></td>' +
+                    '<td>' + cargo + '</td>' +
+                    '<td>' + salario + '</td>' +
+                    '<td>' + adm + '</td>' +
+                    '<td>' + ativo + '</td>' +
+                    '<td><div class="action-cell">' +
+                        '<button class="btn-secondary btn-sm" onclick="editarFuncionario(' + f.id + ')">Editar</button>' +
+                        '<button class="btn-danger btn-sm" onclick="excluirFuncionario(' + f.id + ')">Excluir</button>' +
+                    '</div></td>' +
+                '</tr>';
+            }).join('') +
+            '</tbody></table></div>';
+}
+
+function filtrarFuncionarios() {
+    var q = document.getElementById('search-func').value.toLowerCase();
+    var filtered = q ? funcionariosData.filter(function(f) {
+        return (f.nome || '').toLowerCase().indexOf(q) > -1 ||
+               (f.cargo || '').toLowerCase().indexOf(q) > -1 ||
+               (f.cargo_display || '').toLowerCase().indexOf(q) > -1;
+    }) : funcionariosData;
+    renderTabela(filtered);
+}
+
+function atualizarStats(lista) {
+    var total = lista.length;
+    var ativos = lista.filter(function(f) { return f.ativo; }).length;
+    var custo = lista.reduce(function(acc, f) { return acc + (parseFloat(f.salario) || 0); }, 0);
+    document.getElementById('total-funcionarios').textContent = total;
+    document.getElementById('total-ativos').textContent = ativos;
+    document.getElementById('custo-total').textContent = 'R$ ' + custo.toFixed(2);
+}
+
+function carregarFuncionarios() {
+    fetch('/api/funcionarios/')
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            funcionariosData = data;
+            renderTabela(data);
+            atualizarStats(data);
+        })
+        .catch(function(e) {
+            document.getElementById('func-table-wrap').innerHTML = '<div class="empty-state"><i class="bi bi-exclamation-triangle" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>Erro ao carregar: ' + e.message + '</div>';
+        });
+}
+
+function editarFuncionario(id) {
+    window.location.href = '{% url "cadastro-funcionario" %}?edit=' + id;
+}
+
+function excluirFuncionario(id) {
+    if (!confirm('Excluir este funcionario?')) return;
+    fetch('/api/funcionarios/' + id + '/', { method: 'DELETE', headers: { 'X-CSRFToken': getCSRFToken() } })
+        .then(function(r) {
+            if (r.ok) { showToast('Funcionario excluido', 'success'); carregarFuncionarios(); }
+            else { showToast('Erro ao excluir', 'error'); }
+        });
+}
+
+document.addEventListener('DOMContentLoaded', carregarFuncionarios);
+</script>
+{% endblock %}

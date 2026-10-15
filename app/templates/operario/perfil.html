@@ -1,0 +1,118 @@
+{% extends base_template %}
+{% load static %}
+
+{% block title %}Ampliagro - Meu Perfil{% endblock %}
+
+{% block extra_css %}
+
+{% endblock %}
+
+{% block dashboard_appbar %}{% endblock %}
+
+{% block scripts %}{{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="perfil-container">
+    <div class="perfil-header">
+        <h1 class="perfil-title"><i class="bi bi-person-circle"></i> Meu Perfil</h1>
+        <a href="{% url 'operario-kanban' %}" class="btn-secondary"><i class="bi bi-kanban"></i> Tarefas</a>
+    </div>
+
+    <div class="perfil-card">
+        <div class="perfil-avatar">
+            {% if funcionario.foto %}
+            <img src="{{ funcionario.foto.url }}" alt="{{ funcionario.nome }}">
+            {% else %}
+            <i class="bi bi-person"></i>
+            {% endif %}
+        </div>
+        <div class="perfil-name">{{ funcionario.nome }}</div>
+        <div class="perfil-role">{{ funcionario.get_cargo_display }}</div>
+
+        <div class="perfil-stats">
+            <div class="stat-item">
+                <div class="stat-value">{{ funcionario.data_admissao|date:"d/m/Y" }}</div>
+                <div class="stat-label">Admissão</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">{{ funcionario.carga_horaria|default:"-" }}h</div>
+                <div class="stat-label">Carga Horária</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">{{ funcionario.propriedade.nome }}</div>
+                <div class="stat-label">Propriedade</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="perfil-card">
+        <h2><i class="bi bi-person-vcard"></i> Dados Pessoais</h2>
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="label">CPF</span>
+                <span class="value">{{ funcionario.cpf|default:"-" }}</span>
+            </div>
+            <div class="info-item">
+                <span class="label">RG</span>
+                <span class="value">{{ funcionario.rg|default:"-" }}</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Data de Nascimento</span>
+                <span class="value">{% if funcionario.data_nascimento %}{{ funcionario.data_nascimento|date:"d/m/Y" }}{% else %}-{% endif %}</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Telefone</span>
+                <span class="value">{{ funcionario.telefone|default:"-" }}</span>
+            </div>
+            <div class="info-item">
+                <span class="label">E-mail</span>
+                <span class="value">{{ funcionario.email|default:"-" }}</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Endereço</span>
+                <span class="value">{{ funcionario.endereco|default:"-" }}</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Cidade/UF</span>
+                <span class="value">{% if funcionario.cidade %}{{ funcionario.cidade }}{% if funcionario.estado %} - {{ funcionario.estado }}{% endif %}{% else %}-{% endif %}</span>
+            </div>
+            <div class="info-item">
+                <span class="label">CEP</span>
+                <span class="value">{{ funcionario.cep|default:"-" }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="perfil-card">
+        <h2><i class="bi bi-shield-check"></i> EPIs</h2>
+        <div class="epi-list">
+            {% for epi in funcionario.epis %}
+            <span class="epi-tag"><i class="bi bi-check-circle-fill"></i> {{ epi }}</span>
+            {% empty %}
+            <span style="color:#94a3b8;font-size:0.875rem;">Nenhum EPI registrado</span>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="perfil-card">
+        <h2><i class="bi bi-telephone"></i> Contato de Emergência</h2>
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="label">Nome</span>
+                <span class="value">{{ funcionario.contato_emergencia|default:"-" }}</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Telefone</span>
+                <span class="value">{{ funcionario.telefone_emergencia|default:"-" }}</span>
+            </div>
+        </div>
+    </div>
+
+    {% if funcionario.observacoes %}
+    <div class="perfil-card">
+        <h2><i class="bi bi-text-left"></i> Observações</h2>
+        <p style="font-size:0.875rem;color:#334155;line-height:1.6;">{{ funcionario.observacoes }}</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

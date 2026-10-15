@@ -1,0 +1,91 @@
+/*
+ * auto-contraste.css — aplica a cor de texto calculada em runtime.
+ *
+ * O script auto-contraste.js le o fundo REAL do elemento (inclusive as paradas
+ * de um gradiente), calcula a razao de contraste WCAG e escreve tres variaveis:
+ *
+ *   --texto-auto      cor de texto escolhida (clara ou escura)
+ *   --sombra-auto     sombra de apoio, necessaria quando ha gradiente com tom
+ *                     intermediario (onde nenhuma cor plana atinge 4.5:1)
+ *   --contraste-auto   a razao medida, para inspecao em devtools
+ *
+ * E marca data-contraste-ok="sim" | "largo" | "fraco".
+ *
+/*
+ * O script escreve a variavel; esta regra e o que a torna EFEITO. Sem ela o
+ * motor calcula a cor certa e nada acontece — foi exatamente o que o primeiro
+ * teste revelou (--texto-auto=rgb(17,24,39) no elemento, cor pintada
+ * rgb(233,238,236)).
+ *
+ * `opacity:1` e proposital: varias surfaces usavam opacity:.88~.92 para
+ * "suavizar" texto secundario. Opacidade reduz o contraste DE FATO, e o motor
+ * nao a enxerga ao medir. O controle de leveza fica com o motor, que escolhe a
+ * cor de maior razao; quem quiser texto mais suave escolhe um tom, nao alpha.
+ */
+[data-auto-contraste] {
+  color: var(--texto-auto);
+  text-shadow: var(--sombra-auto, none);
+  opacity: 1;
+}
+
+/* Quem quiser vencer o motor usa especificidade maior ou !important — este
+   bloco nao esta em :where(), entao nao ganha de um seletor de classe. */
+.servidor-hero {
+  color: var(--texto-auto, #fff);
+  text-shadow: var(--sombra-auto, none);
+}
+
+/* `.servidor-hero p { opacity:.92 }` existe no extracted-components.css e tem
+   especificidade (0,1,1) — maior que [data-auto-contraste] (0,1,0), entao
+   venceria e voltaria a baixar o contraste. Aqui fica no mesmo nivel. */
+.servidor-hero h1,
+.servidor-hero p,
+.servidor-hero .hero-sub {
+  color: inherit;
+  text-shadow: inherit;
+  opacity: 1;
+}
+
+/* O codigo de permissoes e o badge de area tem fundo proprio: o motor
+   escolheu a cor do HERO, nao a deles. Eles vao escurecer/clarear junto. */
+.servidor-hero code {
+  color: inherit;
+  background: rgba(0, 0, 0, 0.22);
+  text-shadow: none;
+}
+
+.servidor-hero .badge-area {
+  /* fundo branco fixo do template: texto escuro e sempre legivel aqui */
+  color: #0f172a;
+  text-shadow: none;
+}
+
+/*
+ * Cuando o motor marca o contraste como "fraco" (< 3:1), a surface ganha um
+ * véu sutil atrás do conteúdo. É o único jeito de garantir legibilidade sobre
+ * gradientes de tom intermediário, onde nem branco nem preto puro passam de
+ * ~3.2:1 em toda a extensão.
+ */
+[data-contraste-ok="fraco"] {
+  position: relative;
+}
+
+[data-contraste-ok="fraco"] > * {
+  position: relative;
+  z-index: 1;
+}
+
+[data-contraste-ok="fraco"]::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: rgba(0, 0, 0, 0.28);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Variante clara: o véu precisa ser branco, não preto. */
+[data-contraste-ok="fraco"][data-fundo-claro="1"]::before {
+  background: rgba(255, 255, 255, 0.3);
+}

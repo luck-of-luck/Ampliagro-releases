@@ -1,0 +1,294 @@
+{% extends "partials/_premium_cadastro_base.html" %}
+{% load static agro_icons %}
+
+{% block title %}Ampliagro - Propriedades / Fazendas{% endblock %}
+
+{% block cadastro_icon %}bi bi-house{% endblock %}
+{% block cadastro_title %}Propriedades / Fazendas{% endblock %}
+{% block cadastro_novo_title %}Nova Propriedade{% endblock %}
+{% block cadastro_lista_title %}Propriedades Cadastradas{% endblock %}
+
+{% block cadastro_subtabs %}
+<div class="pcrud-subtabs" id="cadastroSubTabs">
+    <button class="pcrud-subtab active" data-tab="novo">Nova Propriedade</button>
+    <button class="pcrud-subtab" data-tab="lista">Minhas Propriedades</button>
+</div>
+{% endblock %}
+
+{% block cadastro_stats %}
+<div class="pcrud-stats" id="cadastroStats">
+    <div class="pcrud-stat"><div class="pcrud-stat-label">Total Propriedades</div><div class="pcrud-stat-value" id="statTotalProps">{{ propriedades|length }}</div></div>
+    <div class="pcrud-stat"><div class="pcrud-stat-label">Área Total (ha)</div><div class="pcrud-stat-value" id="statAreaTotal">{{ area_total|floatformat:2 }}</div></div>
+    <div class="pcrud-stat"><div class="pcrud-stat-label">Estados (UF)</div><div class="pcrud-stat-value" id="statUfs">{{ ufs_count }}</div></div>
+    <div class="pcrud-stat"><div class="pcrud-stat-label">Biomas</div><div class="pcrud-stat-value" id="statBiomas">{{ biomas_count }}</div></div>
+</div>
+{% endblock %}
+
+{% block cadastro_form_novo %}
+<form id="propriedade-form" onsubmit="return submitPropriedade(event)">
+    {% csrf_token %}
+    <div class="pcrud-form-grid">
+        <div class="pcrud-form-group">
+            <label>Nome da Propriedade</label>
+            <input type="text" name="nome" placeholder="Ex: Fazenda Boa Esperança" required onblur="validateField(this)">
+        </div>
+        <div class="pcrud-form-group">
+            <label>Área Total (ha)</label>
+            <input type="number" step="0.01" name="area_total" required placeholder="0,00" onblur="validateField(this)">
+        </div>
+        <div class="pcrud-form-group">
+            <label>UF</label>
+            <select name="uf" required onblur="validateField(this)">
+                <option value="">Selecione...</option>
+                <option value="AC">AC</option>
+                <option value="AL">AL</option>
+                <option value="AP">AP</option>
+                <option value="AM">AM</option>
+                <option value="BA">BA</option>
+                <option value="CE">CE</option>
+                <option value="DF">DF</option>
+                <option value="ES">ES</option>
+                <option value="GO">GO</option>
+                <option value="MA">MA</option>
+                <option value="MT">MT</option>
+                <option value="MS">MS</option>
+                <option value="MG">MG</option>
+                <option value="PA">PA</option>
+                <option value="PB">PB</option>
+                <option value="PR">PR</option>
+                <option value="PE">PE</option>
+                <option value="PI">PI</option>
+                <option value="RJ">RJ</option>
+                <option value="RN">RN</option>
+                <option value="RS">RS</option>
+                <option value="RO">RO</option>
+                <option value="RR">RR</option>
+                <option value="SC">SC</option>
+                <option value="SP">SP</option>
+                <option value="SE">SE</option>
+                <option value="TO">TO</option>
+            </select>
+        </div>
+        <div class="pcrud-form-group">
+            <label>Cidade</label>
+            <input type="text" name="cidade" placeholder="Ex: Rio Verde">
+        </div>
+        <div class="pcrud-form-group" style="grid-column:span 2;">
+            <label>Endereço</label>
+            <textarea name="endereco" rows="2" placeholder="Endereço completo da propriedade"></textarea>
+        </div>
+        <div class="pcrud-form-group">
+            <label>Bioma</label>
+            <select name="bioma">
+                <option value="">Selecione...</option>
+                <option value="amazonia">Amazônia</option>
+                <option value="cerrado">Cerrado</option>
+                <option value="mata_atlantica">Mata Atlântica</option>
+                <option value="caatinga">Caatinga</option>
+                <option value="pampa">Pampa</option>
+                <option value="pantanal">Pantanal</option>
+            </select>
+        </div>
+        <div class="pcrud-form-group">
+            <label>Moeda</label>
+            <input type="text" name="moeda" value="BRL" readonly style="background:var(--cor-fundo-card);color:var(--cor-texto-fraco);">
+        </div>
+    </div>
+
+    <!-- Seção: Configurações Fiscais (LCDPR) -->
+    <div style="margin-top: 30px; margin-bottom: 20px;">
+        <h3 style="font-size: 1.1rem; color: var(--cor-texto-forte); margin-bottom: 10px; border-bottom: 1px solid var(--cor-borda); padding-bottom: 5px;">
+            <i class="bi bi-file-earmark-bar-graph"></i> Configurações Fiscais (LCDPR)
+        </h3>
+        <p style="font-size: 0.85rem; color: var(--cor-texto-medio); margin-bottom: 15px;">
+            Estes campos são obrigatórios apenas se você for emitir o Livro Caixa Digital do Produtor Rural pela plataforma.
+        </p>
+
+        <div class="pcrud-form-grid">
+            <div class="pcrud-form-group">
+                <label>CPF ou CNPJ</label>
+                <input type="text" name="cpf_cnpj" placeholder="Documento do titular">
+            </div>
+
+            <div class="pcrud-form-group">
+                <label>CAEPF</label>
+                <input type="text" name="caepf" placeholder="Apenas números">
+            </div>
+
+            <div class="pcrud-form-group">
+                <label>Inscrição Estadual (IE)</label>
+                <input type="text" name="inscricao_estadual" placeholder="IE da Fazenda">
+            </div>
+
+            <!--
+                MEDIDO 2026-10-05: estes quatro campos NAO existiam no ecra, e o
+                LCDPR exige tres deles.
+
+                O Manual de Preenchimento do LCDPR 1.3 (Receita Federal, secção
+                3.3) marca `COD_MUN` e `CEP` como **Sim** nos registos `0030` e
+                `0040`. Sem eles a Receita recusa o ficheiro — e o produtor
+                descobria-o na entrega, em Abril.
+
+                A API ja aceitava os campos (o serializer foi corrigido no mesmo
+                dia). O que faltava era o **ecra**: a regra escrevia nos cinco
+                campos, e nao havia forma de os preencher. Um guarda que
+                aponta um campo que ninguem consegue escrever e' um guarda que
+                ninguem cumpre.
+            -->
+            <div class="pcrud-form-group">
+                <label>Bairro</label>
+                <input type="text" name="bairro" placeholder="Bairro ou distrito">
+            </div>
+
+            <div class="pcrud-form-group">
+                <label>Código do Município (IBGE)</label>
+                <!--
+                    inputmode="numeric" e pattern: o produtor escreve no
+                    teclado do telefone, e um codigo de 7 digitos nao leva
+                    letras. `pattern` da uma mensagem do proprio navegador,
+                    que e' mais util do que um erro de validacao no servidor.
+                -->
+                <input type="text" name="cod_municipio" inputmode="numeric" pattern="[0-9]{7}" maxlength="7"
+                       placeholder="Ex: 5103403" title="Código IBGE do município, 7 dígitos. Não é o nome da cidade.">
+            </div>
+
+            <div class="pcrud-form-group">
+                <label>CEP</label>
+                <input type="text" name="cep" inputmode="numeric" pattern="[0-9]{8}" maxlength="9"
+                       placeholder="Ex: 78000-000" title="8 dígitos. Pode escrever com ou sem hifen — o ficheiro fiscal leva só os dígitos.">
+            </div>
+
+            <div class="pcrud-form-group">
+                <label>Telefone</label>
+                <input type="text" name="telefone" inputmode="tel" placeholder="DDD + número">
+            </div>
+
+            <!--
+                CAD_ITR e' o codigo do IMOVEL no Cadastro Imobiliario Nacional, e
+                **nao** e' o CAEPF em cima: esse identifica a atividade da pessoa
+                fisica (IN RFB 1.828/2018), este identifica o imovel. Sao dois
+                registos diferentes, e trocar um pelo outro produz um ficheiro
+                recusado.
+            -->
+            <div class="pcrud-form-group">
+                <label>CAD_ITR (código do imóvel)</label>
+                <input type="text" name="cad_itr" inputmode="numeric" maxlength="8"
+                       placeholder="8 dígitos, com DV" title="Código do imóvel no Cadastro Imobiliario Nacional. Não é o CAEPF.">
+            </div>
+
+            <div class="pcrud-form-group">
+                <label>Tipo de Exploração (Reg 0040)</label>
+                <select name="tipo_exploracao">
+                    <option value="1">Exploração Individual (1)</option>
+                    <option value="2">Condomínio (2)</option>
+                    <option value="3">Imóvel Arrendado (3)</option>
+                    <option value="4">Parceria (4)</option>
+                    <option value="5">Comodato (5)</option>
+                    <option value="6">Outros (6)</option>
+                </select>
+            </div>
+
+            <div class="pcrud-form-group">
+                <label>Participação (%)</label>
+                <input type="number" step="0.01" name="participacao" value="100.00" placeholder="100.00">
+            </div>
+        </div>
+    </div>
+    <div class="pcrud-form-actions">
+        <button type="submit" class="pcrud-btn pcrud-btn-primary"><i class="bi bi-check-lg"></i> Salvar Propriedade</button>
+        <button type="reset" class="pcrud-btn pcrud-btn-secondary">Limpar</button>
+    </div>
+</form>
+{% endblock %}
+
+{% block cadastro_tab_lista %}
+{% if propriedades %}
+<div class="pcrud-table-wrap">
+    <table class="pcrud-table">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Área (ha)</th>
+                <th>UF/Cidade</th>
+                <th>Bioma</th>
+                <th>Moeda</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in propriedades %}
+            <tr>
+                <td><strong>{{ p.nome }}</strong></td>
+                <td>{{ p.area_total|floatformat:2 }}</td>
+                <td>{{ p.uf }}{% if p.cidade %} / {{ p.cidade }}{% endif %}</td>
+                <td>{{ p.get_bioma_display|default:"—" }}</td>
+                <td>{{ p.moeda }}</td>
+                <td>
+                    <div class="action-cell">
+                        <button class="pcrud-btn pcrud-btn-secondary pcrud-btn-sm" onclick="editarPropriedade({{ p.id }})"><i class="bi bi-pencil"></i> Editar</button>
+                        <button class="pcrud-btn pcrud-btn-danger pcrud-btn-sm" onclick="excluirPropriedade({{ p.id }})"><i class="bi bi-trash"></i> Excluir</button>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+{% include "partials/_empty_state_cta.html" with empty_icone="bi bi-geo" empty_titulo="Nenhuma propriedade cadastrada" empty_descricao="Cadastre a propriedade para vincular talhoes, safras, maquinas e LCDPR." empty_acao="Cadastrar propriedade" empty_aba="novo" %}
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+(function() {
+    window.submitPropriedade = async function(event) {
+        event.preventDefault();
+        if (!validateForm('propriedade-form')) { showToast('Corrija os campos em destaque', 'error'); return false; }
+        const f = document.getElementById('propriedade-form');
+        const data = {
+            nome: f.nome.value,
+            area_total: parseFloat(f.area_total.value),
+            uf: f.uf.value,
+            cidade: f.cidade.value || '',
+            endereco: f.endereco.value || '',
+            bioma: f.bioma.value || '',
+            moeda: f.moeda.value || 'BRL',
+            // MEDIDO 2026-10-05: os campos fiscais NAO eram enviados. Os inputs
+            // existiam a partir desta mesma correccao, mas sem estas linhas o
+            // navegador nunca os mandava — e o produtor preenchia um campo que
+            // sumia ao guardar.
+            //
+            // `replace(/\D/g, '')` e' o mesmo cuidado do `CAD_ITR`: o ficheiro
+            // fiscal leva so digitos, e um hifen no CEP e' recusado. aqui
+            // normaliza-se **antes** de enviar, e o utilizador ve o que ficou.
+            cpf_cnpj: f.cpf_cnpj.value || '',
+            caepf: (f.caepf.value || '').replace(/\D/g, ''),
+            inscricao_estadual: f.inscricao_estadual.value || '',
+            tipo_exploracao: f.tipo_exploracao.value || '1',
+            participacao: parseFloat(f.participacao.value) || 100.0,
+            bairro: f.bairro.value || '',
+            cod_municipio: (f.cod_municipio.value || '').replace(/\D/g, ''),
+            cep: (f.cep.value || '').replace(/\D/g, ''),
+            telefone: (f.telefone.value || '').replace(/\D/g, ''),
+            cad_itr: (f.cad_itr.value || '').replace(/\D/g, ''),
+        };
+        const btn = f.querySelector('.pcrud-btn-primary'); showLoading(btn);
+        try {
+            const resp = await fetch('/api/propriedades/', { method:'POST', headers:{'Content-Type':'application/json','X-CSRFToken':getCSRFToken()}, body: JSON.stringify(data) });
+            if (resp.ok) { showToast('Propriedade cadastrada!','success'); setTimeout(() => location.reload(), 800); }
+            else { const err = await resp.json(); showToast('Erro: '+JSON.stringify(err),'error'); }
+        } catch(e) { showToast('Erro: '+e.message,'error'); } finally { hideLoading(btn); }
+        return false;
+    };
+
+    window.excluirPropriedade = function(id) {
+        if (!confirm('Excluir esta propriedade?')) return;
+        fetch('/api/propriedades/'+id+'/', { method:'DELETE', headers:{'X-CSRFToken':getCSRFToken()} })
+            .then(r => { if(r.ok){ showToast('Excluída','success'); setTimeout(() => location.reload(), 500); } else showToast('Erro','error'); });
+    };
+
+})();
+</script>
+{% endblock %}

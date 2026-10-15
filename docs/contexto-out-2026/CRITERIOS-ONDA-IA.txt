@@ -1,0 +1,134 @@
+==========================================================================
+Os 8 criterios do video aplicados ao Ampliagro
+Fonte: descricao do video (titulos dos criterios, sem transcricao)
+==========================================================================
+
+CRITERIO 1 - o orcamento ja existe?
+  'o cliente ja paga por isso hoje?'
+
+  MEDIDO no repo:
+    - ha 'orcamento' em ANY model?
+
+    modelos de orcamento/assinatura: ['app/ia/tests_palco.py', 'app/models/palco.py']
+    modelo de preco/plano:            ['app/ia/tests_palco.py', 'app/models/palco.py', 'app/models/safra.py']
+
+  VEREDITO: o orcamento EXISTE no mercado (contabilidade, NF-e, LCDPR,
+  CFO agricola) mas o Ampliagro NAO o cobra: nao ha preco, plano nem
+  checkout no repo. O orcamento e' uma ticao nao-accionada.
+
+CRITERIO 2 - o incumbente consegue reagir sem se destruir?
+
+    dominios que o incumbent tambem faz: ['Auditoria', 'Contabil', 'Custeio', 'LCDPR', 'NF-e', 'NFe', 'SEFAZ']
+    'SEFAZ' em app/*.py: 11 ocorrencia(s)
+      em comentario:       0
+      dentro de docstring: 11
+      em CODIGO:           0
+      -> ZERO. Nenhuma chamada de API, nenhuma URL, nenhum import
+         de biblioteca SEFAZ. Todas as ocorrencias sao texto a
+         explicar a falta - por isso 'grep sefaz' > 0 nao prova que
+         a integracao existe.
+
+  VEREDITO: PARCIAL. O Ampliagro tem o registo agricola (safra, talhao,
+  aplicacao) que o contador NAO tem, mas nao tem a parte que o contador
+  cobra: nenhuma integracao SEFAZ, nenhum envio de NF-e. Sem isso o
+  contador mantem o lucro e o produtor fica com um dashboard.
+
+CRITERIO 3 - o problema e' caro o suficiente pra doer?
+
+  MEDIDO: a resposta honesta esta no proprio codigo.
+
+    - LCDPR implementado e a validar campos?  ver app/services/lcdpr*.py
+    - orcamento x REALIZADO por talhao?        ver app/services/custo_talhao.py
+
+    app/services/lcdpr.py: existe (193 linhas)
+    app/services/lcdpr_export.py: existe (1068 linhas)
+    app/services/custo_talhao.py: existe (468 linhas)
+
+  VEREDITO: SIM, dói. Um produtor que descobre que gastou 25% a mais
+  do que orcadou na safra sobe na hora - e este e' o calculo que fizeste.
+  A dor e' real E o produto faz o calculo. E' o criterio mais forte do
+  Ampliagro, e ja esta feito.
+
+CRITERIO 4 - quanto do trabalho a IA pode assumir sozinha?
+
+    intents catalogadas: 27
+   ativity: existe AmplIA (sandbox), motor proativo, e MCP em app/amplia_mcp/
+  VEREDITO: PARCIAL-FORTE. A AMPLIA existe, tem intents, confirmacao,
+  proveniencia e modo proativo. O que falta e' a parte que o video diz
+  ser O CRITERIO: agentes que EXECUTAM de forma autonoma, com humano
+  em vez de confirmacao por intent. Hoje cada write passa por confirm.
+
+CRITERIO 5 - como saber se o resultado da IA e' bom?
+
+  'se o cliente nao consegue avaliar, nao ha produto'
+
+    app/ia/proveniencia.py: existe
+    app/validators.py:       existe
+    NOTA: dois vocabularios de proveniencia nao reconciliados
+           (validators = 5 estados; proveniencia = 6, com 'simulado')
+
+  VEREDITO: SIM, e e' a parte mais forte do codebase. O LCDPR,
+  proveniencia e o `None` vs `0` sao evidencia de que o produtor
+  consegue avaliar a resposta. O que FALTA e' um numero comparavel a
+  outro: um score de confianca que o produtor veja antes de confiar.
+
+CRITERIO 6 - a IA te deixa 10x melhor em que?
+
+  'Peter Thiel: 10x melhor, ou nao comece'
+
+  MEDIDO - o que ja e' 10x:
+    LCDPR: 9 registos, validacao de campos, geracao de ficheiro
+    orcamento x realizado com N+1 eliminado (121 queries -> 3)
+    revogacao de chaves, IoT zero-trust
+  MEDIDO - o que e' 1x (ou pior):
+    o produtor tem de LIGAR cada lancamento ao talhao a mao
+    o orcamento e' por talhao, nao por lavoura/operacao
+    a UI de orcado x realizado NAO EXISTE (so ha o servico)
+
+  VEREDITO: PARCIAL. O motor e' 10x. O PRODUTO QUE O PRODUTOR VE
+  ainda nao - falta a tela que compara orcado e realizado lado a lado,
+  que e' a unica coisa que faz a conta virar accao.
+
+CRITERIO 7 - seu negocio melhora conforme cresce?
+
+  'ou voce vai ser mais uma empresa de servicos'
+
+  MEDIDO:
+    -IA por propriedade (multi-tenant) existe?  ver app/models, middleware
+    -custo por hectare = escalavel por area?      ver custo_talhao.py
+    -o custo de servir mais um produtor?     SEM DADO - nao medido
+
+  VEREDITO: PARCIAL. Multi-tenant existe, e o custo por hectare E' a
+  metrica que escala (a mesma conta serve 5 ou 500 talhoes). Mas nao ha
+  nada no repo que diga quanto custa serving um produtor a mais.
+
+CRITERIO 8 - a regulacao te protege ou te trava?
+
+  MEDIDO:
+    -NF-e: importacao existe; emissao SEFAZ NAO
+    -LCDPR: implementado e validado (a RFB e' o unico regulador que o
+     produtor tem mesmo; nao e' opcional)
+    -certificacao de software agricola: SEM DADO
+
+  VEREDITO: A RFB NAO E' TRAVA - E' O PRODUTO. Um produtor nao pode
+  emitir LCDPR sem sistema, e sem o sistema nao tem como provar o que
+  gastou quando precisa de auditar. A regulacao OBRIGA o produto a
+  existir - e o criterio mais defensavel do negocio inteiro.
+
+==========================================================================
+O TESTE FINAL DO VIDEO: 'voce tem TECNOLOGIA ou uma EMPRESA DE SERVICOS?'
+==========================================================================
+
+  A resposta honesta, medida:
+
+  - TECNOLOGIA: o motor (LCDPR, custo, proveniencia, PWA, IoT)
+    e' real, testado e nao depende de quantas pessoas o usem.
+  - EMPRESA DE SERVICOS: a camada de VENDA e' inexistente. Sem preco,
+    sem plano, sem checkout, sem API para terceiro.
+
+  Ou seja: construiu-se a TECNOLOGIA e nao se construiu o NEGOCIO que a
+  tecnologia sustenta. O videospent o video com 'resultado, nao
+  ferramenta' - e o resultado ('a sua safra lucrou 30% a mais este
+  ano') ainda nao esta a ser vendido por ninguem.
+
+==========================================================================

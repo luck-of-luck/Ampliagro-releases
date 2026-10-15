@@ -1,0 +1,105 @@
+{% extends base_template %}
+{% load static agro_icons %}
+{# Base template para cadastros no padrão Premium (esmeralda/branco/preto). #}
+
+{% block extra_css %}
+{% include "partials/_premium_cadastro_styles.html" %}
+{% endblock %}
+
+{% block dashboard_appbar %}{% endblock %}
+
+{% block content %}
+<div class="pcrud-container">
+    <div class="pcrud-header">
+        <h1 class="pcrud-title"><i class="{% block cadastro_icon %}bi bi-database{% endblock %}"></i> {% block cadastro_title %}Cadastro{% endblock %}</h1>
+        <a href="{% url 'index_spa' %}" class="pcrud-btn pcrud-btn-secondary pcrud-btn-sm"><i class="bi bi-speedometer2"></i> Dashboard</a>
+    </div>
+
+    {% block cadastro_subtabs %}
+    <div class="pcrud-subtabs" id="cadastroSubTabs">
+        <button class="pcrud-subtab active" data-tab="novo">Novo</button>
+        <button class="pcrud-subtab" data-tab="lista">Lista</button>
+    </div>
+    {% endblock %}
+
+    {% block cadastro_stats %}
+    <div class="pcrud-stats">
+        <div class="pcrud-stat"><div class="pcrud-stat-label">Total</div><div class="pcrud-stat-value">—</div></div>
+        <div class="pcrud-stat"><div class="pcrud-stat-label">Ativos</div><div class="pcrud-stat-value">—</div></div>
+        <div class="pcrud-stat"><div class="pcrud-stat-label">Este Mês</div><div class="pcrud-stat-value">—</div></div>
+        <div class="pcrud-stat"><div class="pcrud-stat-label">Valor Total</div><div class="pcrud-stat-value">—</div></div>
+    </div>
+    {% endblock %}
+
+    <!-- Tab: Novo -->
+    <div class="pcrud-tab active" id="tab-novo">
+        <h2><i class="bi bi-plus-circle"></i> {% block cadastro_novo_title %}Novo Registro{% endblock %}</h2>
+        <div class="pcrud-form-card">
+            {% block cadastro_form_novo %}{% endblock %}
+        </div>
+    </div>
+
+    <!-- Tab: Lista -->
+    <div class="pcrud-tab" id="tab-lista">
+        <h2><i class="bi bi-list-ul"></i> {% block cadastro_lista_title %}Registros Cadastrados{% endblock %}</h2>
+        <div class="pcrud-form-card" style="padding:0;">
+            {% block cadastro_tab_lista %}{% endblock %}
+        </div>
+    </div>
+
+    {% block cadastro_extra_tabs %}{% endblock %}
+</div>
+
+<div id="toast" class="pcrud-toast"></div>
+{% include "partials/_confirm_modal.html" %}
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="{% static 'js/cadastro.js' %}?v=20260918b"></script>
+<script>
+(function() {
+    // Sub-tabs
+    const tabs = document.querySelectorAll('.pcrud-subtab');
+    const tabContents = document.querySelectorAll('.pcrud-tab');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => t.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
+            tab.classList.add('active');
+            document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+        });
+    });
+
+    // Validation helpers
+    window.validateField = function(el) {
+        const val = (el.value || '').trim();
+        if (el.hasAttribute('required') && !val) { el.classList.add('error'); return false; }
+        el.classList.remove('error'); return true;
+    };
+    window.validateForm = function(formId) {
+        const form = document.getElementById(formId);
+        let ok = true;
+        form.querySelectorAll('[required]').forEach(el => { if (!validateField(el)) ok = false; });
+        return ok;
+    };
+    window.showToast = function(msg, type='success') {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.className = 'pcrud-toast show pcrud-toast-' + type;
+        clearTimeout(t._hide);
+        t._hide = setTimeout(() => t.classList.remove('show'), 3500);
+    };
+    window.showLoading = function(btn) {
+        btn.disabled = true; btn.dataset.txt = btn.innerHTML;
+        btn.innerHTML = '<span class="pcrud-spinner"></span> Salvando...';
+    };
+    window.hideLoading = function(btn) {
+        btn.disabled = false; btn.innerHTML = btn.dataset.txt || 'Salvar';
+    };
+    window.getCSRFToken = function() {
+        return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+    };
+})();
+</script>
+{% endblock %}

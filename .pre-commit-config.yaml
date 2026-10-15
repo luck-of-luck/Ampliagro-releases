@@ -1,0 +1,49 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.5.0
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v3.1.0
+    hooks:
+      - id: prettier
+        types_or: [javascript, css]
+
+  # A guarda de migracoes. MEDIDO 2026-10-03, depois de uma colisao real:
+  # duas sessoes a correr `makemigrations` no mesmo repositorio, e a
+  # migration de uma ficou com os models da outra dentro. O comando tem
+  # sucesso e o ficheiro parece limpo — e' o que torna o erro invisivel.
+  #
+  # So corre quando `app/models/` mexeu (MEDIDO: 5,2 s quando corre, ~0 s
+  # quando nao ha nada a fazer). E' um hook local e nao um job de CI: o
+  # objectivo e' apanhar ANTES do commit, onde ainda ha alguem para
+  # perguntar a quem pertence a mudanca.
+  - repo: local
+    hooks:
+      - id: guard-migrations
+        name: app/models alterado sem migration
+        # `--no-cov` porque o `pytest.ini` mete `--cov=app --cov-report=html`
+        # no `addopts`: sem isto o hook escreve um relatorio de cobertura de
+        # 25k linhas a cada commit, e a saida que interessa fica soterrada.
+        # Um hook e' rapido e calado.
+        entry: >-
+          python -m pytest tests/test_migrations_tem_o_que_descrevem.py
+          -q --no-cov -p no:warnings
+        language: system
+        pass_filenames: false
+        files: ^app/models/.*\.py$
+        env:
+          # Sem isto o teste lento salta e o hook nao guarda nada.
+          AMPLIAGRO_CHECAR_MIGRACOES: "1"
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: detect-private-key

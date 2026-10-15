@@ -1,0 +1,77 @@
+/*
+ * Badge Component
+ */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  padding: 0.125rem 0.5rem;
+  font-size: var(--text-xs);
+  font-weight: var(--font-medium);
+  line-height: 1.25;
+  color: var(--text-primary);
+  background-color: var(--bg-tertiary);
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+
+/* Variantes de cor */
+.badge--primary {
+  color: var(--color-primary-600);
+  background-color: var(--color-primary-50);
+}
+
+.badge--success {
+  color: var(--color-success-600);
+  background-color: var(--color-success-50);
+}
+
+.badge--warning {
+  color: var(--color-warning-600);
+  background-color: var(--color-warning-50);
+}
+
+.badge--danger {
+  color: var(--color-danger-600);
+  background-color: var(--color-danger-50);
+}
+
+.badge--info {
+  color: var(--color-info-600);
+  background-color: var(--color-info-50);
+}
+
+/* Modificadores */
+.badge--outline {
+  background-color: transparent;
+  border: 1px solid currentColor;
+}
+
+.badge--dot::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: currentColor;
+}
+
+/* Adaptação Dark Mode - As cores "soft" já foram adaptadas no design-tokens,
+ * então o fundo se ajusta automaticamente. Mas podemos garantir melhor contraste no texto. */
+.dark .badge--primary {
+  color: var(--color-primary-500);
+}
+.dark .badge--success {
+  color: var(--color-success-500);
+}
+.dark .badge--warning {
+  color: var(--color-warning-500);
+}
+.dark .badge--danger {
+  color: var(--color-danger-500);
+}
+.dark .badge--info {
+  color: var(--color-info-500);
+}

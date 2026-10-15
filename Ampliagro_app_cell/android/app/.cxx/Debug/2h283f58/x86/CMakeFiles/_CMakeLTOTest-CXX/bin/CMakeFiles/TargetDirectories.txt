@@ -1,0 +1,4 @@
+C:/Trabalho/Projetos/Ativos/Ampliagro2/Ampliagro_app_cell/android/app/.cxx/Debug/2h283f58/x86/CMakeFiles/_CMakeLTOTest-CXX/bin/CMakeFiles/foo.dir
+C:/Trabalho/Projetos/Ativos/Ampliagro2/Ampliagro_app_cell/android/app/.cxx/Debug/2h283f58/x86/CMakeFiles/_CMakeLTOTest-CXX/bin/CMakeFiles/boo.dir
+C:/Trabalho/Projetos/Ativos/Ampliagro2/Ampliagro_app_cell/android/app/.cxx/Debug/2h283f58/x86/CMakeFiles/_CMakeLTOTest-CXX/bin/CMakeFiles/edit_cache.dir
+C:/Trabalho/Projetos/Ativos/Ampliagro2/Ampliagro_app_cell/android/app/.cxx/Debug/2h283f58/x86/CMakeFiles/_CMakeLTOTest-CXX/bin/CMakeFiles/rebuild_cache.dir

@@ -1,0 +1,101 @@
+{
+  "_sobre": [
+    "Receita de ligacao MCP para o AmplIA. E' isto que falta em qualquer",
+    "cliente que pergunta 'como e' que ligo isto?' — e a resposta anterior era",
+    "'le o servidor.py e tira os args'.",
+    "",
+    "Copie o bloco 'mcpServers' para a configuracao do seu cliente, troque",
+    "'USUARIO' pelo username de um produtor que exista no banco, e ajuste os",
+    "dois caminhos absolutos se a repo tiver noutro sitio.",
+    "",
+    "VERIFICACAO (faz isto antes de entregar a um agente):",
+    "  .\\.venv\\Scripts\\python.exe app\\amplia_mcp\\servidor.py --usuario USUARIO",
+    "Com o SDK `mcp` instalado, o comando NAO imprime nada e fica a espera:",
+    "isso e' o certo — um servidor stdio que imprime nao-e-stdio esta a",
+    "corromper o protocolo. Sem o SDK, sai com codigo 2 e diz como instalar.",
+    "",
+    "SEM O SDK, A IA CONTINUA A FUNCIONAR por HTTP, com a sessao do produtor:",
+    "  GET  /api/amplia/tools/       catalogo (formato OpenAI) + o guia",
+    "  GET  /api/amplia/skills/      as especialidades de dominio",
+    "  GET  /api/amplia/diagnostico/ se o caminho esta inteiro",
+    "  POST /api/amplia/exec/        {tool, args, entrada}",
+    "O HTTP e' a porta que o WebLLM na aba usa; o stdio e' a porta de fora."
+  ],
+
+  "mcpServers": {
+    "amplia": {
+      "command": "C:\\Trabalho\\Projetos\\Ativos\\Ampliagro\\.venv\\Scripts\\python.exe",
+      "args": [
+        "C:\\Trabalho\\Projetos\\Ativos\\Ampliagro\\app\\amplia_mcp\\servidor.py",
+        "--usuario",
+        "USUARIO"
+      ],
+      "env": {
+        "DJANGO_SETTINGS_MODULE": "config.settings.dev"
+      }
+    },
+
+    "amplia-escrita": {
+      "_aviso": [
+        "O MISMO servidor, com escrita liberada. So para um agente de confianca",
+        "e so depois de o produtor autorizar acao fisica — ligar irrigador,",
+        "criar registo. Sem esta flag, as 24 tools de escrita respondem com uma",
+        "recusa que explica o motivo, e nada e' executado."
+      ],
+      "command": "C:\\Trabalho\\Projetos\\Ativos\\Ampliagro\\.venv\\Scripts\\python.exe",
+      "args": [
+        "C:\\Trabalho\\Projetos\\Ativos\\Ampliagro\\app\\amplia_mcp\\servidor.py",
+        "--usuario",
+        "USUARIO",
+        "--permitir-escrita"
+      ],
+      "env": {
+        "DJANGO_SETTINGS_MODULE": "config.settings.dev"
+      }
+    },
+
+    "amplia-producao": {
+      "_aviso": [
+        "Para um servidor MCP em producao. A diferenca nao e' o caminho: e' as",
+        "settings. O default do servidor segue o ambiente (AMPLIA_PROD=1 ->",
+        "config.settings.prod), e `--settings` ganha sempre. Um servidor MCP em",
+        "producao com config.settings.dev e' DEBUG ligado a mostrar tracebacks ao",
+        "primeiro utilizador que erre um argumento."
+      ],
+      "command": "C:\\Trabalho\\Projetos\\Ativos\\Ampliagro\\.venv\\Scripts\\python.exe",
+      "args": [
+        "C:\\Trabalho\\Projetos\\Ativos\\Ampliagro\\app\\amplia_mcp\\servidor.py",
+        "--usuario",
+        "USUARIO",
+        "--settings",
+        "config.settings.prod"
+      ],
+      "env": {
+        "AMPLIA_PROD": "1"
+      }
+    }
+  },
+
+  "_porque_estes_caminhos": [
+    "1. O interpretador e' o do VENV, nao o do sistema. O servidor precisa de",
+    "   Django e do settings; o Python do sistema nao os tem, e a falha e' um",
+    "   ModuleNotFoundError que nao diz nada sobre o caminho.",
+    "",
+    "2. O script e' por ABSOLUTO. Um cliente MCP nao tem CWD — Claude Desktop",
+    "   e Hermes arrancam o processo no directorio de trabalho do utilizador.",
+    "   `python -m app.amplia_mcp.servidor` exige que o CWD seja a raiz da repo",
+    "   e falha de outra forma. Medido, L3:",
+    "     rc=2, 'django.setup() falhou: No module named config'",
+    "   O script deduz a raiz pelo proprio `__file__`, por isso o caminho que",
+    "   importa e' o do FICHEIRO — e um so, e estavel.",
+    "",
+    "3. `--usuario` e' obrigatorio e tem de existir no banco. O MCP stdio e' um",
+    "   processo local sem sessao web, e o sandbox exige um utilizador a quem",
+    "   responder. Se o username nao existir, o servidor sai com codigo 2 e diz",
+    "   qual nao existe — nao arranca a servir e' nobody.",
+    "",
+    "4. O prefixo e' `amplia_` e o nome tem de existir NO CATALOGO. Um nome",
+    "   inventado devolve `tool_fora_do_catalogo`. A lista do que existe vem de",
+    "   `GET /api/amplia/tools/` ou de `amplia://capacidades`."
+  ]
+}

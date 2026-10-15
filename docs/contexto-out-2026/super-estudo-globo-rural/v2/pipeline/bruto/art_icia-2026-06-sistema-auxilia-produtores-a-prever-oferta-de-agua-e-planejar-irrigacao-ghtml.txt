@@ -1,0 +1,27 @@
+A irrigação representou 50,3% do uso de água no Brasil em 2024 , dado mais recente disponível, segundo a Agência Nacional de Águas e Saneamento Básico (ANA). Além disso, um levantamento do Ministério da Integração e do Desenvolvimento Regional mostra que cerca de 64% das áreas irrigadas utilizam água captada de rios, açudes e reservatórios .
+
+Diante desse cenário e da expansão dessa agricultura, que alcançou aproximadamente 2,2 milhões de hectares irrigados por pivôs centrais em 2024, a previsibilidade hídrica ganha importância como estratégia de prevenção e otimização no campo. Com esse objetivo, a startup paulista Espectro desenvolveu, em parceria com a FAPESP entre 2022 e 2025 o Palmaview , plataforma de gestão hídrica que integra o ecossistema Palmaflex, sistema formado por um conjunto de hardwares focado na coleta de dados.
+
+O Palmaview tem como objetivo a gestão hídrica, eficiência energética e monitoramento de pivôs e tanques na agricultura de precisão . Para isso, ele conta com sensores e inteligência artificial para monitorar recursos hídricos e prever a oferta de água para as semanas seguintes.
+
+No campo, a IA ajuda a detectar pragas em lavouras e controlar cabeças de gado Irrigação e aquicultura ganham novas regras de descontos tarifários
+
+Segundo Adilson Chinatto, diretor de Tecnologia e CEO da Espectro, a iniciativa surgiu após a empresa identificar a falta de previsibilidade hídrica como um dos principais desafios enfrentados pelos produtores rurais.
+
+No Noroeste Paulista, por exemplo, as estiagens são longas e a chuva fica concentrada em poucos meses do ano. Isso gera dificuldades para quem depende da irrigação”, explica.
+
+De acordo com Cynthia Junqueira, diretora de Pesquisa e Desenvolvimento da Espectro, a água é o elemento central de todo esse ecossistema. “Seja agricultura, pecuária ou irrigação, tudo depende da gestão adequada desse recurso , explica.
+
+Chinatto explica que a ferramenta mede a vazão dos cursos d&#x27;água e cruza essas informações com dados de chuva obtidos por satélite para estimar a disponibilidade hídrica futura. Fazemos medições frequentes da vazão e cruzamos essas informações com dados de chuva obtidos por satélite. A chuva que cai na cabeceira de uma bacia não impacta imediatamente o ponto de captação. Dependendo das condições do solo, esse efeito pode levar dias para aparecer , explica.
+
+Além de auxiliar no planejamento, o sistema pode gerar economia de cerca de 30% , dependendo do manejo adotado pelo produtor. Segundo o diretor, a plataforma também alcança aproximadamente 75% de assertividade nas previsões de pluviometria .
+
+Com acesso contínuo às informações geradas pela ferramenta, o agricultor pode programar a irrigação nos horários mais vantajosos e evitar desperdícios. Com o monitoramento das informações, o produtor consegue irrigar nos horários mais vantajosos e aproveitar tarifas de energia mais baixas , complementa.
+
+Junqueira explica que a tecnologia também indica quando a vazão dos mananciais deve aumentar e se haverá água suficiente a longo prazo para manter os sistemas de irrigação em operação.
+
+O sistema consegue indicar que hoje não há água suficiente, mas que, em três ou quatro dias, a vazão deve se recuperar , afirma.
+
+Além de auxiliar no manejo da irrigação, a tecnologia busca apoiar produtores em autorizações concedidas pelos órgãos ambientais para captação em rios e mananciais . Durante os testes realizados no Noroeste Paulista, os pesquisadores identificaram situações em que a disponibilidade real de água não correspondia aos limites estabelecidos pelas outorgas. Encontramos situações em que a outorga permite captar mais água do que o manancial consegue fornecer e outras em que o produtor tem água disponível, mas a outorga limita o uso , relata Chinatto.
+
+Segundo ele, o monitoramento contínuo cria uma base de dados atualizada que pode subsidiar tanto o planejamento da irrigação quanto futuras solicitações de renovação das autorizações. A ideia é dar ao produtor informações próprias para apoiar processos de renovação de outorga e tomada de decisão , complementou Junqueira.

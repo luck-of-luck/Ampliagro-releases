@@ -1,0 +1,25 @@
+function arrasta(de, para) {
+      const ov = document.getElementById('ia-print-overlay');
+      ev(ov, 'mousedown', de.x, de.y);
+      ev(window, 'mousemove', para.x, para.y);
+      ev(window, 'mouseup', para.x, para.y);
+      return ov;
+    }
+
+    /* Abre o editor e deixa uma seleção feita.
+     *
+     * Devolve `{p}` e NÃO a promessa: um `async` que devolve uma promessa
+     * adota-a, e `await editorComSelecao()` ficava à espera de um print que só
+     * existe depois de o produtor confirmar — um impasse com aspecto de tempo
+     * esgotado que não mede nada. */ async function editorComSelecao() {
+      const p = window.IaPrint.selecionar();
+      await esperaOverlay();
+      arrasta({ x: 100, y: 100 }, { x: 500, y: 400 });
+      return { p };
+    }
+
+    function confirmar() {
+      document.getElementById('ia-print-ok').click();
+    }
+
+    /* ── O ecrã preto ────────────────────────

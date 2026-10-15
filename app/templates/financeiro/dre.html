@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% load static breadcrumbs %}
+
+{% block title %}DRE - Demonstrativo do Resultado do Exercício{% endblock %}
+
+{% block content %}
+<div class="main-content flex-1 bg-[var(--bg-secondary)] overflow-y-auto w-full p-4 md:p-8">
+  <div class="max-w-7xl mx-auto w-full space-y-8">
+
+    <!-- Header e Breadcrumbs -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-2xl font-bold text-[var(--text-primary)]">DRE</h1>
+        {% breadcrumb "Financeiro" "/financeiro/" "DRE" %}
+      </div>
+
+      <div class="flex items-center gap-2">
+        <input type="date" id="data_inicio" class="form-input text-sm w-32" value="{{ de|default:'' }}">
+        <span class="text-[var(--text-secondary)]">até</span>
+        <input type="date" id="data_fim" class="form-input text-sm w-32" value="{{ ate|default:'' }}">
+        <button onclick="carregarDRE()" class="btn btn--primary btn--sm">Filtrar</button>
+      </div>
+    </div>
+
+    <!-- DRE Table -->
+    <div class="card p-0 overflow-hidden" id="dre-container">
+      <div class="p-8 text-center" id="dre-loading">
+        <div class="skeleton-line skeleton-line--title mx-auto mb-4" style="width: 200px"></div>
+        <div class="skeleton-line skeleton-line--text mx-auto" style="width: 300px"></div>
+      </div>
+
+      <table class="table w-full hidden" id="dre-table">
+        <tbody id="dre-body">
+          <!-- Renderizado via JS -->
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function formatCurrency(val) {
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
+  }
+
+  function carregarDRE() {
+    const de = document.getElementById('data_inicio').value;
+    const ate = document.getElementById('data_fim').value;
+
+    document.getElementById('dre-loading').classList.remove('hidden');
+    document.getElementById('dre-table').classList.add('hidden');
+
+    fetch(`/api/financeiro/dre/?de=${de}&ate=${ate}`)
+      .then(res => res.json())
+      .then(data => {
+        if(data.error) {
+          showError(data.error);
+          return;
+        }
+        renderDRE(data.dre);
+      })
+      .catch(err => showError('Erro ao carregar DRE'));
+  }
+
+  function renderRow(label, value, isBold = false, isIndent = false) {
+    // `null` aqui é AUSÊNCIA DE MEDIÇÃO, não zero.
+    // `Intl.NumberFormat.format(null)` coage para 0 e imprimiria "R$ 0,00" —
+    // que é exactamente a mentira que o `deducoes` deixou de dizer.
+    // Mostrar "não medido" é mais útil ao produtor e mais honesto ao banco.
+    const naoMedido = (value === null || value === undefined);
+    const celulaValor = naoMedido
+      ? '<span class="text-[var(--color-warning-500)] text-sm italic" title="o sistema não mede esta linha">não medido</span>'
+      : formatCurrency(value);
+    const corValor = (!naoMedido && value < 0) ? 'text-[var(--color-danger-500)]' : '';
+    return `
+      <tr class="${isBold ? 'font-bold bg-[var(--bg-tertiary)]' : ''}">
+        <td class="px-6 py-3 border-b border-[var(--border-default)] ${isIndent ? 'pl-10 text-[var(--text-secondary)] text-sm' : ''}">${label}</td>
+        <td class="px-6 py-3 border-b border-[var(--border-default)] text-right ${corValor}">${celulaValor}</td>
+      </tr>
+    `;
+  }
+
+  function renderAviso(dre) {
+    if (!dre.aviso) return '';
+    const linhas = (dre.incompleto || [])
+      .map(i => `<li><strong>${i.linha || i.categoria}</strong>: ${i.motivo || 'categoria fora do mapa de grupos do DRE'}</li>`)
+      .join('');
+    return `
+      <div class="mx-6 my-4 p-4 rounded-lg border border-[var(--color-warning-500)] bg-[var(--bg-secondary)]">
+        <p class="font-semibold text-[var(--color-warning-500)] mb-1">Este DRE está incompleto</p>
+        <ul class="list-disc pl-5 text-sm text-[var(--text-secondary)]">${linhas}</ul>
+      </div>
+    `;
+  }
+
+  function renderDRE(dre) {
+    let html = renderAviso(dre);
+
+    html += renderRow('(=) Receita Bruta Total', dre.receita_bruta, true);
+    dre.detalhes.receita_bruta.forEach(d => {
+      html += renderRow(d.categoria, d.valor, false, true);
+    });
+
+    html += renderRow('(-) Deduções da Receita Bruta', dre.deducoes, true);
+    html += renderRow('(=) Receita Operacional Líquida', dre.receita_liquida, true);
+
+    html += renderRow('(-) Custos de Produção', dre.custo_producao, true);
+    dre.detalhes.custo_producao.forEach(d => {
+      html += renderRow(d.categoria, d.valor, false, true);
+    });
+
+    html += renderRow('(=) Resultado Bruto (Lucro Bruto)', dre.lucro_bruto, true);
+
+    html += renderRow('(-) Despesas Operacionais', dre.despesa_operacional, true);
+    dre.detalhes.despesa_operacional.forEach(d => {
+      html += renderRow(d.categoria, d.valor, false, true);
+    });
+
+    html += renderRow('(=) Resultado Operacional', dre.resultado_operacional, true);
+
+    html += renderRow('(+/-) Resultado Financeiro', dre.resultado_financeiro, true);
+    dre.detalhes.resultado_financeiro.forEach(d => {
+      html += renderRow(d.categoria, d.valor, false, true);
+    });
+
+    html += renderRow('(=) Lucro Líquido do Exercício', dre.lucro_liquido, true);
+
+    document.getElementById('dre-body').innerHTML = html;
+    document.getElementById('dre-loading').classList.add('hidden');
+    document.getElementById('dre-table').classList.remove('hidden');
+  }
+
+  // Define datas padrão se estiver vazio
+  document.addEventListener('DOMContentLoaded', () => {
+    const today = new Date();
+    if(!document.getElementById('data_inicio').value) {
+      document.getElementById('data_inicio').value = `${today.getFullYear()}-01-01`;
+    }
+    if(!document.getElementById('data_fim').value) {
+      document.getElementById('data_fim').value = `${today.getFullYear()}-12-31`;
+    }
+    carregarDRE();
+  });
+</script>
+{% endblock %}

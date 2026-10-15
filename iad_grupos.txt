@@ -1,0 +1,69 @@
+### 6 testes  =>  TypeError: Cannot read properties of null (reading 'click')
+    - a barra desenhada no DOM o print da tela abre o seletor de área sem pedir permissão de tela
+    - a barra desenhada no DOM o print da tela o overlay mostra as instruções e o retângulo de seleção
+    - a barra desenhada no DOM o print da tela confirmar tira o overlay e devolve o print ACIMA do campo
+    - a barra desenhada no DOM o print da tela o print ABRE o chat, para a caixa ser visível
+    - a barra desenhada no DOM o print da tela o print NAO passa pelo iaDockToggle (que baixa 1,1 GB e pode fechar)
+    - a barra desenhada no DOM o print da tela confirmar sem seleção é recusado em vez de dar um print vazio
+
+### 5 testes  =>  TypeError: Cannot read properties of null (reading 'style')
+    - a barra desenhada no DOM o print da tela arrastar cria a seleção com as 8 pegas
+    - a barra desenhada no DOM o print da tela o painel fica AO LADO da seleção, nunca por cima
+    - a barra desenhada no DOM o print da tela a PRIMEIRA ferramenta é mover — sem ela não se mexe na caixa
+    - a barra desenhada no DOM o print da tela seleção pequena demais não entra — seria uma imagem em branco
+    - a barra desenhada no DOM o print da tela a seleção cresce com o arrasto, e com números a sério
+
+### 5 testes  =>  TypeError: Cannot read properties of null (reading 'dispatchEvent')
+    - a barra desenhada no DOM o print da tela REDIMENSIONAR: arrastar uma pega muda só o lado que ela é
+    - a barra desenhada no DOM o print da tela MOVER: arrastar por dentro leva a caixa e não desenha
+    - a barra desenhada no DOM o print da tela escolher uma ferramenta fica assinalada
+    - a barra desenhada no DOM o print da tela DESENHAR: com o lápis escolhido, o traço fica desenhado
+    - a barra desenhada no DOM o print da tela a ferramenta "apaga" não começa um traço novo
+
+### 5 testes  =>  Error: Test timed out in 5000ms.
+    - a barra desenhada no DOM o print so existe no app do Ampliagro recusa fora do app, sem sequer pedir a tela
+    - a barra desenhada no DOM o print so existe no app do Ampliagro recusa se a appbar nao existe (uma pagina que nao tem dashboard)
+    - a barra desenhada no DOM o print so existe no app do Ampliagro fora de https, diz que o problema e a ligacao, e nao o botao
+    - a barra desenhada no DOM a falha do print tem de se VER uma falha que vem do navegador também é dita
+    - a barra desenhada no DOM a falha do print tem de se VER falha UMA vez, não duas
+
+### 3 testes  =>  AssertionError: expected null to be truthy
+    - a barra desenhada no DOM os menus "criar no chat" abre com planilha e grafico
+    - a barra desenhada no DOM o print da tela o overlay mostra um frame CONGELADO, e o vídeo já foi desligado
+    - a barra desenhada no DOM o print da tela Esc cancela e limpa tudo
+
+### 3 testes  =>  TypeError: Cannot read properties of undefined (reading '0')
+    - a barra desenhada no DOM os botoes que produzem pecas "com os widgets que ja existem" nomeia widgets do catalogo do servidor
+    - a barra desenhada no DOM os botoes que produzem pecas "widgets vazios + valores" NAO nomeia widget nenhum
+    - a barra desenhada no DOM os botoes que produzem pecas sem pipeline, o botao DIZ que não há — não finge
+
+### 2 testes  =>  TypeError: Cannot read properties of null (reading 'querySelectorAll')
+    - a barra desenhada no DOM os menus "criar no painel" abre com as DUAS formas de montar
+    - a barra desenhada no DOM o print da tela o painel tem as ferramentas, desfazer, limpar, usar e cancelar
+
+### 1 testes  =>  AssertionError: expected [ 'alternar-barra', …(10) ] to deeply equal [ 'alternar-barra', …(8) ]
+    - a barra desenhada no DOM desenha os nove botoes que o produtor pediu
+
+### 1 testes  =>  TypeError: Cannot read properties of null (reading 'parentElement')
+    - a barra desenhada no DOM os menus o menu é irmão do botão, e nunca filho
+
+### 1 testes  =>  AssertionError: expected +0 to be 1 // Object.is equality
+    - a barra desenhada no DOM os menus abrir um menu fecha o anterior
+
+### 1 testes  =>  TypeError: Cannot read properties of undefined (reading 'getAttribute')
+    - a barra desenhada no DOM os menus a ferramenta escolhida é executada e o menu fecha
+
+### 1 testes  =>  AssertionError: expected [] to have a length of 2 but got +0
+    - a barra desenhada no DOM os botoes que produzem pecas planilha e grafico mandam um pedido COMPLETO, nao um spiritinho
+
+### 1 testes  =>  AssertionError: expected false to be true // Object.is equality
+    - a barra desenhada no DOM o print da tela Enter confirma, como o ✓ do painel
+
+### 1 testes  =>  AssertionError: nada ouviu o fim da captura: expected 0 to be greater than 0
+    - a barra desenhada no DOM o print da tela acabar com a captura no painel do browser não deixa nada preso
+
+### 1 testes  =>  AssertionError: expected 'erro' to be 'sem_suporte' // Object.is equality
+    - a barra desenhada no DOM o print so existe no app do Ampliagro sem getDisplayMedia, diz que o browser nao deixa
+
+### 1 testes  =>  AssertionError: ninguém disse nada ao produtor: expected +0 to be 1 // Object.is equality
+    - a barra desenhada no DOM a falha do print tem de se VER sem iaLocalMsg, a recusa aparece NA CONVERSA

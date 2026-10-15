@@ -1,0 +1,3240 @@
+:root {
+  --ncs-green-dark: #0f9d6e;
+  --ncs-orange-amber: #c19a3c;
+  --ncs-blue-light: #e8eeec;
+  --ncs-blue-dark: #1d2421;
+  --color-active-light: #0f9d6e;
+  --color-active-dark: #3ec48f;
+  --theme-accent: #0f9d6e;
+  --theme-text: #e9eeec;
+  --theme-navbar: #131917;
+  --theme-workspace: #0b0f0e;
+  --theme-card: #151b19;
+  --theme-widgetbar: #131917;
+}
+
+html.custom-theme {
+  color: var(--theme-text);
+}
+html.custom-theme.custom-theme-navbar #nav-premium {
+  background-color: var(--theme-navbar) !important;
+  border-bottom-color: var(--theme-accent) !important;
+}
+html.custom-theme.custom-theme-navbar #nav-premium .nav-pill,
+html.custom-theme.custom-theme-navbar .nav-brand-text,
+html.custom-theme.custom-theme-navbar .nav-tag {
+  color: var(--theme-text) !important;
+}
+html.custom-theme.custom-theme-workspace #content {
+  background-color: var(--theme-workspace) !important;
+  color: var(--theme-text);
+}
+html.custom-theme.custom-theme-workspace #content .bento-block {
+  background-color: var(--theme-card) !important;
+  color: var(--theme-text);
+}
+html.custom-theme.custom-theme-widgetbar #dashboard-appbar {
+  background-color: var(--theme-widgetbar) !important;
+  border-color: var(--theme-accent) !important;
+  color: var(--theme-text) !important;
+}
+html.custom-theme.custom-theme-widgetbar #dashboard-appbar input,
+html.custom-theme.custom-theme-widgetbar #dashboard-appbar button,
+html.custom-theme.custom-theme-widgetbar #dashboard-appbar span {
+  color: var(--theme-text);
+}
+html.custom-theme .theme-phase-container {
+  background-color: color-mix(in srgb, var(--theme-accent) 18%, transparent);
+}
+html.custom-theme .theme-phase-btn.active,
+html.custom-theme .theme-phase-btn.active .bi,
+html.custom-theme .nav-theme-btn.active {
+  color: var(--theme-accent) !important;
+}
+html.custom-theme .custom-theme-control {
+  accent-color: var(--theme-accent);
+}
+
+/* ── Paleta única do tema (KPIs, badges, valores) ── */
+.text-theme-accent {
+  color: var(--pal-accent, #0f9d6e) !important;
+}
+.text-theme-ok {
+  color: var(--pal-ok, #0a7d56) !important;
+}
+.text-theme-alert {
+  color: var(--pal-alert, #d97706) !important;
+}
+.text-theme-error {
+  color: var(--pal-error, #dc2626) !important;
+}
+.text-theme-tick {
+  color: var(--pal-tick, #5f6b66) !important;
+}
+.bg-theme-accent {
+  background-color: var(--pal-accent, #0f9d6e) !important;
+}
+.bg-theme-accent-soft {
+  background-color: var(--pal-accent-fill, rgba(15, 157, 110, 0.06)) !important;
+}
+.bg-theme-ok {
+  background-color: var(--pal-ok, #0a7d56) !important;
+}
+.bg-theme-alert {
+  background-color: var(--pal-alert, #d97706) !important;
+}
+.bg-theme-error {
+  background-color: var(--pal-error, #dc2626) !important;
+}
+.bg-theme-ok-soft {
+  background-color: color-mix(in srgb, var(--pal-ok, #0a7d56) 12%, transparent) !important;
+}
+.bg-theme-alert-soft {
+  background-color: color-mix(in srgb, var(--pal-alert, #d97706) 12%, transparent) !important;
+}
+.bg-theme-error-soft {
+  background-color: color-mix(in srgb, var(--pal-error, #dc2626) 12%, transparent) !important;
+}
+
+/* Estado vazio de widgets de gráfico */
+.chart-empty-msg {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--pal-tick, #94a3b8);
+  pointer-events: none;
+}
+
+/* ═══════ AMOLED Neon: fundo preto total + dourado com brilho ═══════ */
+html.custom-theme #content,
+html.custom-theme #nav-premium,
+html.custom-theme #dashboard-appbar {
+  text-shadow: 0 0 12px color-mix(in srgb, currentColor 40%, transparent);
+}
+html.custom-theme #content .bento-block {
+  border: 1px solid color-mix(in srgb, var(--pal-accent, #ffd23f) 55%, transparent) !important;
+  box-shadow: none !important;
+}
+html.custom-theme .matrix-container.editing {
+  background-image:
+    linear-gradient(
+      color-mix(in srgb, var(--pal-accent, #ffd23f) 5%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--pal-accent, #ffd23f) 5%, transparent) 1px,
+      transparent 1px
+    );
+}
+html.custom-theme .bento-block .widget-heading,
+html.custom-theme .bento-block .widget-title {
+  border-bottom-color: color-mix(in srgb, var(--pal-accent, #ffd23f) 25%, transparent) !important;
+}
+html.custom-theme .period-switch .active-period,
+html.custom-theme .finance-switch .active-finance,
+html.custom-theme #dashboard-appbar .period-toggle .active-period {
+  background-color: color-mix(in srgb, var(--pal-accent, #ffd23f) 15%, transparent) !important;
+  color: var(--pal-accent, #ffd23f) !important;
+  text-shadow: 0 0 10px color-mix(in srgb, var(--pal-accent, #ffd23f) 55%, transparent) !important;
+}
+
+/* Neutraliza acentos fixos do Tailwind → paleta do tema (dourado) */
+html.custom-theme [class*='text-emerald-'],
+html.custom-theme [class*='text-teal-'],
+html.custom-theme [class*='text-ncs-green-'],
+html.custom-theme [class*='text-ncs-blue-'],
+html.custom-theme [class*='text-blue-'],
+html.custom-theme [class*='text-sky-'],
+html.custom-theme [class*='text-cyan-'],
+html.custom-theme [class*='text-indigo-'] {
+  color: var(--pal-accent, #ffd23f) !important;
+}
+html.custom-theme [class*='text-amber-'],
+html.custom-theme [class*='text-orange-'],
+html.custom-theme [class*='text-yellow-'] {
+  color: var(--pal-alert, #ffd23f) !important;
+}
+html.custom-theme [class*='text-rose-'],
+html.custom-theme [class*='text-red-'],
+html.custom-theme [class*='text-pink-'] {
+  color: var(--pal-error, #ff6a4d) !important;
+}
+/* Sistema de cores: verde malachite = lucro, vermelho flag-vermelho = prejuízo, roxo escuro = bordas/design, branco/preto = fundos dia/noite */
+:root {
+  --malachite: #0f9d6e;
+  --flag-red: #d93a3a;
+  --dark-amethyst: #1d2421;
+  --white: #fdfefe;
+  --black: #000;
+}
+
+/* ── Dia / Noite: verde = lucro, vermelho = prejuízo (dados) ── */
+html:not(.custom-theme) [class*='text-emerald-'],
+html:not(.custom-theme) [class*='text-teal-'],
+html:not(.custom-theme) [class*='text-ncs-green-'],
+html:not(.custom-theme) [class*='text-green-'] {
+  color: var(--pal-ok, #0f9d6e) !important;
+}
+html:not(.custom-theme) [class*='text-streak-red'],
+html:not(.custom-theme) [class*='text-rose-'],
+html:not(.custom-theme) [class*='text-red-'],
+html:not(.custom-theme) [class*='text-pink-'] {
+  color: var(--pal-error, #d93a3a) !important;
+}
+html:not(.custom-theme) [class*='text-amber-'],
+html:not(.custom-theme) [class*='text-orange-'],
+html:not(.custom-theme) [class*='text-yellow-'] {
+  color: var(--pal-alert, #c98a24) !important;
+}
+html.dark:not(.custom-theme) [class*='text-emerald-'],
+html.dark:not(.custom-theme) [class*='text-teal-'],
+html.dark:not(.custom-theme) [class*='text-ncs-green-'],
+html.dark:not(.custom-theme) [class*='text-green-'] {
+  color: var(--pal-ok, #0f9d6e) !important;
+}
+html.dark:not(.custom-theme) [class*='text-rose-'],
+html.dark:not(.custom-theme) [class*='text-red-'],
+html.dark:not(.custom-theme) [class*='text-pink-'] {
+  color: var(--pal-error, #ef6a6a) !important;
+}
+html.dark:not(.custom-theme) [class*='text-amber-'],
+html.dark:not(.custom-theme) [class*='text-orange-'],
+html.dark:not(.custom-theme) [class*='text-yellow-'] {
+  color: var(--pal-alert, #e0a84e) !important;
+}
+html:not(.custom-theme) [class*='bg-emerald-100'],
+html:not(.custom-theme) [class*='bg-emerald-50'],
+html:not(.custom-theme) [class*='bg-emerald-500/15'],
+html:not(.custom-theme) [class*='bg-teal-100'] {
+  background-color: color-mix(in srgb, var(--pal-ok, #0f9d6e) 14%, transparent) !important;
+}
+html:not(.custom-theme) [class*='bg-rose-100'],
+html:not(.custom-theme) [class*='bg-rose-50'] {
+  background-color: color-mix(in srgb, var(--pal-error, #d93a3a) 14%, transparent) !important;
+}
+
+/* ── Dia / Noite: roxo (#1d2421) em bordas e design (estética, não dados) ── */
+/* A borda do widget passou a ser `--amp-borda-widget` (o bloco da moldura,
+   mais abaixo, neste ficheiro). Estas duas regras mantem o `!important`
+   dos empates antigos mas deixam de ser uma segunda fonte de verdade: leem
+   o mesmo token, por isso o widget nao fica com duas cores diferentes. */
+html:not(.custom-theme) .bento-block {
+  border-color: var(--amp-borda-widget) !important;
+}
+html:not(.custom-theme) .widget-heading,
+html:not(.custom-theme) .widget-title {
+  border-bottom-color: rgba(29, 36, 33, 0.2) !important;
+}
+html:not(.custom-theme) #dashboard-appbar {
+  border-top-color: rgba(29, 36, 33, 0.25) !important;
+  background-color: rgba(255, 255, 255, 0.85) !important;
+}
+html.dark:not(.custom-theme) .bento-block {
+  border-color: var(--amp-borda-widget) !important;
+}
+html.dark:not(.custom-theme) .widget-heading,
+html.dark:not(.custom-theme) .widget-title {
+  border-bottom-color: rgba(62, 196, 143, 0.28) !important;
+}
+html.dark:not(.custom-theme) #dashboard-appbar {
+  border-color: rgba(62, 196, 143, 0.28) !important;
+  background-color: rgba(0, 0, 0, 0.85) !important;
+}
+/* Neutraliza fundos azul-teal antigos → preto (noite) / branco (dia) */
+html.dark:not(.custom-theme) [class*='dark:bg-ncs-blue-dark'],
+html.dark:not(.custom-theme) [class*='dark:bg-[#0a2a33]'],
+html.dark:not(.custom-theme) [class*='dark:bg-[#131917]'],
+html.dark:not(.custom-theme) [class*='dark:bg-slate-900'] {
+  background-color: #000000 !important;
+}
+html.custom-theme [class*='bg-emerald-100'],
+html.custom-theme [class*='bg-emerald-50'],
+html.custom-theme [class*='bg-emerald-500/15'],
+html.custom-theme [class*='bg-teal-100'] {
+  background-color: var(--pal-accent-fill, rgba(15, 157, 110, 0.06)) !important;
+}
+html.custom-theme [class*='bg-emerald-500'],
+html.custom-theme [class*='bg-emerald-600'],
+html.custom-theme [class*='bg-teal-500'] {
+  background-color: var(--pal-accent, #ffd23f) !important;
+}
+html.custom-theme [class*='bg-amber-100'],
+html.custom-theme [class*='bg-amber-50'] {
+  background-color: color-mix(in srgb, var(--pal-alert, #ffd23f) 14%, transparent) !important;
+}
+html.custom-theme [class*='bg-rose-100'],
+html.custom-theme [class*='bg-rose-50'] {
+  background-color: color-mix(in srgb, var(--pal-error, #ff6a4d) 14%, transparent) !important;
+}
+html.custom-theme [class*='hover:border-emerald-'],
+html.custom-theme [class*='focus:ring-emerald-'],
+html.custom-theme [class*='border-emerald-'] {
+  border-color: var(--pal-accent, #ffd23f) !important;
+}
+html.custom-theme [class*='hover:text-emerald-'],
+html.custom-theme [class*='hover:text-amber-'] {
+  color: var(--pal-accent, #ffd23f) !important;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+body {
+  transition: background-color 0.3s ease;
+  background-color: var(--white, #fdfefe);
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+html.dark body {
+  background-color: var(--black, #000000) !important;
+}
+
+/* Matriz 9x9 - Grid Fixo para Widgets */
+
+.matrix-container {
+  display: grid !important;
+  grid-template-columns: repeat(var(--grid-cols, 64), 1fr) !important;
+  grid-template-rows: repeat(var(--grid-rows, 40), minmax(0, 1fr)) !important;
+  width: 100%;
+  height: calc(100vh - 120px);
+  max-height: calc(100vh - 120px);
+  padding: 3px;
+  gap: 2px;
+  position: relative;
+}
+
+.matrix-container.editing {
+  background-image:
+    linear-gradient(rgba(15, 157, 110, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 157, 110, 0.04) 1px, transparent 1px);
+  background-size: calc(100% / var(--grid-cols, 64)) calc(100% / var(--grid-rows, 40));
+}
+
+/* Widgets Bento */
+
+.bento-block {
+  position: relative;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 8px;
+  border: 1px solid rgba(29, 36, 33, 0.22);
+  box-shadow: var(--widget-shadow, 0 2px 8px rgba(0, 0, 0, 0.08));
+  transition: all 0.2s ease;
+  overflow: hidden;
+  min-width: 0;
+  min-height: 0;
+}
+.bento-block .widget-content {
+  position: absolute;
+  inset: 0;
+  padding: 0.5rem; /* p-2 */
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+}
+.bento-block .widget-content canvas {
+  flex: 1 1 0%;
+  min-height: 0;
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+.bento-block.widget-edit-mode {
+  overflow: visible;
+}
+
+.bento-block:hover {
+  box-shadow: var(--widget-shadow-hover, 0 4px 12px rgba(0, 0, 0, 0.12));
+}
+
+html.dark .bento-block {
+  background-color: rgba(0, 0, 0, 0.95);
+  border-color: rgba(62, 196, 143, 0.3);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* MODO DE EDICAO */
+
+.widget-edit-mode {
+  outline: 2px solid rgba(15, 157, 110, 0.55);
+
+  outline-offset: 1px;
+
+  box-shadow: 0 0 0 3px rgba(15, 157, 110, 0.2);
+
+  transition: all 0.2s ease;
+
+  cursor: grab;
+}
+
+.widget-edit-mode:active {
+  cursor: grabbing;
+}
+.bento-block.dragging {
+  opacity: 0.5 !important;
+  transform: scale(0.95) !important;
+}
+
+/* Drag and Drop - Mouse-based smooth drag */
+.bento-block.widget-edit-mode {
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+}
+.bento-block.widget-edit-mode:active {
+  cursor: grabbing;
+}
+.bento-block.drag-origin {
+  opacity: 0.4;
+  transform: scale(0.95);
+  transition:
+    opacity 0.2s,
+    transform 0.2s;
+}
+.bento-block.drag-ghost {
+  position: fixed;
+  pointer-events: none;
+  z-index: 2147483646;
+  opacity: 0.85;
+  transform: scale(1.02);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  transition: none;
+  outline: 2px dashed rgba(15, 157, 110, 0.7);
+  outline-offset: -2px;
+}
+.matrix-container.drag-active .bento-block:not(.drag-origin):not(.drag-ghost) {
+  transition: all 0.15s ease;
+}
+.bento-block.drop-target {
+  outline: 3px dashed rgba(15, 157, 110, 0.6);
+  outline-offset: -3px;
+  background-color: rgba(15, 157, 110, 0.05);
+}
+.bento-block.drop-target-invalid {
+  outline: 3px dashed rgba(244, 63, 94, 0.6);
+  outline-offset: -3px;
+  background-color: rgba(244, 63, 94, 0.05);
+}
+.bento-block.resize-blocked {
+  outline: 3px dashed rgba(244, 63, 94, 0.8);
+  outline-offset: -3px;
+  box-shadow: 0 0 0 4px rgba(244, 63, 94, 0.15);
+}
+.drag-position-hint,
+.grid-drop-hint {
+  position: absolute;
+  background: rgba(15, 157, 110, 0.8);
+  color: white;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  pointer-events: none;
+  z-index: 10;
+  opacity: 0.8;
+}
+
+.edit-mode-badge {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  width: 18px;
+  height: 18px;
+  background: #0f9d6e;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 10px;
+  box-shadow: 0 2px 6px rgba(15, 157, 110, 0.4);
+  z-index: 30;
+  opacity: 0;
+  transform: scale(0);
+  transition: all 0.2s ease;
+  pointer-events: none;
+}
+.widget-edit-mode .edit-mode-badge {
+  opacity: 1;
+  transform: scale(1);
+}
+.resize-handle {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  background: rgba(15, 157, 110, 0.7);
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  z-index: 25;
+  border: 1px solid rgba(255, 255, 255, 0.85);
+}
+.widget-edit-mode .resize-handle {
+  opacity: 0.55;
+  pointer-events: auto;
+}
+.widget-edit-mode.widget-selected .resize-handle {
+  opacity: 0.95;
+}
+.resize-handle:hover {
+  opacity: 1 !important;
+  background: rgba(15, 157, 110, 0.95) !important;
+}
+.resize-handle::after {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid rgba(255, 255, 255, 0.9);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.9);
+  display: block;
+  margin: auto;
+}
+.resize-handle.edge-se {
+  right: -7px;
+  bottom: -7px;
+  cursor: nwse-resize;
+}
+.resize-handle.edge-se::after {
+  transform: rotate(0deg);
+}
+.resize-handle.edge-sw {
+  left: -7px;
+  bottom: -7px;
+  cursor: nesw-resize;
+}
+.resize-handle.edge-sw::after {
+  transform: rotate(90deg);
+}
+.resize-handle.edge-ne {
+  right: -7px;
+  top: -7px;
+  cursor: nesw-resize;
+}
+.resize-handle.edge-ne::after {
+  transform: rotate(-90deg);
+}
+.resize-handle.edge-nw {
+  left: -7px;
+  top: -7px;
+  cursor: nwse-resize;
+}
+.resize-handle.edge-nw::after {
+  transform: rotate(180deg);
+}
+.resize-handle.edge-e {
+  right: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: ew-resize;
+}
+.resize-handle.edge-e::after {
+  transform: rotate(-45deg);
+}
+.resize-handle.edge-w {
+  left: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: ew-resize;
+}
+.resize-handle.edge-w::after {
+  transform: rotate(135deg);
+}
+.resize-handle.edge-s {
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: ns-resize;
+}
+.resize-handle.edge-s::after {
+  transform: rotate(45deg);
+}
+.resize-handle.edge-n {
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: ns-resize;
+}
+.resize-handle.edge-n::after {
+  transform: rotate(225deg);
+}
+.widget-edit-mode {
+  outline: 2px solid rgba(15, 157, 110, 0.4);
+  outline-offset: 1px;
+}
+.widget-edit-mode.widget-selected {
+  outline: 3px solid #f59e0b;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.2);
+}
+.widget-edit-mode.widget-selected .resize-handle {
+  background: rgba(245, 158, 11, 0.9);
+}
+
+/* ============================================
+           MODAL ADD-WIDGET - Adaptável ao Tema Customizado
+           ============================================ */
+html.custom-theme #add-widget-modal .bg-white,
+html.custom-theme #add-widget-modal .bg-slate-50 {
+  background-color: var(--theme-card) !important;
+}
+
+html.custom-theme #add-widget-modal .text-emerald-600,
+html.custom-theme #add-widget-modal .hover\:text-emerald-600:hover,
+html.custom-theme #add-widget-modal .hover\:text-emerald-400:hover,
+html.custom-theme #add-widget-modal .text-emerald-500 {
+  color: var(--theme-accent) !important;
+}
+
+html.custom-theme #add-widget-modal .border-emerald-200,
+html.custom-theme #add-widget-modal .hover\:border-emerald-400:hover,
+html.custom-theme #add-widget-modal .hover\:border-emerald-500:hover {
+  border-color: var(--theme-accent) !important;
+}
+
+html.custom-theme #add-widget-modal .bg-emerald-50,
+html.custom-theme #add-widget-modal .hover\:bg-emerald-50:hover,
+html.custom-theme #add-widget-modal .hover\:bg-emerald-100:hover {
+  background-color: color-mix(in srgb, var(--theme-accent) 12%, transparent) !important;
+}
+
+html.custom-theme .dark #add-widget-modal .dark\:bg-emerald-900\/30,
+html.custom-theme .dark #add-widget-modal .dark\:hover\:bg-emerald-900\/50:hover {
+  background-color: color-mix(in srgb, var(--theme-accent) 20%, transparent) !important;
+}
+
+html.custom-theme #add-widget-modal .text-emerald-700,
+html.custom-theme #add-widget-modal .dark\:text-emerald-300 {
+  color: var(--theme-accent) !important;
+}
+
+html.custom-theme #add-widget-modal .border-emerald-500 {
+  border-color: var(--theme-accent) !important;
+}
+
+html.custom-theme #add-widget-modal .text-slate-700,
+html.custom-theme #add-widget-modal .text-slate-500,
+html.custom-theme #add-widget-modal .text-slate-600,
+html.custom-theme #add-widget-modal .text-slate-400 {
+  color: var(--theme-text) !important;
+}
+
+html.custom-theme #add-widget-modal .border-slate-200,
+html.custom-theme #add-widget-modal .border-slate-300\/40,
+html.custom-theme #add-widget-modal .border-slate-100 {
+  border-color: color-mix(in srgb, var(--theme-text) 20%, transparent) !important;
+}
+
+html.custom-theme #add-widget-modal .bg-slate-200 {
+  background-color: color-mix(in srgb, var(--theme-text) 15%, transparent) !important;
+}
+
+html.custom-theme #add-widget-modal .dark\:bg-ncs-blue-dark {
+  background-color: var(--theme-card) !important;
+}
+html.custom-theme #add-widget-modal .dark\:border-slate-700,
+html.custom-theme #add-widget-modal .dark\:border-slate-600\/40 {
+  border-color: color-mix(in srgb, var(--theme-text) 15%, transparent) !important;
+}
+html.custom-theme #add-widget-modal .dark\:text-slate-200,
+html.custom-theme #add-widget-modal .dark\:text-slate-300,
+html.custom-theme #add-widget-modal .dark\:text-slate-400 {
+  color: var(--theme-text) !important;
+}
+html.custom-theme #add-widget-modal .dark\:bg-black\/10 {
+  background-color: color-mix(in srgb, var(--theme-text) 8%, transparent) !important;
+}
+
+/* Culture card refinements for custom theme */
+html.custom-theme #add-widget-modal .hover\:from-emerald-50 {
+  --tw-gradient-from: color-mix(in srgb, var(--theme-accent) 12%, transparent) !important;
+}
+html.custom-theme #add-widget-modal .hover\:to-white {
+  --tw-gradient-to: transparent !important;
+}
+html.custom-theme #add-widget-modal .bg-emerald-50 {
+  background-color: color-mix(in srgb, var(--theme-accent) 12%, transparent) !important;
+}
+
+/* Widget card custom theme support */
+html.custom-theme #add-widget-modal .widget-card:hover {
+  border-color: var(--theme-accent) !important;
+}
+html.custom-theme #add-widget-modal .widget-card.widget-added {
+  border-color: var(--theme-accent) !important;
+  background-color: color-mix(in srgb, var(--theme-accent) 8%, transparent) !important;
+}
+html.custom-theme #add-widget-modal .widget-card.widget-added::after {
+  background: var(--theme-accent) !important;
+}
+html.custom-theme #add-widget-modal .widget-card:hover .widget-card-label {
+  color: var(--theme-accent) !important;
+}
+html.custom-theme #add-widget-modal .widget-card:hover .widget-card-icon {
+  background-color: color-mix(in srgb, var(--theme-accent) 15%, transparent) !important;
+  color: var(--theme-accent) !important;
+}
+html.custom-theme #add-widget-modal .widget-modal-tab.active-tab {
+  color: var(--theme-accent) !important;
+  border-bottom-color: var(--theme-accent) !important;
+}
+html.custom-theme #add-widget-modal .bg-emerald-100 {
+  background-color: color-mix(in srgb, var(--theme-accent) 15%, transparent) !important;
+}
+html.custom-theme #add-widget-modal .hover\:bg-emerald-100:hover,
+html.custom-theme #add-widget-modal .group\/card:hover .group-hover\/card\:bg-emerald-100 {
+  background-color: color-mix(in srgb, var(--theme-accent) 18%, transparent) !important;
+}
+html.custom-theme #add-widget-modal .bg-emerald-50\/80 {
+  background-color: color-mix(in srgb, var(--theme-accent) 15%, transparent) !important;
+}
+html.custom-theme #add-widget-modal .hover\:bg-emerald-100:hover {
+  background-color: color-mix(in srgb, var(--theme-accent) 20%, transparent) !important;
+}
+html.custom-theme #add-widget-modal .text-emerald-600 {
+  color: var(--theme-accent) !important;
+}
+html.custom-theme #add-widget-modal .hover\:text-emerald-800:hover {
+  color: var(--theme-accent) !important;
+}
+html.custom-theme #add-widget-modal .dark\:bg-emerald-800\/50 {
+  background-color: color-mix(in srgb, var(--theme-accent) 20%, transparent) !important;
+}
+html.custom-theme #add-widget-modal .border-emerald-300\/60 {
+  border-color: color-mix(in srgb, var(--theme-accent) 40%, transparent) !important;
+}
+html.custom-theme #add-widget-modal .dark\:border-emerald-700\/60 {
+  border-color: color-mix(in srgb, var(--theme-accent) 35%, transparent) !important;
+}
+html.custom-theme #add-widget-modal .bg-emerald-100 {
+  background-color: color-mix(in srgb, var(--theme-accent) 18%, transparent) !important;
+}
+
+/* Grid drop hint (position label) */
+.grid-drop-hint.invalid {
+  background: rgba(244, 63, 94, 0.8);
+  border-color: rgba(244, 63, 94, 0.5);
+}
+
+/* ── Neomorfismo ("soft-ui") agora vive em css/soft-ui.css ── */
+
+/* Search Menu - Windows 11 Style */
+
+.search-menu {
+  position: fixed;
+
+  bottom: 64px;
+
+  left: 50%;
+
+  transform: translateX(-50%) translateY(-6px) scale(0.96);
+
+  min-width: 320px;
+
+  max-width: 90vw;
+
+  min-height: 60px;
+
+  max-height: 380px;
+
+  overflow-y: auto;
+
+  border-radius: 16px;
+
+  padding: 12px;
+
+  z-index: 9999;
+
+  opacity: 0;
+
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+
+  pointer-events: none;
+
+  background: rgba(255, 255, 255, 0.95);
+
+  backdrop-filter: blur(20px);
+
+  -webkit-backdrop-filter: blur(20px);
+
+  border: none;
+
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.12),
+    0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+html.dark .search-menu {
+  background: rgba(21, 27, 25, 0.95);
+
+  border-color: transparent;
+
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.search-menu.open {
+  opacity: 1;
+
+  transform: translateX(-50%) translateY(0) scale(1);
+
+  pointer-events: auto;
+}
+
+.search-menu-item {
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 10px 12px;
+
+  border-radius: 10px;
+
+  cursor: pointer;
+
+  transition: background-color 0.15s;
+
+  font-size: 12px;
+
+  color: #1d2421;
+}
+
+html.dark .search-menu-item {
+  color: #e9eeec;
+}
+
+.search-menu-item:hover {
+  background-color: rgba(15, 157, 110, 0.1);
+}
+
+html.dark .search-menu-item:hover {
+  background-color: rgba(178, 219, 231, 0.1);
+}
+
+/* Edit Dropdowns - Smooth open/close animation */
+.edit-dropdown {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+}
+.edit-dropdown.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* IA Panel - Lateral estilo Copilot */
+
+#ia-panel {
+  position: fixed;
+
+  top: 0;
+
+  right: 0;
+
+  width: 380px;
+
+  height: 100vh;
+
+  z-index: 10000;
+
+  transform: translateX(100%);
+
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  display: flex;
+
+  flex-direction: column;
+}
+
+#ia-panel.open {
+  transform: translateX(0);
+}
+
+#ia-panel-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  background: rgba(0, 0, 0, 0.3);
+
+  z-index: 9999;
+
+  opacity: 0;
+
+  pointer-events: none;
+
+  transition: opacity 0.3s ease;
+}
+
+#ia-panel-overlay.open {
+  opacity: 1;
+
+  pointer-events: auto;
+}
+
+/* Widget bar compact mode */
+
+#dashboard-appbar.compact .widgetbar-section-extra {
+  display: none !important;
+}
+
+.preset-card.active-preset {
+  background-color: rgba(0, 107, 104, 0.2) !important;
+
+  box-shadow: inset 2px 2px 4px rgba(0, 94, 119, 0.15);
+}
+
+html.dark .preset-card.active-preset {
+  background-color: rgba(248, 126, 8, 0.2) !important;
+}
+
+/* ── Chart left-to-right reveal animation ── */
+@keyframes chartReveal {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+canvas[id^='chart-']:not(.no-reveal) {
+  animation: chartReveal 1.2s ease-out forwards;
+}
+.reveal-chart {
+  animation: none;
+}
+.reveal-chart:not(.no-reveal) {
+  animation: chartReveal 1.2s ease-out forwards;
+}
+
+/* Dashboard Appbar - Windows 11 Style */
+
+#dashboard-appbar {
+  background-color: rgba(251, 255, 254, 0.85);
+
+  color: #1d2421;
+
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+
+  border-top: 1px solid rgba(29, 36, 33, 0.2);
+}
+
+html.dark #dashboard-appbar {
+  background-color: rgba(0, 0, 0, 0.85);
+
+  color: #3ec48f;
+}
+
+/* Switches - estilo Windows 11 com pill design */
+
+.period-switch,
+.finance-switch {
+  display: flex;
+
+  align-items: center;
+
+  gap: 0 2px;
+
+  font-size: 0.75rem;
+
+  background-color: rgba(0, 0, 0, 0.08);
+
+  border-radius: 9999px;
+
+  padding: 2px;
+}
+
+.period-switch div,
+.finance-switch div {
+  padding: 4px 10px;
+
+  cursor: pointer;
+
+  border-radius: 9999px;
+
+  transition: all 0.15s ease;
+
+  white-space: nowrap;
+}
+
+.period-switch div:hover,
+.finance-switch div:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.period-switch .active-period,
+.finance-switch .active-finance {
+  background-color: rgba(0, 107, 104, 0.15);
+
+  color: #0f9d6e;
+
+  font-weight: 500;
+}
+
+html.dark .period-switch .active-period,
+html.dark .finance-switch .active-finance {
+  background-color: rgba(248, 126, 8, 0.15);
+
+  color: #f87e08;
+}
+
+/* Botões com borda minimalista */
+
+.minimal-border-btn {
+  border: 1px solid rgba(148, 163, 184, 0.3);
+
+  transition: all 0.2s ease;
+}
+
+.minimal-border-btn:hover {
+  border-color: rgba(148, 163, 184, 0.5);
+}
+
+/* Search Menu Windows 11 */
+
+#search-menu {
+  backdrop-filter: blur(12px);
+}
+
+#search-menu div[onclick] {
+  transition: background-color 0.15s ease;
+}
+
+/* Export Dropdown */
+
+#export-dropdown {
+  backdrop-filter: blur(12px);
+}
+
+/* Export button: hidden by default, visible only in edit mode */
+#export-btn {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+#dashboard-appbar.editing #export-btn {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* AmplIA Panel */
+
+#amplia-chat-panel {
+  height: calc(100vh - 56px);
+}
+
+/* Widget Bar Styles - Windows 11 Style */
+
+#widget-bar {
+  height: auto;
+
+  min-height: 64px;
+
+  padding: 12px 20px;
+}
+
+#widget-bar .widget-bar-section {
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+}
+
+/* Preset Blocks - Carrossel */
+
+.preset-block {
+  width: 42px;
+
+  height: 42px;
+
+  border-radius: 8px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+
+  border: 1px solid transparent;
+}
+
+.preset-block:hover {
+  transform: scale(1.05);
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.preset-block.active {
+  border-color: var(--ncs-green-dark);
+
+  background-color: rgba(0, 107, 104, 0.15);
+}
+
+html.dark .preset-block.active {
+  border-color: var(--ncs-blue-light);
+
+  background-color: rgba(178, 219, 231, 0.15);
+}
+
+.preset-block i {
+  font-size: 16px;
+
+  margin-bottom: 2px;
+}
+
+.preset-block span {
+  font-size: 9px;
+
+  line-height: 1;
+
+  text-align: center;
+}
+
+/* Presets Carousel */
+
+.presets-carousel {
+  display: flex;
+
+  gap: 10px;
+
+  overflow-x: auto;
+
+  overflow-y: hidden;
+
+  scrollbar-width: none;
+
+  -ms-overflow-style: none;
+
+  padding: 2px;
+}
+
+.presets-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+/* Search Field */
+
+.search-widget {
+  position: relative;
+
+  width: 192px;
+}
+
+.search-widget input {
+  width: 100%;
+
+  padding-left: 32px;
+
+  padding-right: 8px;
+
+  height: 32px;
+
+  border-radius: 6px;
+
+  font-size: 12px;
+
+  border: 1px solid transparent;
+}
+
+html.dark .search-widget input {
+  background-color: rgba(0, 77, 99, 0.3);
+
+  color: var(--ncs-blue-light);
+}
+
+.search-widget i {
+  position: absolute;
+
+  left: 10px;
+
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  font-size: 14px;
+
+  color: var(--ncs-blue-dark);
+}
+
+html.dark .search-widget i {
+  color: var(--ncs-blue-light);
+}
+
+/* Filter Tags */
+
+.filter-tags-container {
+  display: flex;
+
+  align-items: center;
+
+  gap: 4px;
+
+  flex-wrap: wrap;
+}
+
+.filter-tag {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 4px;
+
+  padding: 2px 8px;
+
+  font-size: 11px;
+
+  border-radius: 12px;
+
+  background-color: var(--ncs-green-dark);
+
+  color: white;
+}
+
+.clear-filters-btn {
+  padding: 2px 6px;
+
+  font-size: 11px;
+
+  border-radius: 4px;
+
+  background-color: var(--ncs-orange-amber);
+
+  color: white;
+
+  border: none;
+
+  cursor: pointer;
+}
+
+/* Financial Toggle - 3 Position Switch */
+
+.financial-toggle {
+  display: flex;
+
+  background-color: rgba(0, 107, 104, 0.1);
+
+  border-radius: 16px;
+
+  padding: 2px;
+
+  height: 32px;
+}
+
+html.dark .financial-toggle,
+#dashboard-appbar.dark .financial-toggle,
+#dashboard-appbar .financial-toggle {
+  background-color: rgba(0, 0, 0, 0.08);
+
+  border-radius: 9999px;
+}
+
+.financial-toggle button {
+  flex: 1;
+
+  border: none;
+
+  background: transparent;
+
+  font-size: 11px;
+
+  cursor: pointer;
+
+  border-radius: 14px;
+
+  transition: all 0.2s ease;
+
+  padding: 4px 10px;
+}
+
+.financial-toggle button.active {
+  background-color: var(--ncs-green-dark);
+
+  color: white;
+}
+
+.financial-toggle button.active.lucros {
+  background-color: var(--malachite, #0f9d6e);
+}
+
+.financial-toggle button.active.gastos {
+  background-color: var(--flag-red, #d93a3a);
+}
+
+/* Period Toggle - Estilo Financial Toggle */
+
+#dashboard-appbar .period-toggle {
+  display: flex;
+
+  align-items: center;
+
+  gap: 0 2px;
+
+  font-size: 0.75rem;
+
+  background-color: rgba(0, 0, 0, 0.08);
+
+  border-radius: 9999px;
+
+  padding: 2px;
+}
+
+#dashboard-appbar .period-toggle div {
+  padding: 4px 10px;
+
+  cursor: pointer;
+
+  border-radius: 9999px;
+
+  transition: all 0.15s ease;
+
+  white-space: nowrap;
+}
+
+#dashboard-appbar .period-toggle div:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+#dashboard-appbar .period-toggle .active-period {
+  background-color: rgba(83, 221, 108, 0.18);
+
+  color: #2f9e4a;
+
+  font-weight: 500;
+}
+
+html.dark #dashboard-appbar .period-toggle .active-period {
+  background-color: rgba(83, 221, 108, 0.2);
+
+  color: #0f9d6e;
+}
+
+/* Widget Highlight for Search */
+
+.widget-highlighted {
+  outline: 2px solid #f59e0b !important;
+
+  outline-offset: 2px;
+
+  z-index: 100;
+}
+
+/* Preset Cards - estilo Windows AppBar */
+
+.preset-card {
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+
+  border: 1px solid rgba(148, 163, 184, 0.4);
+}
+
+.preset-card:hover {
+  transform: scale(1.05);
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.preset-card.active {
+  border-color: var(--ncs-green-dark);
+
+  background-color: rgba(0, 107, 104, 0.15);
+}
+
+html.dark .preset-card.active {
+  border-color: var(--ncs-blue-light);
+
+  background-color: rgba(178, 219, 231, 0.15);
+}
+
+.preset-card i {
+  font-size: 18px;
+
+  margin-bottom: 2px;
+
+  transition: color 0.2s ease;
+}
+
+.preset-card span {
+  font-size: 10px;
+
+  line-height: 1;
+
+  text-align: center;
+}
+
+/* Responsive Widget Bar */
+
+@media (max-width: 1024px) {
+  .search-widget {
+    width: 140px;
+  }
+
+  .preset-card {
+    width: 42px;
+    height: 42px;
+  }
+
+  .preset-card i {
+    font-size: 16px;
+  }
+
+  .preset-card span {
+    font-size: 9px;
+  }
+}
+
+@media (max-width: 768px) {
+  #widget-bar {
+    min-height: 56px;
+    padding: 6px 12px;
+  }
+
+  .search-widget {
+    width: 120px;
+  }
+
+  .financial-toggle {
+    height: 28px;
+  }
+
+  .financial-toggle button {
+    font-size: 10px;
+  }
+
+  .preset-card {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+@media (max-width: 640px) {
+  #widget-bar .widget-bar-section {
+    flex-wrap: wrap;
+  }
+
+  .presets-carousel {
+    max-width: 200px;
+  }
+
+  .search-widget {
+    width: 100px;
+  }
+}
+
+@media (max-width: 768px) {
+  #widget-bar {
+    min-height: 56px;
+    padding: 6px 12px;
+  }
+
+  .search-widget {
+    width: 120px;
+  }
+
+  .financial-toggle {
+    height: 28px;
+  }
+
+  .financial-toggle button {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 640px) {
+  #widget-bar .widget-bar-section {
+    flex-wrap: wrap;
+  }
+
+  .presets-carousel {
+    max-width: 200px;
+  }
+
+  .search-widget {
+    width: 100px;
+  }
+}
+
+.htmx-indicator {
+  opacity: 0;
+}
+.htmx-request .htmx-indicator {
+  opacity: 1;
+  transition: opacity 200ms ease-in;
+}
+.htmx-request.htmx-indicator {
+  opacity: 1;
+  transition: opacity 200ms ease-in;
+}
+
+[data-lucide] {
+  display: none;
+}
+.lucide {
+  display: inline-block;
+}
+.nav-badge-new {
+  display: inline-block;
+  font-size: 7px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: #0a7d56;
+  color: #fff;
+  vertical-align: middle;
+  margin-left: 4px;
+  letter-spacing: 0.3px;
+}
+
+/* ── Navegacao estilo Bootstrap puro (sem Bootstrap) — nav-tabs com dropdown ── */
+.widget-nav-wrapper {
+  border-bottom: 1px solid #dee2e6;
+  padding: 12px 16px 0 16px;
+  flex-shrink: 0;
+  background: transparent;
+}
+.dark .widget-nav-wrapper {
+  border-bottom-color: #2a3430;
+  background: transparent;
+}
+.widget-nav-tabs {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: flex-end;
+  gap: 2px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  position: relative;
+  bottom: -1px;
+}
+.widget-nav-tabs::-webkit-scrollbar {
+  display: none;
+}
+.widget-nav-tabs .nav-item {
+  position: relative;
+  margin-bottom: -1px;
+  flex-shrink: 0;
+}
+.widget-nav-tabs .nav-link,
+.widget-modal-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  background: transparent;
+  color: #64748b;
+  transition: all 0.15s ease;
+}
+.widget-nav-tabs .nav-link:hover,
+.widget-modal-tab:hover {
+  border-color: #e9ecef #e9ecef #dee2e6;
+  background: rgba(15, 157, 110, 0.04);
+  color: #0f9d6e;
+  isolation: isolate;
+}
+.widget-nav-tabs .nav-link.active,
+.widget-nav-tabs .nav-link.active-tab,
+.widget-modal-tab.active,
+.widget-modal-tab.active-tab {
+  color: #0f9d6e;
+  background: #fdfefe;
+  border-color: #dee2e6 #dee2e6 #fdfefe;
+  box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.04);
+}
+.dark .widget-nav-tabs .nav-link,
+.dark .widget-modal-tab {
+  color: #cbd5e1;
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.03);
+}
+.dark .widget-nav-tabs .nav-link:hover,
+.dark .widget-modal-tab:hover {
+  border-color: rgba(15, 157, 110, 0.5);
+  background: rgba(15, 157, 110, 0.14);
+  color: #3ec48f;
+}
+.dark .widget-nav-tabs .nav-link.active,
+.dark .widget-nav-tabs .nav-link.active-tab,
+.dark .widget-modal-tab.active,
+.dark .widget-modal-tab.active-tab {
+  color: #3ec48f;
+  background: #0f1412;
+  border-color: rgba(15, 157, 110, 0.5) rgba(15, 157, 110, 0.5) #0f1412;
+}
+.nav-link.disabled {
+  color: #adb5bd;
+  pointer-events: none;
+  opacity: 0.6;
+}
+.dropdown {
+  position: relative;
+}
+.dropdown-toggle {
+  padding-right: 28px !important;
+}
+.dropdown-toggle .dropdown-chevron {
+  font-size: 10px;
+  margin-left: 2px;
+  transition: transform 0.2s ease;
+}
+.dropdown.show .dropdown-chevron {
+  transform: rotate(180deg);
+}
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 1000;
+  display: none;
+  min-width: 260px;
+  padding: 6px;
+  margin: 0;
+  list-style: none;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+}
+.dropdown.show .dropdown-menu {
+  display: block;
+  animation: dropdownIn 0.15s ease-out;
+}
+@keyframes dropdownIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 9px 12px;
+  font-size: 12.5px;
+  font-weight: 500;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: #334155;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.12s;
+}
+.dropdown-item:hover {
+  background: #f1f5f9;
+  color: #0f9d6e;
+}
+.dropdown-item.active {
+  background: #eaf7f1;
+  color: #0f9d6e;
+  font-weight: 600;
+}
+.dark .dropdown-menu {
+  background: #1e2a26;
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+.dark .dropdown-item {
+  color: #cbd5e1;
+}
+.dark .dropdown-item:hover {
+  background: rgba(15, 157, 110, 0.12);
+  color: #3ec48f;
+}
+.dark .dropdown-item.active {
+  background: rgba(15, 157, 110, 0.15);
+  color: #3ec48f;
+}
+.dropdown-divider {
+  height: 1px;
+  margin: 6px 0;
+  background: #e2e8f0;
+  border: none;
+}
+.dark .dropdown-divider {
+  background: rgba(255, 255, 255, 0.08);
+}
+/* Fix: lupa nao sobrepoe texto */
+.search-menu .search-icon {
+  pointer-events: none !important;
+  z-index: 2 !important;
+  left: 12px !important;
+}
+.search-menu input#search-menu-input {
+  padding-left: 38px !important;
+  text-indent: 0 !important;
+}
+#widget-modal-footer .relative i.bi-search {
+  pointer-events: none !important;
+}
+#widget-modal-search {
+  padding-left: 38px !important;
+}
+/* Accordion */
+.calc-tab {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 4px 10px;
+  font-size: 9px;
+  font-weight: 500;
+  border-radius: 9999px;
+  border: 1.5px solid #e9eeec;
+  white-space: nowrap;
+  transition: all 0.15s;
+  color: var(--cor-texto-medio);
+  cursor: pointer;
+  background: #fff;
+}
+.calc-tab:hover {
+  border-color: #0f9d6e;
+  color: #0f9d6e;
+  background: #eaf7f1;
+}
+.dark .calc-tab {
+  border-color: rgba(30, 42, 38, 0.7);
+  background: rgba(21, 27, 25, 0.6);
+  color: #94a3b8;
+}
+.dark .calc-tab:hover {
+  border-color: #0f9d6e;
+  color: #3ec48f;
+  background: rgba(15, 157, 110, 0.1);
+}
+.calc-tab.active-calc-tab {
+  border-color: #0f9d6e;
+  color: #0a7d56;
+  background: #eaf7f1;
+}
+.dark .calc-tab.active-calc-tab {
+  border-color: #0f9d6e;
+  color: #3ec48f;
+  background: rgba(15, 157, 110, 0.15);
+}
+#command-palette-results .cp-item:hover {
+  background: #eaf7f1;
+}
+.dark #command-palette-results .cp-item:hover {
+  background: rgba(15, 157, 110, 0.1);
+}
+#command-palette-results .cp-item.selected {
+  background: #d1fae5;
+}
+.dark #command-palette-results .cp-item.selected {
+  background: rgba(15, 157, 110, 0.2);
+}
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #field-notebook-content,
+  #field-notebook-content * {
+    visibility: visible;
+  }
+  #field-notebook-content {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+  .no-print {
+    display: none !important;
+  }
+  #field-notebook-content {
+    font-size: 11px !important;
+  }
+  #field-notebook-content table {
+    page-break-inside: avoid;
+  }
+  #field-notebook-content h1 {
+    font-size: 16px !important;
+  }
+  #field-notebook-content h2 {
+    font-size: 13px !important;
+  }
+}
+/* ── Accordion como botoes pill (igual sub-tab vegetal/animal) — maiores ── */
+.accordion-header {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: auto;
+  min-width: 200px;
+  max-width: 100%;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  line-height: 1;
+  border: 1.5px solid transparent;
+  background: transparent;
+  transition: all 0.16s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: left;
+  color: var(--cor-texto-medio);
+}
+.accordion-header:hover {
+  color: #0f9d6e;
+  background: rgba(15, 157, 110, 0.08);
+  border-color: rgba(15, 157, 110, 0.14);
+}
+.dark .accordion-header {
+  color: #cbd5e1;
+  border-color: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.04);
+}
+.dark .accordion-header:hover {
+  color: #3ec48f;
+  background: rgba(15, 157, 110, 0.12);
+  border-color: rgba(15, 157, 110, 0.35);
+}
+.accordion-header.open {
+  color: #fff;
+  background: #0f9d6e;
+  border-color: #0f9d6e;
+  box-shadow: 0 4px 12px rgba(15, 157, 110, 0.2);
+}
+.dark .accordion-header.open {
+  color: #fff;
+  background: #0f9d6e;
+  border-color: #0f9d6e;
+}
+.accordion-header .chevron {
+  transition: transform 0.2s;
+  font-size: 12px;
+}
+.accordion-header.open .chevron {
+  transform: rotate(180deg);
+}
+.accordion-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+}
+.accordion-body.open {
+  max-height: 2000px;
+  transition: max-height 0.5s ease-in;
+}
+.accordion-count {
+  margin-left: auto;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 10px;
+  background: rgba(15, 157, 110, 0.12);
+  color: #0f9d6e;
+}
+.dark .accordion-count {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+.accordion-header.open .accordion-count {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+/* Subgroup pills — maiores */
+.subgroup-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 9999px;
+  border: 1.5px solid #e9eeec;
+  background: #fff;
+  color: var(--cor-texto-medio);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.subgroup-pill:hover {
+  border-color: #0f9d6e;
+  color: #0f9d6e;
+  background: #eaf7f1;
+}
+.subgroup-pill.active {
+  border-color: #0f9d6e;
+  color: #0a7d56;
+  background: #eaf7f1;
+}
+.dark .subgroup-pill {
+  border-color: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.04);
+  color: #cbd5e1;
+}
+.dark .subgroup-pill:hover {
+  border-color: #0f9d6e;
+  color: #3ec48f;
+  background: rgba(15, 157, 110, 0.14);
+}
+.dark .subgroup-pill.active {
+  border-color: #0f9d6e;
+  color: #3ec48f;
+  background: rgba(15, 157, 110, 0.18);
+}
+.subgroup-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+/* Widget cards — botoes subgroup maiores, minimo 140x44 */
+.widget-card {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1.5px solid #e9eeec;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  animation: widgetCardIn 0.2s ease-out both;
+  min-width: 140px;
+  min-height: 44px;
+  overflow: hidden;
+}
+@keyframes widgetCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.dark .widget-card {
+  border-color: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.03);
+}
+.widget-card:hover {
+  border-color: #0f9d6e;
+  background: #eaf7f1;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(15, 157, 110, 0.12);
+}
+.dark .widget-card:hover {
+  background: rgba(15, 157, 110, 0.12);
+  border-color: #0f9d6e;
+  box-shadow: 0 4px 12px rgba(15, 157, 110, 0.15);
+}
+.widget-card.widget-added {
+  border-color: #0f9d6e;
+  background: rgba(15, 157, 110, 0.05);
+}
+.widget-card.widget-added::after {
+  content: '\f26a';
+  font-family: 'bootstrap-icons';
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #0f9d6e;
+  color: #fff;
+  font-size: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 0 2px #fff;
+  animation: checkPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes checkPop {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+.dark .widget-card.widget-added::after {
+  box-shadow: 0 0 0 2px #151b19;
+}
+.widget-card-icon {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.widget-card:hover .widget-card-icon {
+  transform: scale(1.05);
+}
+.widget-card-label {
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--cor-texto);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dark .widget-card-label {
+  color: #e9eeec;
+}
+.widget-card:hover .widget-card-label {
+  color: #0a7d56;
+}
+.dark .widget-card:hover .widget-card-label {
+  color: #3ec48f;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+body.widget-modal-open .resize-handle,
+body.widget-modal-open .edit-mode-badge,
+body.widget-modal-open .remove-widget-btn {
+  display: none !important;
+  pointer-events: none !important;
+}
+body.widget-modal-open .bento-block.widget-edit-mode {
+  outline: none !important;
+  box-shadow: none !important;
+}
+/* Mini panel pill tabs */
+.mini-pill-tab {
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 9999px;
+  border: 1.5px solid #e9eeec;
+  background: #fff;
+  color: var(--cor-texto);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.mini-pill-tab:hover {
+  border-color: #0f9d6e;
+  color: #0f9d6e;
+}
+.mini-pill-tab.active {
+  border-color: #0f9d6e;
+  color: #0a7d56;
+  background: #eaf7f1;
+}
+.mini-pill-tab.mini-pill-link {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #0f9d6e;
+  color: #fff;
+  border-color: #0f9d6e;
+}
+.mini-pill-tab.mini-pill-link:hover {
+  background: #0a7d56;
+  border-color: #0a7d56;
+  color: #fff;
+}
+.dark .mini-pill-tab {
+  border-color: rgba(30, 42, 38, 0.7);
+  background: rgba(21, 27, 25, 0.4);
+  color: #e9eeec;
+}
+.dark .mini-pill-tab:hover {
+  border-color: #0f9d6e;
+  color: #3ec48f;
+}
+.dark .mini-pill-tab.active {
+  border-color: #0f9d6e;
+  color: #3ec48f;
+  background: rgba(15, 157, 110, 0.15);
+}
+.dark .mini-pill-tab.mini-pill-link {
+  background: #0f9d6e;
+  color: #fff;
+  border-color: #0f9d6e;
+}
+.dark .mini-pill-tab.mini-pill-link:hover {
+  background: #0a7d56;
+  border-color: #0a7d56;
+  color: #fff;
+}
+/* Mini panel content box */
+.mini-panel-box {
+  border: 1.5px solid #e9eeec;
+  border-radius: 10px;
+  padding: 12px;
+  background: #fff;
+  width: 100%;
+}
+.dark .mini-panel-box {
+  border-color: rgba(30, 42, 38, 0.5);
+  background: rgba(21, 27, 25, 0.3);
+}
+/* Grid 2 colunas para cards */
+.mini-panel-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+/* Toggle 3 posicoes */
+.mini-toggle {
+  display: inline-flex;
+  border: 1.5px solid #e9eeec;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #f8fafc;
+}
+.mini-toggle button {
+  padding: 3px 8px;
+  font-size: 8px;
+  font-weight: 500;
+  border: none;
+  background: transparent;
+  color: var(--cor-texto);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+  border-right: 1px solid #e9eeec;
+}
+.mini-toggle button:last-child {
+  border-right: none;
+}
+.mini-toggle button:hover {
+  color: #0f9d6e;
+}
+.mini-toggle button.active {
+  background: #0f9d6e;
+  color: #fff;
+  font-weight: 600;
+}
+.dark .mini-toggle {
+  border-color: rgba(30, 42, 38, 0.7);
+  background: rgba(21, 27, 25, 0.4);
+}
+.dark .mini-toggle button {
+  color: #e9eeec;
+  border-right-color: rgba(30, 42, 38, 0.5);
+}
+.dark .mini-toggle button:hover {
+  color: #3ec48f;
+}
+.dark .mini-toggle button.active {
+  background: #0a7d56;
+  color: #fff;
+}
+/* Card horizontal */
+.mini-card {
+  border: 1.5px solid #e9eeec;
+  border-radius: 10px;
+  padding: 10px;
+  background: #fff;
+  display: flex;
+  gap: 10px;
+  min-height: 130px;
+}
+.dark .mini-card {
+  border-color: rgba(30, 42, 38, 0.5);
+  background: rgba(21, 27, 25, 0.35);
+}
+.mini-star-btn {
+  border: none;
+  background: transparent;
+  color: #cbd5e1;
+  cursor: pointer;
+  padding: 0 2px;
+  font-size: 11px;
+  line-height: 1;
+  vertical-align: middle;
+  transition:
+    color 0.15s ease,
+    transform 0.15s ease;
+}
+.mini-star-btn:hover {
+  color: #f59e0b;
+  transform: scale(1.15);
+}
+.mini-star-btn.active {
+  color: #f59e0b;
+}
+.mini-star-btn .bi {
+  pointer-events: none;
+}
+.mini-card-left {
+  flex: 0 0 38%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.mini-card-right {
+  flex: 1;
+  position: relative;
+  background: #f1f5f9;
+  border-radius: 6px;
+  overflow: hidden;
+  min-height: 100px;
+}
+.dark .mini-card-right {
+  background: rgba(21, 27, 25, 0.4);
+}
+.mini-card-right canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+.mini-card-title {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--cor-texto-medio);
+  line-height: 1.2;
+}
+.dark .mini-card-title {
+  color: #e9eeec;
+}
+.mini-card-badge {
+  font-size: 7px;
+  padding: 1px 5px;
+  border-radius: 9999px;
+  background: #f1f5f9;
+  color: var(--cor-texto-medio);
+  display: inline-block;
+  width: fit-content;
+}
+.dark .mini-card-badge {
+  background: rgba(30, 42, 38, 0.5);
+  color: #94a3b8;
+}
+.mini-card-select {
+  width: 100%;
+  font-size: 8px;
+  padding: 2px 4px;
+  border: 1px solid #e9eeec;
+  border-radius: 4px;
+  background: #fff;
+  color: var(--cor-texto);
+}
+.dark .mini-card-select {
+  border-color: rgba(30, 42, 38, 0.7);
+  background: rgba(13, 20, 18, 0.6);
+  color: #e9eeec;
+}
+.mini-inserir-btn {
+  margin-top: auto;
+  width: 100%;
+  padding: 10px 0;
+  font-size: 12px;
+  font-weight: 700;
+  border: none;
+  border-radius: 8px;
+  background: #0a7d56;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.mini-inserir-btn:hover {
+  background: #047857;
+}
+.mini-chart-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* ═════════════════════════════════════════════
+           3-COLUMN WIDGET EDITOR (Chart Lab)
+           ─────────────────────────────────────────────
+           Col 1 · Config (categoria, variantes, comparar)
+           Col 2 · Preview do widget
+           Col 3 · Fonte de dados (Mercado vs Minha produção)
+           ═════════════════════════════════════════════ */
+.mini-editor {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr) 320px;
+  gap: 10px;
+  height: 100%;
+  min-height: 0;
+}
+.mini-editor-col {
+  border: 1.5px solid #e9eeec;
+  border-radius: 10px;
+  background: #fff;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.mini-editor-col::-webkit-scrollbar {
+  display: none;
+}
+.mini-editor-col-fixed {
+  overflow: hidden !important;
+  border-color: #0f9d6e;
+  background: rgba(15, 157, 110, 0.04);
+}
+.dark .mini-editor-col-fixed {
+  border-color: rgba(15, 157, 110, 0.3);
+  background: rgba(15, 157, 110, 0.04);
+}
+.mini-editor-section {
+  border-top: 1px solid #e9eeec;
+  margin-top: 6px;
+  padding-top: 8px;
+}
+.dark .mini-editor-section {
+  border-top-color: rgba(30, 42, 38, 0.5);
+}
+.dark .mini-editor-col {
+  border-color: rgba(30, 42, 38, 0.5);
+  background: rgba(21, 27, 25, 0.3);
+}
+.mini-editor-col-title {
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--cor-texto-medio);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.mini-variant-hint {
+  font-size: 6.5px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: #94a3b8;
+}
+.dark .mini-editor-col-title {
+  color: #94a3b8;
+}
+/* Categoria (tipo) de gráfico */
+.mini-style-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.mini-style-pill {
+  padding: 3px 8px;
+  font-size: 8px;
+  font-weight: 600;
+  border-radius: 9999px;
+  border: 1.5px solid #e9eeec;
+  background: #fff;
+  color: var(--cor-texto-medio);
+  cursor: pointer;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.mini-style-pill:hover {
+  border-color: #0f9d6e;
+  color: #0a7d56;
+}
+.mini-style-pill.active {
+  border-color: #0f9d6e;
+  color: #fff;
+  background: #0a7d56;
+}
+.dark .mini-style-pill {
+  border-color: rgba(30, 42, 38, 0.7);
+  background: rgba(21, 27, 25, 0.4);
+  color: #cbd5e1;
+}
+.dark .mini-style-pill:hover {
+  border-color: #0f9d6e;
+  color: #3ec48f;
+}
+.dark .mini-style-pill.active {
+  border-color: #0f9d6e;
+  color: #fff;
+  background: #0a7d56;
+}
+/* Variantes (seleção única — radio chips) */
+.mini-variant-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+.mini-variant-radio {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+.mini-variant-chip {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  cursor: pointer;
+  padding: 5px 7px;
+  border-radius: 8px;
+  border: 1.5px solid #e9eeec;
+  background: #fff;
+  transition: all 0.15s;
+  position: relative;
+}
+.mini-variant-chip:hover {
+  border-color: #0f9d6e;
+  background: #eaf7f1;
+}
+.mini-variant-chip-check {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  border-radius: 9999px;
+  border: 1.5px solid #cbd5e1;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 8px;
+  transition: all 0.15s;
+}
+.mini-variant-chip.active,
+.mini-variant-radio:checked + .mini-variant-chip {
+  border-color: #0f9d6e;
+  background: #e4f5ec;
+  box-shadow: 0 1px 4px rgba(15, 157, 110, 0.12);
+}
+.mini-variant-chip.active .mini-variant-chip-check,
+.mini-variant-radio:checked + .mini-variant-chip .mini-variant-chip-check {
+  background: #0a7d56;
+  border-color: #0a7d56;
+}
+.mini-variant-check-name {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--cor-texto-medio);
+  line-height: 1.1;
+  display: block;
+}
+.mini-variant-check-desc {
+  font-size: 7px;
+  color: #94a3b8;
+  margin-top: 1px;
+  line-height: 1.2;
+  display: block;
+}
+.dark .mini-variant-chip {
+  border-color: rgba(30, 42, 38, 0.5);
+  background: rgba(21, 27, 25, 0.4);
+}
+.dark .mini-variant-chip:hover {
+  border-color: #0f9d6e;
+  background: rgba(15, 157, 110, 0.08);
+}
+.dark .mini-variant-chip.active,
+.dark .mini-variant-radio:checked + .mini-variant-chip {
+  border-color: #0f9d6e;
+  background: rgba(15, 157, 110, 0.12);
+}
+.dark .mini-variant-check-name {
+  color: #e9eeec;
+}
+.dark .mini-variant-chip-check {
+  border-color: rgba(30, 42, 38, 0.7);
+  background: rgba(13, 20, 18, 0.5);
+}
+/* Comparar séries */
+.mini-compare {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.mini-compare-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 7px;
+  border-radius: 7px;
+  border: 1.5px solid #e9eeec;
+  background: #f8fafc;
+}
+.dark .mini-compare-row {
+  border-color: rgba(30, 42, 38, 0.5);
+  background: rgba(21, 27, 25, 0.35);
+}
+.mini-compare-color {
+  width: 16px;
+  height: 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 0;
+  background: transparent;
+}
+.mini-compare-label {
+  flex: 1;
+  min-width: 0;
+  font-size: 8px;
+  font-weight: 600;
+  color: var(--cor-texto-medio);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dark .mini-compare-label {
+  color: #cbd5e1;
+}
+.mini-compare-remove {
+  border: none;
+  background: transparent;
+  color: #f43f5e;
+  cursor: pointer;
+  padding: 2px;
+}
+.mini-compare-add {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.mini-compare-add select {
+  flex: 1;
+  min-width: 0;
+  font-size: 8px;
+  padding: 3px 5px;
+  border: 1.5px solid #e9eeec;
+  border-radius: 6px;
+  background: #fff;
+  color: var(--cor-texto);
+}
+.dark .mini-compare-add select {
+  border-color: rgba(71, 85, 105, 0.35);
+  background: rgba(15, 23, 42, 0.5);
+  color: #e9eeec;
+}
+.mini-add-ok {
+  padding: 4px 8px;
+  font-size: 8px;
+  font-weight: 700;
+  border: none;
+  border-radius: 6px;
+  background: #0f9d6e;
+  color: #fff;
+  cursor: pointer;
+}
+.mini-add-ok:hover {
+  background: #0a7d56;
+}
+/* Preview (col 2) */
+.mini-editor-preview {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  background: #f8fafc;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.dark .mini-editor-preview {
+  background: rgba(30, 41, 59, 0.35);
+}
+.mini-editor-preview canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+.mini-editor-preview-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+  font-size: 9px;
+}
+.mini-editor-prevrow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: #e4f5ec;
+  border: 1.5px solid #bbf7d0;
+}
+.dark .mini-editor-prevrow {
+  background: rgba(15, 157, 110, 0.1);
+  border-color: rgba(15, 157, 110, 0.3);
+}
+.mini-editor-prevrow .lbl {
+  font-size: 7px;
+  color: var(--cor-texto-medio);
+}
+.mini-editor-prevrow .val {
+  font-size: 11px;
+  font-weight: 800;
+  color: #0a7d56;
+}
+.dark .mini-editor-prevrow .val {
+  color: #3ec48f;
+}
+/* Fonte de dados (col 3) */
+.mini-source-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.mini-source-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 1.5px solid #e9eeec;
+  background: #fff;
+  transition: all 0.15s;
+  text-align: left;
+  width: 100%;
+}
+.mini-source-item:hover {
+  border-color: #fcd34d;
+}
+.mini-source-item.active {
+  border-color: #0f9d6e;
+  background: #e4f5ec;
+}
+.dark .mini-source-item {
+  border-color: rgba(71, 85, 105, 0.35);
+  background: rgba(15, 23, 42, 0.25);
+}
+.dark .mini-source-item:hover {
+  border-color: #fbbf24;
+}
+.dark .mini-source-item.active {
+  border-color: #0f9d6e;
+  background: rgba(15, 157, 110, 0.12);
+}
+.mini-source-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 9999px;
+  margin-top: 4px;
+  flex-shrink: 0;
+}
+.mini-source-title {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--cor-texto-medio);
+  line-height: 1.15;
+}
+.dark .mini-source-title {
+  color: #e9eeec;
+}
+.mini-source-sub {
+  font-size: 7px;
+  color: #94a3b8;
+}
+.mini-source-prev {
+  font-size: 9px;
+  font-weight: 800;
+  color: #0a7d56;
+}
+.dark .mini-source-prev {
+  color: #3ec48f;
+}
+.mini-source-desc {
+  font-size: 7px;
+  color: var(--cor-texto-medio);
+  margin-top: 2px;
+}
+.dark .mini-source-desc {
+  color: #94a3b8;
+}
+/* Carousel de registros (col 3) — cards selecionáveis por borda */
+.mini-record-carousel {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 4px;
+  align-items: stretch;
+}
+.mini-record-carousel::-webkit-scrollbar {
+  display: none;
+}
+.mini-record-card {
+  flex: 0 0 150px;
+  width: 150px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1.5px solid #e9eeec;
+  background: #fff;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  text-align: left;
+  transition: all 0.15s;
+  justify-content: flex-start;
+}
+.mini-record-card:hover {
+  border-color: #0f9d6e;
+  background: #eaf7f1;
+}
+.mini-record-card.selected {
+  border-color: #0f9d6e;
+  background: rgba(15, 157, 110, 0.05);
+  box-shadow: 0 2px 8px rgba(15, 157, 110, 0.15);
+}
+.mini-record-card-name {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--cor-texto);
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mini-record-card-detail {
+  font-size: 9px;
+  color: #94a3b8;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mini-record-card-badge {
+  display: inline-block;
+  font-size: 8px;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-weight: 700;
+  width: fit-content;
+}
+.dark .mini-record-card {
+  border-color: rgba(71, 85, 105, 0.35);
+  background: rgba(15, 23, 42, 0.25);
+}
+.dark .mini-record-card:hover {
+  border-color: #3ec48f;
+  background: rgba(15, 157, 110, 0.1);
+}
+.dark .mini-record-card.selected {
+  border-color: #0f9d6e;
+  background: rgba(15, 157, 110, 0.12);
+}
+.dark .mini-record-card-name {
+  color: #e9eeec;
+}
+.dark .mini-record-card-detail {
+  color: #94a3b8;
+}
+@media (max-width: 900px) {
+  .mini-editor {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(220px, 1fr) auto;
+  }
+}
+/* =========================================================================
+   MOLDURA DO WIDGET — verde esmeralda no canto real
+   =========================================================================
+   O que estava aqui era `border: none; box-shadow: none`. Os widgets
+   ficavam SEM moldura nenhuma, e como `buildModernKpiHtml` desenhava um
+   cartao com fundo e borda propria DENTRO do widget, o que se via era uma
+   moldura a meio do painel — a "borda interna" — em vez de uma moldura em
+   volta do widget. Duas camadas onde so devia existir uma.
+
+   Agora a moldura e' do `.bento-block` (o widget inteiro) e o interior nao
+   tem fundo nem borda: o fundo do painel atravessa o vidro.
+
+   Este ficheiro e' o ULTIMO a carregar (base.html põe `extra_css` no fim,
+   e o index.html e' que o inclui), por isso ganha os empates de
+   especificidade a soft-ui.css e widgets-polish.css sem precisar de
+   !important em tudo.
+
+   Ponto de restauracao: rever para `border: none` neste bloco.
+   ========================================================================= */
+
+:root {
+  /* Borda do widget. `--pal-ok` e' o verde de dados do sistema; quando nao
+     ha paleta de tema, cai no malachite (#0f9d6e). */
+  --amp-borda-widget: color-mix(in srgb, var(--pal-ok, #0f9d6e) 55%, transparent);
+  --amp-borda-widget-forte: color-mix(in srgb, var(--pal-ok, #0f9d6e) 85%, transparent);
+  /* Vidro. Quase transparente: le-se o gradiente do painel atras do widget
+     em vez de tapar com um cartao preto. */
+  --amp-fundo-widget: rgba(255, 255, 255, 0.045);
+  --amp-fundo-widget-forte: rgba(255, 255, 255, 0.075);
+}
+
+/* Um tema escolhido pelo utilizador tem a sua cor de acento — o dourado do
+   AMOLED, por exemplo. A moldura segue-o em vez de impor o verde. */
+html.custom-theme {
+  --amp-borda-widget: color-mix(in srgb, var(--pal-accent, #ffd23f) 45%, transparent);
+  --amp-borda-widget-forte: color-mix(in srgb, var(--pal-accent, #ffd23f) 75%, transparent);
+}
+
+html.dark {
+  /* No escuro o verde de dados (#0f9d6e) some no fundo. O esmeralda claro
+     (#3ec48f) e' o mesmo verde, a luminancia certa para fundo escuro. */
+  --amp-borda-widget: color-mix(in srgb, #3ec48f 42%, transparent);
+  --amp-borda-widget-forte: color-mix(in srgb, #3ec48f 78%, transparent);
+  --amp-fundo-widget: rgba(16, 26, 23, 0.34);
+  --amp-fundo-widget-forte: rgba(16, 26, 23, 0.5);
+}
+
+.bento-block,
+.bento-block.lc-panel,
+html.dark .bento-block,
+html.dark .bento-block.lc-panel,
+html.custom-theme #content .bento-block,
+html.custom-theme #content .bento-block.lc-panel {
+  border: 1px solid var(--amp-borda-widget);
+  border-radius: var(--amp-widget-raio, 14px);
+  background-color: var(--amp-fundo-widget);
+  box-shadow: 0 6px 22px -12px rgba(0, 0, 0, 0.55);
+  outline: none;
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+/* O verde da moldura e' o destaque do widget, mas um destaque quieto: no
+   hover acende, sem grow/shadow que fa' o painel inteiro saltar. */
+.bento-block:hover,
+.bento-block.lc-panel:hover {
+  border-color: var(--amp-borda-widget-forte);
+  background-color: var(--amp-fundo-widget-forte);
+}
+
+/* O `.lc-panel` traz um `::after` com `filter: url(#container-glass)` e um
+   `::before` de borda a rodar. Ambos sao de outros paineis (login, modais) e
+   aqui so acrescentavam uma segunda moldura por cima da que desenhamos. */
+.bento-block::before,
+.bento-block::after,
+.bento-block.lc-panel::before,
+.bento-block.lc-panel::after {
+  display: none;
+  content: none;
+}
+
+/* O vidro so se escreve onde o navegador o faz. Sem `backdrop-filter` o
+   fundo semi-transparente continua legivel — so nao desfoca. */
+@supports (backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px)) {
+  .bento-block,
+  .bento-block.lc-panel,
+  html.dark .bento-block,
+  html.dark .bento-block.lc-panel {
+    backdrop-filter: blur(14px) saturate(150%);
+    -webkit-backdrop-filter: blur(14px) saturate(150%);
+  }
+}
+
+/* O `padding` do `.bento-block` nunca teve efeito: o `.widget-content` e'
+   `position:absolute; inset:0`, ou seja, ignora o padding do pai e escreve
+   por cima. E' por isso que os widgets antigos sentiam "apertados" e o
+   cartao interno do KPI carregava o seu proprio `p-4`. O respiro passa
+   aqui, onde de facto se aplica. */
+.bento-block > .widget-content {
+  padding: var(--amplia-widget-padding, 1.125rem);
+}
+
+/* O `overflow:auto` do `.widget-content` mantem conteudo inacessivel quando
+   o widget encolhe, mas a barra visivel a' ela propria aparecia dentro de
+   cards de 100px de altura — a "barra" que se via no meio dos widgets.
+   Some a barra; a rolagem continua a existir. */
+.bento-block > .widget-content {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--amp-borda-widget-forte) 55%, transparent) transparent;
+}
+.bento-block > .widget-content::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+.bento-block > .widget-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+.bento-block > .widget-content::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--amp-borda-widget-forte) 55%, transparent);
+  border-radius: 99px;
+}
+.bento-block > .widget-content::-webkit-scrollbar-thumb:hover {
+  background: var(--amp-borda-widget-forte);
+}
+
+/* -------------------------------------------------------------------------
+   O CONTEUDO DO WIDGET: sem cartao, sem fundo, sem borda
+   -------------------------------------------------------------------------
+   Tudo o que desenhava uma segunda camada dentro do widget:
+   - os cartoes de KPI (removidos em index.html, `buildModernKpiHtml`);
+   - as linhas de alerta e as minicasixas de previsao, que traziam
+     `bg-slate-50` / `dark:bg-slate-800/40` + `rounded-md`;
+   - os wrappers `.border` / `.border-b` das listas de artefatos e comandos.
+   Passam a ser apenas agrupamento: separacao por espaco e por um filete
+   muito discreto, sem caixa propria. */
+
+.bento-block .widget-content .amp-kpi {
+  position: relative;
+  min-width: 0;
+  /* `overflow-wrap`: sem isto a palavra mais longa do texto nao tem onde
+     partir e transborda do widget em vez de quebrar. Trata a palavra unica
+     e o numero com separador de milhar ("R$ 1.038.800,00"), que nao tem
+     espaco. */
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+/* O KPI nao pode ter `height:100%` (a classe `h-full` que traz no HTML).
+   O `.widget-content` e' um contentor flex em COLUNA com `overflow:auto`:
+   um filho a 100% da altura mede o contentor, nao o espaco que sobra, e o
+   texto final — a legenda, que tem `margin-top:auto` — sai pela base do
+   widget e corta-se a meio. Era o "Rent abi..." do KPI estreito e o
+   "Sem lancamentOS finai" do largo.
+
+   `flex:1` em vez disso: o KPI ocupa o espaco disponivel, encolhe quando
+   nao cabe e a legenda deixa de ser cortada. */
+.bento-block .widget-content .amp-kpi {
+  height: auto;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+/* Filhos directos: podem encolher em ambos os eixos. `min-width:auto` (o
+   default num flex item) e' o que impede a quebra dentro deles. */
+.bento-block .widget-content .amp-kpi > * {
+  min-width: 0;
+  max-width: 100%;
+  flex-shrink: 1;
+}
+
+/* Rotulo do KPI. `--pal-tick` e' o cinza de ticks do sistema, que e' o que
+  o resto do painel usa para texto secundario — antes era `text-slate-500`.
+
+  MEDIDO 2026-10-05: o rotulo media 0 px de ALTURA. A causa nao era o texto
+  ser grande — era o `flex-shrink: 1` herdado de `.amp-kpi > *`. Num widget
+  cujo conteudo nao cabe na altura (rotulo 13 + valor 50 + legenda 23 + gaps
+  8 = 94 px dentro de 62 px medidos), o flex encolhe os tres na proporcao e o
+  rotulo — o mais pequeno — vai a zero. Um rotulo de zero altura e' um
+  rotulo INVISIVEL, e nao "um rotulo pequena": o `kpi-area` media 64 px de
+  largura util e o rotulo "Área Total" precisa de 65 px.
+
+  `flex-shrink: 0` tira o rotulo da distribuicao: e' o texto que diz o que
+  o numero e', e sem ele o numero fica orfao. E `overflow-wrap: anywhere`
+  deixa-o QUEBRAR em vez de transbordar, que e' o pedido explicito — e
+  `break-words` no JS sozinho nao resolvia, porque o problema era o eixo
+  vertical, nao o horizontal.
+
+  `white-space: normal` e' OBRIGATORIO e e' a peca que faltava. MEDIDO na
+  cadeia de herencia:
+
+      .widget-content        white-space: nowrap   <-- a origem
+      .amp-kpi               white-space: nowrap   (herdado)
+      .amp-kpi__label        white-space: nowrap   (herdado)
+
+  `white-space` e' HERDADO, e nenhuma regra do repo define `nowrap` no
+  rotulo — vem do `.widget-content`, que o põe para as tabelas e listas
+  nao partirem as celulas. Por isso `break-words` no JS nao resolvia nada:
+  nao ha palavra para quebrar enquanto o espaco for `nowrap`. E' preciso
+  declarar `normal` no proprio rotulo, que e' o unico sitio onde a
+  excepcao faz sentido — um KPI e' texto corrido, nao uma celula de tabela. */
+.bento-block .widget-content .amp-kpi__label {
+  color: var(--pal-tick, #64748b);
+  opacity: 0.85;
+  flex-shrink: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  hyphens: auto;
+}
+
+/* O numero. Branco puro e' o que o olho vai buscar primeiro num painel
+   com 20 widgets; antes vinha de `text-slate-800 dark:text-white`.
+
+   `overflow-wrap: normal` e' deliberado e sobrepoe o `anywhere` herdado do
+   `.amp-kpi`. Com `anywhere`, um valor como "459,1%" ou "R$ 1.038.800,00"
+   partia-se a meio da linha dentro de um widget estreito — o numero grande,
+   que e' precisamente o que se le, ficava ilegivel. Aqui o numero so
+   quebra quando nao ha mais opcao; a escala do texto e' tratada pelo
+   `clamp()` do `.widget-content` (soft-ui.css). */
+.bento-block .widget-content .amp-kpi__value {
+  color: var(--text-primary, #f8fafc);
+  letter-spacing: -0.015em;
+  overflow-wrap: normal;
+  word-break: keep-all;
+  min-width: 0;
+}
+html:not(.dark) .bento-block .widget-content .amp-kpi__value {
+  color: var(--text-primary, #0f172a);
+}
+
+/* Legenda do KPI: `truncate` cortava "Manutenções pendentes" em
+   "Manutenções pend...". Duas linhas, e o texto que se queria ler fica.
+
+   Implementacao: `max-height` em vez de `-webkit-line-clamp`.
+
+   O clamp de linhas cria um contentor `-webkit-box`, e dentro dele o texto
+   e' medido em caixas de linha. Num widget cuja altura e' calculada pelo
+   grid, isso dava a legenda a altura de ZERO e punha-a invisivel — dava-se
+   pelo widget estreito: a caixa da legenda desenhava-se, o texto nao. Um
+   `max-height` em multiplos da altura da linha limita as mesmas duas linhas
+   sem introduzir esse contentor intermedio.
+
+   `min-width: 0` e' o que permite a quebra. Sem ele o `span`, sendo flex
+   item, fica no `min-content` — a largura da palavra mais longa — e essa
+   palavra transborda do widget em vez de partir. Era o "Rent abi..." e o
+   "Sem lancamentOS finai" que apareciam sem reticencias.
+
+   `overflow-wrap: anywhere` cobre os casos sem espaco onde partir: a palavra
+   unica e o numero com separador de milhar ("R$ 1.038.800,00"). */
+.bento-block .widget-content .amp-clamp-2 {
+  display: block;
+  max-height: 2.6em; /* 2 linhas, a line-height 1.3 */
+  overflow: hidden;
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: var(--pal-tick, #64748b);
+  opacity: 0.85;
+  line-height: 1.3;
+}
+/* O contentor da legenda tambem tem de ceder espaco:
+   - `align-items: center` alinhava badge e legenda pelo centro;
+   - `min-width: 0` + `flex-wrap` resolvem o caso apertado COM badge. Sem
+     o wrap, o badge (`shrink-0`, para nunca encolher) e a legenda disputam a
+     mesma linha e num widget estreito a legenda perde e desaparece — era o
+     "Rentabilidade estimada" que sumia ao lado do "+459,1%". Com `wrap`,
+     quando nao ha espaco para os dois, a legenda desce para a linha de
+     baixo em vez de ser cortada. */
+.bento-block .widget-content .amp-kpi__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+/* Linhas de lista (alertas, novidades, comandos, eventos): leem-se como
+   linhas de uma lista, nao como mini-cartoes empilhados. Fica um filete
+   entre elas em vez de uma caixa cada uma. */
+.bento-block .widget-content .rounded-md,
+.bento-block .widget-content .rounded-lg,
+.bento-block .widget-content .rounded-xl {
+  background-color: transparent;
+  border: 0;
+  box-shadow: none;
+}
+/* Linha de alerta. O que separa duas linhas e' um filete na mesma cor da
+   moldura do widget — o que mantem a lista ligada a uma coisa so. O `+`
+   salta a primeira: um filete no topo da lista marcava a borda do widget
+   uma segunda vez, exatamente a duplicacao que se quer tirar. */
+.bento-block .widget-content .amp-alerta-linha + .amp-alerta-linha {
+  border-top: 1px solid color-mix(in srgb, var(--amp-borda-widget) 32%, transparent);
+}
+/* Card de dia da previsao. `items-stretch` no contentor da linha iguala as
+   alturas, mas so se os tres tiverem o mesmo conteudo: por isso a humidade
+   entra sempre (index.html). Aqui o que se tira e' a caixa — os tres dias
+   leem-se como tres colunas do mesmo dado, divididas por espaco e por um
+   filete vertical, nao como tres cartoes. */
+.bento-block .widget-content .amp-dia-card {
+  background-color: transparent;
+  border: 0;
+  box-shadow: none;
+}
+.bento-block .widget-content .amp-dia-card + .amp-dia-card {
+  border-left: 1px solid color-mix(in srgb, var(--amp-borda-widget) 32%, transparent);
+}
+
+/* Filetes de lista genericos: um traco fino, na linha do verde. */
+.bento-block .widget-content .border-b,
+.bento-block .widget-content .border-t,
+.bento-block .widget-content table tr,
+.bento-block .widget-content thead tr {
+  border-color: color-mix(in srgb, var(--amp-borda-widget) 32%, transparent) !important;
+}
+
+/* Os slots de forecast (Hoje/Amanhã/Depois) e as miniaturas de estado
+   vazio vinham com `bg-slate-50`/`bg-slate-800`, que o soft-ui ja' pintava
+   de preto translucido — fundo opaco dentro de fundo transparente. */
+.bento-block .widget-content .bg-slate-50,
+.bento-block .widget-content .bg-slate-100,
+.bento-block .widget-content [class*='dark:bg-slate-800'] {
+  background-color: color-mix(in srgb, var(--pal-ok, #0f9d6e) 7%, transparent) !important;
+}
+/* =========================================================================
+   PAINEIS DE WIDGETS E EDIÇÃO
+   ========================================================================= */
+/* Superfície, borda, sombra e cores de texto destes painéis ficam em
+   panels-premium.css (tokens --pnl-*, light + dark). Aqui só o layout. */
+
+/* 1. Modal de Adicionar Widgets (#add-widget-modal-panel) */
+/* Remove a pseudo-borda antiga para não dar conflito */
+#add-widget-modal-panel::before,
+#add-widget-modal-panel::after,
+.widget-modal-box.lc-panel::before,
+.widget-modal-box.lc-panel::after {
+  display: none !important;
+}
+
+/* 2. Menu Flutuante de Edição (.edit-dropdown) */
+
+/* 3. Sub-painel / Culture Mini Panel (edição extra de gráficos) — FIX campos fora do lugar + botões sem clique */
+#culture-mini-panel .mini-editor {
+  display: grid !important;
+  grid-template-columns: 280px minmax(0, 1fr) 320px !important;
+  gap: 10px !important;
+  min-height: 0 !important;
+  align-items: start !important;
+}
+@media (max-width: 1024px) {
+  #culture-mini-panel .mini-editor {
+    grid-template-columns: 1fr !important;
+  }
+  #culture-mini-panel .mini-editor-col {
+    min-height: auto !important;
+  }
+}
+#culture-mini-panel .mini-editor-col,
+#culture-mini-panel .mini-editor-col-fixed {
+  pointer-events: auto !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+#culture-mini-panel button,
+#culture-mini-panel .mini-pill-tab,
+#culture-mini-panel .subgroup-pill {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+/* =========================================================================
+   PAINEIS DE WIDGETS E EDIÇÃO (VIDRO TOTAL / FULL GLASS)
+   ========================================================================= */
+
+/* Garantir que abas e conteúdos tenham altura 100% no modal content */
+#widget-modal-content {
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 400px !important;
+}
+.tab-content {
+  flex: 1 !important;
+  height: 100% !important;
+}
+#kpi-accordion-container {
+  width: 100% !important;
+  min-height: 200px !important;
+}
+
+/* Pills de Categorias (Comercial, Operacional, etc) — só o layout;
+   cor, fundo e borda vêm de panels-premium.css (#add-widget-modal-panel .subgroup-pill) */
+.subgroup-pill {
+  padding: 8px 16px !important;
+  border-radius: 12px !important;
+  font-weight: 500 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  transition: all 0.2s !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+.subgroup-pill.active,
+.subgroup-pill:hover {
+  transform: translateY(-1px) !important;
+}
+
+/* Cards dos Widgets (O que estava sumindo no meio) — só o layout.
+   Superfície usa color-mix sobre currentColor para acompanhar o tema
+   sem precisar de um par de regras. */
+.widget-card {
+  border: 1px solid color-mix(in srgb, currentColor 10%, transparent) !important;
+  background: color-mix(in srgb, currentColor 4%, transparent) !important;
+  border-radius: 16px !important;
+  padding: 16px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  transition: all 0.2s !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  min-height: 100px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  cursor: pointer;
+}
+.widget-card:hover {
+  background: color-mix(in srgb, currentColor 8%, transparent) !important;
+  border-color: color-mix(in srgb, currentColor 20%, transparent) !important;
+  transform: translateY(-2px) !important;
+}
+.widget-card-icon {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 20px !important;
+}
+.widget-card-label {
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  text-align: center !important;
+}

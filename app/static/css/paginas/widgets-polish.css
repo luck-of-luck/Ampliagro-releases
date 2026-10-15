@@ -1,0 +1,292 @@
+/* ==========================================================================
+   widgets-polish.css — respiro, cor e profundidade nos widgets do painel
+   ==========================================================================
+
+   Ponto de restauracao: tag `pre-widgets-css-2026-10-01` (5053f7f).
+   Para desfazer tudo o que este ficheiro faz: apagar o <link> em base.html
+   e apagar este ficheiro. Nao ha outra alteracao espalhada.
+
+   CARREGADO DEPOIS de soft-ui.css e dashboard-index.css (ver base.html), por
+   isso entra depois em caso de empate de especificidade.
+
+   --------------------------------------------------------------------------
+   O QUE ESTA A MUDAR, E PORQUE
+   --------------------------------------------------------------------------
+   1. Estados vazios que pareciam erro de carregamento.
+      O texto "sem dado" aparecia sozinho e, com uma linha por cima, lia-se
+      como "isto ainda esta a carregar". Agora ha um icone cinzento, o
+      conteudo centrado nos dois eixos, e a opacidade reduzida.
+
+      NOTA IMPORTANTE — e' deliberado NAO injectar uma curva de exemplo para
+      "melhorar" o vazio. Em index.html existem `_sampleProd` / `_sampleBar`
+      (linhas 3427-3498), vazios de proposito, com o comentario:
+      "UM WIDGET SEM DADO MOSTRA 'SEM DADO'". E' a decisao D2 da equipa: um
+      vazio avisado e' um bugreport, uma curva bonita e' uma mentira.
+      Este ficheiro muda o aspecto do aviso. Nao transforma o aviso em grafico.
+
+   2. Cores mais vivas contra fundo escuro.
+      Verde esmeralda #10b981 para o que esta saudavel, vermelho/laranja mais
+      saturado para o que e' critico, e um halo muito subtil para o alerta
+      chamar atencao sem gritar.
+
+   3. Espacamento.
+      O `.widget-content` usava `p-2` (8px) — apertado. Passa a 1.25rem (20px),
+      e o gap do grid sobe para 1rem.
+
+   4. Profundidade.
+      Gradiente muito subtil no fundo do widget, borda visivel (era quase
+      invisivel) e `backdrop-filter` atras de elementos coloridos.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   TOKENS
+   Todos num sitio so, para nao haver cor.escrita em tres ficheiros.
+   Os valores sao os que foram pedidos; todos podem ser sobrepostos por quem
+   vier depois.
+   -------------------------------------------------------------------------- */
+:root {
+  /* Semantica de estado */
+  --amplia-ok:            #10b981;   /* verde esmeralda: saudavel */
+  --amplia-ok-forte:      #059669;
+  --amplia-critico:       #ef4444;   /* vermelho saturado: critico */
+  --amplia-critico-forte: #dc2626;
+  --amplia-alerta:        #f97316;   /* laranja saturado: atencao */
+  --amplia-alerta-forte:  #ea580c;
+
+  /* Halo. Muito subtil de proposito: se se nota, esta a gritar. */
+  --amplia-glow-critico: 0 0 0 1px rgba(239, 68, 68, 0.28),
+                         0 4px 18px -6px rgba(239, 68, 68, 0.35);
+  --amplia-glow-alerta:  0 0 0 1px rgba(249, 115, 22, 0.26),
+                         0 4px 18px -6px rgba(249, 115, 22, 0.32);
+  --amplia-glow-ok:      0 0 0 1px rgba(16, 185, 129, 0.20),
+                         0 3px 14px -6px rgba(16, 185, 129, 0.28);
+
+  /* Superficie do widget */
+  --amplia-widget-borda:    rgba(255, 255, 255, 0.05);
+  --amplia-widget-borda-forte: rgba(255, 255, 255, 0.09);
+  --amplia-widget-padding:  1.25rem;   /* 20px */
+  --amplia-widget-gap:      1rem;      /* 16px */
+
+  /* Gradiente quase imperceptivel: so se sente quando se olha de lado. */
+  --amplia-widget-fundo:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.028) 0%, rgba(255, 255, 255, 0) 42%),
+    linear-gradient(160deg, rgba(255, 255, 255, 0.018) 0%, rgba(0, 0, 0, 0.10) 100%);
+}
+
+/* --------------------------------------------------------------------------
+   1. RESPIRO
+   O `.widget-content` e' montado em index.html:4601 como
+   `widget-content p-2 overflow-auto absolute inset-0 flex flex-col`.
+   `p-2` sao 8px. Loading depois de tailwind/soft-ui, por isso ganha o empate
+   de especificidade (0,2,0 vs 0,1,0).
+   -------------------------------------------------------------------------- */
+.bento-block .widget-content {
+  padding: var(--amplia-widget-padding);
+  gap: var(--amplia-widget-gap);
+}
+
+/* O bento-block e' o cartao. Padding interno, para o texto nao encostar. */
+.bento-block {
+  padding: var(--amplia-widget-padding);
+  gap: var(--amplia-widget-gap);
+}
+
+/* Grid: separar claramente as informacoes. */
+.bento-grid,
+.bento-grid-widgets,
+.bento-container {
+  gap: var(--amplia-widget-gap);
+}
+
+/* Widgets que se apertam em vez de respirar — o "Alertas" da esquerda. */
+.bento-block--compacta,
+.bento-block--larga {
+  gap: var(--amplia-widget-gap);
+}
+
+/* --------------------------------------------------------------------------
+   2. FUNDO E BORDAS
+   A borda era quase invisivel (era preciso confiar na sombra).
+   -------------------------------------------------------------------------- */
+.bento-block {
+  background-color: transparent;
+  background-image: var(--amplia-widget-fundo);
+  border: 1px solid var(--amplia-widget-borda);
+  border-radius: var(--radius-lg, 12px);
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.bento-block:hover {
+  border-color: var(--amplia-widget-borda-forte);
+}
+
+/* `backdrop-filter` atras de elementos coloridos que passem por baixo.
+   -webkit- e' Safari; sem ele, no iPhone, o painel fica opaco. */
+@supports (backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px)) {
+  .bento-block--vidro,
+  .bento-block[data-fundo="colorido"] {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   3. ESTADO VAZIO
+   Reutiliza `.empty-state` (components/empty-state.css) em vez de inventar
+   uma segunda versao. Aqui so se ajusta ao container do widget.
+   -------------------------------------------------------------------------- */
+.bento-block .empty-state,
+.bento-block .widget-content > div:only-child > .empty-state {
+  /* Borda tracejada = duas linhas horizontais a dizer "isto e' um buraco".
+     Num cartao de 120px isso e' o que se ve primeiro. Fora. */
+  border: 0;
+  background: transparent;
+  height: 100%;
+  min-height: 6rem;
+  justify-content: center;
+  align-items: center;
+  padding: var(--amplia-widget-padding);
+  gap: var(--amplia-widget-gap);
+}
+
+/* O icone preenche o espaco em vez de deixar um rectangulo vazio. */
+.bento-block .empty-state__icon,
+.bento-block .empty-state--compact .empty-state__icon {
+  width: 2.25rem;
+  height: 2.25rem;
+  margin-bottom: 0;
+  opacity: 0.55;
+  color: var(--text-muted, #94a3b8);
+  /* Anel suave: da presenca sem competir com o texto */
+  background: radial-gradient(circle at 50% 45%,
+              rgba(148, 163, 184, 0.14) 0%,
+              rgba(148, 163, 184, 0.04) 55%,
+              transparent 72%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bento-block .empty-state__icon i,
+.bento-block .empty-state--compact .empty-state__icon i {
+  font-size: 1.05rem;
+  opacity: 0.9;
+}
+
+/* Texto centrado, opacidade reduzida: legivel sem gritar. */
+.bento-block .empty-state__title,
+.bento-block .empty-state--compact .empty-state__title {
+  color: var(--text-secondary, #cbd5e1);
+  opacity: 0.72;
+  font-size: 0.8125rem;
+  letter-spacing: 0.02em;
+  margin-bottom: 0;
+}
+
+.bento-block .empty-state__description {
+  max-width: none;
+  margin-bottom: 0;
+  opacity: 0.5;
+  font-size: 0.75rem;
+}
+
+.bento-block .empty-state--compact {
+  border: 0;
+  background: transparent;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+}
+
+/* O fragmento SEM_DADO (index.html:4676) nao usa .empty-state — e' um <span>
+   solto dentro de um cartao. Dar-lhe o mesmo ar sem lhe impor a estrutura. */
+.bento-block .text-theme-tick {
+  opacity: 0.72;
+  letter-spacing: 0.03em;
+}
+
+/* O aviso "selecione os registros no painel de edicao" (index.html:4598):
+   e' o outro estado vazio, e hoje esta colado a uma linha. */
+.bento-block .flex.items-center.justify-center.h-full.text-xs.text-slate-400 {
+  color: var(--text-secondary, #cbd5e1);
+  opacity: 0.6;
+  text-align: center;
+  padding: var(--amplia-widget-padding);
+}
+.bento-block .flex.items-center.justify-center.h-full.text-xs.text-slate-400 i {
+  opacity: 0.7;
+  margin-right: 0.4rem;
+}
+
+/* --------------------------------------------------------------------------
+   4. COR DE ESTADO
+   Verde esmeralda para o saudavel; o valor tem de se ler de relance.
+   -------------------------------------------------------------------------- */
+.amplia-ok,
+.bento-block .text-emerald-400,
+.bento-block .text-green-400 {
+  color: var(--amplia-ok) !important;
+}
+
+/* O numero de destaque dentro do widget */
+.bento-block .widget-content .text-emerald-500,
+.bento-block .widget-content .text-green-500,
+.bento-block .widget-content .text-2xl.text-emerald-400 {
+  color: var(--amplia-ok) !important;
+}
+
+.amplia-critico,
+.bento-block .text-red-400,
+.bento-block .text-rose-400 {
+  color: var(--amplia-critico) !important;
+}
+
+.amplia-alerta,
+.bento-block .text-amber-400,
+.bento-block .text-orange-400 {
+  color: var(--amplia-alerta) !important;
+}
+
+/* Halo no widget inteiro, so quando ele E' o aviso. Serve para chamar atencao. */
+.bento-block[data-estado="critico"],
+.bento-block[data-estado="critical"] {
+  border-color: rgba(239, 68, 68, 0.28);
+  box-shadow: var(--amplia-glow-critico);
+}
+
+.bento-block[data-estado="alerta"],
+.bento-block[data-estado="warning"] {
+  border-color: rgba(249, 115, 22, 0.26);
+  box-shadow: var(--amplia-glow-alerta);
+}
+
+.bento-block[data-estado="ok"],
+.bento-block[data-estado="saudavel"] {
+  border-color: rgba(16, 185, 129, 0.22);
+  box-shadow: var(--amplia-glow-ok);
+}
+
+/* --------------------------------------------------------------------------
+   5. MOVIMENTO
+   Respeita quem pediu menos movimento. As transicoes acima ficam a 0.
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .bento-block {
+    transition: none;
+  }
+  .bento-block:hover {
+    transform: none;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   6. DARK MODE
+   O token do fundo foi feito com alpha, por isso nao muda com o tema.
+   -------------------------------------------------------------------------- */
+html:not(.dark) .bento-block {
+  border-color: rgba(15, 23, 42, 0.09);
+}
+html:not(.dark) .bento-block .empty-state__title {
+  color: var(--text-secondary, #475569);
+}

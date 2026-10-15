@@ -1,0 +1,53 @@
+/*
+ * Global fixes para Dark Mode e Responsividade
+ */
+
+/* Ajuste de todos os cartões antigos para respeitarem o dark mode */
+.dark .bg-white,
+.dark .card,
+.dark .widget-box,
+.dark .fundo-card,
+.dark .fundo-card-aninhado {
+  background-color: var(--surface-primary) !important;
+  border-color: var(--border-default) !important;
+  color: var(--text-primary) !important;
+}
+
+.dark .text-gray-800,
+.dark .text-gray-900,
+.dark .cor-texto {
+  color: var(--text-primary) !important;
+}
+
+.dark .text-gray-500,
+.dark .text-gray-600,
+.dark .cor-texto-suave {
+  color: var(--text-secondary) !important;
+}
+
+.dark .border,
+.dark .border-gray-200,
+.dark .borda-suave {
+  border-color: var(--border-default) !important;
+}
+
+/* Melhoria de contraste WCAG AA global (T06.11) */
+.text-muted,
+.text-gray-400 {
+  color: var(--text-muted) !important; /* Já calibrado no token para WCAG */
+}
+
+/* Responsividade Tablet (T06.08) */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .sidebar {
+    width: 60px !important;
+    overflow: hidden;
+  }
+  .sidebar:hover {
+    width: 250px !important;
+  }
+  .main-content,
+  #content {
+    margin-left: 60px !important;
+  }
+}

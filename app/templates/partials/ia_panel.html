@@ -1,0 +1,121 @@
+<!-- IA Panel Overlay -->
+<div id="ia-panel-overlay" onclick="toggleIAPanel()"></div>
+
+<!-- IA Panel - Lateral estilo Copilot -->
+<div id="ia-panel">
+    <div class="p-3 border-b border-slate-300/30 dark:border-slate-600/30 font-bold text-sm flex items-center justify-between bg-white/80 dark:bg-ncs-blue-dark/80 backdrop-blur-md">
+        <div class="flex items-center gap-x-2">
+            <i class="bi bi-robot text-ncs-green-dark dark:text-ncs-orange-amber"></i>
+            <span>IA - Assistente Inteligente</span>
+        </div>
+        <div class="flex items-center gap-x-1">
+            <span id="ia-panel-status" class="text-xs text-slate-500 dark:text-slate-400 hidden">carregando…</span>
+            <button onclick="iaPanelDiagnostico()" class="w-8 h-8 rounded hover:bg-black/5 dark:hover:bg-white/10 flex items-center justify-center" title="Diagnóstico da IA">
+                <i class="bi bi-activity"></i>
+            </button>
+            <button onclick="toggleIAPanel()" class="w-8 h-8 rounded hover:bg-black/5 dark:hover:bg-white/10 flex items-center justify-center">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+    </div>
+
+    <div id="ia-chat-history" class="flex-1 p-3 overflow-y-auto text-xs space-y-2 bg-white dark:bg-ncs-blue-dark">
+        <div class="text-slate-600 dark:text-slate-300">Olá! Como posso ajudar no seu agronegócio hoje?</div>
+    </div>
+
+    <div id="ia-panel-diagnostico" class="border-t border-slate-300/30 dark:border-slate-600/30 bg-white/80 dark:bg-ncs-blue-dark/80 backdrop-blur-md hidden">
+        <div class="p-3 text-xs space-y-2">
+            <div class="flex items-center justify-between">
+                <span class="font-bold">Diagnóstico da IA</span>
+                <button onclick="iaPanelFecharDiagnostico()" class="text-slate-500 hover:text-slate-700">✕</button>
+            </div>
+            <div id="ia-panel-diag-content" class="text-slate-600 dark:text-slate-300">
+                <div class="flex gap-2">
+                    <span class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-800">Total: <span id="diag-total">—</span></span>
+                    <span class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-800">Catálogos: <span id="diag-cats">—</span></span>
+                    <span class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-800" id="diag-integro">⏳</span>
+                </div>
+                <div id="diag-cats-detail" class="space-y-1 text-[10px]"></div>
+                <div id="diag-falhas" class="space-y-1 text-[10px] text-red-600 dark:text-red-400"></div>
+                <div id="diag-drift" class="space-y-1 text-[10px] text-amber-600 dark:text-amber-400"></div>
+            </div>
+            <button onclick="iaPanelRecarregarDiagnostico()" class="w-full mt-2 px-2 py-1 text-xs rounded bg-ncs-green-dark text-white hover:bg-ncs-green-dark/80">Recarregar diagnóstico</button>
+        </div>
+    </div>
+
+    <div class="p-3 border-t border-slate-300/30 dark:border-slate-600/30 bg-white/80 dark:bg-ncs-blue-dark/80 backdrop-blur-md">
+        <div class="flex gap-x-2">
+            <input type="text" id="ia-input" placeholder="Digite um comando..." class="flex-1 px-2 py-1 text-xs rounded border border-slate-300 dark:border-slate-600 dark:bg-slate-800 focus:outline-none focus:ring-1 focus:ring-ncs-green-dark" onkeydown="if(event.key==='Enter') sendIAMessage();">
+            <button onclick="sendIAMessage()" class="px-3 py-1 text-xs rounded bg-ncs-green-dark text-white hover:bg-ncs-green-dark/80 transition-all">Enviar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+function iaPanelDiagnostico() {
+    const diag = document.getElementById('ia-panel-diagnostico');
+    const content = document.getElementById('ia-panel-diag-content');
+    diag.classList.remove('hidden');
+    content.innerHTML = '<div class="text-slate-500 text-center py-4">Carregando diagnóstico…</div>';
+    fetch('/api/ia/diagnostico/', { credentials: 'same-origin', headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(r => r.json())
+        .then(j => {
+            if (!j.integro) {
+                document.getElementById('diag-integro').innerHTML = '<span class="px-2 py-1 rounded bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400">⚠️ Não íntegro</span>';
+            } else {
+                document.getElementById('diag-integro').innerHTML = '<span class="px-2 py-1 rounded bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400">✅ Íntegro</span>';
+            }
+            document.getElementById('diag-total').textContent = j.intents_total || 0;
+            document.getElementById('diag-cats').textContent = (j.catalogos_carregados || 0) + '/' + (j.catalogos_esperados || 0);
+
+            const catsDiv = document.getElementById('diag-cats-detail');
+            catsDiv.innerHTML = '';
+            if (j.por_catalogo) {
+                for (const [cat, intents] of Object.entries(j.por_catalogo)) {
+                    const el = document.createElement('div');
+                    el.className = 'flex gap-1';
+                    el.innerHTML = `<span class="font-mono">${cat}:</span> <span>${intents.join(', ')}</span>`;
+                    catsDiv.appendChild(el);
+                }
+            }
+
+            const falhasDiv = document.getElementById('diag-falhas');
+            falhasDiv.innerHTML = '';
+            if (j.catalogos_falharam && j.catalogos_falharam.length) {
+                for (const f of j.catalogos_falharam) {
+                    const el = document.createElement('div');
+                    el.textContent = '❌ ' + f + ': ' + (j.falhas_detalhe?.[f] || '');
+                    falhasDiv.appendChild(el);
+                }
+            }
+
+            const driftDiv = document.getElementById('diag-drift');
+            driftDiv.innerHTML = '';
+            if (j.drift_registro_sandbox && j.drift_registro_sandbox.length) {
+                for (const d of j.drift_registro_sandbox) {
+                    const el = document.createElement('div');
+                    el.textContent = '⚠️ Drift: ' + d;
+                    driftDiv.appendChild(el);
+                }
+            }
+            if (j.duplicados_diferentes && Object.keys(j.duplicados_diferentes).length) {
+                for (const [nome, cats] of Object.entries(j.duplicados_diferentes)) {
+                    const el = document.createElement('div');
+                    el.textContent = '⚠️ Colisão: ' + nome + ' em ' + cats.join(', ');
+                    driftDiv.appendChild(el);
+                }
+            }
+        })
+        .catch(e => {
+            content.innerHTML = '<div class="text-red-600 text-center py-4">Erro ao carregar diagnóstico: ' + e.message + '</div>';
+        });
+}
+
+function iaPanelFecharDiagnostico() {
+    document.getElementById('ia-panel-diagnostico').classList.add('hidden');
+}
+
+function iaPanelRecarregarDiagnostico() {
+    iaPanelDiagnostico();
+}
+</script>

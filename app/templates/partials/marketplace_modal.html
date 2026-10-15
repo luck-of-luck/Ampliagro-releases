@@ -1,0 +1,34 @@
+<!-- Marketplace Modal -->
+<div id="marketplace-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center">
+    <div class="bg-white dark:bg-ncs-blue-dark rounded-lg p-4 max-w-2xl w-full max-h-96 overflow-y-auto">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-bold">Adicionar Widget</h3>
+            <button onclick="fecharMarketplaceWidgets()" class="w-8 h-8 rounded hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <div id="marketplace-grid" class="grid grid-cols-4 gap-3">
+            <div onclick="addWidget('kpi-roi'); fecharMarketplaceWidgets();" class="p-3 border rounded-lg cursor-pointer hover:bg-ncs-blue-light/20 dark:hover:bg-ncs-blue-dark/30 text-center">
+                <i class="bi bi-currency-dollar text-2xl text-ncs-green-dark"></i><p class="text-xs mt-1">ROI Operacional</p>
+            </div>
+            <div onclick="addWidget('kpi-custo'); fecharMarketplaceWidgets();" class="p-3 border rounded-lg cursor-pointer hover:bg-ncs-blue-light/20 dark:hover:bg-ncs-blue-dark/30 text-center">
+                <i class="bi bi-calculator text-2xl text-ncs-blue-dark"></i><p class="text-xs mt-1">Custo/Ha</p>
+            </div>
+            <div onclick="addWidget('kpi-alertas'); fecharMarketplaceWidgets();" class="p-3 border rounded-lg cursor-pointer hover:bg-ncs-blue-light/20 dark:hover:bg-ncs-blue-dark/30 text-center">
+                <i class="bi bi-exclamation-triangle text-2xl text-rose-600"></i><p class="text-xs mt-1">Alertas</p>
+            </div>
+            <div onclick="addWidget('chart-line'); fecharMarketplaceWidgets();" class="p-3 border rounded-lg cursor-pointer hover:bg-ncs-blue-light/20 dark:hover:bg-ncs-blue-dark/30 text-center">
+                <i class="bi bi-graph-up text-2xl text-ncs-blue-dark"></i><p class="text-xs mt-1">Gráfico Linha</p>
+            </div>
+            <div onclick="addWidget('chart-bar'); fecharMarketplaceWidgets();" class="p-3 border rounded-lg cursor-pointer hover:bg-ncs-blue-light/20 dark:hover:bg-ncs-blue-dark/30 text-center">
+                <i class="bi bi-bar-chart text-2xl text-ncs-blue-dark"></i><p class="text-xs mt-1">Gráfico Barras</p>
+            </div>
+            <div onclick="addWidget('table-data'); fecharMarketplaceWidgets();" class="p-3 border rounded-lg cursor-pointer hover:bg-ncs-blue-light/20 dark:hover:bg-ncs-blue-dark/30 text-center">
+                <i class="bi bi-table text-2xl text-slate-700"></i><p class="text-xs mt-1">Tabela</p>
+            </div>
+            <div onclick="addWidget('kpi-clima'); fecharMarketplaceWidgets();" class="p-3 border rounded-lg cursor-pointer hover:bg-ncs-blue-light/20 dark:hover:bg-ncs-blue-dark/30 text-center">
+                <i class="bi bi-cloud-sun text-2xl text-sky-600"></i><p class="text-xs mt-1">Clima</p>
+            </div>
+        </div>
+    </div>
+</div>

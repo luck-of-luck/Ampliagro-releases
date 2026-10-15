@@ -1,0 +1,158 @@
+{% extends base_template %}
+{% load static %}
+{% block title %}Ampliagro - Centros de Custo{% endblock %}
+{% block extra_css %}
+
+{% endblock %}
+{% block dashboard_appbar %}{% endblock %}
+{% block content %}
+<div class="section-container">
+    <div class="section-header">
+        <h1 class="section-title"><i class="bi bi-diagram-3 me-2"></i>Centros de Custo</h1>
+        <div style="display:flex;gap:0.75rem;">
+            <a href="{% url 'custos-producao' %}" class="btn-secondary" style="text-decoration:none;display:inline-flex;align-items:center;gap:0.375rem;"><i class="bi bi-arrow-left"></i> Custos</a>
+            <a href="{% url 'orcamento-realizado' %}" class="btn-secondary" style="text-decoration:none;display:inline-flex;align-items:center;gap:0.375rem;"><i class="bi bi-clipboard-data"></i> Orcado x Realizado</a>
+            <button class="btn-primary" onclick="abrirModal()"><i class="bi bi-plus-lg"></i> Novo Centro</button>
+        </div>
+    </div>
+
+    <div class="content-card">
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Nome</th><th>Tipo</th><th>Propriedade</th><th>Status</th><th>Ações</th></tr></thead>
+                <tbody id="tabela-centros">
+                    <tr><td colspan="5" class="empty-state">Carregando...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modal-centro" onclick="if(event.target===this)fecharModal()">
+    <div class="modal">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+            <h3 class="modal-title" id="modal-titulo">Novo Centro de Custo</h3>
+            <button class="btn-secondary" onclick="fecharModal()" style="padding:0.25rem 0.5rem;"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <form id="form-centro" onsubmit="salvarCentro(event)">
+            <input type="hidden" id="edit-id" value="">
+            <div class="form-group">
+                <label class="form-label">Propriedade *</label>
+                <select class="form-input" id="f-propriedade" required><option value="">Carregando...</option></select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Nome *</label>
+                <input type="text" class="form-input" id="f-nome" required placeholder="Ex.: Agricultura — Talhão 4">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Tipo *</label>
+                <select class="form-input" id="f-tipo" required>
+                    <option value="AGRICULTURA">Agricultura</option>
+                    <option value="PECUARIA">Pecuária</option>
+                    <option value="MECANICA">Mecânica/Oficina</option>
+                    <option value="SEDE">Sede/Administração</option>
+                    <option value="GERAL">Geral</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Descrição</label>
+                <textarea class="form-input" id="f-descricao" rows="2" placeholder="Opcional"></textarea>
+            </div>
+            <div class="form-group">
+                <label style="display:flex;align-items:center;gap:0.5rem;font-size:0.875rem;cursor:pointer;">
+                    <input type="checkbox" id="f-ativo" checked> Ativo
+                </label>
+            </div>
+            <div style="display:flex;gap:0.75rem;justify-content:flex-end;margin-top:1.5rem;">
+                <button type="button" class="btn-secondary" onclick="fecharModal()">Cancelar</button>
+                <button type="submit" class="btn-primary" id="btn-salvar">Salvar</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+<script>
+(function(){
+    const API='/api/centros-custo/';
+    let centros=[];
+    function getCSRF(){ return document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''; }
+
+    async function carregarPropriedades(){
+        try{ const r=await fetch('/api/propriedades/'); if(r.ok){ let d=await r.json(); if(d.results) d=d.results; const sel=document.getElementById('f-propriedade'); sel.innerHTML='<option value=\"\">Selecione</option>'; d.forEach(p=>{ const o=document.createElement('option'); o.value=p.id; o.textContent=p.nome; sel.appendChild(o); }); if(d.length===1) sel.value=d[0].id; } }catch(e){}
+    }
+    async function carregarCentros(){
+        try{
+            const r=await fetch(API);
+            if(!r.ok) throw 1;
+            let d=await r.json(); if(d.results) d=d.results;
+            centros=d;
+            renderTabela();
+        }catch(e){ document.getElementById('tabela-centros').innerHTML='<tr><td colspan=\"5\" class=\"empty-state\">Erro ao carregar</td></tr>'; }
+    }
+    function tipoBadge(tipo){
+        const map={ AGRICULTURA:'badge-agri', PECUARIA:'badge-pec', MECANICA:'badge-mec', SEDE:'badge-sede', GERAL:'badge-geral' };
+        return '<span class=\"badge '+(map[tipo]||'badge-geral')+'\">'+tipo+'</span>';
+    }
+    function renderTabela(){
+        const tbody=document.getElementById('tabela-centros');
+        if(!centros.length){ tbody.innerHTML='<tr><td colspan=\"5\" class=\"empty-state\">Nenhum centro cadastrado. Os 4 centros padrão são criados automaticamente ao cadastrar uma propriedade.</td></tr>'; return; }
+        let html='';
+        centros.forEach(c=>{
+            html+='<tr><td><strong>'+c.nome+'</strong>'+(c.descricao?' <small style=\"color:#94a3b8\">'+c.descricao.substring(0,60)+'</small>':'')+'</td>'
+                +'<td>'+tipoBadge(c.tipo)+'</td>'
+                +'<td>'+(c.propriedade||'--')+'</td>'
+                +'<td>'+(c.ativo?'<span class=\"badge badge-agri\">Ativo</span>':'<span class=\"badge\" style=\"background:#fee2e2;color:#dc2626;\">Inativo</span>')+'</td>'
+                +'<td style=\"display:flex;gap:0.25rem;\">'
+                +'<button class=\"btn-secondary\" style=\"padding:0.25rem 0.5rem;\" onclick=\"editarCentro('+c.id+')\"><i class=\"bi bi-pencil\"></i></button>'
+                +'<button class=\"btn-secondary\" style=\"padding:0.25rem 0.5rem;background:#fef2f2;color:#dc2626;\" onclick=\"excluirCentro('+c.id+')\"><i class=\"bi bi-trash\"></i></button>'
+                +'</td></tr>';
+        });
+        tbody.innerHTML=html;
+    }
+    window.abrirModal=function(editItem){
+        document.getElementById('form-centro').reset();
+        document.getElementById('edit-id').value='';
+        document.getElementById('modal-titulo').textContent=editItem?'Editar Centro':'Novo Centro de Custo';
+        document.getElementById('f-ativo').checked=true;
+        if(editItem){
+            document.getElementById('edit-id').value=editItem.id;
+            document.getElementById('f-propriedade').value=editItem.propriedade;
+            document.getElementById('f-nome').value=editItem.nome||'';
+            document.getElementById('f-tipo').value=editItem.tipo||'GERAL';
+            document.getElementById('f-descricao').value=editItem.descricao||'';
+            document.getElementById('f-ativo').checked=!!editItem.ativo;
+        }
+        document.getElementById('modal-centro').classList.add('open');
+    };
+    window.fecharModal=function(){ document.getElementById('modal-centro').classList.remove('open'); };
+    window.editarCentro=function(id){ const item=centros.find(c=>c.id===id); if(item) abrirModal(item); };
+    window.excluirCentro=async function(id){
+        if(!confirm('Excluir este centro de custo?')) return;
+        try{ const r=await fetch(API+id+'/',{method:'DELETE',headers:{'X-CSRFToken':getCSRF()}}); if(r.ok) carregarCentros(); else alert('Erro ao excluir'); }catch(e){ alert('Erro de conexão'); }
+    };
+    window.salvarCentro=async function(e){
+        e.preventDefault();
+        const btn=document.getElementById('btn-salvar'); btn.disabled=true; btn.textContent='Salvando...';
+        const editId=document.getElementById('edit-id').value;
+        const payload={
+            propriedade: parseInt(document.getElementById('f-propriedade').value),
+            nome: document.getElementById('f-nome').value.trim(),
+            tipo: document.getElementById('f-tipo').value,
+            descricao: document.getElementById('f-descricao').value.trim(),
+            ativo: document.getElementById('f-ativo').checked,
+        };
+        try{
+            const url=editId?API+editId+'/':API;
+            const method=editId?'PATCH':'POST';
+            const r=await fetch(url,{method,headers:{'Content-Type':'application/json','X-CSRFToken':getCSRF()},body:JSON.stringify(payload)});
+            if(!r.ok){ const err=await r.json(); alert('Erro: '+JSON.stringify(err)); btn.disabled=false; btn.textContent='Salvar'; return; }
+            fecharModal(); carregarCentros();
+        }catch(ex){ alert('Erro de conexão'); }
+        btn.disabled=false; btn.textContent='Salvar';
+    };
+    document.addEventListener('DOMContentLoaded', function(){ carregarPropriedades(); carregarCentros(); });
+})();
+</script>
+{% endblock %}

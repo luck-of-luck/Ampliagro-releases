@@ -1,0 +1,1716 @@
+{% extends "base.html" %} {% load static %} {% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/paginas/dashboard-index.css' %}?v=15" />
+<link rel="stylesheet" href="{% static 'css/liquid-glass.css' %}?v=1" />
+<style>
+  /* =========================================================================
+   RE-DESIGN: PAINEIS DE WIDGETS E EDIÇÃO (VIDRO TOTAL / FULL GLASS)
+   ========================================================================= */
+  #add-widget-modal-panel {
+    background: rgba(10, 15, 20, 0.4) !important;
+    backdrop-filter: blur(40px) saturate(200%) !important;
+    -webkit-backdrop-filter: blur(40px) saturate(200%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    box-shadow:
+      0 30px 60px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+    border-radius: 24px !important;
+    color: #ffffff !important;
+  }
+  #add-widget-modal-panel::before,
+  #add-widget-modal-panel::after,
+  .widget-modal-box.lc-panel::before,
+  .widget-modal-box.lc-panel::after {
+    display: none !important;
+  }
+  #widget-modal-content {
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 400px !important;
+  }
+  .tab-content {
+    flex: 1 !important;
+    height: 100% !important;
+  }
+  #kpi-accordion-container {
+    width: 100% !important;
+    min-height: 200px !important;
+  }
+  .edit-dropdown {
+    background: rgba(10, 15, 20, 0.5) !important;
+    backdrop-filter: blur(30px) saturate(200%) !important;
+    -webkit-backdrop-filter: blur(30px) saturate(200%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35) !important;
+    border-radius: 16px !important;
+    color: #fff !important;
+    padding: 8px !important;
+    position: absolute !important;
+    z-index: 99999 !important;
+  }
+  #add-widget-modal-panel .text-slate-800,
+  #add-widget-modal-panel .text-slate-700,
+  #add-widget-modal-panel .text-slate-600,
+  #add-widget-modal-panel .text-slate-500,
+  #add-widget-modal-panel .text-slate-400 {
+    color: #e2e8f0 !important;
+  }
+  .subgroup-pill {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #f1f5f9 !important;
+    padding: 8px 16px !important;
+    border-radius: 12px !important;
+    font-weight: 500 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    transition: all 0.2s !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  .subgroup-pill.active,
+  .subgroup-pill:hover {
+    background: rgba(255, 255, 255, 0.15) !important;
+    border-color: rgba(255, 255, 255, 0.25) !important;
+    color: #ffffff !important;
+    transform: translateY(-1px) !important;
+  }
+  .widget-card {
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    border-radius: 16px !important;
+    padding: 16px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    transition: all 0.2s !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    min-height: 100px !important;
+  }
+  .widget-card:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+    transform: translateY(-2px) !important;
+  }
+  .widget-card-icon {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 20px !important;
+  }
+  .widget-card-label {
+    color: #e2e8f0 !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    text-align: center !important;
+  }
+</style>
+
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+  crossorigin=""
+/>
+
+<!-- Dashboard Appbar Styles - WidgetBar Estilo Windows 11 -->
+
+{% endblock %} {% block navbar %}
+<nav class="nav-premium" id="nav-premium">
+  <div class="nav-glass">
+    <div class="nav-main">
+      <div
+        class="nav-brand-box nav-brand-box--left"
+        id="nav-brand-theme-box"
+        onclick="toggleModeCentered(event)"
+        title="Trocar tema"
+      >
+        <span id="nav-brand-icon" style="display: inline-flex"
+          ><svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg
+        ></span>
+      </div>
+      <a href="#" class="nav-brand" data-tab="dashboard"
+        ><span class="nav-brand-text">ampliagro</span></a
+      >
+
+      <div class="nav-pills" id="nav-pills">
+        <a href="{% url 'index_spa' %}" class="nav-pill is-active" data-pill="dashboard"
+          ><svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <rect x="3" y="3" width="7" height="9" />
+            <rect x="14" y="3" width="7" height="5" />
+            <rect x="14" y="12" width="7" height="9" />
+            <rect x="3" y="16" width="7" height="5" /></svg
+          >Dashboard</a
+        >
+
+        <div class="nav-pill-group">
+          <span
+            class="nav-pill"
+            onclick="toggleMega('mega-guias')"
+            data-mega-trigger
+            data-pill="guias"
+            ><svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M11 20A7 7 0 0 1 9.8 6.9C15.5 4.9 17 3.5 19 2c1 2 2 4.5 2 8 0 5-3 10-7 10" />
+              <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" /></svg
+            >Guias<svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              class="chevron"
+            >
+              <polyline points="6 9 12 15 18 9" /></svg
+          ></span>
+          <div class="nav-mega" id="mega-guias" style="min-width: 280px">
+            <div class="nav-mega-col">
+              <a href="{% url 'guia-vegetal' %}"
+                ><svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M11 20A7 7 0 0 1 9.8 6.9C15.5 4.9 17 3.5 19 2c1 2 2 4.5 2 8 0 5-3 10-7 10"
+                  />
+                  <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+                </svg>
+                Vegetal <small style="color: var(--cor-texto-fraco)">709 culturas</small></a
+              >
+              <a href="{% url 'guia-animal' %}"
+                ><svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor">
+                  <path
+                    d="M212,80a28,28,0,1,0,28,28A28,28,0,0,0,212,80Zm0,40a12,12,0,1,1,12-12A12,12,0,0,1,212,120ZM72,108a28,28,0,1,0-28,28A28,28,0,0,0,72,108ZM44,120a12,12,0,1,1,12-12A12,12,0,0,1,44,120ZM92,88A28,28,0,1,0,64,60,28,28,0,0,0,92,88Zm0-40A12,12,0,1,1,80,60,12,12,0,0,1,92,48Zm72,40a28,28,0,1,0-28-28A28,28,0,0,0,164,88Zm0-40a12,12,0,1,1-12,12A12,12,0,0,1,164,48Zm23.12,100.86a35.3,35.3,0,0,1-16.87-21.14,44,44,0,0,0-84.5,0A35.25,35.25,0,0,1,69,148.82,40,40,0,0,0,88,224a39.48,39.48,0,0,0,15.52-3.13,64.09,64.09,0,0,1,48.87,0,40,40,0,0,0,34.73-72ZM168,208a24,24,0,0,1-9.45-1.93,80.14,80.14,0,0,0-61.19,0,24,24,0,0,1-20.71-43.26,51.22,51.22,0,0,0,24.46-30.67,28,28,0,0,1,53.78,0,51.27,51.27,0,0,0,24.53,30.71A24,24,0,0,1,168,208Z"
+                  ></path>
+                </svg>
+                Animal</a
+              >
+              <a href="{% url 'guia-aquatica' %}"
+                ><svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"
+                  />
+                  <path
+                    d="M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"
+                  />
+                  <path
+                    d="M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"
+                  />
+                </svg>
+                Aquática</a
+              >
+              <a href="{% url 'guia-sistemas' %}"
+                ><svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <rect x="3" y="3" width="7" height="7" />
+                  <rect x="14" y="3" width="7" height="7" />
+                  <rect x="14" y="14" width="7" height="7" />
+                  <rect x="3" y="14" width="7" height="7" />
+                </svg>
+                Sistemas</a
+              >
+              <div class="nav-divider"></div>
+              <a
+                href="{% url 'guia-ferramentas' %}"
+                style="background: var(--cor-primaria-suave); border-radius: 8px"
+                ><svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"
+                  />
+                </svg>
+                Ferramentas <span class="nav-badge-new">novo</span></a
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="nav-pill-group">
+          <span class="nav-pill" onclick="toggleMega('mega-cadastros')" data-mega-trigger
+            ><svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 8v8" />
+              <path d="M8 12h8" /></svg
+            >Cadastros<svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              class="chevron"
+            >
+              <polyline points="6 9 12 15 18 9" /></svg
+          ></span>
+          <div class="nav-mega" id="mega-cadastros">
+            <div class="nav-mega-col">
+              <div class="nav-mega-col-title">Produção</div>
+              <a href="{% url 'cadastro-safra' %}">Safras</a
+              ><a href="{% url 'cadastro-talhao' %}">Talhões</a
+              ><a href="{% url 'cadastro-animal' %}">Animais</a
+              ><a href="{% url 'cadastro-apiario' %}">Apiário</a
+              ><a href="{% url 'cadastro-cultura' %}">Culturas</a>
+            </div>
+            <div class="nav-mega-col">
+              <div class="nav-mega-col-title">Gestão</div>
+              <a href="{% url 'cadastro-insumo' %}">Insumos</a
+              ><a href="{% url 'cadastro-maquinario' %}">Maquinários</a
+              ><a href="{% url 'cadastro-funcionario' %}">Funcionários</a
+              ><a href="{% url 'cadastro-propriedade' %}">Propriedades</a>
+            </div>
+            <div class="nav-mega-col">
+              <div class="nav-mega-col-title">Financeiro</div>
+              <a href="{% url 'cadastro-financeiro' %}">Financeiro</a
+              ><a href="{% url 'cadastro-estoque' %}">Estoque</a
+              ><a href="{% url 'estoque-geral' %}">Estoque Geral</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="nav-pill-group">
+          <span class="nav-pill" onclick="toggleMega('mega-operacao')" data-mega-trigger
+            ><svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M8 2v4" />
+              <path d="M16 2v4" />
+              <rect x="3" y="4" width="18" height="18" rx="2" />
+              <path d="M3 10h18" /></svg
+            >Operação<svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              class="chevron"
+            >
+              <polyline points="6 9 12 15 18 9" /></svg
+          ></span>
+          <div class="nav-mega" id="mega-operacao" style="min-width: 560px">
+            <div class="nav-mega-col">
+              <div class="nav-mega-col-title">Agenda</div>
+              <a href="{% url 'equipe-agenda' %}">Agenda Geral</a
+              ><a href="{% url 'agenda-agricola' %}">Agenda Agrícola</a
+              ><a href="{% url 'agenda-pecuaria' %}">Agenda Pecuária</a
+              ><a href="{% url 'equipe-empregados' %}">Empregados</a>
+            </div>
+            <div class="nav-mega-col">
+              <div class="nav-mega-col-title">Logística & Campo</div>
+              <a href="{% url 'logistica-caminhao' %}">Caminhões</a
+              ><a href="{% url 'logistica-rotas' %}">Rotas</a
+              ><a href="{% url 'cadastro-talhao' %}">Talhões</a
+              ><a href="{% url 'cadastro-safra' %}">Safras</a>
+            </div>
+            <div class="nav-mega-col">
+              <div class="nav-mega-col-title">Estoque</div>
+              <a href="{% url 'estoque-geral' %}">Estoque Geral</a
+              ><a href="{% url 'cadastro-insumo' %}">Insumos</a
+              ><a href="{% url 'cadastro-estoque' %}">Itens Estoque</a
+              ><a
+                href="#"
+                onclick="
+                  event.preventDefault();
+                  openQuickSpreadsheet();
+                "
+                >Entrada Rápida</a
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="nav-pill-group">
+          <span class="nav-pill" onclick="toggleMega('mega-inteligencia')" data-mega-trigger
+            ><svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                d="M9.5 2A5.5 5.5 0 0 0 4 7.5a5.5 5.5 0 0 0 5.5 5.5A5.5 5.5 0 0 0 15 7.5A5.5 5.5 0 0 0 9.5 2z"
+              />
+              <path d="M9.5 13v3" />
+              <path d="M7 16h5" /></svg
+            >Inteligência<svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              class="chevron"
+            >
+              <polyline points="6 9 12 15 18 9" /></svg
+          ></span>
+          <div class="nav-mega" id="mega-inteligencia" style="min-width: 620px">
+            <div class="nav-mega-col">
+              <div class="nav-mega-col-title">IoT</div>
+              <a href="{% url 'sensores' %}">Sensores</a
+              ><a href="{% url 'dispositivos' %}">Dispositivos</a
+              ><a href="/iot/comandos/">Comandos</a><a href="/iot/alertas/">Alertas</a>
+            </div>
+            <div class="nav-mega-col">
+              <div class="nav-mega-col-title">Monitor</div>
+              <a href="{% url 'cadastro-mip' %}">MIP</a><a href="{% url 'cadastro-vra' %}">VRA</a
+              ><a href="{% url 'cadastro-receituario' %}">Receituário</a
+              ><a href="{% url 'previsao-clima' %}">Clima 7d</a>
+            </div>
+            <div class="nav-mega-col">
+              <div class="nav-mega-col-title">Previsão & IA</div>
+              <a href="{% url 'previsao-safra' %}">Previsão Safra</a
+              ><a href="{% url 'simulador-financeiro' %}">Simulador Financeiro</a
+              ><a href="{% url 'simulador-colheita' %}">Simulador Colheita</a
+              ><a
+                href="#"
+                onclick="
+                  event.preventDefault();
+                  location.href = '/guias/ferramentas/';
+                "
+                >Ferramentas IA</a
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="nav-pill-group">
+          <span class="nav-pill" onclick="toggleMega('mega-gestao')" data-mega-trigger
+            ><svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg
+            >Gestão<svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              class="chevron"
+            >
+              <polyline points="6 9 12 15 18 9" /></svg
+          ></span>
+          <div class="nav-mega" id="mega-gestao">
+            <div class="nav-mega-col">
+              <div class="nav-mega-col-title">Relatórios</div>
+              <a href="{% url 'dashboard-os' %}">Dashboard OS</a
+              ><a href="{% url 'resumo-gerencial' %}">Resumo Gerencial</a
+              ><a href="{% url 'previsao-safra' %}">Previsão Safra</a
+              ><a href="{% url 'logistica-caminhao' %}">Logística</a>
+            </div>
+            <div class="nav-mega-col">
+              <div class="nav-mega-col-title">Sistema</div>
+              <a href="{% url 'config-sistema' %}">Config Sistema</a
+              ><a href="{% url 'perfil-config' %}">Perfil</a
+              ><a
+                href="#"
+                onclick="
+                  event.preventDefault();
+                  exportSystemSnapshot();
+                "
+                >Export .agro</a
+              ><a
+                href="#"
+                onclick="
+                  event.preventDefault();
+                  importSystemSnapshot();
+                "
+                >Import .agro</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="nav-right">
+        <span
+          class="nav-brand-text"
+          style="cursor: pointer"
+          onclick="iaDockToggle()"
+          title="AmplIA — Assistente"
+          >ampl<span style="color: #0f9d6e">ia</span></span
+        >
+        <a href="#" data-tab="dashboard" class="nav-brand"></a>
+        <div
+          class="nav-brand-box nav-brand-box--right"
+          id="nav-brand-profile-box"
+          onclick="toggleUserDropdown(event)"
+          title="Perfil"
+        >
+          <div
+            class="nav-avatar"
+            style="
+              width: 100%;
+              height: 100%;
+              border-radius: 6px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              background: transparent;
+              color: var(--cor-nav-texto);
+            "
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </div>
+          <div class="nav-user-dropdown" id="user-dropdown" style="min-width: 280px">
+            <div class="dropdown-header">
+              <div class="name">
+{% if user.is_authenticated %}{{ user.get_full_name|default:user.username }}{% else %}Visitante{% endif %}
+              </div>
+              <div class="email">{% if user.is_authenticated %}{{ user.email }}{% endif %}</div>
+            </div>
+            <div class="dropdown-divider"></div>
+            <a href="{% url 'perfil-config' %}"
+              ><svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <circle cx="12" cy="12" r="3" />
+                <path
+                  d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
+                />
+              </svg>
+              Configurações</a
+            >
+            <a href="{% url 'logout' %}" class="text-danger" onclick="logoutUser(event)"
+              ><svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
+              </svg>
+              Sair</a
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+<div class="nav-mode-dropdown nav-mode-panel is-centered hidden" id="mode-dropdown" role="menu">
+  <div
+    class="nav-mode-panel-grid"
+    id="mode-panel-grid"
+    style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px"
+  >
+    <div
+      class="nav-mode-card is-active"
+      data-preset="escuro"
+      role="button"
+      tabindex="0"
+      onclick="selectPreset('escuro', event)"
+    >
+      <div class="nav-mode-card-head">
+        <span class="nav-mode-card-title"><i class="bi bi-moon-stars"></i><span>Escuro</span></span
+        ><span class="nav-mode-card-badge">Ativo</span>
+      </div>
+      <div class="nav-mode-card-preview">
+        <div class="nmc-pv" style="background: #0b0f0e; border-color: #3ec48f">
+          <div class="nmc-pv-nav" style="background: #131917; border-color: #3ec48f">
+            <i class="nmc-pv-acc" style="background: #3ec48f"></i
+            ><i class="nmc-pv-line" style="background: #8b9792"></i>
+          </div>
+          <div class="nmc-pv-row">
+            <div
+              class="nmc-pv-card"
+              style="background: #151b19; border-color: rgba(62, 196, 143, 0.22)"
+            >
+              <span class="nmc-pv-vbar" style="background: #3ec48f; height: 55%"></span
+              ><span class="nmc-pv-vbar" style="background: #3ec48f; height: 85%"></span>
+            </div>
+            <div
+              class="nmc-pv-card nmc-pv-card-nest"
+              style="background: #1a211f; border-color: rgba(62, 196, 143, 0.22)"
+            >
+              <i class="nmc-pv-acc" style="background: #57d7a0"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="nav-mode-card-name">Escuro</div>
+    </div>
+    <div
+      class="nav-mode-card"
+      data-preset="claro"
+      role="button"
+      tabindex="0"
+      onclick="selectPreset('claro', event)"
+    >
+      <div class="nav-mode-card-head">
+        <span class="nav-mode-card-title"><i class="bi bi-sun"></i><span>Claro</span></span
+        ><span class="nav-mode-card-badge">Ativo</span>
+      </div>
+      <div class="nav-mode-card-preview">
+        <div class="nmc-pv" style="background: #f6f8f7; border-color: #0f9d6e">
+          <div class="nmc-pv-nav" style="background: #fdfefe; border-color: #0f9d6e">
+            <i class="nmc-pv-acc" style="background: #0f9d6e"></i
+            ><i class="nmc-pv-line" style="background: #5f6b66"></i>
+          </div>
+          <div class="nmc-pv-row">
+            <div
+              class="nmc-pv-card"
+              style="background: #fdfefe; border-color: rgba(15, 157, 110, 0.25)"
+            >
+              <span class="nmc-pv-vbar" style="background: #0f9d6e; height: 55%"></span
+              ><span class="nmc-pv-vbar" style="background: #0f9d6e; height: 85%"></span>
+            </div>
+            <div
+              class="nmc-pv-card nmc-pv-card-nest"
+              style="background: #f3f7f5; border-color: rgba(15, 157, 110, 0.25)"
+            >
+              <i class="nmc-pv-acc" style="background: #4cc396"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="nav-mode-card-name">Claro</div>
+    </div>
+    <div
+      class="nav-mode-card"
+      data-preset="personalizado"
+      role="button"
+      tabindex="0"
+      onclick="selectPreset('personalizado', event)"
+    >
+      <div class="nav-mode-card-head">
+        <span class="nav-mode-card-title"
+          ><i class="bi bi-palette"></i><span>Personalizado</span></span
+        ><span class="nav-mode-card-badge">Ativo</span>
+      </div>
+      <div class="nav-mode-card-preview">
+        <div class="nmc-pv" style="background: #0b0f0e; border-color: #33413f">
+          <div class="nmc-pv-nav" style="background: #131917; border-color: #33413f">
+            <i class="nmc-pv-acc" style="background: #3ec48f"></i
+            ><i class="nmc-pv-line" style="background: #8b9792"></i>
+          </div>
+          <div class="nmc-pv-row">
+            <div class="nmc-pv-card" style="background: #151b19; border-color: #33413f">
+              <span class="nmc-pv-vbar" style="background: #3ec48f; height: 55%"></span
+              ><span class="nmc-pv-vbar" style="background: #3ec48f; height: 85%"></span>
+            </div>
+            <div
+              class="nmc-pv-card nmc-pv-card-nest"
+              style="background: #1a211f; border-color: #33413f"
+            >
+              <i class="nmc-pv-acc" style="background: #57d7a0"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="nav-mode-card-name">Personalizado</div>
+    </div>
+  </div>
+  <div style="padding: 0.5rem; text-align: center">
+    <button
+      type="button"
+      class="btn-personalizar-mode"
+      onclick="openPersonalizarMode(event)"
+      style="width: 100%"
+    >
+      Personalizar
+    </button>
+  </div>
+</div>
+
+<script>
+  // nav-brand como botão de tema com ícone sol/lua/p e menu centralizado
+  function updateNavBrandIcon() {
+    try {
+      const icon = document.getElementById('nav-brand-icon');
+      if (!icon) return;
+      let modo = 'claro';
+      const active = document.querySelector('.nav-mode-card.is-active');
+      if (active) modo = active.dataset.preset || 'claro';
+      else {
+        const raw =
+          localStorage.getItem('ampliagro-preferences') ||
+          localStorage.getItem('ampliagro-preferences_u' + (window.AMPLIAGRO_USER_ID || ''));
+        if (raw) {
+          try {
+            const prefs = JSON.parse(raw);
+            if (prefs.theme && prefs.theme.mode) modo = prefs.theme.mode;
+          } catch (e) {}
+        }
+        if (document.documentElement.classList.contains('dark') && modo === 'claro')
+          modo = 'escuro';
+      }
+      modo = String(modo).toLowerCase();
+      const sunSVG =
+        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>';
+      const moonSVG =
+        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>';
+      const pSVG =
+        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5"></circle><circle cx="17.5" cy="10.5" r=".5"></circle><circle cx="8.5" cy="7.5" r=".5"></circle><circle cx="6.5" cy="12.5" r=".5"></circle><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.563-5.554C21.965 6.012 17.461 2 12 2z"></path></svg>';
+      if (modo.includes('escuro') || modo.includes('dark') || modo.includes('noite'))
+        icon.innerHTML = moonSVG;
+      else if (modo.includes('personal') || modo.includes('custom') || modo === 'p')
+        icon.innerHTML = pSVG;
+      else icon.innerHTML = sunSVG;
+    } catch (e) {}
+  }
+  function toggleModeCentered(e) {
+    if (e) e.stopPropagation();
+    const dd = document.getElementById('mode-dropdown');
+    if (!dd) return;
+    dd.style.display = '';
+    const isOpen = dd.classList.contains('is-open');
+    if (isOpen) {
+      dd.classList.remove('is-open', 'is-centered');
+      dd.classList.add('hidden');
+    } else {
+      dd.classList.remove('hidden');
+      dd.classList.add('is-open', 'is-centered');
+      if (window.refreshModePanel) window.refreshModePanel();
+      updateNavBrandIcon();
+      document.querySelectorAll('.nav-mega.is-open').forEach((m) => m.classList.remove('is-open'));
+      const ud = document.getElementById('user-dropdown');
+      if (ud) ud.classList.remove('is-open');
+      if (ud) ud.classList.add('hidden');
+    }
+  }
+  const _origToggleModeDropdownIdx = window.toggleModeDropdown;
+  window.toggleModeDropdown = function (e) {
+    return toggleModeCentered(e);
+  };
+  const _origCloseModeDropdownIdx = window.closeModeDropdown;
+  window.closeModeDropdown = function () {
+    const dd = document.getElementById('mode-dropdown');
+    if (dd) {
+      dd.classList.remove('is-open', 'is-centered');
+      dd.classList.add('hidden');
+    }
+    if (typeof _origCloseModeDropdownIdx === 'function')
+      try {
+        _origCloseModeDropdownIdx();
+      } catch (e) {}
+  };
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(updateNavBrandIcon, 300);
+  });
+  const _origRefreshIdx = window.refreshModePanel;
+  window.refreshModePanel = function () {
+    if (typeof _origRefreshIdx === 'function')
+      try {
+        _origRefreshIdx();
+      } catch (e) {}
+    updateNavBrandIcon();
+  };
+  const _origSelectModeIdx = window.selectMode;
+  window.selectMode = function (mode, e) {
+    if (e) e.stopPropagation();
+    if (typeof _origSelectModeIdx === 'function') _origSelectModeIdx(mode, e);
+    else {
+      closeModeDropdown();
+      if (typeof window.setTheme === 'function') window.setTheme(mode);
+    }
+    setTimeout(updateNavBrandIcon, 100);
+  };
+  // Fallback for onceEvent AND onEvent/offEvent in case spa.js hasn't loaded yet
+  window.onceEvent =
+    window.onceEvent ||
+    function (type, handler) {
+      document.addEventListener(
+        type,
+        function (e) {
+          handler(e);
+        },
+        { once: true }
+      );
+    };
+
+  window.onEvent =
+    window.onEvent ||
+    function (type, handler, options) {
+      document.addEventListener(type, handler, options);
+    };
+
+  window.offEvent =
+    window.offEvent ||
+    function (type, handler) {
+      document.removeEventListener(type, handler);
+    };
+
+  window.onceEvent('DOMContentLoaded', function () {
+    try {
+      updateConnectionStatus();
+    } catch (e) {
+      console.warn('Falha ao atualizar status de conexão:', e);
+    }
+    initNavPremium();
+    try {
+      /* Restaura SEMPRE o tema a partir do JSON do usuário
+       (modos válidos: claro | escuro | custom) */
+      var modoRestaurado =
+        typeof window.restaurarTemaDoUsuario === 'function'
+          ? window.restaurarTemaDoUsuario()
+          : null;
+      if (!modoRestaurado) {
+        var saved = window.getPreferences();
+        window.syncModeDropdown(saved.theme.mode);
+      }
+    } catch (e) {}
+    try {
+      renderWidgetbarPresets();
+    } catch (e) {
+      console.warn('Falha ao renderizar presets:', e);
+    }
+  });
+
+  function initNavPremium() {
+    var nav = document.getElementById('nav-premium');
+    if (!nav) return;
+
+    if (typeof window.updateNavActive === 'function') {
+      window.updateNavActive();
+    } else {
+      var path = window.location.pathname;
+      var pills = nav.querySelectorAll('.nav-pill[data-pill]');
+      pills.forEach(function (p) {
+        p.classList.remove('is-active');
+      });
+      pills.forEach(function (p) {
+        var pill = p.getAttribute('data-pill');
+        if (
+          (pill === 'dashboard' && (path === '/' || path.indexOf('index') > -1 || path === '')) ||
+          path.indexOf(pill) > -1
+        ) {
+          p.classList.add('is-active');
+        }
+      });
+    }
+  }
+
+  window.toggleMega = function (id) {
+    var menu = document.getElementById(id);
+    if (!menu) return;
+    var isOpen = menu.classList.contains('is-open');
+    document.querySelectorAll('.nav-mega.is-open').forEach(function (m) {
+      m.classList.remove('is-open');
+    });
+    if (!isOpen) {
+      menu.classList.add('is-open');
+    }
+  };
+
+  document.addEventListener('click', function (e) {
+    var group = e.target.closest('.nav-pill-group');
+    if (!group) {
+      document.querySelectorAll('.nav-mega.is-open').forEach(function (m) {
+        m.classList.remove('is-open');
+      });
+    } else {
+      var mega = e.target.closest('.nav-mega');
+      if (mega) {
+        mega.classList.remove('is-open');
+      }
+    }
+  });
+
+  window.toggleUserDropdown = function (e) {
+    e.stopPropagation();
+    var dd = document.getElementById('user-dropdown');
+    if (!dd) return;
+    var isOpen = dd.classList.contains('is-open');
+    if (isOpen) {
+      dd.classList.remove('is-open');
+      dd.classList.add('hidden');
+    } else {
+      dd.classList.remove('hidden', 'open');
+      dd.classList.add('is-open');
+      var md = document.getElementById('mode-dropdown');
+      if (md) md.classList.remove('is-open');
+    }
+  };
+
+  window.logoutUser = function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    var form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '{% url "logout" %}';
+    var csrf = document.createElement('input');
+    csrf.type = 'hidden';
+    csrf.name = 'csrfmiddlewaretoken';
+    csrf.value = (typeof getCookie === 'function' && getCookie('csrftoken')) || '';
+    form.appendChild(csrf);
+    document.body.appendChild(form);
+    form.submit();
+  };
+
+  document.addEventListener('click', function (e) {
+    var dd = document.getElementById('user-dropdown');
+    if (dd && !e.target.closest('.nav-user')) {
+      dd.classList.remove('is-open');
+    }
+  });
+
+  window.toggleModeDropdown = function (e) {
+    return toggleModeCentered(e);
+  };
+  window.closeModeDropdown = function () {
+    var dd = document.getElementById('mode-dropdown');
+    if (dd) {
+      dd.classList.remove('is-open', 'is-centered');
+      dd.classList.add('hidden');
+    }
+  };
+  window.selectMode = function (mode, e) {
+    if (e) e.stopPropagation();
+    window.closeModeDropdown();
+    if (typeof window.setTheme === 'function') window.setTheme(mode);
+  };
+  document.addEventListener('click', function (e) {
+    var dd = document.getElementById('mode-dropdown');
+    if (dd && !e.target.closest('#nav-brand-theme-box') && !e.target.closest('#mode-dropdown')) {
+      dd.classList.remove('is-open', 'is-centered');
+      dd.classList.add('hidden');
+    }
+  });
+</script>
+{% endblock %} {% block marketplace_modal %}{% endblock %} {% block dashboard_appbar %}{% include 'partials/dashboard_appbar.html' %}{% endblock %} {% block content %}
+<div class="matrix-container" style="--grid-cols: 64; --grid-rows: 40"></div>
+{% endblock %} {% block custom_theme_modal %}
+<!-- Modal de Personalização de Tema -->
+<div
+  id="custom-theme-modal"
+  class="fixed inset-0 z-[2147483647] hidden items-center justify-center p-4"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="custom-theme-title"
+  aria-describedby="custom-theme-description"
+  aria-hidden="true"
+>
+  <div
+    class="custom-theme-backdrop absolute inset-0 bg-slate-950/50 backdrop-blur-sm"
+    onclick="closeCustomThemeModal()"
+  ></div>
+  <section
+    class="custom-theme-card relative w-full max-w-xl rounded-2xl border border-slate-300/50 dark:border-slate-600/50 bg-white dark:bg-slate-900 shadow-2xl"
+    onclick="event.stopPropagation()"
+  >
+    <header
+      class="flex items-start justify-between gap-4 border-b border-slate-200 dark:border-slate-700 px-5 py-4"
+    >
+      <div>
+        <h2
+          id="custom-theme-title"
+          class="text-base font-semibold text-slate-800 dark:text-slate-100"
+        >
+          Personalizar tema
+        </h2>
+        <p id="custom-theme-description" class="mt-1 text-xs text-slate-500 dark:text-slate-400">
+          Altere cores e escolha onde o tema deve ser aplicado.
+        </p>
+      </div>
+      <button
+        id="custom-theme-close"
+        type="button"
+        onclick="closeCustomThemeModal()"
+        class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 hover:text-slate-800 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+        aria-label="Fechar personalização de tema"
+      >
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </header>
+    <div class="grid gap-5 px-5 py-5 md:grid-cols-2">
+      <div class="md:col-span-2">
+        <h3
+          class="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400"
+        >
+          Começar de
+        </h3>
+        <select
+          id="custom-theme-base"
+          onchange="presetBaseChange()"
+          class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+        >
+          <option value="">Padrão vazio</option>
+        </select>
+        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">
+          Vazio traz as cores padrão; "Clonar" copia as cores de um preset existente para ajustar.
+        </p>
+      </div>
+      <div>
+        <h3
+          class="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400"
+        >
+          Aplicar em
+        </h3>
+        <div class="space-y-2">
+          <label
+            class="theme-modal-option flex cursor-pointer items-center justify-between rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 hover:border-slate-400 dark:border-slate-700 dark:text-slate-200 dark:hover:border-slate-500"
+            ><span>Navbar</span
+            ><input
+              id="custom-theme-option-navbar"
+              class="h-4 w-4"
+              type="checkbox"
+              onchange="applyCustomTheme()"
+          /></label>
+          <label
+            class="theme-modal-option flex cursor-pointer items-center justify-between rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 hover:border-slate-400 dark:border-slate-700 dark:text-slate-200 dark:hover:border-slate-500"
+            ><span>Workspace</span
+            ><input
+              id="custom-theme-option-workspace"
+              class="h-4 w-4"
+              type="checkbox"
+              onchange="applyCustomTheme()"
+          /></label>
+          <label
+            class="theme-modal-option flex cursor-pointer items-center justify-between rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 hover:border-slate-400 dark:border-slate-700 dark:text-slate-200 dark:hover:border-slate-500"
+            ><span>Widgetbar</span
+            ><input
+              id="custom-theme-option-widgetbar"
+              class="h-4 w-4"
+              type="checkbox"
+              onchange="applyCustomTheme()"
+          /></label>
+          <label
+            class="theme-modal-option flex cursor-pointer items-center justify-between rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 hover:border-slate-400 dark:border-slate-700 dark:text-slate-200 dark:hover:border-slate-500"
+            ><span>Modo escuro</span
+            ><input
+              id="custom-theme-option-dark"
+              class="h-4 w-4"
+              type="checkbox"
+              onchange="applyCustomTheme()"
+          /></label>
+        </div>
+      </div>
+      <div>
+        <h3
+          class="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400"
+        >
+          Cores
+        </h3>
+        <div class="grid grid-cols-2 gap-3">
+          <label
+            class="flex items-center justify-between gap-2 text-xs text-slate-600 dark:text-slate-300"
+            >Acento<input
+              id="custom-theme-accent"
+              class="theme-color-input"
+              type="color"
+              value="#0f9d6e"
+              onchange="applyCustomTheme()"
+          /></label>
+          <label
+            class="flex items-center justify-between gap-2 text-xs text-slate-600 dark:text-slate-300"
+            >Texto<input
+              id="custom-theme-text"
+              class="theme-color-input"
+              type="color"
+              value="#e9eeec"
+              onchange="applyCustomTheme()"
+          /></label>
+          <label
+            class="flex items-center justify-between gap-2 text-xs text-slate-600 dark:text-slate-300"
+            >Navbar<input
+              id="custom-theme-navbar"
+              class="theme-color-input"
+              type="color"
+              value="#131917"
+              onchange="applyCustomTheme()"
+          /></label>
+          <label
+            class="flex items-center justify-between gap-2 text-xs text-slate-600 dark:text-slate-300"
+            >Workspace<input
+              id="custom-theme-workspace"
+              class="theme-color-input"
+              type="color"
+              value="#0b0f0e"
+              onchange="applyCustomTheme()"
+          /></label>
+          <label
+            class="flex items-center justify-between gap-2 text-xs text-slate-600 dark:text-slate-300"
+            >Cards<input
+              id="custom-theme-card"
+              class="theme-color-input"
+              type="color"
+              value="#151b19"
+              onchange="applyCustomTheme()"
+          /></label>
+          <label
+            class="flex items-center justify-between gap-2 text-xs text-slate-600 dark:text-slate-300"
+            >Widgetbar<input
+              id="custom-theme-widgetbar"
+              class="theme-color-input"
+              type="color"
+              value="#131917"
+              onchange="applyCustomTheme()"
+          /></label>
+          <label
+            class="flex items-center justify-between gap-2 text-xs text-slate-600 dark:text-slate-300"
+            >Gráfico<input
+              id="custom-theme-chart"
+              class="theme-color-input"
+              type="color"
+              value="#0f9d6e"
+              onchange="applyCustomTheme()"
+          /></label>
+          <label
+            class="flex items-center justify-between gap-2 text-xs text-slate-600 dark:text-slate-300"
+            >Borda<input
+              id="custom-theme-border"
+              class="theme-color-input"
+              type="color"
+              value="#33413f"
+              onchange="applyCustomTheme()"
+          /></label>
+        </div>
+        <div class="mt-3">
+          <h4
+            class="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400"
+          >
+            Gráfico do Preset Ativo
+          </h4>
+          <div class="flex gap-2">
+            <label class="flex-1 flex items-center justify-between gap-2 text-xs"
+              >Cor 1<input
+                id="custom-chart-color1"
+                type="color"
+                value="#0f9d6e"
+                style="width: 32px; height: 24px"
+                onchange="updatePresetChartColors()"
+            /></label>
+            <label class="flex-1 flex items-center justify-between gap-2 text-xs"
+              >Cor 2<input
+                id="custom-chart-color2"
+                type="color"
+                value="#3ec48f"
+                style="width: 32px; height: 24px"
+                onchange="updatePresetChartColors()"
+            /></label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <footer
+      class="flex items-center justify-between gap-3 border-t border-slate-200 dark:border-slate-700 px-5 py-4 bg-slate-50 dark:bg-slate-800/50"
+    >
+      <button
+        type="button"
+        onclick="revertCustomTheme()"
+        class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300"
+      >
+        <i class="bi bi-arrow-counterclockwise"></i> Reverter
+      </button>
+      <div class="flex gap-2">
+        <button
+          type="button"
+          onclick="closeCustomThemeModal()"
+          class="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          onclick="saveCustomTheme()"
+          class="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-5 py-2 text-sm font-semibold text-white hover:bg-emerald-700"
+        >
+          <i class="bi bi-check-lg"></i> Salvar
+        </button>
+      </div>
+    </footer>
+  </section>
+</div>
+
+{% endblock %} {% block add_widget_modal %}
+<!-- Modal — container captura cliques fora do painel para fechar -->
+<div
+  id="add-widget-modal"
+  onclick="closeAddWidgetModal()"
+  class="fixed inset-0 z-[2147483647] hidden items-center justify-center p-4 bg-black/50 backdrop-blur-sm transition-all"
+  style="pointer-events: auto"
+>
+  <!-- Painel -->
+  <div
+    onclick="event.stopPropagation()"
+    class="widget-modal-box lc-panel rounded-2xl flex flex-col overflow-hidden pointer-events-auto transform transition-all duration-200 scale-95 opacity-0"
+    style="width: 92vw; height: 74vh; max-width: 1240px; border-radius: 20px !important"
+    id="add-widget-modal-panel"
+  >
+    <!-- Header reservado para mini-painel de cultura (oculto no modo normal; footer ja tem Cancelar) -->
+    <div id="widget-modal-header" class="hidden"></div>
+
+    <!-- Navegacao estilo Liquid Glass — abas tipo nav-tabs -->
+    <div
+      class="preset-tabs-container flex gap-4 px-4 pt-4 mb-3 border-b border-white/10 overflow-x-auto hide-scrollbar shrink-0"
+      id="widget-nav-wrapper"
+    >
+      <ul class="flex gap-4" id="widget-modal-tabs" role="tablist">
+        <li class="nav-item">
+          <button
+            class="preset-tab-btn active"
+            data-modal-tab="kpi"
+            onclick="switchWidgetTab('kpi')"
+            role="tab"
+            aria-selected="true"
+          >
+            <i class="bi bi-speedometer2"></i> KPIs
+          </button>
+        </li>
+        <li class="nav-item">
+          <button
+            class="preset-tab-btn"
+            data-modal-tab="recent"
+            onclick="switchWidgetTab('recent')"
+            role="tab"
+          >
+            <i class="bi bi-clock-history"></i> Recentes
+          </button>
+        </li>
+        <li class="nav-item">
+          <button
+            class="preset-tab-btn"
+            data-modal-tab="suggested"
+            onclick="switchWidgetTab('suggested')"
+            role="tab"
+          >
+            <i class="bi bi-magic"></i> IA
+          </button>
+        </li>
+        <div id="widget-modal-tabs-cultura" class="flex gap-4" style="margin-left: 6px"></div>
+      </ul>
+    </div>
+
+    <!-- Conteúdo principal (lista de categorias + accordion) -->
+    <div class="flex-1 overflow-y-auto scrollbar-none px-3 py-1.5" id="widget-modal-content">
+      <!-- KPIs: subcategorias accordion -->
+      <div class="tab-content" data-modal-tab="kpi">
+        <div id="kpi-accordion-container"></div>
+      </div>
+      <!-- Recentes -->
+      <div class="tab-content hidden" data-modal-tab="recent" id="recent-widgets-container">
+        <div class="text-[11px] font-medium text-slate-600 dark:text-slate-400 mb-3">
+          Widgets usados recentemente
+        </div>
+        <div id="recent-widgets-grid" class="grid grid-cols-3 gap-2"></div>
+      </div>
+      <!-- Sugeridos por IA -->
+      <div class="tab-content hidden" data-modal-tab="suggested" id="suggested-widgets-container">
+        <div class="text-[11px] font-medium text-slate-600 dark:text-slate-400 mb-3">
+          Sugestões baseadas no seu contexto
+        </div>
+        <div id="suggested-widgets-grid" class="grid grid-cols-3 gap-2"></div>
+      </div>
+      <!-- Conteúdo de grupos de cultura — gerado dinamicamente pelo CulturesLoader -->
+    </div>
+
+    <!-- Mini painel de cultura (escondido por padrão) -->
+    <div
+      id="culture-mini-panel"
+      class="hidden flex-1 min-h-0 w-full overflow-y-auto scrollbar-none px-3 py-1.5"
+    >
+      <!-- Preenchido dinamicamente -->
+    </div>
+
+    <!-- Estado vazio global -->
+    <div id="widget-modal-empty-state" class="hidden px-4 py-6 text-center shrink-0">
+      <div class="flex flex-col items-center">
+        <div
+          class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-300 dark:text-slate-600 mb-2"
+        >
+          <i class="bi bi-search text-lg"></i>
+        </div>
+        <h3 class="text-[12px] font-bold text-slate-700 dark:text-slate-200 mb-0.5">
+          Nenhum resultado
+        </h3>
+        <p class="text-[10px] text-slate-400 dark:text-slate-500">
+          Tente outro termo ou explore as abas
+        </p>
+      </div>
+      <div class="grid grid-cols-3 gap-1.5 mt-3 opacity-30">
+        <div class="h-12 rounded-lg bg-slate-200 dark:bg-slate-700 animate-pulse"></div>
+        <div
+          class="h-12 rounded-lg bg-slate-200 dark:bg-slate-700 animate-pulse"
+          style="animation-delay: 0.1s"
+        ></div>
+        <div
+          class="h-12 rounded-lg bg-slate-200 dark:bg-slate-700 animate-pulse"
+          style="animation-delay: 0.2s"
+        ></div>
+      </div>
+    </div>
+
+    <!-- Footer com busca à esquerda e botoes à direita -->
+    <div
+      id="widget-modal-footer"
+      class="px-4 py-3 border-t border-white/10 flex items-center justify-between shrink-0 gap-3"
+      style="position: relative; z-index: 1"
+    >
+      <div class="relative flex-1 max-w-[280px]">
+        <i
+          class="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-[12px] text-slate-400"
+        ></i>
+        <input
+          type="text"
+          id="widget-modal-search"
+          placeholder="Pesquisar widgets..."
+          class="lc-input w-full pl-8 pr-3 py-2 text-[12px]"
+          oninput="filterWidgetModal()"
+        />
+      </div>
+      <div class="flex items-center gap-2 shrink-0">
+        <button
+          onclick="closeAddWidgetModal()"
+          class="lc-btn-secondary"
+          style="padding: 0.4rem 0.8rem; font-size: 0.75rem; border-radius: 8px"
+        >
+          Cancelar
+        </button>
+        <button
+          onclick="closeAddWidgetModal()"
+          class="lc-btn"
+          style="padding: 0.4rem 1rem; font-size: 0.75rem"
+        >
+          Salvar Widgets
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast de feedback -->
+<div
+  id="widget-toast"
+  class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[1100] hidden pointer-events-none"
+>
+  <div
+    id="widget-toast-inner"
+    class="px-4 py-2 rounded-xl bg-emerald-600 text-white text-sm font-medium shadow-lg flex items-center gap-2"
+    style="
+      transform: translateY(8px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    "
+  >
+    <i class="bi bi-check-circle text-base"></i>
+    <span id="widget-toast-msg">Widget adicionado ao dashboard!</span>
+  </div>
+</div>
+
+<!-- Command Palette (Ctrl+K / Cmd+K) -->
+<div
+  id="command-palette"
+  onclick="closeCommandPalette()"
+  class="fixed inset-0 z-[1002] hidden items-start justify-center pt-[15vh] bg-black/40 backdrop-blur-sm"
+>
+  <div
+    onclick="event.stopPropagation()"
+    class="bg-white dark:bg-[#131917] rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700/60 overflow-hidden transition-all duration-200 scale-95 opacity-0"
+    style="width: 520px; max-width: 90vw"
+    id="command-palette-panel"
+  >
+    <div
+      class="flex items-center gap-2 px-3 py-2 border-b border-slate-200 dark:border-slate-700/60"
+    >
+      <i class="bi bi-search text-slate-400 text-[11px]"></i>
+      <input
+        type="text"
+        id="command-palette-input"
+        placeholder="Buscar comandos, culturas, talhoes..."
+        class="flex-1 text-[11px] bg-transparent text-slate-700 dark:text-slate-200 placeholder:text-slate-400 focus:outline-none"
+        oninput="filterCommandPalette(this.value)"
+        autocomplete="off"
+        spellcheck="false"
+      />
+      <kbd
+        class="text-[8px] px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-400 font-mono border border-slate-200 dark:border-slate-700"
+        >ESC</kbd
+      >
+    </div>
+    <div
+      id="command-palette-results"
+      class="max-h-[50vh] overflow-y-auto scrollbar-none py-1"
+    ></div>
+    <div
+      class="px-3 py-1.5 border-t border-slate-200 dark:border-slate-700/60 flex items-center gap-3 text-[7px] text-slate-400"
+    >
+      <span
+        ><kbd
+          class="px-1 py-0.5 rounded bg-slate-100 dark:bg-slate-800 font-mono border border-slate-200 dark:border-slate-700"
+          >&uarr;&darr;</kbd
+        >
+        Navegar</span
+      >
+      <span
+        ><kbd
+          class="px-1 py-0.5 rounded bg-slate-100 dark:bg-slate-800 font-mono border border-slate-200 dark:border-slate-700"
+          >&crarr;</kbd
+        >
+        Selecionar</span
+      >
+    </div>
+  </div>
+</div>
+
+<!-- Calculadoras Agronomicas -->
+<div
+  id="calculator-modal"
+  onclick="closeCalculatorModal()"
+  class="fixed inset-0 z-[1002] hidden items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
+>
+  <div
+    onclick="event.stopPropagation()"
+    class="bg-white dark:bg-[#131917] rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700/60 flex flex-col overflow-hidden transition-all duration-200 scale-95 opacity-0"
+    style="width: 640px; max-width: 95vw; max-height: 80vh"
+    id="calculator-modal-panel"
+  >
+    <div
+      class="flex items-center justify-between px-3 py-2 border-b border-slate-200 dark:border-slate-700/60 shrink-0"
+    >
+      <div class="flex items-center gap-2">
+        <div
+          class="w-6 h-6 flex items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
+        >
+          <i class="bi bi-calculator text-[11px]"></i>
+        </div>
+        <span class="text-[12px] font-bold text-slate-800 dark:text-slate-100"
+          >Calculadoras Agronomicas</span
+        >
+      </div>
+      <button
+        onclick="closeCalculatorModal()"
+        class="w-6 h-6 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700/50 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+      >
+        <i class="bi bi-x-lg text-[10px]"></i>
+      </button>
+    </div>
+    <div
+      class="flex gap-1 px-3 pt-2 pb-1 border-b border-slate-200 dark:border-slate-700/60 shrink-0 overflow-x-auto scrollbar-none"
+      id="calc-tabs"
+    >
+      <button
+        onclick="switchCalcTab('pulverizacao')"
+        class="calc-tab active-calc-tab"
+        data-calc-tab="pulverizacao"
+      >
+        Pulverizacao
+      </button>
+      <button onclick="switchCalcTab('pearson')" class="calc-tab" data-calc-tab="pearson">
+        Racao (Pearson)
+      </button>
+      <button onclick="switchCalcTab('npk')" class="calc-tab" data-calc-tab="npk">NPK</button>
+      <button onclick="switchCalcTab('biometria')" class="calc-tab" data-calc-tab="biometria">
+        Biometria
+      </button>
+    </div>
+    <div
+      class="flex-1 overflow-y-auto scrollbar-none px-3 py-2 text-[10px] text-slate-600 dark:text-slate-300"
+      id="calc-content"
+    >
+      <!-- Preenchido dinamicamente -->
+    </div>
+  </div>
+</div>
+
+<!-- Planilha Rapida (Bulk Data Entry) -->
+<div
+  id="quick-spreadsheet-modal"
+  onclick="closeQuickSpreadsheet()"
+  class="fixed inset-0 z-[1002] hidden items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
+>
+  <div
+    onclick="event.stopPropagation()"
+    class="bg-white dark:bg-[#131917] rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700/60 flex flex-col overflow-hidden transition-all duration-200 scale-95 opacity-0"
+    style="width: 800px; max-width: 95vw; max-height: 85vh"
+    id="quick-spreadsheet-panel"
+  >
+    <div
+      class="flex items-center justify-between px-3 py-2 border-b border-slate-200 dark:border-slate-700/60 shrink-0"
+    >
+      <div class="flex items-center gap-2">
+        <div
+          class="w-6 h-6 flex items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
+        >
+          <i class="bi bi-table text-[11px]"></i>
+        </div>
+        <div>
+          <span class="text-[12px] font-bold text-slate-800 dark:text-slate-100"
+            >Entrada Rapida</span
+          >
+          <p class="text-[7px] text-slate-400">Registros em lote | Tab/Enter navega</p>
+        </div>
+      </div>
+      <button
+        onclick="closeQuickSpreadsheet()"
+        class="w-6 h-6 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700/50 text-slate-400"
+      >
+        <i class="bi bi-x-lg text-[10px]"></i>
+      </button>
+    </div>
+    <div
+      class="flex items-center gap-2 px-3 py-1.5 border-b border-slate-200 dark:border-slate-700/60 shrink-0"
+    >
+      <select
+        id="qs-type"
+        class="text-[9px] px-2 py-1 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200"
+        onchange="rebuildQuickSheet()"
+      >
+        <option value="producao">Producao/Safra</option>
+        <option value="pesagem">Pesagem de Animais</option>
+        <option value="insumo">Aplicacao de Insumos</option>
+        <option value="financeiro">Lancamento Financeiro</option>
+        <option value="produto">Produtos / Precificacao</option>
+      </select>
+      <select
+        id="qs-rows"
+        class="text-[9px] px-2 py-1 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200"
+        onchange="rebuildQuickSheet()"
+      >
+        <option value="5">5 linhas</option>
+        <option value="10" selected>10 linhas</option>
+        <option value="20">20 linhas</option>
+        <option value="50">50 linhas</option>
+      </select>
+      <div class="flex-1"></div>
+      <button
+        onclick="saveQuickSheet()"
+        class="px-3 py-1 text-[9px] font-semibold rounded-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm transition-all"
+      >
+        <i class="bi bi-check-lg mr-1"></i>Salvar Tudo
+      </button>
+    </div>
+    <div class="flex-1 overflow-auto scrollbar-none px-3 py-1" id="qs-grid-container"></div>
+  </div>
+</div>
+
+<!-- Product Registry (Cadastro de Produtos + Precos) -->
+<div
+  id="product-registry-modal"
+  onclick="closeProductRegistry()"
+  class="fixed inset-0 z-[1002] hidden items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
+>
+  <div
+    onclick="event.stopPropagation()"
+    class="bg-white dark:bg-[#131917] rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700/60 flex flex-col overflow-hidden transition-all duration-200 scale-95 opacity-0"
+    style="width: 700px; max-width: 95vw; max-height: 85vh"
+    id="product-registry-panel"
+  >
+    <div
+      class="flex items-center justify-between px-3 py-2 border-b border-slate-200 dark:border-slate-700/60 shrink-0"
+    >
+      <div class="flex items-center gap-2">
+        <div
+          class="w-6 h-6 flex items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
+        >
+          <i class="bi bi-box-seam text-[11px]"></i>
+        </div>
+        <span class="text-[12px] font-bold text-slate-800 dark:text-slate-100"
+          >Produtos &amp; Precificacao</span
+        >
+      </div>
+      <button
+        onclick="closeProductRegistry()"
+        class="w-6 h-6 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700/50 text-slate-400"
+      >
+        <i class="bi bi-x-lg text-[10px]"></i>
+      </button>
+    </div>
+    <div
+      class="flex items-center gap-1 px-3 pt-2 pb-1 border-b border-slate-200 dark:border-slate-700/60 shrink-0 overflow-x-auto scrollbar-none"
+      id="product-registry-tabs"
+    >
+      <button
+        onclick="showProductTab('lista')"
+        class="px-2 py-1 text-[9px] font-semibold rounded-full bg-emerald-600 text-white"
+        id="prod-tab-lista"
+      >
+        Meus Produtos
+      </button>
+      <button
+        onclick="showProductTab('cadastrar')"
+        class="px-2 py-1 text-[9px] font-semibold rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200"
+        id="prod-tab-cadastrar"
+      >
+        + Novo Produto
+      </button>
+      <button
+        onclick="showProductTab('precos')"
+        class="px-2 py-1 text-[9px] font-semibold rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200"
+        id="prod-tab-precos"
+      >
+        Tabela de Precos
+      </button>
+    </div>
+    <div
+      class="flex-1 overflow-y-auto scrollbar-none px-3 py-2 text-[10px] text-slate-700 dark:text-slate-200"
+      id="product-registry-content"
+    ></div>
+  </div>
+</div>
+
+<!-- Caderno de Campo (preview + print) -->
+<div
+  id="field-notebook-modal"
+  onclick="closeFieldNotebook()"
+  class="fixed inset-0 z-[1002] hidden items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
+>
+  <div
+    onclick="event.stopPropagation()"
+    class="bg-white dark:bg-[#131917] rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700/60 flex flex-col overflow-hidden transition-all duration-200 scale-95 opacity-0"
+    style="width: 800px; max-width: 95vw; max-height: 85vh"
+    id="field-notebook-panel"
+  >
+    <div
+      class="flex items-center justify-between px-3 py-2 border-b border-slate-200 dark:border-slate-700/60 shrink-0 no-print"
+    >
+      <div class="flex items-center gap-2">
+        <div
+          class="w-6 h-6 flex items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
+        >
+          <i class="bi bi-journal-text text-[11px]"></i>
+        </div>
+        <span class="text-[12px] font-bold text-slate-800 dark:text-slate-100"
+          >Caderno de Campo</span
+        >
+      </div>
+      <div class="flex items-center gap-1">
+        <button
+          onclick="printFieldNotebook()"
+          class="px-3 py-1 text-[9px] font-semibold rounded-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm transition-all"
+        >
+          <i class="bi bi-printer mr-1"></i>Imprimir / PDF
+        </button>
+        <button
+          onclick="closeFieldNotebook()"
+          class="w-6 h-6 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700/50 text-slate-400"
+        >
+          <i class="bi bi-x-lg text-[10px]"></i>
+        </button>
+      </div>
+    </div>
+    <div
+      class="flex-1 overflow-y-auto scrollbar-none px-3 py-2 text-[10px] text-slate-700 dark:text-slate-200"
+      id="field-notebook-content"
+    ></div>
+  </div>
+</div>
+
+<link rel="stylesheet" href="{% static 'css/soft-ui.css' %}?v=20260918a" />
+{% endblock %} {% block scripts %} {{ block.super }}
+<script>
+/* Os 4 valores que o Django injectava no script de 772 KB.
+ *
+ * A interpolacao e' CRUA, e e' de proposito. A primeira versao desta
+ * extraccao punha os valores em atributos `data-*` e lia-os com JSON.parse.
+ * Isso partiu `culturas_do_produtor`: e' uma lista Python, e `|safe` em
+ * Python-renderiza com ASPAS SIMPLES — `[{...'id': 7...}]`. Isso e'
+ * JavaScript valido mas nao e' JSON, e `JSON.parse` devolve `[]`.
+ *
+ * O que a segunda versao faz e' o que o original fazia: mete o valor como
+ * literal JavaScript, sem interpretar. O que muda e' o SITIO — 30 linhas
+ * em vez de estar no meio de 772 KB. Zero mudanca de semantica.
+ */
+window._BOOTSTRAP = {
+  culturas: {{ culturas_do_produtor|default:"[]"|safe }},
+  presetBlock: {{ PRESET_BLOCK_JSON|default:"[]"|safe }},
+  presetSistema: {{ PRESET_SISTEMA_JSON|default:"[]"|safe }},
+  csrf: "{{ csrf_token }}",
+};
+</script>
+<script src="{% static 'js/pagina-index.js' %}?v=20261007dbg"></script>
+<script src="{% static 'js/liquid-glass.js' %}?v=1"></script>
+{% endblock %}

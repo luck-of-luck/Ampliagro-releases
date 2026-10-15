@@ -1,0 +1,106 @@
+{% extends base_template %}
+{% load static %}
+{% block title %}Ampliagro - DRE{% endblock %}
+{% block extra_css %}
+
+{% endblock %}
+{% block dashboard_appbar %}{% endblock %}
+{% block content %}
+<div class="section-container">
+    <div class="section-header">
+        <h1 class="section-title"><i class="bi bi-file-earmark-bar-graph me-2"></i>DRE — Demonstrativo de Resultado</h1>
+        <div style="display:flex;gap:0.75rem;align-items:center;">
+            <select class="search-input" id="safra-select" style="min-width:180px;" onchange="carregarDRE()">
+                <option value="">Todas as Safras</option>
+            </select>
+            <a href="{% url 'custos-producao' %}" class="btn-secondary" style="text-decoration:none;display:inline-flex;align-items:center;gap:0.375rem;"><i class="bi bi-arrow-left"></i> Custos</a>
+            <a href="{% url 'orcamento-realizado' %}" class="btn-secondary" style="text-decoration:none;display:inline-flex;align-items:center;gap:0.375rem;"><i class="bi bi-clipboard-data"></i> Orcado x Realizado</a>
+            <button class="btn-primary" onclick="exportarCSV()"><i class="bi bi-download"></i> CSV</button>
+        </div>
+    </div>
+
+    <div class="summary-grid">
+        <div class="summary-card"><div class="summary-value" id="sum-receitas" style="color:#15803d;">--</div><div class="summary-label">Receitas</div></div>
+        <div class="summary-card"><div class="summary-value" id="sum-despesas" style="color:#dc2626;">--</div><div class="summary-label">Despesas</div></div>
+        <div class="summary-card"><div class="summary-value" id="sum-saldo">--</div><div class="summary-label">Saldo</div></div>
+    </div>
+
+    <div class="content-card">
+        <div class="card-title"><i class="bi bi-journal-text"></i> Receitas vs Despesas por Categoria</div>
+        <table class="dre-table" id="dre-table">
+            <thead><tr><th>Categoria</th><th>Valor</th></tr></thead>
+            <tbody id="dre-body"><tr><td colspan="2" class="empty-state">Carregando...</td></tr></tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+<script>
+(function(){
+    function fmt(v){ return 'R$ '+parseFloat(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2}); }
+
+    async function carregarSafras(){
+        try{ const r=await fetch('/api/safras/'); if(!r.ok) return; let d=await r.json(); if(d.results) d=d.results; const sel=document.getElementById('safra-select'); d.forEach(s=>{ const o=document.createElement('option'); o.value=s.id; o.textContent=(s.safra_nome||s.cultura_nome||'Safra')+' '+s.ano; sel.appendChild(o); }); }catch(e){}
+    }
+    async function carregarDRE(){
+        const safraId=document.getElementById('safra-select').value;
+        let url='/api/custos-producao/dre/';
+        if(safraId) url+='?safra='+safraId;
+        const tbody=document.getElementById('dre-body');
+        tbody.innerHTML='<tr><td colspan=\"2\" class=\"empty-state\">Carregando...</td></tr>';
+        try{
+            const r=await fetch(url);
+            if(!r.ok) throw 1;
+            const data=await r.json();
+            const dre=data.dre||{};
+            // Separar receitas e despesas por chave conhecida
+            const receitasKeys=['VENDA_SOJA','VENDA_MILHO','VENDA_ALGODAO','VENDA_CAFE','VENDA_BOVINO','VENDA_LEITE','VENDA_SUINO','OUTRA_RECEITA','VENDA_PROD','VENDA_ANIMAL','VENDA_LEITE'];
+            let html='';
+            const receitas={}, despesas={};
+            Object.entries(dre).forEach(([k,v])=>{ if(receitasKeys.includes(k)) receitas[k]=v; else despesas[k]=v; });
+            // Receitas
+            html+='<tr class=\"total\"><td>RECEITAS</td><td>'+fmt(data.receitas)+'</td></tr>';
+            Object.entries(receitas).forEach(([k,v])=>{ html+='<tr><td class=\"dre-indent\">'+labelCategoria(k)+'</td><td>'+fmt(v)+'</td></tr>'; });
+            if(!Object.keys(receitas).length) html+='<tr><td class=\"dre-indent\" colspan=\"2\" style=\"color:#94a3b8\">Nenhuma receita</td></tr>';
+            // Despesas
+            html+='<tr class=\"total\"><td>DESPESAS</td><td>'+fmt(data.despesas)+'</td></tr>';
+            Object.entries(despesas).forEach(([k,v])=>{ html+='<tr><td class=\"dre-indent\">'+labelCategoria(k)+'</td><td>'+fmt(v)+'</td></tr>'; });
+            if(!Object.keys(despesas).length) html+='<tr><td class=\"dre-indent\" colspan=\"2\" style=\"color:#94a3b8\">Nenhuma despesa</td></tr>';
+            // Saldo
+            const saldoCls=parseFloat(data.saldo||0)>=0?'':' negative';
+            html+='<tr class=\"saldo'+saldoCls+'\"><td>SALDO (Receitas − Despesas)</td><td>'+fmt(data.saldo)+'</td></tr>';
+            tbody.innerHTML=html;
+            document.getElementById('sum-receitas').textContent=fmt(data.receitas);
+            document.getElementById('sum-despesas').textContent=fmt(data.despesas);
+            const saldoEl=document.getElementById('sum-saldo');
+            saldoEl.textContent=fmt(data.saldo);
+            saldoEl.style.color=parseFloat(data.saldo||0)>=0?'#15803d':'#dc2626';
+        }catch(e){ tbody.innerHTML='<tr><td colspan=\"2\" class=\"empty-state\">Erro ao carregar DRE.</td></tr>'; }
+    }
+    function labelCategoria(k){
+        const map={ 'VENDA_SOJA':'Soja', 'VENDA_MILHO':'Milho', 'VENDA_ALGODAO':'Algodão', 'VENDA_CAFE':'Café', 'VENDA_BOVINO':'Boi', 'VENDA_LEITE':'Leite', 'VENDA_SUINO':'Suíno', 'OUTRA_RECEITA':'Outra Receita',
+            'COMPRA_SEMENTE':'Semente', 'COMPRA_FERTILIZANTE':'Fertilizante', 'COMPRA_DEFENSIVO':'Defensivo', 'COMPRA_CORRETIVO':'Corretivo', 'COMPRA_RACAO':'Ração', 'COMPRA_COMBUSTIVEL':'Combustível', 'COMPRA_OUTRO_INSUMO':'Outro Insumo',
+            'FOLHA_PAGAMENTO':'Folha', 'DIARISTA':'Diarista', 'TERCEIRO':'Terceirizado',
+            'MANUTENCAO':'Manutenção', 'PECA':'Peça', 'COMBUSTIVEL':'Combustível', 'DEPRECIACAO':'Depreciação',
+            'IMPOSTO':'Imposto', 'ENERGIA':'Energia', 'SEGURO':'Seguro', 'FINANCEIRO':'Financeiro', 'OUTRA_DESPESA':'Outra Despesa' };
+        return map[k]||k;
+    }
+    window.carregarDRE=carregarDRE;
+    window.exportarCSV=function(){
+        // simples export do DRE atual
+        const safraId=document.getElementById('safra-select').value;
+        let url='/api/custos-producao/dre/';
+        if(safraId) url+='?safra='+safraId;
+        fetch(url).then(r=>r.json()).then(data=>{
+            const dre=data.dre||{};
+            let csv='Categoria,Valor\n';
+            Object.entries(dre).forEach(([k,v])=>{ csv+=k+','+v+'\n'; });
+            csv+='Receitas,'+data.receitas+'\nDespesas,'+data.despesas+'\nSaldo,'+data.saldo+'\n';
+            const blob=new Blob([csv],{type:'text/csv'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='dre.csv'; a.click();
+        });
+    };
+    document.addEventListener('DOMContentLoaded', function(){ carregarSafras(); carregarDRE(); });
+})();
+</script>
+{% endblock %}

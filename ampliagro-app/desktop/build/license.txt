@@ -1,0 +1,17 @@
+Ampliagro Desktop — Licença de Uso
+
+Copyright © 2026 Ampliagro. Todos os direitos reservados.
+
+Este software é fornecido "como está", sem garantia de qualquer tipo,
+expressa ou implícita, incluindo mas não se limitando a garantias de
+comercialização, adequação a um propósito específico e não violação.
+
+Em nenhum caso os autores ou detentores de direitos autorais serão
+responsáveis por qualquer reivindicação, danos ou outra responsabilidade,
+seja em ação de contrato, delito ou de outra forma, decorrente de,
+fora de ou em conexão com o software ou o uso ou outras negociações
+no software.
+
+Ao instalar e usar este software, você concorda com os termos acima.
+
+Para suporte: suporte@ampliagro.com

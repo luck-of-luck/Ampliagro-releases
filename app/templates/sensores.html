@@ -1,0 +1,57 @@
+{% extends base_template %}
+{% load static %}
+
+{% block title %}Ampliagro - Sensores{% endblock %}
+
+{% block extra_css %}
+
+{% endblock %}
+
+{% block dashboard_appbar %}{% endblock %}
+
+{% block content %}
+<div class="section-container">
+    <div class="section-header">
+        <h1 class="section-title">Sensores IoT</h1>
+        <div>
+            <a href="{% url 'dispositivos' %}" class="btn-secondary btn-sm"><i class="bi bi-hdd-stack"></i> Dispositivos</a>
+            <a href="{% url 'index_spa' %}" class="btn-secondary btn-sm">Voltar ao Dashboard</a>
+        </div>
+    </div>
+
+    <div class="sensors-grid" id="sensors-grid">
+        {% if sensores %}
+        {% for s in sensores %}
+        <div class="sensor-card">
+            <div class="sensor-header">
+                <div>
+                    <div class="sensor-name">{{ s.nome }}</div>
+                    <div class="sensor-type">{{ s.get_tipo_display }}</div>
+                </div>
+                <span class="status-indicator status-{{ s.status }}">
+                    <i class="bi bi-circle-fill" style="font-size:0.5rem;"></i> {{ s.get_status_display }}
+                </span>
+            </div>
+            <div class="sensor-location"><i class="bi bi-geo-alt"></i> Talhao {{ s.localizacao.nome|default:"-" }}</div>
+            <div class="sensor-reading">{{ s.ultima_leitura|default:"-" }}{% if s.tipo == "TEMPERATURA" %}°C{% elif s.tipo == "UMIDADE" %}%{% elif s.tipo == "PH" %}{% endif %}</div>
+            <div class="sensor-battery">
+                <i class="bi bi-battery-{% if s.bateria > 60 %}full{% elif s.bateria > 20 %}half{% else %}low{% endif %}"></i>
+                <span class="{% if s.bateria > 60 %}battery-high{% elif s.bateria > 20 %}battery-medium{% else %}battery-low{% endif %}">{{ s.bateria|default:"0" }}%</span>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="empty-state" style="grid-column:1/-1;"><i class="bi bi-wifi-off" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>Nenhum sensor encontrado.</div>
+        {% endif %}
+    </div>
+</div>
+<div id="toast" class="toast"></div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+function getCSRFToken() { return document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''; }
+function showToast(msg, type) { const t = document.getElementById('toast'); t.textContent = msg; t.className = 'toast toast-' + type + ' show'; setTimeout(() => t.classList.remove('show'), 3000); }
+</script>
+{% endblock %}

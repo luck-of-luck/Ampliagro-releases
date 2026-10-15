@@ -1,0 +1,245 @@
+{% extends base_template %}
+{% load static %}
+{% block title %}Ampliagro — Quadro de Tarefas {{ area|default:"Geral" }}{% endblock %}
+
+{% block extra_css %}
+
+{% endblock %}
+{% block dashboard_appbar %}{% endblock %}
+
+{% block content %}
+<div class="kanban-container">
+  <div class="kanban-header">
+    <div>
+      <h1 class="kanban-title"><i class="bi bi-kanban"></i> Quadro de Tarefas — {{ area|default:"Geral" }} {% if propriedade %}<span style="font-weight:500;font-size:.9rem;color:var(--cor-texto-medio)">• {{ propriedade.nome }}</span>{% endif %}</h1>
+      <div class="kanban-meta">
+        {% if funcionario %}<span><i class="bi bi-person-badge"></i> {{ funcionario.nome }} — {{ funcionario.get_cargo_display }}</span>{% endif %}
+        {% if perfil %}<span class="badge-area">{{ perfil.get_area_servidor_display|default:perfil.area_servidor|default:area }}</span>{% endif %}
+        <span><i class="bi bi-layers"></i> {{ total }} tarefas</span>
+        <span style="color:#64748b">Arraste os cards entre colunas para atualizar status</span>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      {% if pode_criar %}
+      <button class="btn-primary" onclick="abrirNovaTarefa()"><i class="bi bi-plus-lg"></i> Nova Tarefa</button>
+      {% endif %}
+      <a href="{% url 'servidor-dashboard' %}" class="btn-secondary"><i class="bi bi-grid"></i> Meu Painel</a>
+      <a href="{% url 'perfil-config' %}" class="btn-secondary"><i class="bi bi-person"></i> Perfil</a>
+    </div>
+  </div>
+
+  {% if alertas %}
+  <div class="alert-strip">
+    {% for a in alertas %}
+    <div class="alert-chip {% if a.severidade == 'warning' %}warning{% endif %}"><i class="bi bi-exclamation-triangle"></i> {{ a.mensagem|truncatechars:70 }} <small>{{ a.timestamp|date:"H:i" }}</small></div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="kanban-board" id="kanbanBoard">
+    <!-- Pendente -->
+    <div class="kanban-column col-pendente" data-status="pendente" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
+      <div class="column-header"><h3>Pendente</h3><span class="count">{{ colunas.pendente|length }}</span></div>
+      <div class="column-body" id="col-pendente">
+        {% for t in colunas.pendente %}
+        <div class="kanban-card" draggable="true" ondragstart="drag(event)" ondragend="dragEnd(event)" data-id="{{ t.id }}" data-status="{{ t.status }}">
+          <div class="card-title">{{ t.descricao|truncatechars:80 }}</div>
+          <div class="card-desc">
+            {% if t.estagio %}<span style="background:#f1f5f9;padding:1px 6px;border-radius:6px;font-size:.7rem">{{ t.estagio.nome }}</span>{% endif %}
+            {% if t.setor %}<span style="font-size:.68rem;color:#64748b">• {{ t.setor }}</span>{% endif %}
+            {% if t.prioridade %}<span class="card-tag tag-{{ t.prioridade }}">{{ t.get_prioridade_display }}</span>{% endif %}
+          </div>
+          <div class="card-foot">
+            <span>{% if t.funcionario %}<i class="bi bi-person"></i> {{ t.funcionario.nome|truncatechars:18 }}{% elif t.cargo_alvo %}<i class="bi bi-people"></i> {{ t.cargo_alvo }}{% else %}<i class="bi bi-layers"></i> Geral{% endif %}</span>
+            <span>{% if t.data_limite %}<i class="bi bi-calendar"></i> {{ t.data_limite|date:"d/m" }}{% endif %} • #{{ t.id }}</span>
+          </div>
+        </div>
+        {% empty %}<div class="empty-state"><i class="bi bi-inbox"></i><br>Nenhuma pendente</div>{% endfor %}
+      </div>
+    </div>
+
+    <!-- Andamento -->
+    <div class="kanban-column col-andamento" data-status="andamento" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
+      <div class="column-header"><h3>Em Andamento</h3><span class="count">{{ colunas.andamento|length }}</span></div>
+      <div class="column-body" id="col-andamento">
+        {% for t in colunas.andamento %}
+        <div class="kanban-card" draggable="true" ondragstart="drag(event)" ondragend="dragEnd(event)" data-id="{{ t.id }}" data-status="{{ t.status }}">
+          <div class="card-title">{{ t.descricao|truncatechars:80 }}</div>
+          <div class="card-desc">{% if t.estagio %}<span style="background:#eff6ff;padding:1px 6px;border-radius:6px;font-size:.7rem">{{ t.estagio.nome }}</span>{% endif %} {% if t.prioridade %}<span class="card-tag tag-{{ t.prioridade }}">{{ t.get_prioridade_display }}</span>{% endif %}</div>
+          <div class="card-foot"><span>{% if t.funcionario %}{{ t.funcionario.nome|truncatechars:18 }}{% else %}{{ t.cargo_alvo|default:"Geral" }}{% endif %}</span><span>#{{ t.id }}</span></div>
+        </div>
+        {% empty %}<div class="empty-state"><i class="bi bi-hourglass"></i><br>Nenhuma em andamento</div>{% endfor %}
+      </div>
+    </div>
+
+    <!-- Concluído -->
+    <div class="kanban-column col-concluido" data-status="concluido" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
+      <div class="column-header"><h3>Concluído</h3><span class="count">{{ colunas.concluido|length }}</span></div>
+      <div class="column-body" id="col-concluido">
+        {% for t in colunas.concluido %}
+        <div class="kanban-card" draggable="true" ondragstart="drag(event)" ondragend="dragEnd(event)" data-id="{{ t.id }}" data-status="{{ t.status }}" style="opacity:0.85">
+          <div class="card-title" style="text-decoration:line-through">{{ t.descricao|truncatechars:80 }}</div>
+          <div class="card-desc"><span class="card-tag" style="background:#dcfce7;color:#166534">concluído {{ t.concluida_em|date:"d/m H:i"|default:"" }}</span></div>
+          <div class="card-foot"><span>{{ t.funcionario.nome|default:t.cargo_alvo|default:"Geral" }}</span><span>#{{ t.id }}</span></div>
+        </div>
+        {% empty %}<div class="empty-state"><i class="bi bi-check-circle"></i><br>Nenhuma concluída</div>{% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:14px;padding:10px;background:rgba(15,157,110,0.06);border:1px dashed rgba(15,157,110,0.18);border-radius:10px;font-size:.78rem;color:var(--cor-texto-medio)">
+    <i class="bi bi-link-45deg"></i> <strong>Associação:</strong> cada tarefa está ligada a <code>Estágio → RegistroProdução → Fazenda ({{ propriedade.nome|default:"—" }})</code> e a um <code>funcionario / cargo_alvo ({{ area }})</code>. O produtor associa arrastando ou via <em>Cadastro &gt; Funcionários &gt; vincular tarefa</em>. O sistema cria tarefas automaticamente via <code>culture_config.task_templates</code> + <code>RegraAlertaTelemetria</code> (ex: solo seco → tarefa para CAMPO).
+  </div>
+</div>
+
+<!-- Modal Nova Tarefa -->
+<div id="modalTarefa" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.55);backdrop-filter:blur(6px);z-index:9999;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:14px;padding:18px;width:min(92vw,480px);border:1px solid #e2e8f0">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <h3 style="font-weight:800;margin:0">Nova Tarefa — {{ area }}</h3>
+      <button onclick="fecharNovaTarefa()" style="background:none;border:none;font-size:1.3rem;cursor:pointer">&times;</button>
+    </div>
+    <form id="formNovaTarefa" onsubmit="criarTarefa(event)">
+      {% csrf_token %}
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <label style="font-size:.82rem;font-weight:600">Descrição *<textarea name="descricao" required rows="2" placeholder="Ex: Revisar trator 8R — trocar filtro" style="width:100%;padding:8px;border:1px solid #cbd5e1;border-radius:8px"></textarea></label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <label style="font-size:.82rem;font-weight:600">Prioridade<select name="prioridade" style="width:100%;padding:8px;border:1px solid #cbd5e1;border-radius:8px"><option value="media">Média</option><option value="baixa">Baixa</option><option value="alta">Alta</option><option value="urgente">Urgente</option></select></label>
+          <label style="font-size:.82rem;font-weight:600">Prazo<input type="date" name="data_limite" style="width:100%;padding:8px;border:1px solid #cbd5e1;border-radius:8px"></label>
+        </div>
+        <label style="font-size:.82rem;font-weight:600">Setor / Cargo alvo<input name="setor" placeholder="MECANICA / CAMPO" value="{{ area }}" style="width:100%;padding:8px;border:1px solid #cbd5e1;border-radius:8px"></label>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px">
+          <button type="button" onclick="fecharNovaTarefa()" class="btn-secondary">Cancelar</button>
+          <button type="submit" class="btn-primary"><i class="bi bi-check-lg"></i> Criar</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="toast" style="position:fixed;bottom:18px;right:18px;background:#0f172a;color:#fff;padding:10px 14px;border-radius:10px;transform:translateY(80px);opacity:0;transition:all .25s;z-index:9999"></div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+function getCSRF(){return document.querySelector('[name=csrfmiddlewaretoken]')?.value||''}
+function toast(m,t='success'){const e=document.getElementById('toast'); e.textContent=m; e.style.background=t==='error'?'#dc2626':t==='warning'?'#b45309':'#0f172a'; e.style.transform='translateY(0)'; e.style.opacity='1'; clearTimeout(e._h); e._h=setTimeout(()=>{e.style.transform='translateY(80px)';e.style.opacity='0'},3000)}
+let dragId=null;
+let dragGhost=null;
+function drag(ev){
+  const card=ev.currentTarget;
+  dragId=card.dataset.id;
+  card.classList.add('dragging');
+  ev.dataTransfer.effectAllowed='move';
+  // cria preview bem visível (opaco, com borda)
+  try{
+    dragGhost=card.cloneNode(true);
+    dragGhost.style.position='absolute';
+    dragGhost.style.top='-1000px';
+    dragGhost.style.opacity='1';
+    dragGhost.style.transform='rotate(2deg) scale(1.05)';
+    dragGhost.style.boxShadow='0 16px 32px rgba(0,0,0,0.28)';
+    dragGhost.style.border='2px solid #0f9d6e';
+    dragGhost.style.background='#fff';
+    dragGhost.style.width=card.offsetWidth+'px';
+    document.body.appendChild(dragGhost);
+    ev.dataTransfer.setDragImage(dragGhost, card.offsetWidth/2, 30);
+    setTimeout(()=>{ if(dragGhost && dragGhost.parentNode) dragGhost.parentNode.removeChild(dragGhost); dragGhost=null; }, 0);
+  }catch(e){}
+  // deixa original semi mas ainda visível para feedback
+  setTimeout(()=> card.style.opacity='0.85', 0);
+}
+function dragEnd(ev){ ev.currentTarget.classList.remove('dragging'); ev.currentTarget.style.opacity='1'; }
+function allowDrop(ev){ev.preventDefault(); ev.currentTarget.classList.add('drag-over')}
+function dragLeave(ev){ev.currentTarget.classList.remove('drag-over')}
+async function drop(ev){
+  ev.preventDefault(); ev.currentTarget.classList.remove('drag-over');
+  const col=ev.currentTarget.closest('.kanban-column');
+  if(!col||!dragId) return;
+  const novo=col.dataset.status;
+  const card=document.querySelector(`.kanban-card[data-id="${dragId}"]`);
+  if(!card) return;
+  card.classList.remove('dragging');
+  card.style.opacity='1';
+  const origem=card.dataset.status;
+  if(origem===novo) return;
+  // otimista: move no DOM
+  const destBody=col.querySelector('.column-body');
+  destBody.prepend(card);
+  card.dataset.status=novo;
+  // persiste
+  try{
+    const r=await fetch(`/api/tarefas-estagio/${dragId}/mover/`,{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':getCSRF()},body:JSON.stringify({status:novo})});
+    const j=await r.json();
+    if(!r.ok||!j.ok) throw new Error(j.erro||'erro');
+    toast(`Tarefa #${dragId} → ${novo}`,'success');
+    // atualiza contadores
+    document.querySelectorAll('.kanban-column').forEach(c=>{
+      const n=c.querySelectorAll('.kanban-card').length;
+      c.querySelector('.count').textContent=n;
+    });
+  }catch(e){
+    toast('Erro ao mover: '+e.message,'error');
+    location.reload();
+  }
+}
+function abrirNovaTarefa(){document.getElementById('modalTarefa').style.display='flex'}
+function fecharNovaTarefa(){document.getElementById('modalTarefa').style.display='none'}
+async function criarTarefa(ev){
+  ev.preventDefault();
+  const f=document.getElementById('formNovaTarefa');
+  const data={descricao:f.descricao.value, prioridade:f.prioridade.value, data_limite:f.data_limite.value||null, setor:f.setor.value||'{{ area }}', status:'pendente'};
+  // precisa de um estagio — pega o primeiro da fazenda via API ou cria via backend que escolhe automaticamente
+  // simplificado: cria via /api/tarefas/ com estagio 1 (o backend vai associar à propriedade do usuário)
+  try{
+    // busca estagio demo
+    const estResp=await fetch('/api/estagios-cultura/?page_size=1');
+    const estJson=await estResp.json();
+    const estId=(estJson.results||estJson)[0]?.id;
+    if(!estId) throw new Error('Nenhum estágio encontrado — crie um Registro de Produção primeiro');
+    const r=await fetch('/api/tarefas-estagio/',{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':getCSRF()},body:JSON.stringify({...data, estagio:estId})});
+    const j=await r.json();
+    if(!r.ok) throw new Error(JSON.stringify(j));
+    toast('Tarefa criada!','success');
+    setTimeout(()=>location.reload(),600);
+  }catch(e){toast('Erro: '+e.message,'error')}
+}
+// Tempo real: a cada 20s verifica notificações não lidas; se crescer, mostra banner (sem reload automático)
+let _kbBaseNaoLidas=null;
+async function kanbanPoll(){
+  try{
+    if(document.hidden||dragId) return;
+    const r=await fetch('/api/notificacoes/?apenas_nao_lidas=1');
+    if(!r.ok) return;
+    const j=await r.json();
+    const items=j.results||j;
+    const n=Array.isArray(items)?items.filter(a=>!a.lida).length:0;
+    if(_kbBaseNaoLidas===null){_kbBaseNaoLidas=n;return;}
+    if(n>_kbBaseNaoLidas){
+      let b=document.getElementById('kb-novas');
+      if(!b){
+        b=document.createElement('button');
+        b.id='kb-novas';
+        b.style.cssText='position:fixed;top:64px;left:50%;transform:translateX(-50%);background:#0f9d6e;color:#fff;border:0;border-radius:999px;padding:8px 18px;font-weight:700;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.25);cursor:pointer';
+        b.onclick=()=>location.reload();
+        document.body.appendChild(b);
+      }
+      b.textContent='🔔 '+(n-_kbBaseNaoLidas)+' novidade(s) — clique para atualizar';
+      b.style.display='block';
+    }
+  }catch(e){}
+}
+// O timer vive em `window` e o anterior e' limpo ANTES de criar outro.
+//
+// MEDIDO 2026-10-06: `setInterval(kanbanPoll, 20000)` solto criava um
+// timer NOVO a cada visita a esta pagina pela SPA, e nenhum era
+// cancelado. Dez visitas = dez timers a pedir `/api/notificacoes/` de
+// 20 em 20 segundos, para sempre, mesmo depois de sair da pagina - e
+// cada um mantem vivos o `document` inteiro onde a pagina foi
+// desenhada. O sintoma no produtor e' lentidao que cresce a cada
+// navegacao, sem nada no codigo que tenha mudado.
+if (window._kbPollTimer) clearInterval(window._kbPollTimer);
+window._kbPollTimer = setInterval(kanbanPoll, 20000);
+</script>
+{% endblock %}

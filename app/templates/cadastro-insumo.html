@@ -1,0 +1,284 @@
+{% extends "partials/_premium_cadastro_base.html" %}
+{% load static agro_icons %}
+
+{% block title %}Ampliagro - Cadastro de Insumos{% endblock %}
+
+{% block cadastro_icon %}bi bi-box-seam{% endblock %}
+{% block cadastro_title %}Cadastro de Insumos{% endblock %}
+{% block cadastro_novo_title %}Novo Insumo{% endblock %}
+{% block cadastro_lista_title %}Insumos Cadastrados{% endblock %}
+
+{% block cadastro_subtabs %}
+<div class="pcrud-subtabs" id="cadastroSubTabs">
+    <button class="pcrud-subtab active" data-tab="novo">Novo Insumo</button>
+    <button class="pcrud-subtab" data-tab="lista">Insumos Cadastrados</button>
+    <button class="pcrud-subtab" data-tab="aplicacoes">Aplicações</button>
+</div>
+{% endblock %}
+
+{% block cadastro_stats %}
+<div class="pcrud-stats" id="cadastroStats">
+    <div class="pcrud-stat"><div class="pcrud-stat-label">Total Insumos</div><div class="pcrud-stat-value" id="statTotalInsumos">{{ insumos|length }}</div></div>
+    <div class="pcrud-stat"><div class="pcrud-stat-label">Quantidade Total</div><div class="pcrud-stat-value" id="statQtdTotal">{{ qtd_total|floatformat:2 }}</div></div>
+    <div class="pcrud-stat"><div class="pcrud-stat-label">Valor Estoque (R$)</div><div class="pcrud-stat-value" id="statValorEstoque">R$ {{ valor_estoque|floatformat:2 }}</div></div>
+    <div class="pcrud-stat"><div class="pcrud-stat-label">Categorias</div><div class="pcrud-stat-value" id="statCategorias">{{ categorias_count }}</div></div>
+</div>
+{% endblock %}
+
+{% block cadastro_form_novo %}
+<form id="insumo-form" onsubmit="return submitInsumo(event)">
+    {% csrf_token %}
+    <div class="pcrud-form-grid">
+        <div class="pcrud-form-group">
+            <label>Propriedade</label>
+            <select name="propriedade" required onblur="validateField(this)">
+                <option value="">Selecione...</option>
+                {% for p in propriedades %}
+                <option value="{{ p.id }}">{{ p.nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="pcrud-form-group">
+            <label>Nome do Insumo</label>
+            <input type="text" name="nome" required placeholder="Ex: Fertilizante NPK 10-10-10" onblur="validateField(this)">
+        </div>
+        <div class="pcrud-form-group">
+            <label>Categoria</label>
+            <select name="categoria">
+                <option value="FERTILIZANTE">Fertilizante</option>
+                <option value="DEFENSIVO">Defensivo</option>
+                <option value="SEMENTE">Semente</option>
+                <option value="CORRETIVO">Corretivo</option>
+                <option value="COMBUSTIVEL">Combustível</option>
+                <option value="RACAO">Ração</option>
+                <option value="VETERINARIO">Veterinário</option>
+                <option value="OUTRO">Outro</option>
+            </select>
+        </div>
+        <div class="pcrud-form-group">
+            <label>Quantidade</label>
+            <input type="number" step="0.01" name="quantidade" required placeholder="0,00" onblur="validateField(this)">
+        </div>
+        <div class="pcrud-form-group">
+            <label>Unidade</label>
+            <select name="unidade">
+                <option value="kg">Kg</option>
+                <option value="L">Litros</option>
+                <option value="un">Unidades</option>
+                <option value="sc">Sacas</option>
+                <option value="ton">Toneladas</option>
+            </select>
+        </div>
+        <div class="pcrud-form-group">
+            <label>Valor Unitário (R$)</label>
+            <input type="number" step="0.01" name="valor_unitario" placeholder="0,00" required onblur="validateField(this)">
+        </div>
+        <div class="pcrud-form-group">
+            <label>Fornecedor</label>
+            <input type="text" name="fornecedor" placeholder="Nome do fornecedor">
+        </div>
+        <div class="pcrud-form-group">
+            <label>Data de Aquisição</label>
+            <input type="date" name="data_aquisicao" value="{{ today|date:'Y-m-d' }}">
+        </div>
+        <div class="pcrud-form-group">
+            <label>Nota Fiscal</label>
+            <input type="text" name="nota_fiscal" placeholder="Número da NF">
+        </div>
+    </div>
+    <div class="pcrud-form-actions">
+        <button type="submit" class="pcrud-btn pcrud-btn-primary"><i class="bi bi-check-lg"></i> Salvar Insumo</button>
+        <button type="reset" class="pcrud-btn pcrud-btn-secondary">Limpar</button>
+    </div>
+</form>
+{% endblock %}
+
+{% block cadastro_tab_lista %}
+{% if insumos %}
+<div class="pcrud-table-wrap">
+    <table class="pcrud-table">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Categoria</th>
+                <th>Quantidade</th>
+                <th>Unidade</th>
+                <th>Valor Unit.</th>
+                <th>Fornecedor</th>
+                <th>Aquisição</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for i in insumos %}
+            <tr>
+                <td><strong>{{ i.nome }}</strong></td>
+                <td>{{ i.get_categoria_display }}</td>
+                <td>{{ i.quantidade|floatformat:2 }}</td>
+                <td>{{ i.unidade }}</td>
+                <td>R$ {{ i.valor_unitario|floatformat:2|default:"—" }}</td>
+                <td>{{ i.fornecedor|default:"—" }}</td>
+                <td>{{ i.data_aquisicao|date:"d/m/Y"|default:"—" }}</td>
+                <td>
+                    <div class="action-cell">
+                        <button class="pcrud-btn pcrud-btn-secondary pcrud-btn-sm" onclick="editarInsumo({{ i.id }})"><i class="bi bi-pencil"></i> Editar</button>
+                        <button class="pcrud-btn pcrud-btn-danger pcrud-btn-sm" onclick="excluirInsumo({{ i.id }})"><i class="bi bi-trash"></i> Excluir</button>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+{% include "partials/_empty_state_cta.html" with empty_icone="bi bi-bag" empty_titulo="Nenhum insumo cadastrado" empty_descricao="Cadastre o primeiro insumo para controlar saldo, custo e consumo por aplicacao." empty_acao="Cadastrar insumo" empty_aba="novo" %}
+{% endif %}
+{% endblock %}
+
+{% block cadastro_extra_tabs %}
+<!-- Tab: Aplicações -->
+<div class="pcrud-tab" id="tab-aplicacoes">
+    <h2><i class="bi bi-droplet"></i> Aplicações de Insumos</h2>
+    <div class="pcrud-form-card">
+        <form id="aplicacao-form" onsubmit="return submitAplicacao(event)">
+            {% csrf_token %}
+            <div class="pcrud-form-grid">
+                <div class="pcrud-form-group">
+                    <label>Insumo</label>
+                    <select name="insumo" required onblur="validateField(this)">
+                        <option value="">Selecione...</option>
+                        {% for i in insumos %}
+                        <option value="{{ i.id }}">{{ i.nome }} ({{ i.quantidade|floatformat:2 }} {{ i.unidade }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="pcrud-form-group">
+                    <label>Talhão</label>
+                    <select name="talhao" required onblur="validateField(this)">
+                        <option value="">Selecione...</option>
+                        {% for t in talhoes %}
+                        <option value="{{ t.id }}">{{ t.nome }} ({{ t.area_hectare|floatformat:2 }} ha)</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="pcrud-form-group">
+                    <label>Data</label>
+                    <input type="date" name="data" value="{{ today|date:'Y-m-d' }}" required onblur="validateField(this)">
+                </div>
+                <div class="pcrud-form-group">
+                    <label>Dose</label>
+                    <input type="number" step="0.01" name="dose" required placeholder="0,00" min="0" onblur="validateField(this)">
+                </div>
+                <div class="pcrud-form-group">
+                    <label>Responsável</label>
+                    <input type="text" name="responsavel" placeholder="Nome do responsável">
+                </div>
+                <div class="pcrud-form-group">
+                    <label>Observação</label>
+                    <textarea name="observacao" rows="2" placeholder="Observações..."></textarea>
+                </div>
+            </div>
+            <div class="pcrud-form-actions">
+                <button type="submit" class="pcrud-btn pcrud-btn-primary"><i class="bi bi-check-lg"></i> Registrar Aplicação</button>
+                <button type="reset" class="pcrud-btn pcrud-btn-secondary">Limpar</button>
+            </div>
+        </form>
+    </div>
+
+    {% if aplicacoes %}
+    <h2 style="margin-top:28px;"><i class="bi bi-clock-history"></i> Histórico de Aplicações</h2>
+    <div class="pcrud-form-card" style="padding:0;">
+        <div class="pcrud-table-wrap">
+            <table class="pcrud-table">
+                <thead>
+                    <tr>
+                        <th>Insumo</th>
+                        <th>Talhão</th>
+                        <th>Data</th>
+                        <th>Dose</th>
+                        <th>Responsável</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for a in aplicacoes %}
+                    <tr>
+                        <td>{{ a.insumo.nome }}</td>
+                        <td>{{ a.talhao.nome }}</td>
+                        <td>{{ a.data|date:"d/m/Y" }}</td>
+                        <td>{{ a.dose|floatformat:2 }}</td>
+                        <td>{{ a.responsavel|default:"—" }}</td>
+                        <td><button class="pcrud-btn pcrud-btn-danger pcrud-btn-sm" onclick="excluirAplicacao({{ a.id }})"><i class="bi bi-trash"></i></button></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+(function() {
+    window.submitInsumo = async function(event) {
+        event.preventDefault();
+        if (!validateForm('insumo-form')) { showToast('Corrija os campos em destaque', 'error'); return false; }
+        const f = document.getElementById('insumo-form');
+        const data = {
+            propriedade: parseInt(f.propriedade.value),
+            nome: f.nome.value,
+            categoria: f.categoria.value,
+            quantidade: parseFloat(f.quantidade.value),
+            unidade: f.unidade.value,
+            valor_unitario: parseFloat(f.valor_unitario.value) || null,
+            fornecedor: f.fornecedor.value || '',
+            data_aquisicao: f.data_aquisicao.value || null,
+            nota_fiscal: f.nota_fiscal.value || '',
+        };
+        const btn = f.querySelector('.pcrud-btn-primary'); showLoading(btn);
+        try {
+            const r = await fetch('/api/insumos/', { method:'POST', headers:{'Content-Type':'application/json','X-CSRFToken':getCSRFToken()}, body: JSON.stringify(data) });
+            if (r.ok) { showToast('Insumo cadastrado!','success'); setTimeout(() => location.reload(), 800); }
+            else { const e=await r.json(); showToast('Erro: '+JSON.stringify(e),'error'); }
+        } catch(e) { showToast('Erro: '+e.message,'error'); } finally { hideLoading(btn); }
+        return false;
+    };
+
+    window.excluirInsumo = function(id) {
+        if (!confirm('Excluir este insumo?')) return;
+        fetch('/api/insumos/'+id+'/', { method:'DELETE', headers:{'X-CSRFToken':getCSRFToken()} })
+            .then(r => { if(r.ok){ showToast('Excluído','success'); setTimeout(() => location.reload(), 500); } else showToast('Erro','error'); });
+    };
+
+    window.submitAplicacao = async function(event) {
+        event.preventDefault();
+        if (!validateForm('aplicacao-form')) { showToast('Corrija os campos em destaque', 'error'); return false; }
+        const f = document.getElementById('aplicacao-form');
+        const data = {
+            insumo: parseInt(f.insumo.value),
+            talhao: parseInt(f.talhao.value),
+            data: f.data.value,
+            dose: parseFloat(f.dose.value),
+            responsavel: f.responsavel.value || '',
+            observacao: f.observacao.value || '',
+        };
+        const btn = f.querySelector('.pcrud-btn-primary'); showLoading(btn);
+        try {
+            const r = await fetch('/api/aplicacoes-insumo/', { method:'POST', headers:{'Content-Type':'application/json','X-CSRFToken':getCSRFToken()}, body: JSON.stringify(data) });
+            if (r.ok) { showToast('Aplicação registrada!','success'); setTimeout(() => location.reload(), 800); }
+            else { const e=await r.json(); showToast('Erro: '+JSON.stringify(e),'error'); }
+        } catch(e) { showToast('Erro: '+e.message,'error'); } finally { hideLoading(btn); }
+        return false;
+    };
+
+    window.excluirAplicacao = function(id) {
+        if (!confirm('Excluir esta aplicação?')) return;
+        fetch('/api/aplicacoes-insumo/'+id+'/', { method:'DELETE', headers:{'X-CSRFToken':getCSRFToken()} })
+            .then(r => { if(r.ok){ showToast('Excluído','success'); setTimeout(() => location.reload(), 500); } else showToast('Erro','error'); });
+    };
+})();
+</script>
+{% endblock %}

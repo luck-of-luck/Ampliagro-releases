@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container-fluid py-4">
+<h2><i class="bi bi-broadcast"></i> Telemetria Tempo Real</h2>
+<div class="row"><div class="col-md-4"><div class="pcrud-stat"><div class="pcrud-stat-label">Dispositivos</div><div class="pcrud-stat-value" id="tel-devs">—</div></div></div><div class="col-md-4"><div class="pcrud-stat"><div class="pcrud-stat-label">Leituras 24h</div><div class="pcrud-stat-value" id="tel-reads">—</div></div></div><div class="col-md-4"><div class="pcrud-stat"><div class="pcrud-stat-label">Alertas</div><div class="pcrud-stat-value" id="tel-alerts">—</div></div></div></div>
+<div id="tel-map" style="height:300px;background:var(--cor-fundo-card-aninhado);border:1px solid var(--cor-borda);border-radius:12px;margin:16px 0;display:flex;align-items:center;justify-content:center;">Mapa tempo real — Timescale hypertable + MQTT ingest</div>
+<div class="pcrud-table-wrap"><table class="pcrud-table"><thead><tr><th>Device</th><th>Talhão</th><th>Tipo</th><th>Valor</th><th>Quando</th></tr></thead><tbody id="tel-rows"><tr><td colspan=5 style="text-align:center;padding:20px;">Carregando telemetria...</td></tr></tbody></table></div>
+</div>
+<script>
+fetch('/api/telemetria/?page_size=20').then(r=>r.json()).then(d=>{
+ var arr=d.results||d;
+ document.getElementById('tel-reads').textContent=arr.length;
+ var tb=document.getElementById('tel-rows'); tb.innerHTML='';
+ arr.slice(0,20).forEach(r=>{ tb.innerHTML+='<tr><td>'+(r.device||r.device_id)+'</td><td>'+(r.talhao||'—')+'</td><td>'+(r.tipo||r.metric)+'</td><td>'+(r.valor||r.value)+'</td><td>'+(r.criado_em||'').slice(0,16)+'</td></tr>';});
+}).catch(()=>{ document.getElementById('tel-rows').innerHTML='<tr><td colspan=5>Sem dados — ingest via POST /api/telemetria/</td></tr>';});
+fetch('/api/dispositivos/?page_size=50').then(r=>r.json()).then(d=>{ var arr=d.results||d; document.getElementById('tel-devs').textContent=arr.length;});
+</script>
+{% endblock %}

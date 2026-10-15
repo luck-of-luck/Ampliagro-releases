@@ -1,0 +1,6 @@
+Ampliagro2 (backup, servidor em http://127.0.0.1:8010)
+- demo / demo123
+- demo.muzambinho / 9mQ8vd0mqPvrlA4jj4Xa8
+
+Original (http://127.0.0.1:8001): as mesmas senhas valem lá também
+(ajustei o hash do demo.muzambinho nos dois bancos em 06/10/2026).

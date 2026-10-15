@@ -1,0 +1,89 @@
+/*
+ * Table Component
+ */
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: var(--text-sm);
+}
+
+.table th {
+  background-color: var(--bg-secondary);
+  color: var(--text-secondary);
+  font-weight: var(--font-medium);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border-strong);
+  text-transform: uppercase;
+  font-size: var(--text-xs);
+  letter-spacing: 0.05em;
+}
+
+.table td {
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--border-default);
+  color: var(--text-primary);
+  vertical-align: middle;
+}
+
+.table tbody tr {
+  transition: background-color var(--transition-fast);
+}
+
+.table tbody tr:hover {
+  background-color: var(--surface-hover);
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Modificadores */
+.table--compact td,
+.table--compact th {
+  padding: var(--space-2) var(--space-3);
+}
+
+.table--striped tbody tr:nth-child(even) {
+  background-color: var(--bg-tertiary);
+}
+
+.table--striped tbody tr:hover {
+  background-color: var(--surface-hover);
+}
+
+/* Sortable Headers */
+.table th.sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: color var(--transition-fast);
+}
+
+.table th.sortable:hover {
+  color: var(--text-primary);
+}
+
+.table th.sortable::after {
+  content: '↕';
+  margin-left: var(--space-1);
+  opacity: 0.3;
+}
+
+.table th.sort-asc::after {
+  content: '↑';
+  opacity: 1;
+  color: var(--color-primary-500);
+}
+
+.table th.sort-desc::after {
+  content: '↓';
+  opacity: 1;
+  color: var(--color-primary-500);
+}

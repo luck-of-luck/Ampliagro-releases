@@ -1,0 +1,58 @@
+ 1. a barra desenhada no DOM as chaves "criar" a chave desenhada e um interruptor, e diz se es
+     TypeError: toContain() expected a DOM node as the argument, but got string
+ 2. a barra desenhada no DOM o print da tela abre o seletor de área sem pedir permissão de tel
+     TypeError: Cannot read properties of null (reading 'click')
+ 3. a barra desenhada no DOM o print da tela o overlay mostra as instruções e o retângulo de s
+     TypeError: Cannot read properties of null (reading 'click')
+ 4. a barra desenhada no DOM o print da tela o overlay mostra um frame CONGELADO, e o vídeo já
+     AssertionError: expected null to be truthy
+ 5. a barra desenhada no DOM o print da tela arrastar cria a seleção com as 8 pegas
+     TypeError: Cannot read properties of null (reading 'style')
+ 6. a barra desenhada no DOM o print da tela REDIMENSIONAR: arrastar uma pega muda só o lado q
+     TypeError: Cannot read properties of null (reading 'dispatchEvent')
+ 7. a barra desenhada no DOM o print da tela MOVER: arrastar por dentro leva a caixa e não des
+     TypeError: Cannot read properties of null (reading 'dispatchEvent')
+ 8. a barra desenhada no DOM o print da tela o painel fica AO LADO da seleção, nunca por cima
+     TypeError: Cannot read properties of null (reading 'style')
+ 9. a barra desenhada no DOM o print da tela o painel tem as ferramentas, desfazer, limpar, us
+     TypeError: Cannot read properties of null (reading 'querySelectorAll')
+10. a barra desenhada no DOM o print da tela a PRIMEIRA ferramenta é mover — sem ela não se me
+     TypeError: Cannot read properties of null (reading 'style')
+11. a barra desenhada no DOM o print da tela escolher uma ferramenta fica assinalada
+     TypeError: Cannot read properties of null (reading 'dispatchEvent')
+12. a barra desenhada no DOM o print da tela DESENHAR: com o lápis escolhido, o traço fica des
+     TypeError: Cannot read properties of null (reading 'dispatchEvent')
+13. a barra desenhada no DOM o print da tela a ferramenta "apaga" não começa um traço novo
+     TypeError: Cannot read properties of null (reading 'dispatchEvent')
+14. a barra desenhada no DOM o print da tela confirmar tira o overlay e devolve o print ACIMA 
+     TypeError: Cannot read properties of null (reading 'click')
+15. a barra desenhada no DOM o print da tela o print ABRE o chat, para a caixa ser visível
+     TypeError: Cannot read properties of null (reading 'click')
+16. a barra desenhada no DOM o print da tela o print NAO passa pelo iaDockToggle (que baixa 1,
+     TypeError: Cannot read properties of null (reading 'click')
+17. a barra desenhada no DOM o print da tela Esc cancela e limpa tudo
+     AssertionError: expected null to be truthy
+18. a barra desenhada no DOM o print da tela Enter confirma, como o ✓ do painel
+     AssertionError: expected false to be true // Object.is equality
+19. a barra desenhada no DOM o print da tela seleção pequena demais não entra — seria uma imag
+     TypeError: Cannot read properties of null (reading 'style')
+20. a barra desenhada no DOM o print da tela a seleção cresce com o arrasto, e com números a s
+     TypeError: Cannot read properties of null (reading 'style')
+21. a barra desenhada no DOM o print da tela confirmar sem seleção é recusado em vez de dar um
+     TypeError: Cannot read properties of null (reading 'click')
+22. a barra desenhada no DOM o print da tela acabar com a captura no painel do browser não dei
+     AssertionError: nada ouviu o fim da captura: expected 0 to be greater than 0
+23. a barra desenhada no DOM o print so existe no app do Ampliagro recusa fora do app, sem seq
+     Error: Test timed out in 5000ms.
+24. a barra desenhada no DOM o print so existe no app do Ampliagro recusa se a appbar nao exis
+     Error: Test timed out in 5000ms.
+25. a barra desenhada no DOM o print so existe no app do Ampliagro sem getDisplayMedia, diz qu
+     AssertionError: expected 'erro' to be 'sem_suporte' // Object.is equality
+26. a barra desenhada no DOM o print so existe no app do Ampliagro fora de https, diz que o pr
+     Error: Test timed out in 5000ms.
+27. a barra desenhada no DOM a falha do print tem de se VER sem iaLocalMsg, a recusa aparece N
+     AssertionError: ninguém disse nada ao produtor: expected +0 to be 1 // Object.is equality
+28. a barra desenhada no DOM a falha do print tem de se VER uma falha que vem do navegador tam
+     Error: Test timed out in 5000ms.
+29. a barra desenhada no DOM a falha do print tem de se VER falha UMA vez, não duas
+     Error: Test timed out in 5000ms.

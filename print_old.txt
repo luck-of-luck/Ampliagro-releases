@@ -1,0 +1,480 @@
+describe('o print da tela', () => {
+    const esperaOverlay = async () => {
+      for (let i = 0; i < 60 && !document.getElementById('ia-print-overlay'); i++) {
+        await new Promise((r) => setTimeout(r, 1));
+      }
+      return document.getElementById('ia-print-overlay');
+    };
+
+    const ev = (alvo, tipo, x, y) =>
+      alvo.dispatchEvent(
+        new window.MouseEvent(tipo, {
+          clientX: x,
+          clientY: y,
+          bubbles: true,
+          button: 0,
+        })
+      );
+
+    function arrasta(de, para) {
+      const ov = document.getElementById('ia-print-overlay');
+      ev(ov, 'mousedown', de.x, de.y);
+      ev(window, 'mousemove', para.x, para.y);
+      ev(window, 'mouseup', para.x, para.y);
+      return ov;
+    }
+
+    /* Abre o editor e deixa uma seleção feita.
+     *
+     * Devolve `{p}` e NÃO a promessa: um `async` que devolve uma promessa
+     * adota-a, e `await editorComSelecao()` ficava à espera de um print que só
+     * existe depois de o produtor confirmar — um impasse com aspecto de tempo
+     * esgotado que não mede nada. */ async function editorComSelecao() {
+      const p = window.IaPrint.selecionar();
+      await esperaOverlay();
+      arrasta({ x: 100, y: 100 }, { x: 500, y: 400 });
+      return { p };
+    }
+
+    function confirmar() {
+      document.getElementById('ia-print-ok').click();
+    }
+
+    /* ── O ecrã preto ─────────────────────────────────────────────────────── */
+
+    it('abre o seletor de área sem pedir permissão de tela', async () => {
+      const p = window.IaPrint.selecionar();
+      await esperaOverlay();
+      /* O overlay de seleção deve estar presente */
+      expect(document.getElementById('ia-print-overlay')).toBeTruthy();
+      /* Não deve ter chamado getDisplayMedia (não há captura de tela) */
+      expect(window.navigator.mediaDevices.getDisplayMedia).not.toHaveBeenCalled();
+      arrasta({ x: 0, y: 0 }, { x: 100, y: 100 });
+      confirmar();
+      await p;
+    });
+
+    it('o overlay mostra as instruções e o retângulo de seleção', async () => {
+      const p = window.IaPrint.selecionar();
+      await esperaOverlay();
+      const overlay = document.getElementById('ia-print-overlay');
+      expect(overlay.querySelector('.ia-print-seletor-rect')).toBeTruthy();
+      expect(overlay.querySelector('.ia-print-seletor-dica')).toBeTruthy();
+      expect(overlay.querySelector('.ia-print-seletor-x')).toBeTruthy();
+      arrasta({ x: 0, y: 0 }, { x: 100, y: 100 });
+      confirmar();
+      await p;
+    });
+
+    it('o overlay mostra um frame CONGELADO, e o vídeo já foi desligado', async () => {
+      const { pista } = stubDeEcra();
+      const p = window.IaPrint.selecionar();
+      await esperaOverlay();
+      const ov = document.getElementById('ia-print-overlay');
+      /* Capturar a própria aba mostra a aba como está renderizada — e um
+         overlay a cobrir a tela toda acabava DENTRO da captura. */
+      expect(ov.querySelector('img#ia-print-fundo')).toBeTruthy();
+      expect(ov.querySelector('video')).toBeNull();
+      /* E a pista fecha antes de o overlay existir: um frame chega. */
+      expect(pista.stop).toHaveBeenCalled();
+      arrasta({ x: 0, y: 0 }, { x: 200, y: 200 });
+      confirmar();
+      await p;
+    });
+
+    /* ── A seleção ────────────────────────────────────────────────────────── */
+
+    it('arrastar cria a seleção com as 8 pegas', async () => {
+      const { p } = await editorComSelecao();
+      const moldura = document.getElementById('ia-print-moldura');
+      expect(moldura.style.display).toBe('block');
+      expect(moldura.style.left).toBe('100px');
+      expect(moldura.style.width).toBe('400px');
+      expect(document.getElementById('ia-print-pegas').querySelectorAll('i').length).toBe(8);
+      confirmar();
+      await p;
+    });
+
+    it('REDIMENSIONAR: arrastar uma pega muda só o lado que ela é', async () => {
+      const { p } = await editorComSelecao();
+      const ov = document.getElementById('ia-print-overlay');
+      /* A pega do canto sudeste está em (500,400). Arrastar para (700,600)
+         aumenta largura e altura, e não mexe no canto noroeste. */
+      expect(
+        window.IaPrint.pegaPerto({ left: 100, top: 100, width: 400, height: 300 }, 500, 400)
+      ).toBe('se');
+      ev(ov, 'mousedown', 500, 400);
+      ev(window, 'mousemove', 700, 600);
+      ev(window, 'mouseup', 700, 600);
+      const moldura = document.getElementById('ia-print-moldura');
+      expect(moldura.style.width).toBe('600px');
+      expect(moldura.style.height).toBe('500px');
+      expect(moldura.style.left, 'a pega mexeu na origem errada').toBe('100px');
+      confirmar();
+      await p;
+    });
+
+    it('redimensionar para lá da origem NAO dá largura negativa', () => {
+      /* Sem o `Math.abs` com o deslocamento do `left`, o browser recusa a
+         propriedade e a caixa fica presa no sítio onde estava. */
+      const invertido = window.IaPrint.redimensiona(
+        { left: 100, top: 100, width: 200, height: 200 },
+        'e',
+        0,
+        100
+      );
+      expect(invertido.width).toBe(100);
+      expect(invertido.left).toBe(0);
+    });
+
+    it('MOVER: arrastar por dentro leva a caixa e não desenha', async () => {
+      const { p } = await editorComSelecao();
+      const ov = document.getElementById('ia-print-overlay');
+      ev(ov, 'mousedown', 300, 250);
+      ev(window, 'mousemove', 350, 300);
+      ev(window, 'mouseup', 350, 300);
+      const moldura = document.getElementById('ia-print-moldura');
+      expect(moldura.style.left).toBe('150px');
+      expect(moldura.style.top).toBe('150px');
+      confirmar();
+      const r = await p;
+      expect(r.ok).toBe(true);
+    });
+
+    /* ── O painel ao lado ─────────────────────────────────────────────────── */
+
+    it('o painel fica AO LADO da seleção, nunca por cima', async () => {
+      const { p } = await editorComSelecao();
+      const painel = document.getElementById('ia-print-painel');
+      const moldura = document.getElementById('ia-print-moldura');
+      const xPainel = parseFloat(painel.style.left);
+      const xSel = parseFloat(moldura.style.left);
+      const larguraSel = parseFloat(moldura.style.width);
+      /* Um editor que tapa o assunto obriga o produtor a mover o assunto — e o
+         assunto é precisamente o que ele quer fotografar. */
+      expect(xPainel >= xSel + larguraSel || xPainel + 56 <= xSel).toBe(true);
+      confirmar();
+      await p;
+    });
+
+    it('o painel tem as ferramentas, desfazer, limpar, usar e cancelar', async () => {
+      const { p } = await editorComSelecao();
+      const ferramentas = [
+        ...document.getElementById('ia-print-painel').querySelectorAll('button[data-ferramenta]'),
+      ];
+      expect(ferramentas.map((b) => b.dataset.ferramenta)).toEqual([
+        'mover',
+        'pin',
+        'seta',
+        'caixa',
+        'apaga',
+      ]);
+      expect(document.getElementById('ia-print-desfazer')).toBeTruthy();
+      expect(document.getElementById('ia-print-ok')).toBeTruthy();
+      confirmar();
+      await p;
+    });
+
+    it('a PRIMEIRA ferramenta é mover — sem ela não se mexe na caixa', async () => {
+      /* Com o lápis activo por omissão, arrastar DENTRO da caixa desenhava em
+         vez de a mover: o produtor via uma linha vermelha em cima da área que
+         acabara de escolher, sem forma de a mexer sem antes trocar de
+         ferramenta. É o oposto do que se pede a um editor. */
+      expect(window.IaPrint.FERRAMENTAS[0].id).toBe('mover');
+      const { p } = await editorComSelecao();
+      const mover = document.querySelector('#ia-print-painel [data-ferramenta="mover"]');
+      expect(mover.style.background, 'mover devia estar assinalado').toBe('rgb(15, 157, 110)');
+      confirmar();
+      await p;
+    });
+
+    it('escolher uma ferramenta fica assinalada', async () => {
+      const { p } = await editorComSelecao();
+      const seta = document.querySelector('#ia-print-painel [data-ferramenta="seta"]');
+      ev(seta, 'click', 0, 0);
+      expect(seta.style.background).toBe('rgb(15, 157, 110)');
+      const pin = document.querySelector('#ia-print-painel [data-ferramenta="pin"]');
+      expect(pin.style.background).not.toBe('rgb(15, 157, 110)');
+      confirmar();
+      await p;
+    });
+
+    /* ── Desenhar ─────────────────────────────────────────────────────────── */
+
+    it('DESENHAR: com o lápis escolhido, o traço fica desenhado', async () => {
+      const { p } = await editorComSelecao();
+      ev(document.querySelector('#ia-print-painel [data-ferramenta="pin"]'), 'click', 0, 0);
+      const ov = document.getElementById('ia-print-overlay');
+      ev(ov, 'mousedown', 200, 200);
+      ev(window, 'mousemove', 250, 250);
+      ev(window, 'mousemove', 300, 220);
+      ev(window, 'mouseup', 300, 220);
+      confirmar();
+      const r = await p;
+      expect(r.ok).toBe(true);
+      expect(r.dataUrl).toMatch(/^data:image\/png/);
+    });
+
+    it('a seta e a caixa são FORMAS, não linhas', () => {
+      /* As duas únicas ferramentas que o produtor usa para apontar um número. Uma
+         seta que é só uma linha não aponta para nada, e uma caixa que é só uma
+         linha é um risco. */
+      const pintor = pintorFalso();
+      const seta = pintor.novoTraco('#f59e0b', 4, 'seta');
+      seta.pontos.push({ x: 10, y: 10 }, { x: 100, y: 100 });
+      pintor.a_retracar();
+      expect(pintor.ctx.fill, 'a seta não desenhou a ponta').toHaveBeenCalled();
+
+      pintor.ctx.fill.mockClear();
+      const caixa = pintor.novoTraco('#3b82f6', 4, 'caixa');
+      caixa.pontos.push({ x: 20, y: 20 }, { x: 120, y: 90 });
+      pintor.a_retracar();
+      expect(pintor.ctx.strokeRect, 'a caixa não desenhou o rectângulo').toHaveBeenCalled();
+
+      pintor.ctx.strokeRect.mockClear();
+      const pin = pintor.novoTraco('#ef4444', 4, null);
+      pin.pontos.push({ x: 0, y: 0 }, { x: 10, y: 10 }, { x: 20, y: 5 });
+      pintor.a_retracar();
+      expect(pintor.ctx.lineTo).toHaveBeenCalled();
+      /* A pinta é uma LINHA por segmento, sem curva: `quadraticCurveTo` passa
+         pelo meio de dois traços e altera o que o produtor escreveu. */
+      expect(pintor.ctx.quadraticCurveTo).toBeUndefined();
+    });
+
+    /* ── Apagar ───────────────────────────────────────────────────────────── */
+
+    it('APAGAR: apanha o traço pelo SEGMENTO, não pelo ponto mais próximo', () => {
+      const tracos = [
+        {
+          pontos: [
+            { x: 0, y: 0 },
+            { x: 0, y: 400 },
+            { x: 400, y: 400 },
+          ],
+        },
+      ];
+      /* (20,20) está a 0 do ponto (0,0) e a 20 do segmento vertical. Apagar
+         pelo ponto mais próximo acertava sempre no canto e nunca no meio da
+         linha — e a linha é o que o produtor quer apagar. */
+      expect(window.IaPrint.marcaEm(tracos, 20, 20)).toBe(-1);
+      expect(window.IaPrint.marcaEm(tracos, 0, 200)).toBe(0);
+    });
+
+    it('APAGAR: apaga a marca de cima, e não a de baixo', () => {
+      const tracos = [
+        {
+          pontos: [
+            { x: 0, y: 0 },
+            { x: 200, y: 200 },
+          ],
+        },
+        {
+          pontos: [
+            { x: 0, y: 0 },
+            { x: 200, y: 200 },
+          ],
+        },
+      ];
+      /* De trás para a frente: o que se vê por cima é o que se apaga. Ao
+         contrário, o produtor risca por cima de uma marca antiga, toca no traço
+         novo à espera de o tirar, e a marca antiga é que desaparece. */
+      expect(window.IaPrint.marcaEm(tracos, 100, 100)).toBe(1);
+    });
+
+    it('APAGAR: longe de qualquer marca não apaga nada', () => {
+      const tracos = [
+        {
+          pontos: [
+            { x: 0, y: 0 },
+            { x: 50, y: 50 },
+          ],
+        },
+      ];
+      expect(window.IaPrint.marcaEm(tracos, 500, 500)).toBe(-1);
+    });
+
+    it('APAGAR: só a marca apontada sai', () => {
+      const pintor = pintorFalso();
+      const t1 = pintor.novoTraco('#ef4444', 4, null);
+      t1.pontos.push({ x: 0, y: 0 }, { x: 200, y: 200 });
+      const t2 = pintor.novoTraco('#f59e0b', 4, null);
+      t2.pontos.push({ x: 0, y: 0 }, { x: 200, y: 200 });
+      const i = window.IaPrint.marcaEm(pintor.tracos, 100, 100);
+      pintor.tracos.splice(i, 1);
+      expect(pintor.tracos).toEqual([t1]);
+    });
+
+    it('a ferramenta "apaga" não começa um traço novo', async () => {
+      const { p } = await editorComSelecao();
+      const ov = document.getElementById('ia-print-overlay');
+      ev(document.querySelector('#ia-print-painel [data-ferramenta="apaga"]'), 'click', 0, 0);
+      ev(ov, 'mousedown', 300, 250);
+      ev(window, 'mouseup', 300, 250);
+      confirmar();
+      const r = await p;
+      expect(r.ok).toBe(true);
+    });
+
+    it('desfazer e limpar mexem nas marcas', () => {
+      const pintor = pintorFalso();
+      pintor.novoTraco('#ef4444', 4, null);
+      pintor.novoTraco('#f59e0b', 4, null);
+      expect(pintor.vazio()).toBe(false);
+      pintor.apagaUltimo();
+      expect(pintor.tracos.length).toBe(1);
+      pintor.limpa();
+      expect(pintor.vazio()).toBe(true);
+    });
+
+    /* ── Confirmar / cancelar ─────────────────────────────────────────────── */
+
+    it('confirmar tira o overlay e devolve o print ACIMA do campo', async () => {
+      const { p } = await editorComSelecao();
+      confirmar();
+      const r = await p;
+      expect(r.ok).toBe(true);
+      expect(r.dataUrl).toMatch(/^data:image\/png/);
+      expect(document.getElementById('ia-print-overlay')).toBeNull();
+      const caixa = document.getElementById('ia-print-caixa');
+      expect(caixa.hidden).toBe(false);
+      expect(caixa.querySelector('.ia-print-img').src).toMatch(/^data:image\/png/);
+      /* ACIMA DO CAMPO. A ancora e' o CONTENTOR `#ia-chat-input`, que e' quem
+         leva mic, campo, enviar e clipe — e nao o `<input>` do miolo. Com o
+         campo solto, o print metia-se entre o contentor e o campo e ficava
+         dentro da barra de ferramentas em vez de acima dela. Este teste
+         affirmava o contrario, e passava porque o fixture nao tinha a forma do
+         template. */
+      expect(caixa.nextElementSibling.id).toBe('ia-chat-input');
+      expect(document.getElementById('ia-dock-input').closest('#ia-chat-input')).not.toBeNull();
+    });
+
+    /* O `#ia-chat` é `display:none` enquanto não está aberto. Um print tirado
+       com o painel fechado ficava guardado num sítio invisível e o produtor
+       jurava que não tinha saído nada. */
+    it('o print ABRE o chat, para a caixa ser visível', async () => {
+      document.getElementById('ia-chat').classList.remove('open');
+      const { p } = await editorComSelecao();
+      confirmar();
+      await p;
+      expect(document.getElementById('ia-chat').classList.contains('open')).toBe(true);
+    });
+
+    /* Abre-se com a CLASSE e não pelo `iaDockToggle()`. O toggle é um `async`
+       que, com o motor local por carregar, pede consentimento e começa a
+       DESCARREGAR 1,1 GB. Um print é um gesto de ver, não um pedido para pesar
+       um gigabyte — e `toggle` FECHA o chat se ele já estiver aberto, que era o
+       caminho para esconder o print que acabara de tirar. */
+    it('o print NAO passa pelo iaDockToggle (que baixa 1,1 GB e pode fechar)', async () => {
+      document.getElementById('ia-chat').classList.remove('open');
+      const alternou = vi.fn();
+      window.iaDockToggle = alternou;
+      const { p } = await editorComSelecao();
+      confirmar();
+      await p;
+      expect(alternou, 'o print chamou o toggle do dock').not.toHaveBeenCalled();
+      expect(document.getElementById('ia-chat').classList.contains('open')).toBe(true);
+    });
+
+    it('Esc cancela e limpa tudo', async () => {
+      const { p } = await editorComSelecao();
+      expect(document.getElementById('ia-print-overlay')).toBeTruthy();
+      document.dispatchEvent(new window.KeyboardEvent('keydown', { key: 'Escape' }));
+      const r = await p;
+      expect(r.ok).toBe(false);
+      expect(document.getElementById('ia-print-overlay')).toBeNull();
+      expect(document.getElementById('ia-print-caixa').hidden).toBe(true);
+    });
+
+    it('Enter confirma, como o ✓ do painel', async () => {
+      const { p } = await editorComSelecao();
+      document.dispatchEvent(new window.KeyboardEvent('keydown', { key: 'Enter' }));
+      const r = await p;
+      expect(r.ok).toBe(true);
+    });
+
+    it('seleção pequena demais não entra — seria uma imagem em branco', async () => {
+      const p = window.IaPrint.selecionar();
+      await esperaOverlay();
+      arrasta({ x: 100, y: 100 }, { x: 102, y: 101 });
+      /* O editor fica ABERTO: o producer pode tentar outra vez, e é isso que a
+         Ferramenta de Recorte do Windows faz. O que não pode é devolver uma
+         área de 2 pontos — essa dava um PNG em branco, que parece uma
+         resposta. */
+      expect(document.getElementById('ia-print-moldura').style.display).toBe('none');
+      expect(window.IaPrint.mensagemDe({ motivo: 'area_pequena' })).toMatch(/pequena/i);
+      document.dispatchEvent(new window.KeyboardEvent('keydown', { key: 'Escape' }));
+      const r = await p;
+      expect(r.ok).toBe(false);
+    });
+
+    it('as marcas entram no print só DENTRO da seleção', () => {
+      /* Sem o `clip`, uma marca feita fora da caixa acabava no print — e o
+         produtor não a via no resultado, que é a pior forma de surpresas. */
+      const pintor = pintorFalso();
+      pintor.tracos.push({
+        cor: '#ef4444',
+        largura: 4,
+        pontos: [
+          { x: 0, y: 0 },
+          { x: 10, y: 10 },
+        ],
+      });
+      const ctx = pintor.ctx;
+      pintor.pintaNoRecorte(ctx, { left: 100, top: 100, width: 200, height: 200 }, 1, 1);
+      expect(ctx.clip, 'as marcas nao estao limitedas a selecao').toHaveBeenCalled();
+      /* E o recorte que se clipa e' a selecao, com a escala do video. */
+      expect(ctx.rect).toHaveBeenCalledWith(100, 100, 200, 200);
+      expect(ctx.save).toHaveBeenCalled();
+      expect(ctx.restore).toHaveBeenCalled();
+    });
+
+    /* A selecção tem de CRESCER com o arrasto, e ficar com números a sério.
+     *
+     * O segundo ponto não é medo teórico: `NaN < 8` é `false`, ou seja, uma
+     * largura `NaN` passava a guarda da área pequena e só rebentava no
+     * recorte. E o browser RECUSA CSS inválido — `style.width = 'NaNpx'` não
+     * muda nada e o valor anterior fica lá — por isso o sintoma real de um
+     * erro aqui não é `NaN` no ecrã: é a caixa que nunca cresce. */
+    it('a seleção cresce com o arrasto, e com números a sério', async () => {
+      const { p } = await editorComSelecao();
+      const m = document.getElementById('ia-print-moldura');
+      expect(m.style.width, 'a caixa nao cresceu com o arrasto').toBe('400px');
+      expect(m.style.height).toBe('300px');
+      for (const prop of ['left', 'top', 'width', 'height']) {
+        expect(m.style[prop], `a selecao tem ${prop} a NaN`).not.toContain('NaN');
+        expect(Number.isFinite(parseFloat(m.style[prop]))).toBe(true);
+      }
+      confirmar();
+      const r = await p;
+      expect(r.rect.width).toBe(400);
+      expect(r.rect.height).toBe(300);
+    });
+
+    it('confirmar sem seleção é recusado em vez de dar um print vazio', async () => {
+      const p = window.IaPrint.selecionar();
+      await esperaOverlay();
+      confirmar();
+      const r = await p;
+      expect(r.ok).toBe(false);
+      expect(r.motivo).toBe('area_pequena');
+    });
+
+    /* A pista é fechada pelo próprio módulo assim que tem o frame. O `ended`
+     * fica ligado para o caso de o produtor cancelar pelo painel do browser no
+     * meio — e o que se mede é que esse caminho não rebenta nem deixa o
+     * overlay preso no ecrã. */
+    it('acabar com a captura no painel do browser não deixa nada preso', async () => {
+      const { pista } = stubDeEcra();
+      const p = window.IaPrint.selecionar();
+      await esperaOverlay();
+      const ligados = pista.addEventListener.mock.calls.filter((c) => c[0] === 'ended');
+      expect(ligados.length, 'nada ouviu o fim da captura').toBeGreaterThan(0);
+      expect(() => ligados.forEach((c) => c[1]())).not.toThrow();
+      /* O editor continua a servir o produtor: o `ended` não leva o print
+         embora, porque o frame já estava guardado. */
+      arrasta({ x: 0, y: 0 }, { x: 200, y: 200 });
+      confirmar();
+      expect((await p).ok).toBe(true);
+    });
+  });
+

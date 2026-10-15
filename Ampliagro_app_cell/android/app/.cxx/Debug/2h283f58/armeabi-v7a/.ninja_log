@@ -1,0 +1,15 @@
+# ninja log v5
+7	76	0	C:/Trabalho/Projetos/Ativos/Ampliagro2/Ampliagro_app_cell/android/app/.cxx/Debug/2h283f58/armeabi-v7a/CMakeFiles/cmake.verify_globs	12dd6698118c1679
+92	8200	8137744996218650	safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/b10cf0a8109d6825e7a971ccec658cab/safeareacontext/States.cpp.o	c107c6f9469b7582
+64	9751	8137745011877228	safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/b10cf0a8109d6825e7a971ccec658cab/safeareacontext/EventEmitters.cpp.o	f0c0216eda3c67d3
+129	11311	8137745027498867	safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/32d83fe81f13a69927203e507325b6c4/jni/safeareacontext-generated.cpp.o	46561766ec05552c
+14	13117	8137745045560235	CMakeFiles/appmodules.dir/OnLoad.cpp.o	ef05bd563dab814
+38	14199	8137745056443758	safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/505cb015ac4cf6ddf9c5d28e6f64136a/RNCSafeAreaViewState.cpp.o	f2d924502243b750
+112	14977	8137745064205387	safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/b10cf0a8109d6825e7a971ccec658cab/safeareacontext/ShadowNodes.cpp.o	be51402fc4367faa
+50	15432	8137745068589575	safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/b10cf0a8109d6825e7a971ccec658cab/safeareacontext/Props.cpp.o	e0e6be560b4430ef
+77	17084	8137745085202663	safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/ddf5fd89dd7656de7a6705ab5c1be511/ComponentDescriptors.cpp.o	14dcb8184e53df5e
+25	18526	8137745099722327	safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir/505cb015ac4cf6ddf9c5d28e6f64136a/RNCSafeAreaViewShadowNode.cpp.o	3c34b8bd68fe5b61
+18528	18781	8137745102354702	C:/Trabalho/Projetos/Ativos/Ampliagro2/Ampliagro_app_cell/android/app/build/intermediates/cxx/Debug/2h283f58/obj/armeabi-v7a/libreact_codegen_safeareacontext.so	72ed0ae08cee45e6
+3	18981	8137745103958940	CMakeFiles/appmodules.dir/12c62d5c89d8bdcbea54e3f8289994dc/android/app/build/generated/autolinking/src/main/jni/autolinking.cpp.o	f8b31cf0b2b3423c
+18982	19170	8137745106339347	C:/Trabalho/Projetos/Ativos/Ampliagro2/Ampliagro_app_cell/android/app/build/intermediates/cxx/Debug/2h283f58/obj/armeabi-v7a/libappmodules.so	30e2d30e6179bde4
+7	59	0	C:/Trabalho/Projetos/Ativos/Ampliagro2/Ampliagro_app_cell/android/app/.cxx/Debug/2h283f58/armeabi-v7a/CMakeFiles/cmake.verify_globs	12dd6698118c1679

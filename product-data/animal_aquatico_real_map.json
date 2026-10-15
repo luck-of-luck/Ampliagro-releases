@@ -1,0 +1,158 @@
+{
+  "Nelore": {
+    "grupo": "bovinos",
+    "ibge": 2670,
+    "agrodoc": "boi_gordo",
+    "especie": "bovino"
+  },
+  "Angus": {
+    "grupo": "bovinos",
+    "ibge": 2670,
+    "agrodoc": "boi_gordo",
+    "especie": "bovino"
+  },
+  "Brahman": {
+    "grupo": "bovinos",
+    "ibge": 2670,
+    "agrodoc": "boi_gordo",
+    "especie": "bovino"
+  },
+  "Holandês": {
+    "grupo": "bovinos",
+    "ibge": 2670,
+    "agrodoc": "boi_gordo",
+    "especie": "bovino"
+  },
+  "Boi Gordo": {
+    "grupo": "bovinos",
+    "ibge": 2670,
+    "agrodoc": "boi_gordo",
+    "especie": "bovino"
+  },
+  "Bezerro": {
+    "grupo": "bovinos",
+    "ibge": 2670,
+    "agrodoc": "bezerro",
+    "especie": "bovino"
+  },
+  "Landrace": {
+    "grupo": "suinos",
+    "ibge": 32794,
+    "agrodoc": "suino",
+    "especie": "suino"
+  },
+  "Large-White": {
+    "grupo": "suinos",
+    "ibge": 32794,
+    "agrodoc": "suino",
+    "especie": "suino"
+  },
+  "Duroc": {
+    "grupo": "suinos",
+    "ibge": 32794,
+    "agrodoc": "suino",
+    "especie": "suino"
+  },
+  "Suíno": {
+    "grupo": "suinos",
+    "ibge": 32794,
+    "agrodoc": "suino",
+    "especie": "suino"
+  },
+  "Galinha": {
+    "grupo": "aves",
+    "ibge": 32796,
+    "agrodoc": "",
+    "especie": "aves"
+  },
+  "Frango": {
+    "grupo": "aves",
+    "ibge": 32796,
+    "agrodoc": "frango",
+    "especie": "aves"
+  },
+  "Peru": {
+    "grupo": "aves",
+    "ibge": 32796,
+    "agrodoc": "",
+    "especie": "aves"
+  },
+  "Codorna": {
+    "grupo": "aves",
+    "ibge": 2680,
+    "agrodoc": "",
+    "especie": "codorna"
+  },
+  "Ovelha": {
+    "grupo": "ovinos",
+    "ibge": 2677,
+    "agrodoc": "",
+    "especie": "ovino"
+  },
+  "Cabra": {
+    "grupo": "ovinos",
+    "ibge": 2681,
+    "agrodoc": "",
+    "especie": "caprino"
+  },
+  "Quarto-de-Milha": {
+    "grupo": "equinos",
+    "ibge": 2672,
+    "agrodoc": "",
+    "especie": "equino"
+  },
+  "Búfalo": {
+    "grupo": "bufalos",
+    "ibge": 2675,
+    "agrodoc": "",
+    "especie": "bubalino"
+  },
+  "Tilápia": {
+    "grupo": "peixes",
+    "ibge": 32877,
+    "agrodoc": "",
+    "especie": "tilapia"
+  },
+  "Tambaqui": {
+    "grupo": "peixes",
+    "ibge": 32876,
+    "agrodoc": "",
+    "especie": "tambaqui"
+  },
+  "Pacu": {
+    "grupo": "peixes",
+    "ibge": 32878,
+    "agrodoc": "",
+    "especie": "pacu"
+  },
+  "Pintado": {
+    "grupo": "peixes",
+    "ibge": 32879,
+    "agrodoc": "",
+    "especie": "pintado"
+  },
+  "Carpa": {
+    "grupo": "peixes",
+    "ibge": 32880,
+    "agrodoc": "",
+    "especie": "carpa"
+  },
+  "Truta": {
+    "grupo": "peixes",
+    "ibge": 32881,
+    "agrodoc": "",
+    "especie": "truta"
+  },
+  "Camarão": {
+    "grupo": "crustaceos",
+    "ibge": 32886,
+    "agrodoc": "",
+    "especie": "camarao"
+  },
+  "Ostra": {
+    "grupo": "crustaceos",
+    "ibge": 32888,
+    "agrodoc": "",
+    "especie": "ostra"
+  }
+}

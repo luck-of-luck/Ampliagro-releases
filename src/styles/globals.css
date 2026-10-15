@@ -1,0 +1,194 @@
+@import 'tailwindcss';
+
+/*
+ * As fontes dos utilitários, declaradas.
+ *
+ * MEDIDO 2026-10-03 (V0, saida do React): sem isto, o `npm run build:css`
+ * perdia 97 utilitários quando `src/*.tsx` deixou de existir — e
+ * `tailwind-compiled.css` é servido em `base.html:16` e `onboarding.html:11`.
+ * A página continuava a parecer igual (os templates não usam quase nenhum dos
+ * utilitários que saíram) e nenhum teste falhava: uma regra CSS que deixou de
+ * existir não é um erro de sintaxe, é ausência.
+ *
+ * Por que `app/static/js` está aqui: `cultures-loader.js:457` escreve HTML com
+ * classes Tailwind (`top-1.5`, `group-hover/card:`, `bg-white/5`) numa string,
+ * e o JavaScript nunca foi varrido. Quem escreve HTML é fonte.
+ */
+@source "../templates";
+@source "../../app/templates";
+@source "../../app/static/js";
+
+@theme {
+  --color-primary-50: #f0fdfa;
+  --color-primary-100: #ccfbf1;
+  --color-primary-200: #99f6e4;
+  --color-primary-300: #5eead4;
+  --color-primary-400: #2dd4bf;
+  --color-primary-500: #14b8a6;
+  --color-primary-600: #0d9488;
+  --color-primary-700: #0f766e;
+  --color-primary-800: #115e59;
+  --color-primary-900: #134e4a;
+  --color-primary-950: #042f2e;
+
+  --color-ncs-green: #006b6e;
+  --color-ncs-green-light: #009688;
+  --color-ncs-green-dark: #004d4f;
+  --color-ncs-cream: #fdfbf7;
+  --color-ncs-dark: #1a1a1a;
+
+  --font-sans: Inter, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --animate-fade-in: fadeIn 0.3s ease-out;
+  --animate-slide-up: slideUp 0.3s ease-out;
+  --animate-slide-down: slideDown 0.3s ease-out;
+  --animate-pulse-soft: pulseSoft 2s infinite;
+
+  @keyframes fadeIn {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+  @keyframes slideUp {
+    0% {
+      transform: translateY(10px);
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  @keyframes slideDown {
+    0% {
+      transform: translateY(-10px);
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  @keyframes pulseSoft {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.7;
+    }
+  }
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 20 14% 4%;
+    --card: 0 0% 100%;
+    --card-foreground: 20 14% 4%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 20 14% 4%;
+    --primary: 174 72% 22%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 174 15% 92%;
+    --secondary-foreground: 174 72% 15%;
+    --muted: 174 15% 96%;
+    --muted-foreground: 174 10% 45%;
+    --accent: 174 15% 92%;
+    --accent-foreground: 174 72% 15%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 174 15% 88%;
+    --input: 174 15% 88%;
+    --ring: 174 72% 22%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 174 20% 6%;
+    --foreground: 174 15% 95%;
+    --card: 174 20% 8%;
+    --card-foreground: 174 15% 95%;
+    --popover: 174 20% 8%;
+    --popover-foreground: 174 15% 95%;
+    --primary: 174 72% 35%;
+    --primary-foreground: 174 20% 6%;
+    --secondary: 174 15% 15%;
+    --secondary-foreground: 174 15% 95%;
+    --muted: 174 15% 15%;
+    --muted-foreground: 174 10% 65%;
+    --accent: 174 15% 15%;
+    --accent-foreground: 174 15% 95%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 174 15% 20%;
+    --input: 174 15% 20%;
+    --ring: 174 72% 35%;
+  }
+}
+
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .animate-in {
+    animation: fadeIn 0.3s ease-out;
+  }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background-color: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: hsl(var(--muted-foreground) / 0.5);
+}
+
+/* Focus visible */
+*:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px hsl(var(--ring)),
+    0 0 0 4px hsl(var(--background));
+}
+
+/* Selection */
+::selection {
+  background-color: hsl(var(--primary) / 0.2);
+  color: hsl(var(--primary-foreground));
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}

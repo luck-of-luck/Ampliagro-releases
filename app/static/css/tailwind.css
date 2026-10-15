@@ -1,0 +1,1266 @@
+@import 'tailwindcss';
+@source "./app/templates/**/*.html";
+
+@theme {
+  --font-display: 'Sora', 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+
+  --color-slate-950: #121816;
+  --color-slate-900: #1a211f;
+  --color-slate-800: #2a3431;
+  --color-slate-700: #3b4743;
+  --color-slate-600: #55625d;
+  --color-slate-500: #67736e;
+  --color-slate-400: #8b9792;
+  --color-slate-300: #b8c3bf;
+  --color-slate-200: #dce4e1;
+  --color-emerald-500: #12a979;
+  --color-emerald-600: #0f9d6e;
+  --color-rose-500: #e04a4a;
+  --color-rose-600: #d93a3a;
+  --color-amber-500: #d9a53f;
+  --color-amber-600: #c19a3c;
+  --color-cyan-500: #2faeae;
+  --color-cyan-600: #1d9a9a;
+
+  /* Custom NCS colors */
+  --color-ncs-50: #b2dbe7;
+  --color-ncs-900: #004d63;
+  --color-ncs-green-dark: #0f9d6e;
+  --color-ncs-orange-amber: #c19a3c;
+  --color-ncs-blue-light: #e8eeec;
+  --color-ncs-blue-dark: #1d2421;
+  --color-ncs-blue-dark-rgb: 29, 36, 33;
+  --color-ncs-blue-light-rgb: 232, 238, 236;
+
+  /* Custom theme tokens. Runtime values come from preferences.theme.custom. */
+  --theme-accent: #0f9d6e;
+  --theme-text: #e9eeec;
+  --theme-navbar: #131917;
+  --theme-workspace: #0b0f0e;
+  --theme-card: #151b19;
+  --theme-widgetbar: #131917;
+}
+
+@layer utilities {
+  .selectable-item:hover {
+    background-color: var(--color-slate-800);
+    color: var(--color-emerald-500);
+  }
+
+  /* Custom properties for theming (definidos em soft-ui.css) */
+}
+
+/* Scrollbar styling - oculta globalmente */
+::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+html {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  overflow: hidden;
+  height: 100%;
+}
+
+body {
+  transition: background-color 0.3s ease;
+  background-color: var(--cor-fundo-escuro);
+  overflow: hidden;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+html.dark body {
+  background-color: var(--cor-fundo) !important;
+}
+
+/* ============================================
+   MATRIX CONTAINER - Grid Fixo para Widgets
+   ============================================ */
+.matrix-container {
+  display: grid !important;
+  grid-template-columns: repeat(var(--grid-cols, 64), 1fr) !important;
+  grid-template-rows: repeat(var(--grid-rows, 40), minmax(20px, 1fr)) !important;
+  width: 100%;
+  height: calc(100vh - 64px) !important;
+  max-height: calc(100vh - 64px) !important;
+  padding: var(--matrix-pad, 3px);
+  gap: var(--matrix-gap, 2px);
+  position: relative;
+}
+
+.matrix-container.editing {
+  background-image: linear-gradient(rgba(16, 185, 129, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(16, 185, 129, 0.04) 1px, transparent 1px);
+  background-size: calc(100% / var(--grid-cols, 64)) calc(100% / var(--grid-rows, 40));
+}
+
+/* Widgets Bento (Liquid Crystal inherited from .lc-panel) */
+.bento-block {
+  position: relative;
+  transition: all 0.2s ease;
+  overflow: visible;
+}
+
+.bento-block:hover {
+}
+
+html.dark .bento-block {
+}
+
+html.custom-theme.custom-theme-workspace .matrix-container {
+  background-color: transparent;
+}
+
+html.custom-theme .theme-color-input {
+  width: 2.5rem;
+  height: 2rem;
+  padding: 0.125rem;
+  border: 1px solid color-mix(in srgb, var(--theme-text) 25%, transparent);
+  border-radius: 0.5rem;
+  background: transparent;
+  cursor: pointer;
+}
+
+html.custom-theme .theme-modal-option input[type='checkbox'] {
+  accent-color: var(--theme-accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+/* Centralized custom theme modal */
+#custom-theme-modal:not(.hidden) {
+  display: flex;
+}
+
+.custom-theme-card {
+  color: var(--theme-text);
+}
+
+.custom-theme-backdrop {
+  background-color: rgba(2, 6, 23, 0.58);
+}
+
+.theme-modal-option {
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+html.custom-theme .theme-modal-option:hover {
+  border-color: var(--theme-accent);
+  background-color: color-mix(in srgb, var(--theme-accent) 8%, transparent);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* ============================================
+   MODO DE EDICAO - Widget Drag/Resize
+   ============================================ */
+.widget-edit-mode {
+  outline: 2px solid rgba(16, 185, 129, 0.55);
+  outline-offset: 1px;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+  transition: all 0.2s ease;
+  cursor: grab;
+}
+
+.widget-edit-mode:active {
+  cursor: grabbing;
+}
+
+.bento-block.dragging {
+  opacity: 0.5 !important;
+  transform: scale(0.95) !important;
+}
+
+/* Drag and Drop - Mouse-based smooth drag */
+.bento-block.widget-edit-mode {
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+}
+
+.bento-block.widget-edit-mode:active {
+  cursor: grabbing;
+}
+
+.bento-block.drag-origin {
+  opacity: 0.4;
+  transform: scale(0.95);
+  transition:
+    opacity 0.2s,
+    transform 0.2s;
+}
+
+.bento-block.drag-ghost {
+  position: fixed;
+  pointer-events: none;
+  z-index: 2147483646;
+  opacity: 0.85;
+  transform: scale(1.02);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  transition: none;
+  outline: 2px dashed rgba(16, 185, 129, 0.7);
+  outline-offset: -2px;
+}
+
+.matrix-container.drag-active .bento-block:not(.drag-origin):not(.drag-ghost) {
+  transition: all 0.15s ease;
+}
+
+.bento-block.drop-target {
+  outline: 3px dashed rgba(16, 185, 129, 0.6);
+  outline-offset: -3px;
+  background-color: rgba(16, 185, 129, 0.05);
+}
+
+.bento-block.drop-target-invalid {
+  outline: 3px dashed rgba(244, 63, 94, 0.6);
+  outline-offset: -3px;
+  background-color: rgba(244, 63, 94, 0.05);
+}
+
+.bento-block.resize-blocked {
+  outline: 3px dashed rgba(244, 63, 94, 0.8);
+  outline-offset: -3px;
+  box-shadow: 0 0 0 4px rgba(244, 63, 94, 0.15);
+}
+
+.drag-position-hint,
+.grid-drop-hint {
+  position: absolute;
+  background: rgba(16, 185, 129, 0.8);
+  color: white;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  pointer-events: none;
+  z-index: 10;
+  opacity: 0.8;
+}
+
+.edit-mode-badge {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  width: 18px;
+  height: 18px;
+  background: #10b981;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 10px;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.4);
+  z-index: 30;
+  opacity: 0;
+  transform: scale(0);
+  transition: all 0.2s ease;
+  pointer-events: none;
+}
+
+.widget-edit-mode .edit-mode-badge {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.resize-handle {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  background: rgba(16, 185, 129, 0.7);
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  z-index: 25;
+  border: 1px solid rgba(255, 255, 255, 0.85);
+}
+
+.widget-edit-mode .resize-handle {
+  opacity: 0.55;
+}
+
+.widget-edit-mode.widget-selected .resize-handle {
+  opacity: 0.95;
+}
+
+.resize-handle:hover {
+  opacity: 1 !important;
+  background: rgba(16, 185, 129, 0.95) !important;
+}
+
+.resize-handle::after {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid rgba(255, 255, 255, 0.9);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.9);
+  display: block;
+  margin: auto;
+}
+
+.resize-handle.edge-se {
+  right: -7px;
+  bottom: -7px;
+  cursor: nwse-resize;
+}
+.resize-handle.edge-se::after {
+  transform: rotate(0deg);
+}
+.resize-handle.edge-sw {
+  left: -7px;
+  bottom: -7px;
+  cursor: nesw-resize;
+}
+.resize-handle.edge-sw::after {
+  transform: rotate(90deg);
+}
+.resize-handle.edge-ne {
+  right: -7px;
+  top: -7px;
+  cursor: nesw-resize;
+}
+.resize-handle.edge-ne::after {
+  transform: rotate(-90deg);
+}
+.resize-handle.edge-nw {
+  left: -7px;
+  top: -7px;
+  cursor: nwse-resize;
+}
+.resize-handle.edge-nw::after {
+  transform: rotate(180deg);
+}
+.resize-handle.edge-e {
+  right: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: ew-resize;
+}
+.resize-handle.edge-e::after {
+  transform: rotate(-45deg);
+}
+.resize-handle.edge-w {
+  left: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: ew-resize;
+}
+.resize-handle.edge-w::after {
+  transform: rotate(135deg);
+}
+.resize-handle.edge-s {
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: ns-resize;
+}
+.resize-handle.edge-s::after {
+  transform: rotate(45deg);
+}
+.resize-handle.edge-n {
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: ns-resize;
+}
+.resize-handle.edge-n::after {
+  transform: rotate(225deg);
+}
+
+.widget-edit-mode {
+  outline: 2px solid rgba(16, 185, 129, 0.4);
+  outline-offset: 1px;
+}
+
+.widget-edit-mode.widget-selected {
+  outline: 3px solid #f59e0b;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.2);
+}
+
+.widget-edit-mode.widget-selected .resize-handle {
+  background: rgba(245, 158, 11, 0.9);
+}
+
+#dashboard-appbar .edit-mode-section {
+  display: none;
+}
+
+#dashboard-appbar.editing .edit-mode-section {
+  display: flex;
+}
+
+/* Grid drop hint (position label) */
+.grid-drop-hint.invalid {
+  background: rgba(244, 63, 94, 0.8);
+  border-color: rgba(244, 63, 94, 0.5);
+}
+
+/* ============================================
+   NEOMORFISMO - Widget Bar Estilo Windows 11
+   ============================================ */
+.neo-card {
+  background: linear-gradient(145deg, #d4e4ea, #b7d0d8);
+  box-shadow:
+    3px 3px 6px rgba(0, 94, 119, 0.15),
+    -3px -3px 6px rgba(255, 255, 255, 0.6);
+  border: none;
+}
+
+html.dark .neo-card {
+  background: linear-gradient(145deg, #004d63, #003a4a);
+  box-shadow:
+    3px 3px 6px rgba(0, 0, 0, 0.3),
+    -3px -3px 6px rgba(78, 127, 145, 0.15);
+}
+
+.neo-btn {
+  background: linear-gradient(145deg, #d9e8ee, #b6cbd3);
+  box-shadow:
+    2px 2px 4px rgba(0, 94, 119, 0.12),
+    -2px -2px 4px rgba(255, 255, 255, 0.5);
+  transition: all 0.2s ease;
+}
+
+html.dark .neo-btn {
+  background: linear-gradient(145deg, #005268, #003845);
+  box-shadow:
+    2px 2px 4px rgba(0, 0, 0, 0.3),
+    -2px -2px 4px rgba(78, 127, 145, 0.12);
+}
+
+.neo-btn:hover {
+  box-shadow:
+    inset 2px 2px 4px rgba(0, 94, 119, 0.12),
+    inset -2px -2px 4px rgba(255, 255, 255, 0.5);
+}
+
+html.dark .neo-btn:hover {
+  box-shadow:
+    inset 2px 2px 4px rgba(0, 0, 0, 0.3),
+    inset -2px -2px 4px rgba(78, 127, 145, 0.12);
+}
+
+.neo-btn:active {
+  box-shadow:
+    inset 3px 3px 6px rgba(0, 94, 119, 0.2),
+    inset -3px -3px 6px rgba(255, 255, 255, 0.4);
+}
+
+.neo-input {
+  background: #d9e8ee;
+  box-shadow:
+    inset 2px 2px 5px rgba(0, 94, 119, 0.12),
+    inset -2px -2px 5px rgba(255, 255, 255, 0.5);
+  border: none;
+}
+
+html.dark .neo-input {
+  background: #004d63;
+  box-shadow:
+    inset 2px 2px 5px rgba(0, 0, 0, 0.3),
+    inset -2px -2px 5px rgba(78, 127, 145, 0.12);
+}
+
+/* Search Menu - Windows 11 Style */
+.search-menu {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(8px) scale(0.97);
+  min-width: 320px;
+  max-width: 90vw;
+  min-height: 60px;
+  max-height: 380px;
+  overflow-y: auto;
+  border-radius: 16px;
+  padding: 12px;
+  z-index: 9999;
+  opacity: 0;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+  pointer-events: none;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.12),
+    0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+html.dark .search-menu {
+  background: rgba(15, 23, 42, 0.95);
+  border-color: rgba(148, 163, 184, 0.15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.search-menu.open {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.search-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.15s;
+  font-size: 12px;
+  color: #004d63;
+}
+
+html.dark .search-menu-item {
+  color: #b2dbe7;
+}
+
+.search-menu-item:hover {
+  background-color: rgba(0, 107, 104, 0.1);
+}
+
+html.dark .search-menu-item:hover {
+  background-color: rgba(178, 219, 231, 0.1);
+}
+
+/* Edit Dropdowns - Smooth open/close animation */
+.edit-dropdown {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+}
+
+.edit-dropdown.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* IA Panel - Lateral estilo Copilot */
+#ia-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 380px;
+  height: 100vh;
+  z-index: 10000;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+#ia-panel.open {
+  transform: translateX(0);
+}
+
+#ia-panel-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+#ia-panel-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Widget bar compact mode */
+#dashboard-appbar.compact .widgetbar-section-extra {
+  display: none !important;
+}
+
+.preset-card.active-preset {
+  background-color: rgba(0, 107, 104, 0.2) !important;
+  box-shadow: inset 2px 2px 4px rgba(0, 94, 119, 0.15);
+}
+
+html.dark .preset-card.active-preset {
+  background-color: rgba(248, 126, 8, 0.2) !important;
+}
+
+/* ============================================
+   DASHBOARD APPBAR - Windows 11 Style
+   ============================================ */
+#dashboard-appbar {
+  background-color: rgba(199, 226, 232, 0.85);
+  color: #005e77;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+  border-top: 1px solid rgba(0, 94, 119, 0.15);
+}
+
+html.dark #dashboard-appbar {
+  background-color: rgba(0, 107, 104, 0.85);
+  color: #f87e08;
+}
+
+/* Switches - estilo Windows 11 com pill design */
+.period-switch,
+.finance-switch {
+  display: flex;
+  align-items: center;
+  gap: 0 2px;
+  font-size: 0.75rem;
+  background-color: rgba(0, 0, 0, 0.08);
+  border-radius: 9999px;
+  padding: 2px;
+}
+
+.period-switch div,
+.finance-switch div {
+  padding: 4px 10px;
+  cursor: pointer;
+  border-radius: 9999px;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.period-switch div:hover,
+.finance-switch div:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.period-switch .active-period,
+.finance-switch .active-finance {
+  background-color: rgba(0, 107, 104, 0.15);
+  color: #006b68;
+  font-weight: 500;
+}
+
+html.dark .period-switch .active-period,
+html.dark .finance-switch .active-finance {
+  background-color: rgba(248, 126, 8, 0.15);
+  color: #f87e08;
+}
+
+/* Botões com borda minimalista */
+.minimal-border-btn {
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  transition: all 0.2s ease;
+}
+
+.minimal-border-btn:hover {
+  border-color: rgba(148, 163, 184, 0.5);
+}
+
+/* Search Menu Windows 11 */
+#search-menu {
+  backdrop-filter: blur(12px);
+}
+
+#search-menu div[onclick] {
+  transition: background-color 0.15s ease;
+}
+
+/* Export Dropdown */
+#export-dropdown {
+  backdrop-filter: blur(12px);
+}
+
+/* AmplIA Panel */
+#amplia-chat-panel {
+  height: calc(100vh - 56px);
+}
+
+/* ============================================
+   WIDGET BAR STYLES - Windows 11 Style
+   ============================================ */
+#widget-bar {
+  height: auto;
+  min-height: 64px;
+  padding: 12px 20px;
+}
+
+#widget-bar .widget-bar-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Preset Blocks - Carrossel */
+.preset-block {
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.preset-block:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.preset-block.active {
+  border-color: var(--cor-primaria);
+  background-color: rgba(0, 107, 104, 0.15);
+}
+
+html.dark .preset-block.active {
+  border-color: var(--cor-fundo-escuro);
+  background-color: rgba(178, 219, 231, 0.15);
+}
+
+.preset-block i {
+  font-size: 16px;
+  margin-bottom: 2px;
+}
+
+.preset-block span {
+  font-size: 9px;
+  line-height: 1;
+  text-align: center;
+}
+
+/* Presets Carousel */
+.presets-carousel {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 2px;
+}
+
+.presets-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+/* Search Field */
+.search-widget {
+  position: relative;
+  width: 192px;
+}
+
+.search-widget input {
+  width: 100%;
+  padding-left: 32px;
+  padding-right: 8px;
+  height: 32px;
+  border-radius: 6px;
+  font-size: 12px;
+  border: 1px solid transparent;
+}
+
+html.dark .search-widget input {
+  background-color: rgba(0, 77, 99, 0.3);
+  color: var(--cor-fundo-escuro);
+}
+
+.search-widget i {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  color: var(--cor-texto);
+}
+
+html.dark .search-widget i {
+  color: var(--cor-fundo-escuro);
+}
+
+/* Filter Tags */
+.filter-tags-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.filter-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  font-size: 11px;
+  border-radius: 12px;
+  background-color: var(--cor-primaria);
+  color: white;
+}
+
+.clear-filters-btn {
+  padding: 2px 6px;
+  font-size: 11px;
+  border-radius: 4px;
+  background-color: var(--cor-ouro);
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+/* Financial Toggle - 3 Position Switch */
+.financial-toggle {
+  display: flex;
+  background-color: rgba(0, 107, 104, 0.1);
+  border-radius: 16px;
+  padding: 2px;
+  height: 32px;
+}
+
+html.dark .financial-toggle,
+#dashboard-appbar.dark .financial-toggle,
+#dashboard-appbar .financial-toggle {
+  background-color: rgba(0, 0, 0, 0.08);
+  border-radius: 9999px;
+}
+
+.financial-toggle button {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 11px;
+  cursor: pointer;
+  border-radius: 14px;
+  transition: all 0.2s ease;
+  padding: 4px 10px;
+}
+
+.financial-toggle button.active {
+  background-color: var(--cor-primaria);
+  color: white;
+}
+
+.financial-toggle button.active.lucros {
+  background-color: #10b981;
+}
+.financial-toggle button.active.gastos {
+  background-color: #f87e08;
+}
+
+/* Period Toggle - Estilo Financial Toggle */
+#dashboard-appbar .period-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0 2px;
+  font-size: 0.75rem;
+  background-color: rgba(0, 0, 0, 0.08);
+  border-radius: 9999px;
+  padding: 2px;
+}
+
+#dashboard-appbar .period-toggle div {
+  padding: 4px 10px;
+  cursor: pointer;
+  border-radius: 9999px;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+#dashboard-appbar .period-toggle div:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+#dashboard-appbar .period-toggle .active-period {
+  background-color: rgba(0, 107, 104, 0.15);
+  color: #006b68;
+  font-weight: 500;
+}
+
+html.dark #dashboard-appbar .period-toggle .active-period {
+  background-color: rgba(248, 126, 8, 0.15);
+  color: #f87e08;
+}
+
+/* Widget Highlight for Search */
+.widget-highlighted {
+  outline: 2px solid #f59e0b !important;
+  outline-offset: 2px;
+  z-index: 100;
+}
+
+/* Preset Cards - estilo Windows AppBar */
+.preset-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+}
+
+.preset-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.preset-card.active {
+  border-color: var(--cor-primaria);
+  background-color: rgba(0, 107, 104, 0.15);
+}
+
+html.dark .preset-card.active {
+  border-color: var(--cor-fundo-escuro);
+  background-color: rgba(178, 219, 231, 0.15);
+}
+
+.preset-card i {
+  font-size: 18px;
+  margin-bottom: 2px;
+  transition: color 0.2s ease;
+}
+
+.preset-card span {
+  font-size: 10px;
+  line-height: 1;
+  text-align: center;
+}
+
+/* Responsive Widget Bar */
+@media (max-width: 1024px) {
+  .search-widget {
+    width: 140px;
+  }
+  .preset-card {
+    width: 42px;
+    height: 42px;
+  }
+  .preset-card i {
+    font-size: 16px;
+  }
+  .preset-card span {
+    font-size: 9px;
+  }
+}
+
+@media (max-width: 768px) {
+  #widget-bar {
+    min-height: 56px;
+    padding: 6px 12px;
+  }
+  .search-widget {
+    width: 120px;
+  }
+  .financial-toggle {
+    height: 28px;
+  }
+  .financial-toggle button {
+    font-size: 10px;
+  }
+  .preset-card {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+@media (max-width: 640px) {
+  #widget-bar .widget-bar-section {
+    flex-wrap: wrap;
+  }
+  .presets-carousel {
+    max-width: 200px;
+  }
+  .search-widget {
+    width: 100px;
+  }
+}
+
+/* ============================================
+   GRID VISUAL - Snap lines for editing mode
+   ============================================ */
+#dashboard-kanban-canvas.editing {
+  background-image: linear-gradient(rgba(16, 185, 129, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(16, 185, 129, 0.05) 1px, transparent 1px);
+  background-size: var(--cell-width, 80px) var(--cell-height, 80px);
+}
+
+/* Drag livre handle */
+.drag-livre-handle {
+  cursor: move !important;
+  user-select: none;
+}
+.drag-livre-handle:hover {
+  color: #059669 !important;
+}
+
+/* Resize handles - cursor hints */
+.resize-handle-se {
+  cursor: nwse-resize;
+}
+.resize-handle-sw {
+  cursor: nesw-resize;
+}
+.resize-handle-ne {
+  cursor: nesw-resize;
+}
+.resize-handle-nw {
+  cursor: nwse-resize;
+}
+
+/* Jiggle animation - iOS style */
+@keyframes jiggle {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(1deg);
+  }
+  75% {
+    transform: rotate(-1deg);
+  }
+}
+.jiggle {
+  animation: jiggle 0.3s infinite;
+}
+.jiggle:hover {
+  animation-play-state: paused;
+  z-index: 50 !important;
+}
+
+/* HTMX indicators */
+.htmx-indicator {
+  opacity: 0;
+}
+.htmx-request .htmx-indicator {
+  opacity: 1;
+  transition: opacity 200ms ease-in;
+}
+.htmx-request.htmx-indicator {
+  opacity: 1;
+  transition: opacity 200ms ease-in;
+}
+
+.bento-block {
+  aspect-ratio: 1 / 1;
+  min-width: 140px;
+}
+
+/* ── Guide card badges ── */
+.cultura-badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #059669;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  z-index: 2;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+.cultura-card:hover .cultura-badge {
+  display: flex !important;
+}
+
+/* ── Guide card quick-add ── */
+.cultura-quick-add {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(5, 150, 105, 0.9);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.15s;
+  z-index: 2;
+  padding: 0;
+  line-height: 1;
+}
+.cultura-card:hover .cultura-quick-add {
+  opacity: 1;
+}
+
+/* ── Help tooltips ── */
+.help-tooltip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #e2e8f0;
+  color: #64748b;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: help;
+  margin-left: 4px;
+  position: relative;
+  vertical-align: middle;
+}
+html.dark .help-tooltip {
+  background: #334155;
+  color: #94a3b8;
+}
+.help-tooltip-text {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: #1e293b;
+  color: #e2e8f0;
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 1.4;
+  white-space: normal;
+  text-align: left;
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: opacity 0.15s;
+}
+html.dark .help-tooltip-text {
+  background: #0f172a;
+}
+.help-tooltip:hover .help-tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+.help-tooltip-text::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 4px solid transparent;
+  border-top-color: #1e293b;
+}
+html.dark .help-tooltip-text::after {
+  border-top-color: #0f172a;
+}
+
+/* ── Inline edit ── */
+.inline-edit-input {
+  padding: 2px 4px;
+  border: 1px solid #059669;
+  border-radius: 4px;
+  font-size: inherit;
+  font-family: inherit;
+  background: #fff;
+  color: #1e293b;
+  outline: none;
+  min-width: 40px;
+}
+html.dark .inline-edit-input {
+  background: #1e293b;
+  color: #e2e8f0;
+}
+
+/* ── Keep-fields toggle ── */
+.keep-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: #64748b;
+  cursor: pointer;
+  user-select: none;
+}
+.keep-toggle input {
+  display: none;
+}
+.keep-toggle-track {
+  width: 32px;
+  height: 16px;
+  border-radius: 8px;
+  background: #cbd5e1;
+  position: relative;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+.keep-toggle input:checked + .keep-toggle-track {
+  background: #059669;
+}
+.keep-toggle-track::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.2s;
+}
+.keep-toggle input:checked + .keep-toggle-track::after {
+  transform: translateX(16px);
+}
+
+/* ── Field error ── */
+.field-error {
+  display: block;
+  margin-top: 2px;
+  font-size: 10px;
+  color: #ef4444;
+  font-weight: 500;
+}
+input.error,
+select.error,
+textarea.error {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 1px #ef4444 !important;
+}
+
+/* ── Animations ── */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-in {
+  animation: fadeIn 0.2s ease-out;
+}

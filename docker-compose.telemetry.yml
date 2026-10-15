@@ -1,0 +1,73 @@
+# Ampliagro — Stack de Telemetria / IoT
+# Uso: docker compose -f docker-compose.telemetry.yml up -d
+# Requer: Docker Desktop (Windows) com volumes mapeados
+version: '3.9'
+
+services:
+  # TimescaleDB (Postgres + extensão time-series) — hypertable para TelemetryData
+  timescaledb:
+    image: timescale/timescaledb:latest-pg16
+    container_name: ampliagro-timescale
+    environment:
+      POSTGRES_DB: ampliagro
+      POSTGRES_USER: ampliagro
+      POSTGRES_PASSWORD: ampliagro_telemetry_2026
+      TIMESCALEDB_TELEMETRY: "off"
+    ports:
+      - "5433:5432" # evita conflito com Postgres local
+    volumes:
+      - timescale_data:/var/lib/postgresql/data
+      - ./scripts/timescale-init.sql:/docker-entrypoint-initdb.d/01-init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ampliagro"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks: [ampliagro-iot]
+
+  # Mosquitto MQTT — broker para pushes dos devices
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: ampliagro-mosquitto
+    ports:
+      - "1883:1883"   # MQTT
+      - "9001:9001"   # WebSockets
+    volumes:
+      - ./mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - mosquitto_data:/mosquitto/data
+      - mosquitto_log:/mosquitto/log
+    networks: [ampliagro-iot]
+
+  # Redis — fila / cache para ingestão e alertas
+  redis:
+    image: redis:7-alpine
+    container_name: ampliagro-redis
+    ports: ["6379:6379"]
+    volumes: [redis_data:/data]
+    networks: [ampliagro-iot]
+
+  # Grafana — dashboards de telemetria (opcional)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: ampliagro-grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ampliagro
+      GF_INSTALL_PLUGINS: grafana-clock-panel
+    ports: ["3001:3000"]
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    depends_on: [timescaledb]
+    networks: [ampliagro-iot]
+
+volumes:
+  timescale_data:
+  mosquitto_data:
+  mosquitto_log:
+  redis_data:
+  grafana_data:
+
+networks:
+  ampliagro-iot:
+    driver: bridge

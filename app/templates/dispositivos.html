@@ -1,0 +1,86 @@
+{% extends base_template %}
+{% load static %}
+
+{% block title %}Ampliagro - Dispositivos{% endblock %}
+
+{% block extra_css %}
+
+{% endblock %}
+
+{% block dashboard_appbar %}{% endblock %}
+
+{% block content %}
+<div class="section-container">
+    <div class="section-header">
+        <h1 class="section-title">Dispositivos IoT</h1>
+        <div>
+            <button class="btn-primary btn-sm" onclick="abrirModal()"><i class="bi bi-plus-lg"></i> Adicionar Dispositivo</button>
+            <a href="{% url 'index_spa' %}" class="btn-secondary btn-sm">Voltar ao Dashboard</a>
+        </div>
+    </div>
+
+    <div class="content-card">
+        <h2 style="font-size:1rem;font-weight:600;margin-bottom:1rem;color:var(--ncs-green-dark);">Dispositivos Cadastrados</h2>
+        {% if dispositivos %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Tipo</th>
+                        <th>Firmware</th>
+                        <th>IP</th>
+                        <th>Data Instalacao</th>
+                        <th>Status</th>
+                        <th>Acoes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for d in dispositivos %}
+                    <tr>
+                        <td><strong>{{ d.nome }}</strong></td>
+                        <td>{{ d.get_tipo_display }}</td>
+                        <td>{{ d.firmware|default:"-" }}</td>
+                        <td>{{ d.ip|default:"-" }}</td>
+                        <td>{{ d.data_instalacao|date:"d/m/Y"|default:"-" }}</td>
+                        <td><span class="badge badge-{{ d.status }}">{{ d.get_status_display }}</span></td>
+                        <td><button class="btn-danger btn-sm" onclick="excluirDispositivo({{ d.id }})">Excluir</button></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state"><i class="bi bi-hdd-network" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>Nenhum dispositivo cadastrado.</div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="modal-overlay" id="modal-dispositivo">
+    <div class="modal-box">
+        <h2 style="font-size:1rem;font-weight:600;margin-bottom:1.25rem;color:var(--ncs-green-dark);">Adicionar Dispositivo</h2>
+        <p style="font-size:0.813rem;color:#64748b;margin-bottom:1rem;">Funcionalidade em desenvolvimento. Em breve voce podera cadastrar novos dispositivos IoT diretamente aqui.</p>
+        <button class="btn-secondary" onclick="fecharModal()">Fechar</button>
+    </div>
+</div>
+
+<div id="toast" class="toast"></div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+function getCSRFToken() { return document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''; }
+function showToast(msg, type) { const t = document.getElementById('toast'); t.textContent = msg; t.className = 'toast toast-' + type + ' show'; setTimeout(() => t.classList.remove('show'), 3000); }
+
+function abrirModal() { document.getElementById('modal-dispositivo').classList.add('active'); }
+function fecharModal() { document.getElementById('modal-dispositivo').classList.remove('active'); }
+document.getElementById('modal-dispositivo')?.addEventListener('click', function(e) { if (e.target === this) fecharModal(); });
+
+function excluirDispositivo(id) {
+    if (!confirm('Excluir este dispositivo?')) return;
+    fetch('/api/dispositivos/'+id+'/', { method:'DELETE', headers:{'X-CSRFToken':getCSRFToken()} })
+        .then(r => { if(r.ok){ showToast('Dispositivo excluido','success'); setTimeout(()=>location.reload(),1000); } else showToast('Erro','error'); });
+}
+</script>
+{% endblock %}

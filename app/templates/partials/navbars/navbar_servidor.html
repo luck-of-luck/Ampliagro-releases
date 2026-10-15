@@ -1,0 +1,129 @@
+{# Navbar Servidor — diferente da do produtor. Só mostra o que a área permite. #}
+<nav class="nav-premium" id="nav-premium" style="--nav-accent: {% if request.user.perfil.area_servidor == 'MECANICA' %}#0f9d6e{% elif request.user.perfil.area_servidor == 'CAMPO' %}#16a34a{% elif request.user.perfil.area_servidor == 'PECUARIA' %}#b45309{% elif request.user.perfil.area_servidor == 'AGRONOMIA' %}#0e7490{% else %}#334155{% endif %}">
+  <div class="nav-glass" style="border-bottom:2px solid var(--nav-accent)">
+  <div class="nav-main">
+    <div class="nav-brand-box nav-brand-box--left" id="nav-brand-theme-box" role="button" tabindex="0" aria-label="Trocar tema" onclick="toggleModeCentered(event)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleModeCentered(event);}" title="Trocar tema"><span id="nav-brand-icon" style="display:inline-flex;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg></span></div>
+    <a href="{% url 'servidor-dashboard' %}" class="nav-brand"><span class="nav-brand-text">ampliagro</span>
+      <span style="margin-left:8px;font-size:.72rem;background:var(--nav-accent);color:#fff;padding:2px 8px;border-radius:999px;font-weight:700;letter-spacing:.3px">{{ request.user.perfil.get_area_servidor_display|default:"Servidor" }} • {{ request.user.perfil.get_dashboard_config.titulo }}</span>
+    </a>
+
+      <button type="button" id="nav-menu-btn" class="nav-hamburger" aria-label="Abrir menu" aria-expanded="false" aria-controls="nav-pills-servidor">
+        <i class="bi bi-list"></i>
+      </button>
+      <div class="nav-pills" id="nav-pills-servidor">
+      <a href="{% url 'servidor-dashboard' %}" class="nav-pill is-active" data-pill="servidor">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+        Meu Painel
+      </a>
+
+      {# Itens por área — só aparecem se a área permite (hierarquia + permissoes) #}
+      {% with cfg=request.user.perfil.get_dashboard_config %}
+        <a href="{% url 'servidor-kanban' %}" class="nav-pill" data-pill="kanban"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><line x1="8" y1="9" x2="8" y2="19"/><line x1="16" y1="9" x2="16" y2="19"/></svg> Quadro de Tarefas</a>
+        {% if request.user.perfil.area_servidor == 'MECANICA' or request.user.perfil.area_servidor == 'ESTOQUE' or request.user.perfil.area_servidor == 'ADMIN' or request.user.perfil.area_servidor == 'GERAL' or not request.user.perfil.area_servidor %}
+        <a href="{% url 'servidor-estoque' %}" class="nav-pill" data-pill="estoque"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg> Estoque</a>
+        {% endif %}
+        <a href="{% url 'servidor-agenda' %}" class="nav-pill" data-pill="agenda"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Agenda</a>
+        <a href="{% url 'servidor-alertas' %}" class="nav-pill" data-pill="alertas"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Alertas</a>
+        {% if 'talhoes' in cfg.paginas %}
+        <a href="{% url 'cadastro-talhao' %}" class="nav-pill" data-pill="talhoes"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> Talhões</a>
+        {% endif %}
+        {% if 'safras' in cfg.paginas %}
+        <a href="{% url 'cadastro-safra' %}" class="nav-pill" data-pill="safras"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 22h20"/><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18"/></svg> Safras</a>
+        {% endif %}
+        {% if 'rebanho' in cfg.paginas %}
+        <a href="{% url 'cadastro-animal' %}" class="nav-pill" data-pill="rebanho"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 13c0-3 3-5 3-5s1 4 6 5c-1.5 2.5-3 5-9 5s-7.5-2.5-9-5c5-1 6-5 6-5s3 2 3 5"/></svg> Rebanho</a>
+        {% endif %}
+        {% if request.user.perfil.area_servidor == 'MECANICA' or request.user.perfil.area_servidor == 'CAMPO' or request.user.perfil.area_servidor == 'AGRONOMIA' or request.user.perfil.area_servidor == 'PECUARIA' or request.user.perfil.area_servidor == 'GERAL' or not request.user.perfil.area_servidor %}
+        <a href="{% url 'telemetria' %}" class="nav-pill" data-pill="telemetria"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16z"/><path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/></svg> Telemetria</a>
+        {% endif %}
+      {% endwith %}
+    </div>
+
+    <div class="nav-right">
+      <span class="nav-brand-text" style="cursor:pointer" onclick="iaDockToggle()" title="AmplIA — Assistente">ampl<span style="color:#0f9d6e">ia</span></span> <a href="#" data-tab="dashboard" class="nav-brand"></a>
+      <div class="nav-brand-box nav-brand-box--right" id="nav-brand-profile-box" onclick="toggleUserDropdown(event)" title="Perfil">
+        <div class="nav-avatar" style="width:100%;height:100%;border-radius:6px;display:flex;align-items:center;justify-content:center; background: transparent; color: var(--cor-nav-texto);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>
+        <div class="nav-user-dropdown" id="user-dropdown" style="min-width:280px;">
+          <div class="dropdown-header"><div class="name">{{ request.user.get_full_name|default:request.user.username }}</div><div class="email">{{ request.user.email }} • {{ request.user.perfil.get_area_servidor_display }}</div><div style="font-size:.72rem;color:#64748b">Fazenda: {{ request.user.perfil.propriedade_vinculada.nome|default:"—" }}</div></div><div class="dropdown-divider"></div>
+          <a href="{% url 'perfil-config' %}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Configurações</a>
+          <a href="{% url 'logout' %}" class="text-danger" onclick="logoutUser(event)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Sair</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+</nav>
+<div class="nav-mode-dropdown nav-mode-panel is-centered hidden" id="mode-dropdown" role="menu">
+    <div class="nav-mode-panel-grid" id="mode-panel-grid" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px;">
+        <div class="nav-mode-card is-active" data-preset="escuro" role="button" tabindex="0" onclick="selectPreset('escuro',event)"><div class="nav-mode-card-head"><span class="nav-mode-card-title"><span>Escuro</span></span><span class="nav-mode-card-badge">Ativo</span></div><div class="nav-mode-card-preview"><div class="nmc-pv" style="background:#0b0f0e;border-color:#3ec48f"><div class="nmc-pv-nav" style="background:#131917;border-color:#3ec48f"><i class="nmc-pv-acc" style="background:#3ec48f"></i><i class="nmc-pv-line" style="background:#8b9792"></i></div><div class="nmc-pv-row"><div class="nmc-pv-card" style="background:#151b19;border-color:rgba(62,196,143,0.22)"><span class="nmc-pv-vbar" style="background:#3ec48f;height:55%"></span><span class="nmc-pv-vbar" style="background:#3ec48f;height:85%"></span></div><div class="nmc-pv-card nmc-pv-card-nest" style="background:#1a211f;border-color:rgba(62,196,143,0.22)"><i class="nmc-pv-acc" style="background:#57d7a0"></i></div></div></div></div><div class="nav-mode-card-name">Escuro</div></div>
+        <div class="nav-mode-card" data-preset="claro" role="button" tabindex="0" onclick="selectPreset('claro',event)"><div class="nav-mode-card-head"><span class="nav-mode-card-title"><span>Claro</span></span><span class="nav-mode-card-badge">Ativo</span></div><div class="nav-mode-card-preview"><div class="nmc-pv" style="background:#f6f8f7;border-color:#0f9d6e"><div class="nmc-pv-nav" style="background:#fdfefe;border-color:#0f9d6e"><i class="nmc-pv-acc" style="background:#0f9d6e"></i><i class="nmc-pv-line" style="background:#5f6b66"></i></div><div class="nmc-pv-row"><div class="nmc-pv-card" style="background:#fdfefe;border-color:rgba(15,157,110,0.25)"><span class="nmc-pv-vbar" style="background:#0f9d6e;height:55%"></span><span class="nmc-pv-vbar" style="background:#0f9d6e;height:85%"></span></div><div class="nmc-pv-card nmc-pv-card-nest" style="background:#f3f7f5;border-color:rgba(15,157,110,0.25)"><i class="nmc-pv-acc" style="background:#4cc396"></i></div></div></div></div><div class="nav-mode-card-name">Claro</div></div>
+        <div class="nav-mode-card" data-preset="personalizado" role="button" tabindex="0" onclick="selectPreset('personalizado',event)"><div class="nav-mode-card-head"><span class="nav-mode-card-title"><span>Personalizado</span></span><span class="nav-mode-card-badge">Ativo</span></div><div class="nav-mode-card-preview"><div class="nmc-pv" style="background:#0b0f0e;border-color:#33413f"><div class="nmc-pv-nav" style="background:#131917;border-color:#33413f"><i class="nmc-pv-acc" style="background:#3ec48f"></i><i class="nmc-pv-line" style="background:#8b9792"></i></div><div class="nmc-pv-row"><div class="nmc-pv-card" style="background:#151b19;border-color:#33413f"><span class="nmc-pv-vbar" style="background:#3ec48f;height:55%"></span><span class="nmc-pv-vbar" style="background:#3ec48f;height:85%"></span></div><div class="nmc-pv-card nmc-pv-card-nest" style="background:#1a211f;border-color:#33413f"><i class="nmc-pv-acc" style="background:#57d7a0"></i></div></div></div></div><div class="nav-mode-card-name">Personalizado</div></div>
+    </div>
+    <div style="padding:0.5rem; text-align:center;"><button type="button" class="btn-personalizar-mode" onclick="openPersonalizarMode(event)" style="width:100%;">Personalizar</button></div>
+</div>
+<script>
+// nav-brand como botão de tema com ícone sol/lua/p e menu centralizado
+function updateNavBrandIcon(){
+  try{
+    const icon=document.getElementById('nav-brand-icon');
+    if(!icon) return;
+    let modo='claro';
+    const active=document.querySelector('.nav-mode-card.is-active');
+    if(active) modo=active.dataset.preset||'claro';
+    else {
+      const raw=localStorage.getItem('ampliagro-preferences')||localStorage.getItem('ampliagro-preferences_u'+(window.AMPLIAGRO_USER_ID||''));
+      if(raw){
+        try{ const prefs=JSON.parse(raw); if(prefs.theme&&prefs.theme.mode) modo=prefs.theme.mode; }catch(e){}
+      }
+      if(document.documentElement.classList.contains('dark') && modo==='claro') modo='escuro';
+    }
+    modo=String(modo).toLowerCase();
+    const sunSVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>';
+    const moonSVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>';
+    const pSVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5"></circle><circle cx="17.5" cy="10.5" r=".5"></circle><circle cx="8.5" cy="7.5" r=".5"></circle><circle cx="6.5" cy="12.5" r=".5"></circle><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.563-5.554C21.965 6.012 17.461 2 12 2z"></path></svg>';
+    if(modo.includes('escuro')||modo.includes('dark')||modo.includes('noite')) icon.innerHTML=moonSVG;
+    else if(modo.includes('personal')||modo.includes('custom')||modo==='p') icon.innerHTML=pSVG;
+    else icon.innerHTML=sunSVG;
+  }catch(e){}
+}
+function toggleModeCentered(e){
+  if(e) e.stopPropagation();
+  const dd=document.getElementById('mode-dropdown');
+  if(!dd) return;
+  dd.style.display='';
+  const isOpen=dd.classList.contains('is-open');
+  if(isOpen){
+    dd.classList.remove('is-open','is-centered'); dd.classList.add('hidden');
+  } else {
+    dd.classList.remove('hidden');
+    dd.classList.add('is-open','is-centered');
+    if(window.refreshModePanel) window.refreshModePanel();
+    updateNavBrandIcon();
+    document.querySelectorAll('.nav-mega.is-open').forEach(m=> m.classList.remove('is-open'));
+    const ud=document.getElementById('user-dropdown'); if(ud) ud.classList.remove('is-open'); if(ud) ud.classList.add('hidden');
+  }
+}
+const _origToggleModeDropdownServ = window.toggleModeDropdown;
+window.toggleModeDropdown = function(e){ return toggleModeCentered(e); };
+const _origCloseModeDropdownServ = window.closeModeDropdown;
+window.closeModeDropdown = function(){
+  const dd=document.getElementById('mode-dropdown');
+  if(dd){ dd.classList.remove('is-open','is-centered'); dd.classList.add('hidden'); }
+  if(typeof _origCloseModeDropdownServ==='function') try{ _origCloseModeDropdownServ(); }catch(e){}
+};
+document.addEventListener('DOMContentLoaded', ()=>{ setTimeout(updateNavBrandIcon, 300); });
+const _origRefreshServ = window.refreshModePanel;
+window.refreshModePanel = function(){ if(typeof _origRefreshServ==='function') try{ _origRefreshServ(); }catch(e){} updateNavBrandIcon(); };
+const _origSelectModeServ = window.selectMode;
+window.selectMode = function(mode,e){
+  if(e) e.stopPropagation();
+  if(typeof _origSelectModeServ==='function') _origSelectModeServ(mode,e);
+  else { closeModeDropdown(); if(typeof window.setTheme==='function') window.setTheme(mode); }
+  setTimeout(updateNavBrandIcon, 100);
+};
+// mesmo JS de tema/notificação do produtor, mas sem mega-menus
+document.addEventListener('click',function(e){var dd=document.getElementById('mode-dropdown');if(dd&&!e.target.closest('#nav-brand-theme-box')&&!e.target.closest('#mode-dropdown')){dd.classList.remove('is-open','is-centered');dd.classList.add('hidden')}});
+document.addEventListener('DOMContentLoaded', function(){
+  if(typeof carregarNotificacoes==='function') try{carregarNotificacoes()}catch(e){}
+});
+</script>

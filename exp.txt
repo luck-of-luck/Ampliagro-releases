@@ -1,0 +1,87 @@
+ho NÃO ESTÁ DEFINIDO EM NENHUM SÍTIO DO
+   * REPOSITÓRIO (`grep iaLocalMsg\s*=` não devolve uma linha). Cada `if (typeof
+   * iaLocalMsg === 'function')` era, na prática, `if (false)`.
+   *
+   * O efeito era o pior possível: o produtor carregava em "Selecionar área", a
+   * captura falhava — por `sem_https`, por o browser negar, por recorta vazio — e
+   * o ecrã não mudava. Nenhuma mensagem, nenhum erro, nada. O botão parecia
+   * partido e a feature parecia não existir.
+   *
+   * `ia-rail-acoes.js` já tem o que isto faz falta, e é o que está certo: a
+   * mensagem vai para a conversa quando há uma, e para o campo de texto quando não
+   * há. Este é o mesmo caminho, com o mesmo fim, para o módulo que carrega
+   * primeiro. */
+  window.IaDizer = function (texto) {
+    if (!texto) return false;
+    if (typeof window.iaLocalMsg === 'function') {
+      window.iaLocalMsg(texto, 'bot');
+      return true;
+    }
+    var body = document.getElementById('ia-chat-body');
+    if (body) {
+      var d = document.createElement('div');
+      d.className = 'ia-msg bot';
+      d.textContent = texto;
+      body.appendChild(d);
+      body.scrollTop = body.scrollHeight;
+      return true;
+    }
+    return false;
+  };
+
+  /* O código da etapa viaja na mensagem de falha — e com ele no "Relatar
+   * problema" (que copia a última resposta), a falha chega investigável em
+   * vez de chegar como "veio vazio". */
+  function codigoEtapa(r) {
+    return r && r.etapa ? ' (código: ' + String(r.etapa) + ')' : '';
+  }
+
+  function mensagemDe(r) {
+    switch (r.motivo) {
+      case 'so_no_app':
+        return 'O print da tela só funciona no painel do Ampliagro. Abra o painel e tente outra vez.';
+      case 'sem_suporte':
+        return 'Este navegador não deixa o AmplIA ver a tela. Use o Chrome ou o Edge, ou mande uma foto pelo clipe.';
+      case 'sem_https':
+        return 'Ver a tela só é permitido numa ligação segura. Abra o Ampliagro por https e tente outra vez.';
+      case 'negado':
+        return 'Não autorizou o AmplIA a ver a tela. Sem essa autorização não há print — mande uma foto pelo clipe.';
+      case 'sem_ecra':
+        return 'Não há ecrã para partilhar. Mande uma foto pelo clipe.';
+      case 'cancelado':
+        return 'Seleção cancelada.';
+      case 'area_pequena':
+        return 'A área ficou pequena demais. Arraste uma área maior.';
+      case 'sem_frame':
+        return (
+          'O navegador não conseguiu desenhar a página. Tente outra vez, ou mande uma foto pelo clipe.' +
+          codigoEtapa(r)
+        );
+      case 'tempo_esgotado':
+        return (
+          'Desenhar a página demorou demais (página muito grande?). Tente uma área menor, ou mande uma foto pelo clipe.' +
+          codigoEtapa(r)
+        );
+      case 'recorte_vazio':
+        return 'O recorte veio vazio. Tente outra vez, arrastando um pouco maior.' + codigoEtapa(r);
+      default:
+        return 'Não consegui tirar o print: ' + ((r && r.erro) || 'erro desconhecido') + '.';
+    }
+  }
+
+  window.IaPrint = {
+    capturar: capturar,
+    selecionar: selecionar,
+    abrirSeletorPagina: abrirSeletorPagina,
+    svgDaArea: svgDaArea,
+    diagnosticar: diagnosticar,
+    perguntarSobreImagem: perguntarSobreImagem,
+    guardarComoFicheiro: guardarComoFicheiro,
+    limpar: limpar,
+    abreZoom: abreZoom,
+    mostraAcimaDoCampo: mostraAcimaDoCampo,
+    caixaDoPrint: caixaDoPrint,
+    ePaginaDoAmpliagro: ePaginaDoAmpliagro,
+    suportado: suportado,
+    motivoDaRecusa: motivoDaRecusa,
+    men

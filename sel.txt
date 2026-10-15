@@ -1,0 +1,80 @@
+function selecionar() {
+    if (SELECIONANDO) return Promise.resolve({ ok: false, motivo: 'ocupado' });
+    SELECIONANDO = true;
+    var destravar = function () {
+      SELECIONANDO = false;
+    };
+    // Primeiro mostra o welcome card (se não foi dispensado)
+    return new Promise(function (resolveWelcome) {
+      mostraWelcomeCard(resolveWelcome);
+    })
+      .then(function (welcomeResult) {
+        // Se cancelou, não continua
+        if (welcomeResult.cancelled) {
+          return { ok: false, motivo: 'cancelado' };
+        }
+
+        // SEM `capturar()`: nada de getDisplayMedia, nada de pedido ao browser.
+        // O retângulo é desenhado sobre a própria página e o SVG sai direto
+        // do DOM (`svgDaArea`) — e isso não precisa de permissão.
+        return abrirSeletorPagina().then(function (r) {
+          if (!r.ok) {
+            if (r.motivo !== 'cancelado') window.IaDizer(mensagemDe(r));
+            return r;
+          }
+          /* DUAS TENTATIVAS: a cheia (com estilo e mídia) e, se ela falhar
+           * na serialização ou na decodificação, a simples (estrutura pura).
+           * Sem imagem, diz-se porquê — e NÃO se entrega texto fingindo ser
+           * visão. Não se tenta de novo quando a falha é no desenho/recorte:
+           * o documento tem o mesmo tamanho nas duas, e daria no mesmo. */
+          return svgDaArea(r.rect, false).then(function (img) {
+            if (img.ok) {
+              PRINT_ATUAL = img;
+              mostraAcimaDoCampo(img.svgUrl, img.rect);
+              mostraToastSucesso(true, false);
+              return img;
+            }
+            if (
+              img.etapa !== 'serializar' &&
+              img.etapa !== 'decodificar' &&
+              img.etapa !== 'tempo'
+            ) {
+              window.IaDizer(mensagemDe(img));
+              return img;
+            }
+            diag('tentando-simples', img.etapa);
+            return svgDaArea(r.rect, true).then(function (img2) {
+              if (!img2.ok) {
+                window.IaDizer(mensagemDe(img2));
+                return img2;
+              }
+              img2.simples = true;
+              PRINT_ATUAL = img2;
+              mostraAcimaDoCampo(img2.svgUrl, img2.rect);
+              mostraToastSucesso(true, true);
+              window.IaDizer(
+                'A imagem saiu simplificada (sem o estilo original) — mas dá para ver os números.'
+              );
+              return img2;
+            });
+          });
+        });
+        /* Destrava em TODAS as saídas (sucesso, cancelamento ou falha): sem
+         * isto, um caminho esquecido deixava o botão morto até recarregar. */
+      })
+      .then(
+        function (r) {
+          destravar();
+          return r;
+        },
+        function (e) {
+          destravar();
+          throw e;
+        }
+      );
+  }
+
+  /* Atalho Alt+A: abre a seleção sem passar pela barra.
+   *
+   * Alt (e não Ctrl): Ctrl+letra é do navegador/aba. Com foco em campo de
+   * texto o atalho NÃO dispara — Alt+letra em

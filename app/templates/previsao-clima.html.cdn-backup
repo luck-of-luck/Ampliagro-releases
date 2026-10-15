@@ -1,0 +1,275 @@
+{% extends base_template %}
+{% load static %}
+
+{% block title %}Ampliagro - Previsão do Clima{% endblock %}
+
+{% block extra_css %}
+
+{% endblock %}
+
+{% block dashboard_appbar %}{% endblock %}
+
+{% block content %}
+<div class="section-container">
+    <div class="section-header">
+        <h1 class="section-title">Previsão do Clima</h1>
+        <div style="display:flex;gap:0.5rem;align-items:center;">
+            <span class="source-badge" id="source-badge" style="display:none;"><i class="bi bi-geo-alt"></i> <span id="source-text"></span></span>
+            <a href="{% url 'index_spa' %}" class="btn-secondary">Voltar ao Dashboard</a>
+        </div>
+    </div>
+
+    <div id="alertas-container"></div>
+
+    <!--
+        De ONDE veio este clima.
+
+        A previsão estava errada em 712 km — uma propriedade em
+        Muzambinho/MG recebia o tempo do interior de São Paulo — e a pessoa
+        não tinha como saber. Via um número, sem nada que dissesse onde
+        tinha sido medido. Um clima sem origem é um clima que ninguém
+        pode corrigir.
+    -->
+    <div id="fonte-coordenadas" class="content-card" style="display:none; padding:0.75rem 1rem; margin-bottom:0.75rem; font-size:0.8125rem; opacity:0.8;"></div>
+
+    <!--
+        E quando a origem é incoerente. Aparece quando o centroide de um
+        talhão discorda da cidade da fazenda: nesse caso o clima é o da
+        cidade, e a pessoa precisa de saber que o talhão foi rejeitado e
+        porquê.
+    -->
+    <div id="aviso-coordenadas" class="content-card" style="display:none; padding:0.75rem 1rem; margin-bottom:0.75rem; font-size:0.8125rem; border-left:3px solid #f59e0b;"></div>
+
+    <div class="content-card">
+        <h2><i class="bi bi-cloud-sun" style="margin-right:0.5rem;"></i>Previsão para os Próximos Dias</h2>
+        <div class="stats-grid" id="forecast-cards">
+            <div class="empty-state" style="grid-column:1/-1;"><i class="bi bi-cloud-sun" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>Carregando previsão...</div>
+        </div>
+    </div>
+
+    <div class="content-card">
+        <h2><i class="bi bi-graph-up" style="margin-right:0.5rem;"></i>Temperatura e Precipitação (7 dias)</h2>
+        <div class="chart-container">
+            <canvas id="clima-chart"></canvas>
+        </div>
+    </div>
+
+    <div class="content-card">
+        <h2><i class="bi bi-clock-history" style="margin-right:0.5rem;"></i>Histórico Recente</h2>
+        <div id="historico-container">
+            <div class="empty-state"><i class="bi bi-inbox" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>Nenhum dado histórico disponível.</div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+function getWeatherIcon(desc) {
+    const d = (desc || '').toLowerCase();
+    if (d.includes('sol') || d.includes('limpo') || d.includes('clear')) return 'bi-sun';
+    if (d.includes('trovoada') || d.includes('tempestade') || d.includes('thunder')) return 'bi-cloud-lightning-rain';
+    if (d.includes(' chuva') || d.includes('rain') || d.includes('chuvoso')) return 'bi-cloud-rain';
+    if (d.includes('névoa') || d.includes('neblina') || d.includes('fog')) return 'bi-cloud-fog';
+    if (d.includes('nublado') || d.includes('cloud') || d.includes('nuvem')) return 'bi-cloud';
+    if (d.includes('vento') || d.includes('wind')) return 'bi-wind';
+    return 'bi-cloud-sun';
+}
+
+let climaChart = null;
+
+async function carregarPrevisao() {
+    const container = document.getElementById('forecast-cards');
+    const alertasContainer = document.getElementById('alertas-container');
+    const sourceBadge = document.getElementById('source-badge');
+    const sourceText = document.getElementById('source-text');
+    try {
+        const r = await fetch('/api/agronomia/clima/previsao/');
+        if (!r.ok) throw new Error('Erro ' + r.status);
+        const data = await r.json();
+
+        // Source badge
+        sourceBadge.style.display = 'inline-flex';
+        sourceText.textContent = 'Propriedade Atual (Open-Meteo)';
+
+        // Alertas (mock para open-meteo)
+        alertasContainer.innerHTML = '';
+
+        // A ORIGEM do número, e o aviso quando incoerente.
+        // A view agora devolve `fonte_coordenadas` e, se o centroide do
+        // talhão discordar da cidade, `aviso_coordenadas`. Sem mostrar, a
+        // pessoa vê 22°C e não tem como saber se foi medido em Muzambinho
+        // ou em São Paulo — que era exactamente o bug.
+        const fonteEl = document.getElementById('fonte-coordenadas');
+        if (fonteEl && data.fonte_coordenadas) {
+            fonteEl.textContent = 'Localização: ' + data.fonte_coordenadas;
+            fonteEl.style.display = 'block';
+        }
+        const avisoEl = document.getElementById('aviso-coordenadas');
+        if (avisoEl && data.aviso_coordenadas) {
+            avisoEl.textContent = data.aviso_coordenadas;
+            avisoEl.style.display = 'block';
+        }
+
+        // Cards
+        const daily = data.daily;
+        if (!daily || !daily.time) {
+            container.innerHTML = '<div class="empty-state" style="grid-column:1/-1;">Nenhuma previsão disponível</div>';
+            return;
+        }
+
+        let previsao = [];
+        for (let i = 0; i < daily.time.length; i++) {
+            const tempMax = daily.temperature_2m_max[i];
+            const tempMin = daily.temperature_2m_min[i];
+            const chuva = daily.precipitation_sum[i];
+            const probChuva = daily.precipitation_probability_max ? daily.precipitation_probability_max[i] : 0;
+
+            let descricao = 'Sol com nuvens';
+            if (chuva > 5) descricao = 'Chuvoso';
+            else if (chuva > 0) descricao = 'Possibilidade de Chuva';
+            else if (probChuva < 20) descricao = 'Céu limpo';
+
+            // Format time
+            const dateObj = new Date(daily.time[i] + 'T12:00:00'); // Evita timezone offset issues
+            const dayStr = dateObj.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' });
+
+            previsao.push({
+                dia: dayStr,
+                temp_max: tempMax,
+                temp_min: tempMin,
+                descricao: descricao,
+                // NÃO HÁ HUMIDADE NESTE PAYLOAD.
+                //
+                // Antes era `umidade: 50`, com o comentário "Open-Meteo
+                // default". Não há: mostrava 50% sempre, em qualquer dia,
+                // para qualquer lugar. E `precipitation_probability_max` não
+                // é humidade — é probabilidade de chuva, que já aparece
+                // como `probChuva` e nunca era mostrada.
+                //
+                // Por isso: sem dado, e diz-se que não há. Um 50% fixo
+                // treina a pessoa a ignorar o número, e depois o número
+                // que importa também é ignorado.
+                umidade: null,
+                prob_chuva: probChuva,
+                chuva_mm: chuva
+            });
+        }
+
+        if (previsao.length === 0) {
+            container.innerHTML = '<div class="empty-state" style="grid-column:1/-1;">Nenhuma previsão disponível</div>';
+            return;
+        }
+        container.innerHTML = previsao.map(d => {
+            const icon = getWeatherIcon(d.descricao);
+            return '<div class="stat-card">' +
+                '<div class="day-name">' + (d.dia || '') + '</div>' +
+                '<div class="weather-icon"><i class="bi ' + icon + '" style="color:' + (d.temp_max > 30 ? '#dc2626' : d.temp_min < 5 ? '#1d4ed8' : '#f59e0b') + ';"></i></div>' +
+                '<div class="temp-range"><span class="temp-max">' + (d.temp_max || d.temp || '-') + '°</span> / <span class="temp-min">' + (d.temp_min || '-') + '°</span></div>' +
+                '<div class="weather-desc">' + (d.descricao || '') + '</div>' +
+                (d.prob_chuva > 0 ? '<div class="weather-desc" style="margin-top:0.125rem;">Chance de chuva: ' + d.prob_chuva + '%</div>' : '') +
+                (d.chuva_mm > 0 ? '<div class="rain-info"><i class="bi bi-droplet"></i> ' + d.chuva_mm + 'mm</div>' : '') +
+            '</div>';
+        }).join('');
+
+        // Gráfico
+        renderChart(previsao);
+
+    } catch (e) {
+        container.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><i class="bi bi-exclamation-triangle" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>Erro ao carregar previsão: ' + e.message + '</div>';
+    }
+}
+
+function renderChart(previsao) {
+    const ctx = document.getElementById('clima-chart');
+    if (!ctx) return;
+    if (climaChart) climaChart.destroy();
+
+    const labels = previsao.map(d => d.dia);
+    const tempMax = previsao.map(d => d.temp_max || d.temp);
+    const tempMin = previsao.map(d => d.temp_min || d.temp);
+    const chuva = previsao.map(d => d.chuva_mm || 0);
+
+    const isDark = document.documentElement.classList.contains('dark');
+    const textColor = isDark ? '#94a3b8' : '#64748b';
+    const gridColor = isDark ? '#1e293b' : '#f1f5f9';
+
+    climaChart = new Chart(ctx, {
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    type: 'line',
+                    label: 'Temp Máx (°C)',
+                    data: tempMax,
+                    borderColor: '#dc2626',
+                    backgroundColor: 'rgba(220,38,38,0.1)',
+                    fill: '+1',
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#dc2626',
+                    yAxisID: 'y',
+                },
+                {
+                    type: 'line',
+                    label: 'Temp Mín (°C)',
+                    data: tempMin,
+                    borderColor: '#1d4ed8',
+                    backgroundColor: 'rgba(29,78,216,0.1)',
+                    fill: false,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#1d4ed8',
+                    yAxisID: 'y',
+                },
+                {
+                    type: 'bar',
+                    label: 'Chuva (mm)',
+                    data: chuva,
+                    backgroundColor: 'rgba(59,130,246,0.6)',
+                    borderColor: '#3b82f6',
+                    borderWidth: 1,
+                    yAxisID: 'y1',
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: { labels: { color: textColor, usePointStyle: true, padding: 16 } },
+                tooltip: {
+                    backgroundColor: isDark ? '#1e293b' : '#fff',
+                    titleColor: isDark ? '#e2e8f0' : '#1e293b',
+                    bodyColor: isDark ? '#cbd5e1' : '#475569',
+                    borderColor: isDark ? '#334155' : '#e2e8f0',
+                    borderWidth: 1,
+                    padding: 12,
+                }
+            },
+            scales: {
+                x: { ticks: { color: textColor }, grid: { color: gridColor } },
+                y: {
+                    type: 'linear', position: 'left',
+                    title: { display: true, text: 'Temperatura (°C)', color: textColor },
+                    ticks: { color: textColor },
+                    grid: { color: gridColor },
+                },
+                y1: {
+                    type: 'linear', position: 'right',
+                    title: { display: true, text: 'Chuva (mm)', color: textColor },
+                    ticks: { color: textColor },
+                    grid: { drawOnChartArea: false },
+                    min: 0,
+                }
+            }
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', carregarPrevisao);
+</script>
+{% endblock %}

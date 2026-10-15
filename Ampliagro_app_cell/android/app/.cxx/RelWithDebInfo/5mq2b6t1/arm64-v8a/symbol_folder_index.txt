@@ -1,0 +1,1 @@
+C:\Trabalho\Projetos\Ativos\Ampliagro2\Ampliagro_app_cell\android\app\build\intermediates\cxx\RelWithDebInfo\5mq2b6t1\obj\arm64-v8a

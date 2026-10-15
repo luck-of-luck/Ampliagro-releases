@@ -1,0 +1,156 @@
+# Dependências do Ampliagro Desktop — o subconjunto CURADO.
+#
+# NÃO É `requirements.txt` com menos linhas. Cada linha aqui foi posta por
+# ter sobrevivido a uma medição de importação (`AMPLIAGRO_DESKTOP_TRACE`),
+# e as que saíram estão listadas em baixo com a razão.
+#
+# A medição de referência (2026-10-12, Windows, Python 3.11.9) serviu
+# `/healthz`, `/` e `/login/` com os settings de desktop e traduiu os
+# `sys.modules` em distribuições. Resultado: 241,4 MB de código carregado no
+# arranque, das quais ~115 MB eram removíveis.
+#
+# ---------------------------------------------------------------------------
+# O QUE SAI, E PORQUÊ — nenhuma delas é importada em lado nenhum
+# ---------------------------------------------------------------------------
+# A verificação foi `grep` de `import`/`from` em `app/`, `config/` e testes,
+# mais o rastreio de imports em execução. **Zero** referências no repositório:
+#
+#   numpy    68,4 MB   entrava por daphne → autobahn → autobahn.flatbuffers
+#                        → compat.py:75 → `import numpy`. Ver NOTA ABAIXO.
+#   pandas   67,5 MB   nenhuma referência
+#   scipy   144,5 MB   nenhuma referência
+#   geopandas 60,3 MB  nenhuma referência
+#   rasterio 65,2 MB   nenhuma referência
+#   opencv-python-headless 104,1 MB  nenhuma referência
+#   fiona / pyogrio / pyproj / shapey  nenhuma referência
+#   Pillow  15,5 MB    nenhuma referência
+#   scikit-learn / scikit-image       nenhuma referência
+#
+# NOTA SOBRE O NUMPY — a mais delicate, e ainda por decidir
+# -------------------------------------------------------
+# `autobahn/flatbuffers/compat.py:62` faz
+# `importlib.machinery.PathFinder.find_spec("numpy")` e, se der `None`,
+# põe `np = None` — o que sugere que o numpy é opcional.
+#
+# Mas `autobahn/flatbuffers/number_types.py:21` faz `np = import_numpy()` ao
+# nível do MÓDULO. Isto é, na prática, o numpy entra sempre que
+# `daphne.ws_protocol` importa `autobahn.twisted.websocket`.
+#
+# **Não se tira o numpy da lista com base numa leitura de código.** Há uma
+# prova a correr (`npm run prova:offline`, ver `backend/`), e o resultado
+# está no comentário de `provas.py`. Até essa prova dar 101 no handshake
+# WebSocket, o numpy fica listado. Cortar 68 MB e partir os alertas de
+# sensor em silêncio é o pior negócio que este projecto pode fazer.
+#
+# ---------------------------------------------------------------------------
+# O QUE FICA, e porquê — medido, não suposto
+# ---------------------------------------------------------------------------
+
+# --- Núcleo Django -------------------------------------------------------
+Django>=5.2.17,<6.0
+djangorestframework>=3.14,<3.15
+django-filter>=23.0,<24
+django-cors-headers>=4.0,<5
+django-csp>=4.0,<5.0
+django-environ>=0.11,<0.12
+
+# `django-vite` é o que faz `{% vite_asset %}` funcionar. Sem ele os
+# templates que o usam levantam `TemplateSyntaxError` — o painel não abre.
+django-vite>=3.0,<3.1
+
+# --- Servidor ASGI -------------------------------------------------------
+# `channels` + `daphne` servem HTTP e WebSocket. `daphne` traz `twisted`
+# (~32 MB) e `autobahn` (~9 MB) como dependências — é o preço do WebSocket,
+# e o WebSocket é o que alimenta `ws/dashboard/` (`app/consumers.py`).
+channels>=4.0,<5.0
+daphne>=4.0,<5.0
+
+# --- Autenticação e identidade ------------------------------------------
+django-allauth>=65.19.2,<66.0
+django-axes>=6.0,<6.1
+
+# `app/security/hashers.py` — o hasher de passwords do projecto.
+cryptography>=49.0.0,<50.0
+bcrypt>=4.0,<4.1
+
+# --- Operação ------------------------------------------------------------
+django-auditlog>=3.0,<3.1
+django-prometheus>=2.3,<2.4
+django-health-check>=3.24,<4.0
+drf-spectacular>=0.27,<0.28
+whitenoise>=6.0,<7.0
+
+# --- Tarefas -------------------------------------------------------------
+# `config/__init__.py:1` faz `from . import celery` **incondicionalmente**, e
+# `config/celery.py:3` faz `from celery import Celery`. Sem este pacote o
+# desktop não arranca — medido, não suposto:
+#
+#     File "config/__init__.py", line 1, in <module>
+#       from .celery import app as celery_app
+#     ModuleNotFoundError: No module named 'celery'
+#
+# `CELERY_TASK_ALWAYS_EAGER = True` (`config/settings/desktop.py`) faz as
+# tarefas correrem na thread do pedido, mas o pacote continua a ser
+# importado — e tem de ser, porque as tarefas são declaradas com
+# `@shared_task`.
+#
+# Tirá-lo exige mexer em `config/__init__.py`, que é código do projecto e
+# não do pacote. Fica para uma decisão à parte; são ~6 MB.
+celery>=5.3,<5.4
+
+# --- Suporte -------------------------------------------------------------
+# `requests` - MEDIDO 14/10/2026, no CI: `bootstrap.py::preparar_build()`
+# chama `django.setup()`, o `allauth.socialaccount` importa TODOS os
+# providers no `ready()`, e um deles precisa de `requests`. O build morria
+# com `ModuleNotFoundError: No module named 'requests'`.
+#
+# Mas o CI so foi a primeira maquina limpa a dizer isto. Sao 15 ficheiros de
+# `app/` a fazer `import requests` na raiz — `api/views/core.py`,
+# `cultures.py`, `iot.py`, `financial.py`, entre outros. Ou seja: NAO e' so o
+# build. Um desktop instalado numa maquina sem `requests` rebentava em
+# qualquer um desses endpoints ao primeira pedido.
+#
+# Passou sempre porque a venv de desenvolvimento tem o pacote e o PyInstaller
+# o empacota por ela. `requests` esta' no `requirements.txt:201` desde sempre;
+# o ficheiro do desktop e' que se esqueceu dele.
+requests>=2.34.2,<3.0
+structlog>=24.1,<25
+PyYAML>=6.0,<7
+python-dateutil>=2.8,<2.9
+psutil>=5.9,<6
+
+# ---------------------------------------------------------------------------
+# FORA DE PROPÓSITO, e a razão
+# ---------------------------------------------------------------------------
+# `celery`, `kombu`, `billiard`, `amqp`  — carregados por `config/__init__.py:1`,
+#   que faz `from . import celery`. Com `CELERY_TASK_ALWAYS_EAGER` as tarefas
+#   correm na thread do pedido, mas o pacote continua a ser importado.
+#   ~6 MB. Tirar exige que `config/celery.py` deixe de ser importado no
+#   desktop — é alteração de código do projecto, não do pacote.
+#
+# `redis`, `channels-redis`, `django-redis` — o desktop é mono-processo:
+#   `CHANNEL_LAYERS = InMemoryChannelLayer` e `CACHES = DatabaseCache`.
+#   ~2,4 MB. O `redis` entra por `health_check`, que o mede.
+#
+# `psycopg2-binary`, `psycopg2` (13,5 MB juntos) — o desktop usa SQLite.
+#   Entram por `rest_framework/compat.py:21`, que importa
+#   `django.contrib.postgres.fields`. Não é escolha nossa: é o DRF.
+#
+# `numpy` (68,4 MB) — ver NOTA SOBRE O NUMPY. Decidido por prova, não por leitura.
+#
+# `geopandas`, `rasterio`, `opencv-python-headless`, `pandas`, `scipy`,
+# `scikit-learn`, `scikit-image`, `Pillow`, `fiona`, `pyogrio`, `pyproj`,
+# `shapely`, `lxml` — nenhuma referência no repositório (medido).
+#
+# `gunicorn` — POSIX-only, e o desktop é multi-SO.
+# `uvicorn` — declarado no `requirements.txt` mas nunca usado: o servidor
+#   real é o daphne. Fica de fora para não haver dois servidores no pacote.
+#
+# `djangorestframework-simplejwt`, `django-celery-beat`, `django-celery-results`,
+# `django-storages`, `django-compressor`, `django-debug-toolbar`,
+# `django-extensions` — ou não são usados no desktop, ou são de
+# desenvolvimento. `django-debug-toolbar` está explicitamente desligado
+# porque `DEBUG=False`.
+#
+# Ferramentas de desenvolvimento (`pytest`, `ruff`, `mypy`, `playwright`,
+# `semgrep`) — não entram num pacote de produção.

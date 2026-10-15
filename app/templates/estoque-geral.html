@@ -1,0 +1,247 @@
+{% extends base_template %}
+{% load static %}
+
+{% block title %}Ampliagro - Estoque Geral{% endblock %}
+
+{% block extra_css %}
+
+{% endblock %}
+
+{% block dashboard_appbar %}{% endblock %}
+
+{% block content %}
+<div class="section-container">
+    <div class="section-header">
+        <h1 class="section-title"><i class="bi bi-boxes me-2"></i>Estoque Geral (Curva ABC)</h1>
+        <div style="display:flex;gap:0.75rem;">
+            <button onclick="abrirLeitorQR()" class="btn-primary" style="background:#0284c7;"><i class="bi bi-qr-code-scan"></i> Baixa Rápida (QR)</button>
+            <a href="{% url 'cadastro-insumo' %}" class="btn-secondary"><i class="bi bi-plus-circle"></i> Novo Insumo</a>
+            <a href="{% url 'cadastro-estoque' %}" class="btn-primary"><i class="bi bi-plus-lg"></i> Novo Item</a>
+        </div>
+    </div>
+
+    {% if total_alertas > 0 %}
+    <div class="content-card" style="border-left: 4px solid #dc2626; padding: 1.5rem; background: #fef2f2;">
+        <h2 style="font-size:1rem;font-weight:700;color:#dc2626;margin-bottom:1rem;"><i class="bi bi-shield-exclamation"></i> Alertas de Supply Chain</h2>
+        <ul style="list-style: none; padding: 0; margin: 0; display: grid; gap: 0.5rem; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+            {% for alerta in alertas_ruptura %}
+                <li style="font-size: 0.875rem;">
+                    <strong>{{ alerta.nome }}</strong>:
+                    <span style="color:#dc2626;font-weight:600;">Ruptura (Estoque: {{ alerta.quantidade_atual }} {{ alerta.unidade }} | Mín: {{ alerta.quantidade_minima }})</span>
+                </li>
+            {% endfor %}
+            {% for alerta in alertas_fefo %}
+                <li style="font-size: 0.875rem;">
+                    <strong>{{ alerta.nome }}</strong>:
+                    {% if alerta.status == 'vencido' %}
+                        <span style="color:#dc2626;font-weight:600;">Vencido há {{ alerta.dias_restantes|stringformat:"d"|slice:"1:" }} dias</span>
+                    {% else %}
+                        <span style="color:#b45309;font-weight:600;">Vence em {{ alerta.dias_restantes }} dias (FEFO)</span>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Valor Total Imobilizado</div>
+            <div class="stat-value" id="valor-total">R$ {{ curva_abc.valor_total|default:"0.00" }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Itens Curva A (80%)</div>
+            <div class="stat-value" style="color:var(--ncs-green-dark)">
+                {{ curva_abc.itens|length }} itens
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Alertas (Ruptura/Validade)</div>
+            <div class="stat-value" style="color:#dc2626;">{{ total_alertas|default:"0" }}</div>
+        </div>
+    </div>
+
+    <div class="content-card">
+        <div class="search-bar">
+            <input type="text" class="search-input" id="search-input" placeholder="Buscar por nome, categoria, local..." oninput="filtrarTabela()">
+            <select class="search-input" id="categoria-filtro" style="flex:0 0 auto;min-width:140px;" onchange="filtrarTabela()">
+                <option value="">Todas Categorias</option>
+                <option value="INSUMO">Insumo</option>
+                <option value="PRODUTO">Produto</option>
+                <option value="RACAO">Ração</option>
+                <option value="EMBALAGEM">Embalagem</option>
+                <option value="PECA">Peça</option>
+                <option value="FERRAMENTA">Ferramenta</option>
+                <option value="OUTRO">Outro</option>
+            </select>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Categoria</th>
+                        <th>Quantidade</th>
+                        <th>Unidade</th>
+                        <th>Local</th>
+                        <th>Validade</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tabela-estoque">
+                    <tr>
+                        <td colspan="7" class="empty-state">
+                            <i class="bi bi-inbox" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>
+                            Nenhum item encontrado.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+    const API_URL = '/api/estoque/';
+
+    async function carregarEstoque() {
+        try {
+            const resp = await fetch(API_URL);
+            if (!resp.ok) throw new Error('Falha ao carregar');
+            const itens = await resp.json();
+            const tbody = document.getElementById('tabela-estoque');
+            const categorias = new Set();
+            let valorTotal = 0;
+            let proximoVencimento = 0;
+            const hoje = new Date();
+            const trintaDias = new Date(hoje.getTime() + 30 * 24 * 60 * 60 * 1000);
+
+            if (!itens.length) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><i class="bi bi-inbox" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>Nenhum item encontrado.</td></tr>';
+                atualizarStats(0, 0, 'R$ 0,00', 0);
+                return;
+            }
+
+            let html = '';
+            itens.forEach(item => {
+                categorias.add(item.categoria);
+                if (item.valor) valorTotal += parseFloat(item.valor) || 0;
+                if (item.data_validade) {
+                    const val = new Date(item.data_validade);
+                    if (val > hoje && val <= trintaDias) proximoVencimento++;
+                }
+                let badge = '';
+                if (item.data_validade) {
+                    const val = new Date(item.data_validade);
+                    const diff = Math.ceil((val - hoje) / (1000 * 60 * 60 * 24));
+                    if (diff < 0) badge = '<span class="badge badge-danger">Vencido</span>';
+                    else if (diff <= 7) badge = '<span class="badge badge-warning">' + diff + 'd</span>';
+                    else if (diff <= 30) badge = '<span class="badge badge-warning">' + diff + 'd</span>';
+                    else badge = '<span class="badge badge-safe">Ok</span>';
+                }
+                html += '<tr>' +
+                    '<td><strong>' + (item.nome || '--') + '</strong></td>' +
+                    '<td>' + (item.categoria || '--') + '</td>' +
+                    '<td>' + (item.quantidade != null ? parseFloat(item.quantidade).toFixed(2) : '--') + '</td>' +
+                    '<td>' + (item.unidade || '--') + '</td>' +
+                    '<td>' + (item.local || '--') + '</td>' +
+                    '<td>' + (item.data_validade ? new Date(item.data_validade).toLocaleDateString('pt-BR') : '--') + ' ' + badge + '</td>' +
+                    '<td><div class="action-cell">' +
+                    '<button class="btn-secondary btn-sm" onclick="editarItem(' + item.id + ')"><i class="bi bi-pencil"></i></button>' +
+                    '<button class="btn-secondary btn-sm" onclick="excluirItem(' + item.id + ')" style="background:#fef2f2;color:#dc2626;"><i class="bi bi-trash"></i></button>' +
+                    '</div></td></tr>';
+            });
+            tbody.innerHTML = html;
+            atualizarStats(itens.length, categorias.size, 'R$ ' + valorTotal.toFixed(2), proximoVencimento);
+            filtrarTabela();
+        } catch (e) {
+            console.error('Erro ao carregar estoque:', e);
+        }
+    }
+
+    function atualizarStats(total, categorias, valor, vencimento) {
+        document.getElementById('total-itens').textContent = total;
+        document.getElementById('total-categorias').textContent = categorias;
+        document.getElementById('valor-total').textContent = valor;
+        document.getElementById('proximo-vencimento').textContent = vencimento + ' itens';
+    }
+
+    function filtrarTabela() {
+        const q = document.getElementById('search-input').value.toLowerCase();
+        const cat = document.getElementById('categoria-filtro').value;
+        const rows = document.querySelectorAll('#tabela-estoque tr');
+        rows.forEach(row => {
+            if (row.classList.contains('empty-state')) return;
+            const texto = row.textContent.toLowerCase();
+            const match = (!q || texto.includes(q)) && (!cat || texto.includes(cat.toLowerCase()));
+            row.style.display = match ? '' : 'none';
+        });
+    }
+
+    function editarItem(id) {
+        window.location.href = '{% url "cadastro-estoque" %}?edit=' + id;
+    }
+
+    async function excluirItem(id) {
+        if (!confirm('Excluir este item?')) return;
+        try {
+            const resp = await fetch(API_URL + id + '/', { method: 'DELETE', headers: { 'X-CSRFToken': getCSRFToken() } });
+            if (resp.ok) carregarEstoque();
+            else alert('Erro ao excluir');
+        } catch (e) {
+            alert('Erro de conexão');
+        }
+    }
+
+    function getCSRFToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+    }
+
+    // --- LEITOR QR CODE (html5-qrcode) ---
+    function abrirLeitorQR() {
+        document.getElementById('qr-modal').style.display = 'block';
+        // Inicia o leitor
+        const html5QrCode = new Html5Qrcode("qr-reader");
+        const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+
+        html5QrCode.start({ facingMode: "environment" }, config, (decodedText, decodedResult) => {
+            // Sucesso na leitura
+            html5QrCode.stop();
+            document.getElementById('qr-modal').style.display = 'none';
+            alert('Leitura QR concluída: ' + decodedText + '\n\nAqui você poderia pré-preencher a "Movimentação de Saída" automaticamente.');
+            // Exemplo: window.location.href = '/estoque/movimentar/?qrcode=' + encodeURIComponent(decodedText);
+        }, (errorMessage) => {
+            // Ignora falhas de frame
+        }).catch((err) => {
+            console.error("Erro ao iniciar a câmera", err);
+            alert("Não foi possível acessar a câmera.");
+        });
+
+        window.fecharLeitorQR = function() {
+            html5QrCode.stop().then(() => {
+                document.getElementById('qr-modal').style.display = 'none';
+            }).catch(err => {
+                document.getElementById('qr-modal').style.display = 'none';
+            });
+        };
+    }
+
+    document.addEventListener('DOMContentLoaded', carregarEstoque);
+</script>
+
+<!-- Modal QR Code -->
+<div id="qr-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999;">
+    <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); background:#fff; padding:1.5rem; border-radius:1rem; width:90%; max-width:400px; text-align:center;">
+        <h3 style="margin-bottom:1rem; font-size:1.25rem;">Leitura de Estoque</h3>
+        <div id="qr-reader" style="width: 100%; margin-bottom:1rem;"></div>
+        <button class="btn-secondary" onclick="fecharLeitorQR()" style="width:100%;">Cancelar</button>
+    </div>
+</div>
+<!-- Importando html5-qrcode -->
+<script src="{% static 'vendor/html5-qrcode-2.3.8.min.js' %}"></script>
+
+{% endblock %}

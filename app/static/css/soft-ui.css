@@ -1,0 +1,1473 @@
+/* ═════════════════════════════════════════════════════════════
+   AMPLIAGRO OS — Soft-UI Design System
+   ─────────────────────────────────────────────────────────────
+   Neomorfismo suave (profundidade 3D tipo Windows 11 / macOS Big
+   Sur) com identidade corporativa esmeralda + dourado-champagne.
+
+   Camada de design carregada por ÚLTIMO: sobrepõe legados e
+   centraliza tokens, primitivas e movimento em um só lugar.
+   Claro/escuro são inversões do mesmo esquema, sóbrios e com
+   bom contraste.
+   ═════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────
+   1. TOKENS — inversão claro / escuro
+      Sistema unificado de variáveis --cor-*
+   ───────────────────────────────────────────── */
+:root {
+  /* Fundos */
+  --cor-fundo: #f4f7f2;
+  --cor-fundo-escuro: #e7eee8;
+  --cor-fundo-card: #fbfcf8;
+  --cor-fundo-card-aninhado: #f1f5ef;
+  --cor-fundo-card-profundo: #e5ece6;
+  /* Texto */
+  --cor-texto: #18221e;
+  --cor-texto-medio: #5b6761;
+  --cor-texto-fraco: #89938e;
+  /* Bordas */
+  --cor-borda: rgba(24, 34, 30, 0.11);
+  --cor-borda-forte: rgba(24, 34, 30, 0.2);
+  /* Sombras */
+  --cor-sombra: rgba(36, 48, 42, 0.12);
+  --cor-sombra-clara: rgba(255, 255, 255, 0.78);
+  --cor-sombra-interna: rgba(24, 34, 30, 0.07);
+  /* Cores primárias */
+  --cor-primaria: #137a59;
+  --cor-primaria-forte: #0d5f45;
+  --cor-primaria-suave: rgba(19, 122, 89, 0.12);
+  /* Cores secundárias */
+  --cor-agua: #1e6f82;
+  --cor-agua-suave: rgba(30, 111, 130, 0.12);
+  --cor-terra: #806747;
+  --cor-terra-suave: rgba(128, 103, 71, 0.14);
+  /* Cores de estado */
+  --cor-ouro: #b98523;
+  --cor-ouro-suave: rgba(185, 133, 35, 0.16);
+  --cor-sucesso: #137a59;
+  --cor-alerta: #b98523;
+  --cor-erro: #bd3f39;
+  --cor-erro-suave: rgba(189, 63, 57, 0.13);
+  /* Formatação */
+  --cor-raio: 8px;
+  --cor-raio-grande: 8px;
+  --cor-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --cor-ease-2: cubic-bezier(0.4, 0, 0.2, 1);
+  /* Variáveis de legado (compatibilidade com templates) */
+  --ncs-green-dark: var(--cor-primaria);
+  --ncs-green-light: var(--cor-texto-medio);
+  --ncs-orange-amber: var(--cor-ouro);
+  --ncs-blue-light: var(--cor-fundo-escuro);
+  --ncs-blue-dark: var(--cor-texto);
+  /* Variáveis de legado para tema personalizado */
+  --theme-accent: var(--cor-primaria);
+  --theme-text: var(--cor-texto);
+  --theme-navbar: var(--cor-fundo-escuro);
+  --theme-workspace: var(--cor-fundo);
+  --theme-card: var(--cor-fundo-card);
+  --theme-widgetbar: var(--cor-fundo-escuro);
+  /* Variáveis da navbar (claro) */
+  --cor-nav-fundo: rgba(255, 255, 255, 0.45);
+  --cor-nav-fundo-rolagem: rgba(253, 254, 254, 0.96);
+  --cor-nav-borda: rgba(29, 36, 33, 0.1);
+  --cor-nav-texto: #1b2220;
+  --cor-nav-texto-medio: #5f6b66;
+  --cor-nav-primaria: var(--cor-primaria);
+  --cor-nav-ouro: var(--cor-ouro);
+  --cor-nav-ouro-brilho: rgba(193, 154, 60, 0.22);
+  --cor-nav-pilula-fundo: transparent;
+  --cor-nav-pilula-hover: rgba(29, 36, 33, 0.055);
+  --cor-nav-pilula-ativa: var(--cor-primaria);
+  --cor-nav-pilula-texto: #ffffff;
+  --cor-nav-vidro-borda: rgba(255, 255, 255, 0.6);
+  --cor-nav-sombra: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.03);
+  --cor-nav-avatar: var(--cor-primaria);
+  --cor-nav-dropdown-fundo: rgba(253, 254, 254, 0.96);
+  --cor-nav-dropdown-borda: rgba(29, 36, 33, 0.1);
+  --cor-nav-dropdown-sombra: 0 12px 48px rgba(13, 22, 18, 0.12);
+  --cor-nav-etiqueta-fundo: rgba(15, 157, 110, 0.07);
+  --cor-nav-etiqueta-hover: rgba(15, 157, 110, 0.14);
+  --cor-nav-busca-fundo: rgba(29, 36, 33, 0.045);
+  --cor-nav-busca-foco: rgba(15, 157, 110, 0.08);
+  --cor-nav-separador: rgba(29, 36, 33, 0.07);
+}
+
+html.dark {
+  /* Fundos */
+  --cor-fundo: #08100d;
+  --cor-fundo-escuro: #111a16;
+  --cor-fundo-card: #151f1a;
+  --cor-fundo-card-aninhado: #1b2620;
+  --cor-fundo-card-profundo: #233029;
+  /* Texto */
+  --cor-texto: #edf3ef;
+  --cor-texto-medio: #a1aaa5;
+  --cor-texto-fraco: #747f79;
+  /* Bordas */
+  --cor-borda: rgba(237, 243, 239, 0.11);
+  --cor-borda-forte: rgba(237, 243, 239, 0.2);
+  /* Sombras */
+  --cor-sombra: rgba(0, 0, 0, 0.46);
+  --cor-sombra-clara: rgba(255, 255, 255, 0.04);
+  --cor-sombra-interna: rgba(0, 0, 0, 0.34);
+  /* Cores primárias */
+  --cor-primaria: #54c996;
+  --cor-primaria-forte: #76dbad;
+  --cor-primaria-suave: rgba(84, 201, 150, 0.16);
+  /* Cores secundárias */
+  --cor-agua: #6bb7c4;
+  --cor-agua-suave: rgba(107, 183, 196, 0.15);
+  --cor-terra: #d0b182;
+  --cor-terra-suave: rgba(208, 177, 130, 0.16);
+  /* Cores de estado */
+  --cor-ouro: #e0b45a;
+  --cor-ouro-suave: rgba(224, 180, 90, 0.18);
+  --cor-sucesso: #54c996;
+  --cor-alerta: #e0b45a;
+  --cor-erro: #f17772;
+  --cor-erro-suave: rgba(241, 119, 114, 0.17);
+  /* Variáveis de legado (compatibilidade com templates) */
+  --ncs-green-dark: var(--cor-primaria);
+  --ncs-green-light: var(--cor-texto-medio);
+  --ncs-orange-amber: var(--cor-ouro);
+  --ncs-blue-light: var(--cor-fundo-escuro);
+  --ncs-blue-dark: var(--cor-texto);
+  /* Variáveis de legado para tema personalizado */
+  --theme-accent: var(--cor-primaria);
+  --theme-text: var(--cor-texto);
+  --theme-navbar: var(--cor-fundo-escuro);
+  --theme-workspace: var(--cor-fundo);
+  --theme-card: var(--cor-fundo-card);
+  --theme-widgetbar: var(--cor-fundo-escuro);
+  /* Variáveis da navbar (escuro) */
+  --cor-nav-fundo: rgba(15, 23, 42, 0.45);
+  --cor-nav-fundo-rolagem: rgba(21, 27, 25, 0.97);
+  --cor-nav-borda: rgba(233, 238, 236, 0.09);
+  --cor-nav-texto: #e9eeec;
+  --cor-nav-texto-medio: #8b9792;
+  --cor-nav-primaria: var(--cor-primaria);
+  --cor-nav-ouro: var(--cor-ouro);
+  --cor-nav-ouro-brilho: rgba(217, 180, 92, 0.2);
+  --cor-nav-pilula-fundo: transparent;
+  --cor-nav-pilula-hover: rgba(62, 196, 143, 0.12);
+  --cor-nav-pilula-ativa: rgba(62, 196, 143, 0.2);
+  --cor-nav-pilula-texto: #3ec48f;
+  --cor-nav-vidro-borda: rgba(255, 255, 255, 0.06);
+  --cor-nav-sombra: 0 1px 3px rgba(0, 0, 0, 0.2);
+  --cor-nav-avatar: #3ec48f;
+  --cor-nav-dropdown-fundo: rgba(21, 27, 25, 0.96);
+  --cor-nav-dropdown-borda: rgba(233, 238, 236, 0.09);
+  --cor-nav-dropdown-sombra: 0 12px 48px rgba(0, 0, 0, 0.5);
+  --cor-nav-etiqueta-fundo: rgba(62, 196, 143, 0.1);
+  --cor-nav-etiqueta-hover: rgba(62, 196, 143, 0.18);
+  --cor-nav-busca-fundo: rgba(255, 255, 255, 0.05);
+  --cor-nav-busca-foco: rgba(62, 196, 143, 0.14);
+  --cor-nav-separador: rgba(255, 255, 255, 0.06);
+}
+
+/* ─────────────────────────────────────────────
+   2. Tipografia premium — Outfit (display/números)
+      + Manrope (corpo/UI), números tabulares
+   ───────────────────────────────────────────── */
+html,
+body {
+  font-family:
+    'Manrope',
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    sans-serif;
+  letter-spacing: 0.01em;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  color: var(--cor-texto);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.nav-brand-text,
+.font-display,
+.widget-title,
+.widget-heading,
+.bento-block .text-2xl,
+.bento-block .text-xl,
+.bento-block .text-lg,
+.hero-copy h4,
+.section-title {
+  font-family: 'Outfit', 'Manrope', ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: -0.01em;
+}
+
+.bento-block .text-2xl,
+.bento-block .text-xl,
+.bento-block .text-lg,
+.bento-block .font-bold,
+.text-theme-accent,
+.text-theme-ok,
+.text-theme-error,
+.text-theme-alert {
+  font-variant-numeric: tabular-nums;
+}
+
+/* *:focus-visible para navegação por teclado */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--cor-primaria);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Barra de rolagem discreta e fina */
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  display: block;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--cor-borda-forte);
+  border-radius: 8px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--cor-texto-fraco);
+}
+
+/* ─────────────────────────────────────────────
+   3. Superfícies Soft-UI — neomorfismo refinado
+   (dupla sombra luz/sombra em tons do fundo,
+    gradiente de superfície sutil, hover que
+    "pressiona" via inset)
+   ───────────────────────────────────────────── */
+.neo-card {
+  background: linear-gradient(160deg, var(--cor-fundo-card), var(--cor-fundo-card-aninhado));
+  border-radius: var(--cor-raio);
+  border: 1px solid var(--cor-borda);
+  box-shadow:
+    3px 3px 8px var(--cor-sombra),
+    -3px -3px 8px var(--cor-sombra-clara),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  transition:
+    transform 0.25s var(--cor-ease-2),
+    box-shadow 0.25s var(--cor-ease-2),
+    border-color 0.25s var(--cor-ease-2);
+}
+
+html.dark .neo-card {
+  background: linear-gradient(160deg, var(--cor-fundo-card), var(--cor-fundo-card-aninhado));
+  border-color: var(--cor-borda-forte);
+  box-shadow:
+    3px 3px 10px var(--cor-sombra),
+    -3px -3px 8px var(--cor-sombra-clara),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.neopress:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--cor-primaria) 28%, transparent);
+  box-shadow:
+    5px 6px 14px var(--cor-sombra),
+    -5px -5px 12px var(--cor-sombra-clara),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.neopress:active {
+  transform: translateY(0) scale(0.985);
+}
+
+/* Botões neomórficos */
+.neo-btn {
+  background: linear-gradient(160deg, var(--cor-fundo-card), var(--cor-fundo-card-aninhado));
+  border: 1px solid var(--cor-borda);
+  border-radius: 10px;
+  color: var(--cor-texto);
+  box-shadow:
+    2px 2px 5px var(--cor-sombra),
+    -2px -2px 5px var(--cor-sombra-clara);
+  transition:
+    transform 0.18s var(--cor-ease-2),
+    box-shadow 0.18s var(--cor-ease-2),
+    background-color 0.18s var(--cor-ease-2);
+}
+.neo-btn:hover {
+  box-shadow:
+    inset 2px 2px 5px var(--cor-sombra-interna),
+    inset -2px -2px 5px var(--cor-sombra-clara);
+}
+.neo-btn:active {
+  transform: scale(0.97);
+  box-shadow:
+    inset 3px 3px 7px var(--cor-sombra-interna),
+    inset -3px -3px 7px var(--cor-sombra-clara);
+}
+
+/* Campos de entrada afundados (inset) */
+.neo-input,
+input[type='text'],
+input[type='password'],
+input[type='email'],
+input[type='number'],
+input[type='date'],
+input[type='time'],
+select,
+textarea {
+  background: var(--cor-fundo-card-aninhado);
+  border: 1px solid var(--cor-borda);
+  border-radius: 10px;
+  color: var(--cor-texto);
+  box-shadow:
+    inset 1.5px 1.5px 4px var(--cor-sombra-interna),
+    inset -1.5px -1.5px 4px var(--cor-sombra-clara);
+  transition:
+    border-color 0.2s var(--cor-ease-2),
+    box-shadow 0.2s var(--cor-ease-2);
+}
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: color-mix(in srgb, var(--cor-primaria) 55%, transparent);
+  box-shadow:
+    inset 1.5px 1.5px 4px var(--cor-sombra-interna),
+    0 0 0 3px var(--cor-primaria-suave);
+  outline: none;
+}
+
+/* Toggles segmentados (Win11) */
+.period-switch,
+.finance-switch {
+  background: var(--cor-fundo-card-aninhado) !important;
+  box-shadow: inset 1.5px 1.5px 4px var(--cor-sombra-interna);
+  padding: 3px;
+}
+.period-switch .active-period,
+.finance-switch .active-finance,
+#dashboard-appbar .period-toggle .active-period {
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--cor-primaria) 18%, var(--cor-fundo-card)),
+    var(--cor-fundo-card-aninhado)
+  ) !important;
+  color: var(--cor-primaria-forte) !important;
+  box-shadow:
+    1.5px 1.5px 3px var(--cor-sombra),
+    -1.5px -1.5px 3px var(--cor-sombra-clara);
+}
+
+/* ─────────────────────────────────────────────
+   4. Matriz de widgets — respiro entre blocos
+      e foco no conteúdo (menos linhas métricas)
+   ───────────────────────────────────────────── */
+.matrix-container {
+  --matrix-gap: 6px;
+  --matrix-pad: 12px;
+  padding: var(--matrix-pad) !important;
+  gap: var(--matrix-gap) !important;
+  height: calc(100vh - 114px) !important;
+  max-height: calc(100vh - 114px) !important;
+  background: transparent !important;
+}
+
+.matrix-container.editing {
+  background-image: linear-gradient(var(--cor-borda) 1px, transparent 1px),
+    linear-gradient(90deg, var(--cor-borda) 1px, transparent 1px) !important;
+  background-size: calc(100% / var(--grid-cols, 64)) calc(100% / var(--grid-rows, 40));
+  border-radius: var(--cor-raio);
+}
+
+.bento-block {
+  border-radius: var(--cor-raio);
+  background: rgba(255, 255, 255, 0.82) !important;
+  backdrop-filter: blur(12px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(160%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06) !important;
+}
+html.dark .bento-block {
+  background: rgba(22, 28, 26, 0.72) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+.bento-block .bg-slate-100,
+.bento-block .bg-slate-200,
+.bento-block .dark\:bg-slate-800,
+.bento-block .dark\:bg-slate-700,
+.bento-block .animate-pulse {
+  background: transparent !important;
+  border: none !important;
+}
+
+.bento-block:hover {
+  transform: none;
+}
+
+.bento-block .widget-content {
+  font-size: clamp(11px, 1.05vw, 12.5px);
+  line-height: 1.45;
+}
+
+/* Área interna mais limpa: tipografia equilibrada */
+.bento-block .widget-content .text-2xl {
+  font-size: clamp(18px, 2.2vw, 24px);
+}
+.bento-block .widget-content .text-xl {
+  font-size: clamp(15px, 1.8vw, 19px);
+}
+.bento-block .widget-content .text-lg {
+  font-size: clamp(14px, 1.6vw, 17px);
+}
+.bento-block .widget-content .text-xs {
+  font-size: clamp(10px, 0.95vw, 11.5px);
+}
+.bento-block .widget-content .text-[10px] {
+  font-size: 10px;
+}
+.bento-block .widget-content .text-[9px] {
+  font-size: 9px;
+}
+
+/* Linhas métricas e divisores internos: quase invisíveis */
+.bento-block .widget-content .border-b,
+.bento-block .widget-content .border-t,
+.bento-block .widget-content .border-slate-200,
+.bento-block .widget-content .border-slate-100,
+.bento-block table tr:not(:last-child),
+.bento-block thead tr {
+  border-color: var(--cor-borda) !important;
+}
+
+.bento-block .widget-content table th {
+  font-weight: 600 !important;
+  color: var(--cor-texto-fraco) !important;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  font-size: 9px !important;
+}
+
+/* Fundos planos internos (mini-células) viram superfícies sutis */
+.bento-block .widget-content .bg-slate-50,
+.bento-block .widget-content .bg-slate-100 {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+html.dark .bento-block .widget-content .bg-slate-50,
+html.dark .bento-block .widget-content .bg-slate-100 {
+  background-color: rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Barras de progresso finas e elegantes */
+.bento-block .widget-content [class$='h-1'],
+.bento-block .widget-content .h-1 {
+  height: 3px !important;
+  background: var(--cor-borda) !important;
+  border-radius: 4px;
+}
+.bento-block .widget-content .h-2 {
+  height: 4px !important;
+}
+
+/* Widgets híbridos com borda violeta legada → nova identidade */
+html:not(.custom-theme) .bento-block {
+  border-color: var(--cor-borda) !important;
+}
+html:not(.custom-theme) .widget-heading,
+html:not(.custom-theme) .widget-title {
+  border-bottom-color: var(--cor-borda) !important;
+}
+
+/* ─────────────────────────────────────────────
+   5. Modo edição — acento esmeralda + âmbar suave
+   ───────────────────────────────────────────── */
+.widget-edit-mode {
+  outline: 1.5px solid color-mix(in srgb, var(--cor-primaria) 60%, transparent) !important;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px var(--cor-primaria-suave) !important;
+}
+.widget-edit-mode.widget-selected {
+  outline: 2px solid var(--cor-ouro) !important;
+  box-shadow: 0 0 0 4px var(--cor-ouro-suave) !important;
+}
+.widget-edit-mode.widget-selected .resize-handle {
+  background: var(--cor-ouro) !important;
+}
+.resize-handle,
+.edit-mode-badge {
+  background: var(--cor-primaria) !important;
+  box-shadow: 0 2px 6px var(--cor-sombra);
+}
+.edit-mode-badge {
+  border: 2px solid var(--cor-fundo-card);
+}
+
+.bento-block.drag-ghost {
+  box-shadow: 0 22px 50px var(--cor-sombra) !important;
+  border-radius: var(--cor-raio);
+}
+.bento-block.drag-origin {
+  opacity: 0.4;
+  filter: saturate(0.6);
+}
+
+/* ─────────────────────────────────────────────
+   6. Navbar refino — glass restrito + acento
+   ───────────────────────────────────────────── */
+.nav-glass,
+#dashboard-appbar {
+  backdrop-filter: blur(22px) saturate(1.25);
+  -webkit-backdrop-filter: blur(22px) saturate(1.25);
+}
+
+.nav-premium {
+  --cor-nav-primaria: var(--cor-primaria-forte);
+}
+
+.nav-glass {
+  background: color-mix(in srgb, var(--cor-fundo-card) 78%, transparent) !important;
+  border-bottom-color: var(--cor-borda) !important;
+  box-shadow:
+    0 1px 3px var(--cor-sombra),
+    0 8px 28px rgba(0, 0, 0, 0.035);
+}
+html.dark .nav-glass {
+  background: color-mix(in srgb, var(--cor-fundo-card) 72%, transparent) !important;
+}
+
+.nav-pill.is-active {
+  background: linear-gradient(160deg, var(--cor-primaria), var(--cor-primaria-forte)) !important;
+  color: #fff !important;
+  box-shadow: 0 4px 14px var(--cor-primaria-suave) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+}
+.nav-pill.is-active::after {
+  background: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Appbar estilo barra de tarefas Windows 11 — corpo inteiro, ponta a ponta */
+#dashboard-appbar {
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  border-radius: 0 !important;
+  border: none !important;
+  border-top: 1px solid var(--cor-borda) !important;
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.04) !important;
+  background: color-mix(in srgb, var(--cor-fundo-card) 82%, transparent) !important;
+}
+html.dark #dashboard-appbar {
+  border-color: var(--cor-borda-forte) !important;
+}
+
+/* Espaço inferior para não cobrir o conteúdo */
+#content {
+  padding-bottom: 76px !important;
+}
+
+/* Menus suspensos com profundidade suave */
+.search-menu,
+.nav-mega,
+.edit-dropdown,
+#export-dropdown,
+.nav-mode-dropdown,
+.structure-menu,
+.dropdown-panel {
+  background: color-mix(in srgb, var(--cor-fundo-card) 88%, transparent) !important;
+  border: 1px solid var(--cor-borda) !important;
+  box-shadow:
+    0 20px 50px var(--cor-sombra),
+    0 4px 14px rgba(0, 0, 0, 0.06) !important;
+  border-radius: 16px;
+}
+
+/* ─────────────────────────────────────────────
+   7. Modais, toasts e overlays — movimento unificado
+   ───────────────────────────────────────────── */
+#add-widget-modal-panel,
+#command-palette > div > div,
+#calculator-modal > div,
+#quick-spreadsheet-modal > div,
+#product-registry-modal > div,
+#field-notebook-modal > div,
+#marketplace-modal .modal-box,
+#custom-theme-modal > div {
+  transition:
+    transform 0.3s var(--cor-ease),
+    opacity 0.3s var(--cor-ease);
+  border-radius: var(--cor-raio-grande) !important;
+  box-shadow:
+    0 30px 80px var(--cor-sombra),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+#widget-toast {
+  bottom: 76px !important;
+}
+#widget-toast-inner {
+  transition:
+    transform 0.32s var(--cor-ease),
+    opacity 0.32s var(--cor-ease);
+  border-radius: 12px;
+  box-shadow: 0 14px 40px var(--cor-sombra);
+  border: 1px solid var(--cor-borda-forte);
+}
+
+/* Fundos de overlay com leve blur */
+[class*='fixed inset-0'],
+.fixed.inset-0 {
+  background-color: color-mix(in srgb, var(--cor-texto) 45%, transparent) !important;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+/* ─────────────────────────────────────────────
+   8. Sistema de movimento — entradas escalonadas
+   ───────────────────────────────────────────── */
+@keyframes suPop {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes suFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes suFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes suShimmer {
+  0% {
+    background-position: -400px 0;
+  }
+  100% {
+    background-position: 400px 0;
+  }
+}
+
+/* Entrada escalonada dos widgets após o primeiro load */
+.matrix-container.su-stagger .bento-block {
+  animation: suPop 0.5s var(--cor-ease) both;
+  animation-delay: calc(var(--widget-index, 0) * 26ms);
+}
+
+/* Transição de página no SPA */
+#content.tab-switching > * {
+  animation: suFadeUp 0.38s var(--cor-ease) both;
+}
+
+/* Skeletons com shimmer premium */
+.skeleton-loader .skeleton-line,
+.skeleton-loader .skeleton-card {
+  background: linear-gradient(
+    90deg,
+    var(--cor-fundo-card-aninhado) 25%,
+    var(--cor-fundo-card-profundo) 50%,
+    var(--cor-fundo-card-aninhado) 75%
+  ) !important;
+  background-size: 800px 100%;
+  animation: suShimmer 1.4s linear infinite;
+}
+
+/* Ícone girando (sync) com easing consistente */
+.spin {
+  animation: suSpin 0.9s linear infinite !important;
+}
+@keyframes suSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Jiggle (edição de widgets) mais suave */
+@keyframes jiggle {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(0.8deg);
+  }
+  75% {
+    transform: rotate(-0.8deg);
+  }
+}
+.jiggle {
+  animation: jiggle 0.28s ease-in-out infinite;
+}
+
+/* ─────────────────────────────────────────────
+   9. Acessibilidade — respeito ao movimento
+   ───────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+  .matrix-container.su-stagger .bento-block {
+    animation: none !important;
+  }
+  #content.tab-switching > * {
+    animation: none !important;
+  }
+}
+
+/* ─────────────────────────────────────────────
+   10. Neutralização de legados — cores dispersas
+       viram os tokens da nova identidade
+   ───────────────────────────────────────────── */
+/* Acento de marca (esmeralda) e dourado para os estados de destaque */
+html:not(.custom-theme) [class*='text-emerald-'],
+html:not(.custom-theme) [class*='text-teal-'],
+html:not(.custom-theme) [class*='text-green-'],
+html:not(.custom-theme) [class*='text-sky-'],
+html:not(.custom-theme) [class*='text-cyan-'],
+html:not(.custom-theme) [class*='text-indigo-'],
+html:not(.custom-theme) [class*='text-blue-'] {
+  color: var(--cor-primaria) !important;
+}
+html:not(.custom-theme) [class*='text-amber-'],
+html:not(.custom-theme) [class*='text-orange-'],
+html:not(.custom-theme) [class*='text-yellow-'] {
+  color: var(--cor-ouro) !important;
+}
+html:not(.custom-theme) [class*='text-rose-'],
+html:not(.custom-theme) [class*='text-red-'],
+html:not(.custom-theme) [class*='text-pink-'] {
+  color: var(--cor-erro) !important;
+}
+
+html:not(.custom-theme) [class*='bg-emerald-100'],
+html:not(.custom-theme) [class*='bg-emerald-50'],
+html:not(.custom-theme) [class*='bg-teal-100'],
+html:not(.custom-theme) [class*='bg-teal-50'] {
+  background-color: var(--cor-primaria-suave) !important;
+}
+html:not(.custom-theme) [class*='bg-rose-100'],
+html:not(.custom-theme) [class*='bg-rose-50'] {
+  background-color: var(--cor-erro-suave) !important;
+}
+
+/* Texto de apoio neutro corrige escala de cinza antiga (slate/violeta) */
+html:not(.custom-theme) .text-slate-900,
+html:not(.custom-theme) .text-slate-800 {
+  color: var(--cor-texto) !important;
+}
+html:not(.custom-theme) .text-slate-500,
+html:not(.custom-theme) .text-slate-600,
+html:not(.custom-theme) .text-slate-700 {
+  color: var(--cor-texto-medio) !important;
+}
+html:not(.custom-theme) .text-slate-400,
+html:not(.custom-theme) .text-slate-300 {
+  color: var(--cor-texto-fraco) !important;
+}
+
+/* O rótulo de status do sistema */
+html:not(.custom-theme) #dashboard-appbar {
+  border-top-color: var(--cor-borda) !important;
+}
+
+/* Acento do tema segue a marca mesmo em tema livre */
+html.custom-theme:not(.custom-theme-workspace) #content {
+  background: transparent !important;
+}
+
+:where(*, *::before, *::after) {
+  letter-spacing: 0 !important;
+}
+
+html {
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  height: auto !important;
+  min-height: 100%;
+}
+
+body {
+  min-height: 100vh;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  color: var(--cor-texto);
+}
+
+body:has(.matrix-container) {
+  overflow: hidden !important;
+}
+
+html,
+body,
+button,
+input,
+select,
+textarea {
+  font-family:
+    'IBM Plex Sans',
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.nav-brand-text,
+.font-display,
+.widget-title,
+.widget-heading,
+.crud-title,
+.guide-title,
+.section-title {
+  font-family: 'Sora', 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif !important;
+}
+
+::selection {
+  background: var(--cor-primaria-suave);
+  color: var(--cor-texto);
+}
+
+#content {
+  min-height: calc(100vh - var(--cor-nav-altura, 64px));
+  padding-bottom: clamp(24px, 4vw, 44px) !important;
+}
+
+body:has(#dashboard-appbar) #content {
+  padding-bottom: 78px !important;
+}
+
+/* Navigation */
+.nav-glass {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--cor-fundo-card) 88%, transparent),
+    color-mix(in srgb, var(--cor-fundo-card-aninhado) 78%, transparent)
+  ) !important;
+  border-bottom: 1px solid var(--cor-borda) !important;
+  box-shadow:
+    0 1px 0 var(--cor-sombra-clara),
+    0 10px 28px rgba(18, 34, 29, 0.07) !important;
+}
+
+html.dark .nav-glass {
+  box-shadow:
+    0 1px 0 var(--cor-sombra-clara),
+    0 12px 34px rgba(0, 0, 0, 0.32) !important;
+}
+
+.nav-main {
+  max-width: none;
+  padding-inline: clamp(12px, 2vw, 24px);
+}
+
+.nav-brand-text {
+  color: var(--cor-texto);
+  font-size: 1rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.nav-brand::before {
+  content: '';
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  background: linear-gradient(135deg, var(--cor-primaria), var(--cor-agua)),
+    linear-gradient(45deg, transparent 45%, rgba(255, 255, 255, 0.55) 45% 55%, transparent 55%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.32),
+    0 8px 18px var(--cor-primaria-suave);
+}
+
+.nav-pill {
+  min-height: 34px;
+  border-radius: 7px;
+  border: 1px solid transparent;
+  font-size: 0.8125rem;
+  color: var(--cor-texto-medio);
+}
+
+.nav-pill:hover {
+  border-color: var(--cor-borda);
+  background: color-mix(in srgb, var(--cor-fundo-card-profundo) 72%, transparent) !important;
+}
+
+.nav-pill.is-active {
+  background: linear-gradient(
+    135deg,
+    var(--cor-primaria),
+    color-mix(in srgb, var(--cor-primaria) 72%, var(--cor-agua))
+  ) !important;
+  color: #fff !important;
+  border-color: color-mix(in srgb, var(--cor-primaria) 62%, transparent);
+  box-shadow: 0 8px 20px var(--cor-primaria-suave) !important;
+}
+
+.nav-pill.is-active::after {
+  display: none;
+}
+
+.nav-mega,
+.nav-user-dropdown,
+.nav-mode-dropdown,
+.search-menu,
+.edit-dropdown,
+#export-dropdown {
+  border-radius: 8px !important;
+  background: color-mix(in srgb, var(--cor-fundo-card) 92%, transparent) !important;
+  border: 1px solid var(--cor-borda) !important;
+  box-shadow: 0 18px 46px var(--cor-sombra) !important;
+}
+
+/* Dashboard matrix */
+.matrix-container {
+  --matrix-gap: 8px;
+  --matrix-pad: 14px;
+  padding: var(--matrix-pad) !important;
+  gap: var(--matrix-gap) !important;
+  height: calc(100vh - 138px) !important;
+  max-height: calc(100vh - 138px) !important;
+}
+
+.matrix-container .bento-block {
+  aspect-ratio: auto !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+}
+
+.bento-block,
+.neo-card,
+.form-card,
+.stat-card,
+.cultura-card,
+.detail-panel,
+.table-wrap {
+  border-radius: 8px !important;
+  border: 1px solid var(--cor-borda) !important;
+  background: linear-gradient(
+    180deg,
+    var(--cor-fundo-card),
+    var(--cor-fundo-card-aninhado)
+  ) !important;
+  box-shadow:
+    0 1px 0 var(--cor-sombra-clara),
+    0 10px 24px var(--cor-sombra) !important;
+}
+
+.bento-block:hover,
+.form-card:hover,
+.stat-card:hover,
+.cultura-card:hover {
+  transform: none !important;
+  border-color: color-mix(in srgb, var(--cor-primaria) 34%, var(--cor-borda)) !important;
+  box-shadow:
+    0 1px 0 var(--cor-sombra-clara),
+    0 14px 28px var(--cor-sombra) !important;
+}
+
+.bento-block .widget-content {
+  font-size: 12px !important;
+  line-height: 1.42;
+}
+
+.bento-block .widget-content .text-2xl {
+  font-size: 1.375rem !important;
+}
+.bento-block .widget-content .text-xl {
+  font-size: 1.125rem !important;
+}
+.bento-block .widget-content .text-lg {
+  font-size: 1rem !important;
+}
+.bento-block .widget-content .text-xs {
+  font-size: 0.75rem !important;
+}
+
+.bento-block table,
+.table-wrap table {
+  border-collapse: separate !important;
+  border-spacing: 0;
+}
+
+.bento-block th,
+.table-wrap th,
+th {
+  background: color-mix(in srgb, var(--cor-fundo-card-profundo) 72%, transparent) !important;
+  color: var(--cor-texto-medio) !important;
+  font-weight: 700 !important;
+  font-size: 0.6875rem !important;
+  text-transform: uppercase;
+}
+
+.bento-block td,
+.table-wrap td,
+td {
+  color: var(--cor-texto) !important;
+  border-color: var(--cor-borda) !important;
+}
+
+/* CRUD and guide pages */
+.crud-container,
+.guide-container {
+  width: min(100% - 24px, 1320px);
+  max-width: 1320px !important;
+  margin: clamp(18px, 3vw, 34px) auto !important;
+  padding: 0 !important;
+}
+
+.crud-header,
+.guide-header {
+  min-height: 48px;
+  padding: 0 2px 12px;
+  border-bottom: 1px solid var(--cor-borda);
+}
+
+.crud-title,
+.guide-title {
+  color: var(--cor-texto) !important;
+  font-size: 1.35rem !important;
+  font-weight: 800 !important;
+}
+
+.crud-title::before,
+.guide-title::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 24px;
+  margin-right: 10px;
+  border-radius: 3px;
+  vertical-align: -5px;
+  background: linear-gradient(180deg, var(--cor-primaria), var(--cor-ouro));
+}
+
+.form-card {
+  padding: clamp(18px, 2vw, 26px) !important;
+  margin-bottom: 18px !important;
+}
+
+.form-card h2,
+.tab-content h2 {
+  color: var(--cor-texto) !important;
+  font-family: 'Sora', 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif !important;
+  font-size: 0.98rem !important;
+  font-weight: 800 !important;
+}
+
+.form-grid {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
+  gap: 14px !important;
+}
+
+.form-group label,
+label {
+  color: var(--cor-texto-medio) !important;
+  font-size: 0.75rem !important;
+  font-weight: 700 !important;
+}
+
+input:not([type='checkbox']):not([type='radio']):not([type='color']),
+select,
+textarea,
+.neo-input {
+  min-height: 38px;
+  border-radius: 7px !important;
+  border: 1px solid var(--cor-borda-forte) !important;
+  background: color-mix(
+    in srgb,
+    var(--cor-fundo-card) 74%,
+    var(--cor-fundo-card-aninhado)
+  ) !important;
+  color: var(--cor-texto) !important;
+  box-shadow: inset 0 1px 2px var(--cor-sombra-interna) !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--cor-primaria) !important;
+  box-shadow: 0 0 0 3px var(--cor-primaria-suave) !important;
+}
+
+.btn-primary,
+.btn-secondary,
+.btn-danger,
+.neo-btn,
+.widgetbar-pill,
+.widgetbar-pill-icon,
+.edit-pill,
+.nav-mode-btn,
+.nav-mode-panel-action,
+button[type='submit'] {
+  border-radius: 7px !important;
+  font-weight: 700 !important;
+  transition:
+    transform 0.16s var(--cor-ease-2),
+    border-color 0.16s var(--cor-ease-2),
+    background-color 0.16s var(--cor-ease-2),
+    box-shadow 0.16s var(--cor-ease-2) !important;
+}
+
+.btn-primary,
+button[type='submit'] {
+  background: linear-gradient(
+    135deg,
+    var(--cor-primaria),
+    color-mix(in srgb, var(--cor-primaria) 76%, var(--cor-agua))
+  ) !important;
+  color: #fff !important;
+  border: 1px solid color-mix(in srgb, var(--cor-primaria) 70%, transparent) !important;
+  box-shadow: 0 8px 18px var(--cor-primaria-suave) !important;
+}
+
+.btn-secondary,
+.neo-btn {
+  background: var(--cor-fundo-card-aninhado) !important;
+  color: var(--cor-texto) !important;
+  border: 1px solid var(--cor-borda) !important;
+}
+
+.btn-danger {
+  background: var(--cor-erro-suave) !important;
+  color: var(--cor-erro) !important;
+  border: 1px solid color-mix(in srgb, var(--cor-erro) 34%, transparent) !important;
+}
+
+.btn-primary:hover,
+.btn-secondary:hover,
+.btn-danger:hover,
+.neo-btn:hover,
+.widgetbar-pill:hover,
+.edit-pill:hover {
+  transform: translateY(-1px);
+}
+
+.sub-tabs {
+  gap: 6px !important;
+  padding: 8px !important;
+  border: 1px solid var(--cor-borda) !important;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--cor-fundo-card) 78%, transparent);
+}
+
+.sub-tab {
+  border-radius: 6px !important;
+  color: var(--cor-texto-medio) !important;
+  background: transparent !important;
+  border: 1px solid transparent !important;
+}
+
+.sub-tab:hover {
+  color: var(--cor-primaria) !important;
+  border-color: var(--cor-borda) !important;
+}
+
+.sub-tab.active {
+  color: #fff !important;
+  background: var(--cor-primaria) !important;
+  border-color: var(--cor-primaria) !important;
+}
+
+.stats-grid,
+.cultura-grid {
+  gap: 12px !important;
+}
+
+.stat-label {
+  color: var(--cor-texto-medio) !important;
+  font-size: 0.6875rem !important;
+}
+
+.stat-value,
+.cultura-icon,
+.detail-nome {
+  color: var(--cor-primaria) !important;
+}
+
+.cultura-card {
+  min-height: 124px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 8px;
+}
+
+.empty-state {
+  border: 1px dashed var(--cor-borda-forte);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--cor-fundo-card) 64%, transparent);
+  color: var(--cor-texto-medio) !important;
+}
+
+.toast {
+  border-radius: 8px !important;
+  box-shadow: 0 14px 38px var(--cor-sombra);
+}
+
+/* Bottom command bar */
+#dashboard-appbar {
+  /* ERA 58px, e brigava com os 40px do widgetbar-windows.css e os 56px
+     reservados em liquid-glass.css. Três alturas, um elemento.
+     Agora consome a variável — que é a única fonte. */
+  min-height: var(--widgetbar-altura, 56px);
+  padding: 8px 14px !important;
+  gap: 10px !important;
+  color: var(--cor-texto) !important;
+  background: color-mix(in srgb, var(--cor-fundo-card) 88%, transparent) !important;
+  border-top: 1px solid var(--cor-borda) !important;
+}
+
+#dashboard-appbar .widgetbar-section-core,
+#dashboard-appbar .right-section-normal {
+  gap: 8px !important;
+}
+
+#dashboard-appbar .period-toggle,
+#dashboard-appbar .financial-toggle,
+.period-switch,
+.finance-switch {
+  min-height: 34px;
+  padding: 3px !important;
+  border: 1px solid var(--cor-borda);
+  border-radius: 8px !important;
+  background: var(--cor-fundo-card-aninhado) !important;
+}
+
+#dashboard-appbar .period-toggle div,
+#dashboard-appbar .financial-toggle button,
+.period-switch div,
+.finance-switch div {
+  min-width: 38px;
+  border-radius: 6px !important;
+  color: var(--cor-texto-medio);
+}
+
+#dashboard-appbar .period-toggle .active-period,
+#dashboard-appbar .financial-toggle button.active,
+.period-switch .active-period,
+.finance-switch .active-finance {
+  background: var(--cor-primaria) !important;
+  color: #fff !important;
+  box-shadow: none !important;
+}
+
+.widgetbar-pill,
+.widgetbar-pill-icon,
+.edit-pill {
+  min-height: 34px;
+  border: 1px solid var(--cor-borda) !important;
+  background: var(--cor-fundo-card-aninhado) !important;
+  color: var(--cor-texto) !important;
+  box-shadow: none !important;
+}
+
+.preset-card,
+.preset-block {
+  border-radius: 7px !important;
+  border-color: var(--cor-borda) !important;
+  background: var(--cor-fundo-card-aninhado) !important;
+}
+
+.preset-card.active,
+.preset-card.active-preset,
+.preset-block.active {
+  background: var(--cor-primaria-suave) !important;
+  border-color: var(--cor-primaria) !important;
+  color: var(--cor-primaria) !important;
+}
+
+html:not(.custom-theme) [class*='text-cyan-'],
+html:not(.custom-theme) [class*='text-blue-'],
+html:not(.custom-theme) [class*='text-sky-'] {
+  color: var(--cor-agua) !important;
+}
+
+html:not(.custom-theme) [class*='bg-cyan-'],
+html:not(.custom-theme) [class*='bg-blue-'],
+html:not(.custom-theme) [class*='bg-sky-'] {
+  background-color: var(--cor-agua-suave) !important;
+}
+
+html:not(.custom-theme) [class*='text-orange-'],
+html:not(.custom-theme) [class*='text-amber-'],
+html:not(.custom-theme) [class*='text-yellow-'] {
+  color: var(--cor-ouro) !important;
+}
+
+@media (max-width: 1120px) {
+  .nav-main {
+    gap: 6px;
+  }
+
+  .nav-pill {
+    padding-inline: 10px;
+  }
+
+  #dashboard-appbar {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+}
+
+@media (max-width: 760px) {
+  /* Aqui o flex-wrap:wrap era o que empurrava o .nav-right para uma segunda
+     linha: a barra media 110px em vez de 64px, 15% da tela de celular, em
+     TODAS as telas.      A intencao original era colar os .nav-pills numa linha
+     propria — mas eles estao display:none no celular, entao a linha extra
+     ficava vazia e sobrava altura.
+     Medido a 393px, tudo cabe numa linha: 44 (tema) + 99 (marca) + 201
+     (direita) + gaps = ~382px. Entao e melhor travar a altura e nao quebrar.
+     ATENCAO: se um dia os .nav-pills voltarem a aparecer no celular, o
+     flex-basis:100% abaixo deixa de fazer sentido e este nowrap precisa ser
+     revisto junto. */
+  .nav-main {
+    height: var(--cor-nav-altura, 64px);
+    flex-wrap: nowrap;
+    padding-block: 0;
+  }
+
+  .nav-pills {
+    order: 3;
+    flex-basis: 100%;
+  }
+
+  .nav-pill {
+    min-height: 32px;
+    font-size: 0.75rem;
+  }
+
+  .crud-header,
+  .guide-header {
+    align-items: flex-start !important;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .form-card {
+    padding: 16px !important;
+  }
+
+  .matrix-container {
+    --matrix-gap: 6px;
+    --matrix-pad: 8px;
+    height: calc(100vh - 166px) !important;
+    max-height: calc(100vh - 166px) !important;
+  }
+
+  body:has(#dashboard-appbar) #content {
+    padding-bottom: 92px !important;
+  }
+}
+
+/* _____________________________________________
+   14. Presets nomeados (cafe/oceano/...) — mesma neutralizacao dos modos
+   nativos + cor de metricas/anos do modo (--pal-metrica).
+   O <html> recebe data-preset quando o preset esta ativo.
+   _____________________________________________ */
+html.custom-theme[data-preset] .bento-block {
+  border-color: var(--cor-borda) !important;
+}
+html.custom-theme[data-preset] .widget-heading,
+html.custom-theme[data-preset] .widget-title {
+  border-bottom-color: var(--cor-borda) !important;
+}
+html.custom-theme[data-preset] [class*='text-emerald-'],
+html.custom-theme[data-preset] [class*='text-teal-'],
+html.custom-theme[data-preset] [class*='text-green-'],
+html.custom-theme[data-preset] [class*='text-sky-'],
+html.custom-theme[data-preset] [class*='text-cyan-'],
+html.custom-theme[data-preset] [class*='text-indigo-'],
+html.custom-theme[data-preset] [class*='text-blue-'] {
+  color: var(--cor-primaria) !important;
+}
+html.custom-theme[data-preset] [class*='text-amber-'],
+html.custom-theme[data-preset] [class*='text-orange-'],
+html.custom-theme[data-preset] [class*='text-yellow-'] {
+  color: var(--cor-ouro) !important;
+}
+html.custom-theme[data-preset] [class*='text-rose-'],
+html.custom-theme[data-preset] [class*='text-red-'],
+html.custom-theme[data-preset] [class*='text-pink-'] {
+  color: var(--cor-erro) !important;
+}
+html.custom-theme[data-preset] [class*='bg-emerald-100'],
+html.custom-theme[data-preset] [class*='bg-emerald-50'],
+html.custom-theme[data-preset] [class*='bg-teal-100'],
+html.custom-theme[data-preset] [class*='bg-teal-50'] {
+  background-color: var(--cor-primaria-suave) !important;
+}
+html.custom-theme[data-preset] [class*='bg-rose-100'],
+html.custom-theme[data-preset] [class*='bg-rose-50'] {
+  background-color: var(--cor-erro-suave) !important;
+}
+html.custom-theme[data-preset] .text-slate-900,
+html.custom-theme[data-preset] .text-slate-800 {
+  color: var(--cor-texto) !important;
+}
+html.custom-theme[data-preset] .text-slate-500,
+html.custom-theme[data-preset] .text-slate-600,
+html.custom-theme[data-preset] .text-slate-700 {
+  color: var(--cor-texto-medio) !important;
+}
+html.custom-theme[data-preset] .text-slate-400,
+html.custom-theme[data-preset] .text-slate-300 {
+  color: var(--cor-texto-fraco) !important;
+}
+html.custom-theme[data-preset] #dashboard-appbar {
+  border-top-color: var(--cor-borda) !important;
+}
+html.custom-theme[data-preset] [class*='text-cyan-'],
+html.custom-theme[data-preset] [class*='text-blue-'],
+html.custom-theme[data-preset] [class*='text-sky-'] {
+  color: var(--cor-agua, var(--cor-primaria)) !important;
+}
+html.custom-theme[data-preset] [class*='bg-cyan-'],
+html.custom-theme[data-preset] [class*='bg-blue-'],
+html.custom-theme[data-preset] [class*='bg-sky-'] {
+  background-color: var(--cor-agua-suave, var(--cor-primaria-suave)) !important;
+}
+
+/* Metricas (1.400.000) e anos/cabecalhos (2024) na cor do modo.
+   Alertas (rose/red/amber) mantem a semantica e NAO sao recoloridos. */
+[id^='kpi-']
+  p.text-2xl:not([class*='text-rose-']):not([class*='text-red-']):not([class*='text-pink-']):not(
+    [class*='text-amber-']
+  ):not([class*='text-orange-']):not([class*='text-yellow-']),
+[id^='kpi-']
+  p.text-3xl:not([class*='text-rose-']):not([class*='text-red-']):not([class*='text-pink-']):not(
+    [class*='text-amber-']
+  ):not([class*='text-orange-']):not([class*='text-yellow-']),
+[id^='kpi-']
+  p.text-4xl:not([class*='text-rose-']):not([class*='text-red-']):not([class*='text-pink-']):not(
+    [class*='text-amber-']
+  ):not([class*='text-orange-']):not([class*='text-yellow-']),
+[id^='kpi-']
+  p.text-xl:not([class*='text-rose-']):not([class*='text-red-']):not([class*='text-pink-']):not(
+    [class*='text-amber-']
+  ):not([class*='text-orange-']):not([class*='text-yellow-']),
+.preview-kpi .value {
+  color: var(--pal-metrica, var(--cor-primaria)) !important;
+}
+.bento-block table thead th {
+  color: var(--pal-metrica, var(--cor-primaria)) !important;
+}

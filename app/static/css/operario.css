@@ -1,0 +1,51 @@
+/* Ampliagro Operário — layout simples para o app do funcionário (mobile-first) */
+.operario-layout {
+  background: #f1f5f9;
+  min-height: 100vh;
+}
+
+.operario-header {
+  background: linear-gradient(135deg, #0f9d6e, #0b7a56);
+  color: #fff;
+  padding: 0.6rem 0 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.operario-nav {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.operario-nav a {
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.55rem 0.9rem;
+  border-radius: 0.6rem 0.6rem 0 0;
+}
+
+.operario-nav a:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.operario-nav a.active {
+  color: #0b7a56;
+  background: #f1f5f9;
+}
+
+.operario-fazenda-badge {
+  background: rgba(0, 0, 0, 0.18);
+  padding: 0.3rem 1rem;
+  font-size: 0.8rem;
+  color: #fff;
+}
+
+.operario-main {
+  padding: 1rem 0 3rem;
+}
+
+.operario-avatar {
+  flex-shrink: 0;
+}

@@ -1,0 +1,173 @@
+==============================================================================
+COMPARATIVO 100x50 REVERIFICADO CONTRA O CODIGO DE HOJE
+Gerado por: scripts/reverifica_comparativo.py
+Cada linha tem DUAS colunas: o que a FOLHA diz, e o que o CODIGO diz.
+Onde discordam, o codigo ganha - a folha foi escrita antes.
+==============================================================================
+
+Ficheiros de execucao analisados: 504
+  (exclui tests/ e scripts/ - a propria folha exclui testes)
+
+------------------------------------------------------------------------------
+ID    Dimensao                              Folha  Codigo  Evidencia
+------------------------------------------------------------------------------
+F01   LCDPR — Livro Caixa do Produtor Rura  C      C       app/services/lcdpr.py:52
+F02   NF-e do produtor rural                C      C       app/services/nfe.py:31
+F03   MDF-e — manifesto eletronico          N      N       nenhuma ocorrencia em codigo de execucao
+F04   Certificado A1 / ICP-Brasil           N      C       app/services/nfe.py:51
+F05   Reforma Tributaria (IBS/CBS)          N      N       nenhuma ocorrencia em codigo de execucao
+F06   NCM / TIPI                            E      C       app/ia/ingestao/bridge.py:84
+F07   DRE rural por cultura e safra         E      C       app/urls.py:219
+F08   Presumido x Resultado                 N      C       app/models/core.py:170
+F10   Contas a pagar e a receber            N      C       app/models/financeiro.py:47
+F11   Fluxo de caixa                        C      C       app/urls.py:56
+F12   Conciliacao bancaria por OFX          C      C       app/api/serializers.py:19
+F13   Custo por talhao e por hectare        C      C       app/services/custo_talhao.py:101
+F14   Orcado x realizado                    N      C       app/services/custo_talhao.py:256
+F15   Benchmark de mercado entre produtore  N      C       app/api/views/amplia_palco.py:173
+F16   Credito rural e seguro agricola       N      C       app/services/compliance_ambiental.py:17
+F17   Projecao de IR ao longo do ano        N      C       app/ia/intents3.py:1351
+F18   Folha de pagamento rural              N      C       app/management/commands/seed_muzambinho_demo.py:76
+G01   Proveniencia de dado em codigo        C      C       app/ia/proveniencia.py:1
+G02   Auditoria de execucao de IA           C      C       app/models/ia.py:58
+G03   Isolamento multi-empresa por tabela   C      C       app/middleware.py:41
+G04   Multi-propriedade e multi-safra       C      C       app/models/core.py:80
+G05   Carbono, ESG e MRV                    N      C       app/ia/palco.py:112
+L01   Estoque de insumos com lote e valida  C      C       app/models/aquatico.py:26
+L02   Romaneio, pesagem e balanca           C      C       app/amplia_mcp/__init__.py:650
+L03   Compras e pedidos                     C      C       app/bot.py:10
+L04   Beneficiamento e armazenagem          N      C       app/ia/dinamico_intents.py:605
+L05   Contratos de safra e torrentes        N      N       nenhuma ocorrencia em codigo de execucao
+M01   Telemetria de maquina                 C      C       app/audit.py:19
+M02   John Deere Operations Center          N      C       app/ia/sandbox.py:260
+M03   Stara, Climate FieldView, Solinftec   N      C       app/ia/ingestao/bridge.py:8
+M04   ISOBUS (ISO 11783)                    N      C       app/services/top_globais.py:23
+M05   OTA — actualizacao de firmware        N      C       app/ia/iot.py:322
+M07   IA que corre no dispositivo           C      C       app/static/js/ia-local/alerta-feed.js:21
+M08   Assistente conversacional e MCP       C      C       app/ia/chamado.py:551
+M09   API publica documentada               C      C       app/api/views/agronomia.py:4
+O01   Caderno de campo digital              C      C       app/models/caderno.py:1
+O02   Offline real — escrita sem rede       C      C       app/static/js/amplia.js:329
+O03   Fotos georreferenciadas               C      C       app/models/caderno.py:52
+O04   Gestao de tarefas com responsavel     C      C       app/models/caderno.py:25
+O05   Planejamento de safra e cronograma    C      C       app/models/estoque.py:83
+O06   Mapas e geoespaciamento de talhoes    C      C       app/models/caderno.py:49
+O07   Imagens de satelite (NDVI)            C      C       app/urls.py:91
+O08   Drones e imageamento aereo            N      C       app/ia/intents3.py:165
+O09   MIP — manejo integrado de pragas      C      C       app/urls.py:49
+P01   Rebanho individual (brinco)           C      C       app/models/culturas_exoticas.py:71
+P02   Calendario sanitario e vacinacao      C      C       app/ia/intents3.py:888
+P03   Producao por animal e por ciclo       C      C       app/admin.py:19
+X02   Conectores prontos                    N      C       app/api/urls.py:323
+X06   WhatsApp como interface de operacao   N      C       app/api/views/financeiro_banco.py:378
+X07   Exportacao de dados em formato abert  C      C       app/api/urls.py:77
+
+==============================================================================
+IGUAIS: 31    DISCORDAM: 19
+==============================================================================
+
+### ONDE A FOLHA ESTA ERRADA OU DESACTUALIZADA
+
+F04  Certificado A1 / ICP-Brasil
+   folha diz NAO tem; o codigo TEM  -> app/services/nfe.py:51
+   Construido DEPOIS da folha, ou a folha procurou mal.
+
+F06  NCM / TIPI
+
+F07  DRE rural por cultura e safra
+
+F08  Presumido x Resultado
+   folha diz NAO tem; o codigo TEM  -> app/models/core.py:170
+   Construido DEPOIS da folha, ou a folha procurou mal.
+
+F10  Contas a pagar e a receber
+   folha diz NAO tem; o codigo TEM  -> app/models/financeiro.py:47
+   Construido DEPOIS da folha, ou a folha procurou mal.
+
+F14  Orcado x realizado
+   folha diz NAO tem; o codigo TEM  -> app/services/custo_talhao.py:256
+   Construido DEPOIS da folha, ou a folha procurou mal.
+
+F15  Benchmark de mercado entre produtore
+   folha diz NAO tem; o codigo TEM  -> app/api/views/amplia_palco.py:173
+   Construido DEPOIS da folha, ou a folha procurou mal.
+
+F16  Credito rural e seguro agricola
+   folha diz NAO tem; o codigo TEM  -> app/services/compliance_ambiental.py:17
+   Construido DEPOIS da folha, ou a folha procurou mal.
+
+F17  Projecao de IR ao longo do ano
+   folha diz NAO tem; o codigo TEM  -> app/ia/intents3.py:1351
+   Construido DEPOIS da folha, ou a folha procurou mal.
+
+F18  Folha de pagamento rural
+   folha diz NAO tem; o codigo TEM  -> app/management/commands/seed_muzambinho_demo.py:76
+   Construido DEPOIS da folha, ou a folha procurou mal.
+
+G05  Carbono, ESG e MRV
+   folha diz NAO tem; o codigo TEM  -> app/ia/palco.py:112
+   Construido DEPOIS da folha, ou a folha procurou mal.
+
+L04  Beneficiamento e armazenagem
+   folha diz NAO tem; o codigo TEM  -> app/ia/dinamico_intents.py:605
+   Construido DEPOIS da folha, ou a folha procurou mal.
+
+M02  John Deere Operations Center
+   folha diz NAO tem; o codigo TEM  -> app/ia/sandbox.py:260
+   Construido DEPOIS da folha, ou a folha procurou mal.
+
+M03  Stara, Climate FieldView, Solinftec
+   folha diz NAO tem; o codigo TEM  -> app/ia/ingestao/bridge.py:8
+   Construido DEPOIS da folha, ou a folha procurou mal.
+
+M04  ISOBUS (ISO 11783)
+   folha diz NAO tem; o codigo TEM  -> app/services/top_globais.py:23
+   Construido DEPOIS da folha, ou a folha procurou mal.
+
+M05  OTA — actualizacao de firmware
+   folha diz NAO tem; o codigo TEM  -> app/ia/iot.py:322
+   Construido DEPOIS da folha, ou a folha procurou mal.
+
+O08  Drones e imageamento aereo
+   folha diz NAO tem; o codigo TEM  -> app/ia/intents3.py:165
+   Construido DEPOIS da folha, ou a folha procurou mal.
+
+X02  Conectores prontos
+   folha diz NAO tem; o codigo TEM  -> app/api/urls.py:323
+   Construido DEPOIS da folha, ou a folha procurou mal.
+
+X06  WhatsApp como interface de operacao
+   folha diz NAO tem; o codigo TEM  -> app/api/views/financeiro_banco.py:378
+   Construido DEPOIS da folha, ou a folha procurou mal.
+
+
+==============================================================================
+A LEITURA HONESTA DESTE TRABALHO
+==============================================================================
+
+Um veredicto 'N' significa 'NAO ENCONTREI'. Nao significa 'nao existe'.
+Tres razoes pelas quais um detector pode falhar, todas vistas nesta sessao:
+
+  1. O NOME. O scanner so reconhece padroes em ingles. 'SENHA' e 'API_KEY'
+     passam limpos num ficheiro em portugues. Este codigo e' em portugues.
+  2. A FORMA. A capacidade existe mas com outro nome, dentro de outro
+     ficheiro, ou construida a partir de varias pecas menores.
+  3. A TEMPORALIDADE. A folha foi escrita antes do codigo existir.
+
+Por isso os 20 'N' da folha sao HIPOTESES, nao veredictos. O trabalho
+certo e confirmar cada uma a mao antes de a transformar em plano - e o que
+F10 e F14 provaram logo a seguir: as duas foram marcadas 'N' e o codigo
+tinha as duas.
+
+O que este script NAO faz, por desenho:
+  - nao escreve os 20 criterios que faltam (sao semanas de trabalho cada)
+  - nao inventa evidencia para justificar um 'C'
+  - nao chama 'feito' a um detector que nao achou nada
+
+Para transformar isto em plano, a pergunta a responder e por ordem:
+  F10  contas a pagar/receber TEM tela? o servico existe; falta a view
+  F14  orcado x realizado TEM tela? o servico existe; falta a view
+  F17  projecao de IR - o IR rural tem regra propria e o dado de custo
+        EXISTE (F13/F14). Esta e' a peca com maior razao de custo-beneficio
+        do grupo B inteiro, porque reusa o que ja foi feito.
+  M09  API publica documentada - e' o que transforma 'app' em 'produto'

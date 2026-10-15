@@ -1,0 +1,142 @@
+<div id="edit-modal" class="hidden fixed inset-0 z-[9998] items-center justify-center bg-black/60 p-3" style="display:none;">
+    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden border border-slate-200 dark:border-slate-700">
+        <div class="flex items-center justify-between px-5 py-3 border-b border-slate-200 dark:border-slate-700">
+            <h3 class="edit-modal-title text-sm font-bold text-slate-700 dark:text-slate-200">Editar</h3>
+            <button onclick="closeEditModal()" class="w-7 h-7 flex items-center justify-center rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-all text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                <i class="bi bi-x text-sm"></i>
+            </button>
+        </div>
+        <div class="flex-1 overflow-y-auto p-5">
+            <form id="edit-form" onsubmit="return false;">
+                {% csrf_token %}
+                <div class="edit-form-fields form-grid"></div>
+                <div class="flex gap-3 mt-5">
+                    <button type="submit" class="btn-primary edit-save-btn"><i class="bi bi-check-lg"></i> Atualizar</button>
+                    <button type="button" onclick="closeEditModal()" class="btn-secondary">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    var editModalState = { id: null, endpoint: '', fields: [] };
+    function openEditModal(id, endpoint, fields, title) {
+        editModalState.id = id;
+        editModalState.endpoint = endpoint;
+        editModalState.fields = fields;
+        var modal = document.getElementById('edit-modal');
+        modal.querySelector('.edit-modal-title').textContent = title || 'Editar';
+        var container = modal.querySelector('.edit-form-fields');
+        container.innerHTML = '';
+        fields.forEach(function(f) {
+            var group = document.createElement('div');
+            group.className = 'form-group';
+            var label = document.createElement('label');
+            label.setAttribute('for', 'edit-' + f.name);
+            label.textContent = f.label || f.name;
+            var input;
+            if (f.type === 'select') {
+                input = document.createElement('select');
+                input.id = 'edit-' + f.name;
+                input.name = f.name;
+                if (f.required) input.required = true;
+                input.innerHTML = '<option value="">Selecione...</option>';
+                (f.options || []).forEach(function(o) {
+                    var opt = document.createElement('option');
+                    opt.value = o.value;
+                    opt.textContent = o.label;
+                    input.appendChild(opt);
+                });
+            } else if (f.type === 'textarea') {
+                input = document.createElement('textarea');
+                input.id = 'edit-' + f.name;
+                input.name = f.name;
+                input.rows = 3;
+            } else if (f.type === 'checkbox') {
+                input = document.createElement('input');
+                input.type = 'checkbox';
+                input.id = 'edit-' + f.name;
+                input.name = f.name;
+                var wrapper = document.createElement('div');
+                wrapper.className = 'flex items-center gap-2';
+                wrapper.appendChild(input);
+                wrapper.appendChild(label);
+                group.appendChild(wrapper);
+                group.appendChild(document.createElement('div'));
+                container.appendChild(group);
+                return;
+            } else {
+                input = document.createElement('input');
+                input.type = f.type || 'text';
+                input.id = 'edit-' + f.name;
+                input.name = f.name;
+                if (f.step) input.step = f.step;
+                if (f.placeholder) input.placeholder = f.placeholder;
+            }
+            if (f.required) input.required = true;
+            group.appendChild(label);
+            group.appendChild(input);
+            container.appendChild(group);
+        });
+        // Fetch current data
+        fetch(endpoint + id + '/')
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                fields.forEach(function(f) {
+                    var el = document.getElementById('edit-' + f.name);
+                    if (!el) return;
+                    var val = data[f.name];
+                    if (el.type === 'checkbox') {
+                        el.checked = val === true || val === 'true';
+                    } else if (f.type === 'select') {
+                        el.value = val != null ? val : '';
+                    } else {
+                        el.value = val != null ? val : '';
+                    }
+                });
+            });
+        modal.classList.remove('hidden', 'style="display:none;"');
+        modal.style.display = 'flex';
+    }
+    function closeEditModal() {
+        var modal = document.getElementById('edit-modal');
+        modal.classList.add('hidden');
+        modal.style.display = 'none';
+    }
+    document.getElementById('edit-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        var btn = this.querySelector('.edit-save-btn');
+        showLoading(btn);
+        var data = {};
+        editModalState.fields.forEach(function(f) {
+            var el = document.getElementById('edit-' + f.name);
+            if (!el) return;
+            var val = el.type === 'checkbox' ? el.checked : el.value;
+            if (f.parse === 'int') val = parseInt(val) || null;
+            else if (f.parse === 'float') val = parseFloat(val) || null;
+            data[f.name] = val;
+        });
+        fetch(editModalState.endpoint + editModalState.id + '/', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() },
+            body: JSON.stringify(data),
+        })
+        .then(function(r) {
+            if (r.ok) {
+                showToast('Atualizado com sucesso!', 'success');
+                closeEditModal();
+                setTimeout(function() { location.reload(); }, 800);
+            } else {
+                return r.json().then(function(err) {
+                    showToast('Erro: ' + JSON.stringify(err), 'error');
+                });
+            }
+        })
+        .catch(function(e) {
+            showToast('Erro de conexão: ' + e.message, 'error');
+        })
+        .finally(function() {
+            hideLoading(btn);
+        });
+    });
+</script>

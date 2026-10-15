@@ -1,0 +1,27 @@
+A Embrapa Agroindústria Tropical (CE) desenvolveu um aplicativo para ajudar produtores e técnicos da extensão rural no monitoramento e diagnóstico do oídio (Pseudoidium anacardii), a principal doença da cajucultura, além da traça-da-castanha (Anacampsis phytomiella) e da broca-das-pontas (Anthistarcha binocularis), pragas com alto potencial de dano.
+
+O “Monitora Caju ” também orienta o manejo fitossanitário, de acordo com o nível de incidência identificado, para prevenir infestações, reduzir perdas e diminuir custos de produção.
+
+A partir das informações fornecidas pelo produtor, o aplicativo calcula o índice de incidência e, de acordo com o resultado, orienta sobre as medidas de controle necessárias.
+
+O app funciona tanto no computador quanto em celulares (sistemas Android e iOS), e pode operar offline. A ferramenta disponibiliza informações organizadas por categorias, como pragas, doenças, sintomas e monitoramento, orientando o usuário na vistoria do pomar, na identificação de problemas e no manejo fitossanitário.
+
+Segundo o pesquisador Marlon Valentim, coordenador dos estudos para desenvolvimento do aplicativo, a tecnologia é de fácil acesso e fornece informações com linguagem simples. “A cajucultura é uma atividade de base familiar e carece de inovações tecnológicas e serviços de assistência técnica no campo. Contar com respostas rápidas e eficientes faz toda diferença para o produtor rural e pode fortalecer a produção de caju no Nordeste”, ressalta o pesquisador.
+
+O Monitora Caju permite gerar mapas das pragas. Com isso, o produtor pode formar seu próprio banco de dados, com informações sobre a evolução das doenças identificadas.
+
+O aplicativo será lançado durante a celebração do 53º aniversário da Embrapa, em Brasília durante a Feira Brasil na Mesa, entre os dias 23 e 25 de abril, na Embrapa Cerrados (DF).
+
+Embora seja uma planta rústica, o cajueiro é altamente suscetível a pragas e doenças. Segundo dados da Embrapa, no Brasil existem cerca de 1.200 espécies de insetos-praga que atacam a planta em diferentes momentos do seu desenvolvimento.
+
+A traça-da-castanha, por exemplo, perfura as castanhas de caju e se alimenta das amêndoas. Já a broca-das-pontas consome a parte central de ramos florais, e interrompe o fluxo da seiva na planta e impede a formação de frutos.
+
+O pesquisador Antonio Lindemberg, da Embrapa, afirma que, em regiões onde o produtor não faz o monitoramento, a infestação chega a 80% de castanhas furadas, ou seja, de 100 castanhas, 80 têm a amêndoa danificada.
+
+O entomologista explica que, de todas as pragas do cajueiro, a mais prejudicial é a traça-da-castanha porque a infestação ocorre quando a planta já está no seu ciclo final de produção. Por atacar o fruto (a castanha) em formação ou já formado, esse inseto coloca em risco todo o investimento feito no plantio.
+
+Além disso, é uma praga silenciosa e o produtor só percebe a castanha furada quando o dano já está feito. “Fazer a identificação adequada e conhecer o comportamento das pragas, bem como a época de ocorrência, é essencial para um manejo eficaz”, complementa.
+
+Já a mais agressiva é o oídio. Com rápida disseminação, a infecção fúngica está presente na maioria das regiões produtoras de caju. Segundo Valentim, o oídio ataca o cajueiro em todas as fases da cultura, mas os maiores danos ocorrem durante a floração e frutificação.
+
+”Quando atinge as inflorescências, provoca a queima e a morte das flores, impedindo a formação de frutos. É crucial monitorar os sintomas como medida preventiva. Esse cuidado possibilita o controle integrado da doença e a adoção de medidas adequadas”, pontua.

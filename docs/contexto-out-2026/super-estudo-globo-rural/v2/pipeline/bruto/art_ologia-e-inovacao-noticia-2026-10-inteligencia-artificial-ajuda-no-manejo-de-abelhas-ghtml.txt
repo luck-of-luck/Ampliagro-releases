@@ -1,0 +1,19 @@
+A necessidade de acompanhar com mais precisão a rotina de cada colmeia levou o apicultor e desenvolvedor de tecnologia Guilherme Sjlender, de Carazinho (RS), a criar a MeliBee, uma plataforma digital voltada à gestão de apiários. O projeto nasceu a partir de uma demanda prática do próprio produtor, que buscava maior controle sobre a produção, o manejo e o histórico das colmeias.
+
+Ao lado do irmão, Rodrigo Sjlender, que hoje atua na gestão da empresa, e de Luís Cesar de Souza, especialista técnico, Guilherme transformou a ideia em um negócio que vem ganhando espaço entre apicultores e meliponicultores. A primeira versão da ferramenta foi apresentada em 2025. Desde então, a solução ganhou aprimoramentos e já atende tanto produtores quanto a agroindústria.
+
+O grande diferencial da plataforma está na aplicação da inteligência artificial (IA) diretamente na rotina do campo, e com acesso offline, explica Rodrigo. Durante uma inspeção, o produtor pode gravar um áudio descrevendo o que observa na colmeia. A ferramenta utiliza IA para interpretar as informações, preencher registros automaticamente, classificar eventos e até sugerir tarefas relacionadas ao manejo, reduzindo a necessidade de anotações manuais.
+
+“ Como muitos apiários estão localizados em regiões com pouca ou nenhuma conectividade, os dados podem ser registrados normalmente durante o trabalho em campo e sincronizados posteriormente, quando houver acesso à internet ”, conta.
+
+A plataforma reúne em um único ambiente recursos para inspeções, controle de produção, rastreabilidade, gestão de rainhas, genealogia de colônias, monitoramento de iscas com GPS e organização de tarefas. O sistema atende tanto a apicultura com Apis mellifera quanto a meliponicultura de abelhas nativas sem ferrão.
+
+Entre as funcionalidades voltadas à apicultura estão a rastreabilidade de lotes de mel , o cadastro em lote de colmeias e o controle de rainhas. A plataforma também permite gerar automaticamente documentos relacionados à comercialização da produção.
+
+Já para a meliponicultura (criação de abelhas sem ferrão), a solução oferece cadastro de dezenas de espécies nativas, monitoramento de caixas-isca georreferenciadas, acompanhamento da linhagem das colônias por meio de árvores genealógicas e gestão de divisões de enxames.
+
+“Na prática, a MeliBee centraliza informações que frequentemente ficam dispersas entre cadernos, planilhas, fotografias, aplicativos de mensagens e a memória do próprio produtor”, avalia Rodrigo.
+
+“O resultado é um sistema capaz de transformar informações operacionais em indicadores e análises que auxiliam a tomada de decisão. Com um histórico detalhado de cada colônia, o produtor consegue acompanhar a evolução do apiário, identificar padrões, melhorar o manejo e ampliar a rastreabilidade da produção”, finaliza.
+
+E se as abelhas desaparecessem? Entenda o que aconteceria com o planeta Produção de mel cresceu 4,5% e alcançou recorde em 2025 Criação de abelhas vira fonte de renda nas cidades

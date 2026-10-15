@@ -1,0 +1,85 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+    restart: unless-stopped
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-ampliagro}
+      POSTGRES_USER: ${POSTGRES_USER:-ampliagro}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ampliagro}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  celery:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # MEDIDO 2026-10-05: era `-A Ampliagro`, e o modulo `Ampliagro.py` nao
+    # existe no repositorio (`Test-Path Ampliagro.py` -> False). O servico de
+    # dev morria no arranque, e como o compose nao tem `healthcheck` nem
+    # `restart`, isso aparecia como "celery nao arranca" sem mais pista.
+    # O nome certo e' `config`, que e' onde esta o objecto `app`
+    # (`config/celery.py:7`), e e' o que `docker-compose.prod.yml:148` ja usa.
+    command: celery -A config worker -l info --concurrency=4
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - static_volume:/static
+      - media_volume:/media
+    depends_on:
+      - web
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  static_volume:
+  media_volume:

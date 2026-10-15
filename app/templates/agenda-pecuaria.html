@@ -1,0 +1,131 @@
+{% extends base_template %}
+{% load static %}
+
+{% block title %}Ampliagro - Agenda Pecuária{% endblock %}
+
+{% block extra_css %}
+
+{% endblock %}
+
+{% block dashboard_appbar %}{% endblock %}
+
+{% block content %}
+<div class="section-container">
+    <div class="section-header">
+        <h1 class="section-title"><i class="bi bi-calendar-heart"></i> Agenda Pecuária</h1>
+        <a href="{% url 'index_spa' %}" class="btn-secondary btn-sm"><i class="bi bi-arrow-left"></i> Voltar ao Dashboard</a>
+    </div>
+
+    <div class="content-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+            <h2 style="font-size:1rem;font-weight:600;color:var(--ncs-green-dark);">Julho 2026</h2>
+            <div style="display:flex;gap:0.5rem;">
+                <button class="btn-secondary btn-sm"><i class="bi bi-chevron-left"></i></button>
+                <button class="btn-secondary btn-sm"><i class="bi bi-chevron-right"></i></button>
+            </div>
+        </div>
+        <div class="calendar-grid">
+            <div class="calendar-header">Dom</div>
+            <div class="calendar-header">Seg</div>
+            <div class="calendar-header">Ter</div>
+            <div class="calendar-header">Qua</div>
+            <div class="calendar-header">Qui</div>
+            <div class="calendar-header">Sex</div>
+            <div class="calendar-header">Sáb</div>
+            <div class="calendar-day other-month"><div class="day-num">29</div></div>
+            <div class="calendar-day other-month"><div class="day-num">30</div></div>
+            <div class="calendar-day"><div class="day-num">1</div><div class="cal-event cal-event-vacinacao">Vacinação - Lote A</div></div>
+            <div class="calendar-day"><div class="day-num">2</div></div>
+            <div class="calendar-day"><div class="day-num">3</div><div class="cal-event cal-event-inseminacao">Inseminação - Matrizes</div></div>
+            <div class="calendar-day"><div class="day-num">4</div></div>
+            <div class="calendar-day"><div class="day-num">5</div></div>
+            <div class="calendar-day"><div class="day-num">6</div></div>
+            <div class="calendar-day"><div class="day-num">7</div></div>
+            <div class="calendar-day"><div class="day-num">8</div></div>
+            <div class="calendar-day"><div class="day-num">9</div><div class="cal-event cal-event-pesagem">Pesagem - Lote B</div></div>
+            <div class="calendar-day"><div class="day-num">10</div></div>
+            <div class="calendar-day"><div class="day-num">11</div></div>
+            <div class="calendar-day"><div class="day-num">12</div></div>
+            <div class="calendar-day"><div class="day-num">13</div><div class="cal-event cal-event-desmama">Desmama - Bezerros</div></div>
+            <div class="calendar-day"><div class="day-num">14</div></div>
+            <div class="calendar-day"><div class="day-num">15</div></div>
+            <div class="calendar-day"><div class="day-num">16</div></div>
+            <div class="calendar-day"><div class="day-num">17</div></div>
+            <div class="calendar-day"><div class="day-num">18</div></div>
+            <div class="calendar-day"><div class="day-num">19</div></div>
+            <div class="calendar-day"><div class="day-num">20</div><div class="cal-event cal-event-venda">Venda - Gado Corte</div></div>
+            <div class="calendar-day"><div class="day-num">21</div></div>
+            <div class="calendar-day"><div class="day-num">22</div><div class="cal-event cal-event-vacinacao">Vacinação - Lote C</div></div>
+            <div class="calendar-day"><div class="day-num">23</div></div>
+            <div class="calendar-day"><div class="day-num">24</div></div>
+            <div class="calendar-day"><div class="day-num">25</div></div>
+            <div class="calendar-day"><div class="day-num">26</div></div>
+            <div class="calendar-day"><div class="day-num">27</div></div>
+            <div class="calendar-day"><div class="day-num">28</div><div class="cal-event cal-event-pesagem">Pesagem - Lote A</div></div>
+            <div class="calendar-day"><div class="day-num">29</div></div>
+            <div class="calendar-day"><div class="day-num">30</div></div>
+            <div class="calendar-day"><div class="day-num">31</div></div>
+            <div class="calendar-day other-month"><div class="day-num">1</div></div>
+        </div>
+        <div class="legend">
+            <div class="legend-item"><span class="legend-color" style="background:#fce7f3;"></span> Inseminação</div>
+            <div class="legend-item"><span class="legend-color" style="background:#dbeafe;"></span> Vacinação</div>
+            <div class="legend-item"><span class="legend-color" style="background:#fef3c7;"></span> Desmama</div>
+            <div class="legend-item"><span class="legend-color" style="background:#dcfce7;"></span> Pesagem</div>
+            <div class="legend-item"><span class="legend-color" style="background:#f3e8ff;"></span> Venda</div>
+        </div>
+    </div>
+
+    <div class="content-card">
+        <h2 style="font-size:1rem;font-weight:600;margin-bottom:1rem;color:var(--ncs-green-dark);">Próximos Eventos</h2>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Tipo</th>
+                        <th>Descrição</th>
+                        <th>Lote</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>01/07/2026</td>
+                        <td><span class="badge badge-vacinacao">Vacinação</span></td>
+                        <td>Vacinação Aftosa</td>
+                        <td>Lote A</td>
+                    </tr>
+                    <tr>
+                        <td>03/07/2026</td>
+                        <td><span class="badge badge-inseminacao">Inseminação</span></td>
+                        <td>IA de matrizes</td>
+                        <td>Matrizes Nelore</td>
+                    </tr>
+                    <tr>
+                        <td>09/07/2026</td>
+                        <td><span class="badge badge-pesagem">Pesagem</span></td>
+                        <td>Pesagem de rotina</td>
+                        <td>Lote B</td>
+                    </tr>
+                    <tr>
+                        <td>13/07/2026</td>
+                        <td><span class="badge badge-desmama">Desmama</span></td>
+                        <td>Desmama de bezerros</td>
+                        <td>Bezerros 2026</td>
+                    </tr>
+                    <tr>
+                        <td>20/07/2026</td>
+                        <td><span class="badge badge-venda">Venda</span></td>
+                        <td>Venda de gado de corte</td>
+                        <td>Gado Corte</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+{% endblock %}

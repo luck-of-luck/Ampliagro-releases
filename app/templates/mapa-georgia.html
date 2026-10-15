@@ -1,0 +1,286 @@
+{% extends base_template %}
+{% load static %}
+
+{% block title %}Ampliagro - Mapa dos Talhões{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/paginas/mapa-georgia.css' %}">
+
+<link rel="stylesheet" href="{% static 'vendor/leaflet-1.9.4.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/leaflet-draw-1.0.4.css' %}" />
+
+{% endblock %}
+
+{% block dashboard_appbar %}{% endblock %}
+
+{% block content %}
+<div class="map-page">
+    <div class="map-sidebar">
+        <div class="sidebar-header">
+            <h1><i class="bi bi-map"></i> Talhões</h1>
+            <a href="{% url 'index_spa' %}" style="font-size:0.75rem;color:var(--cor-primaria);text-decoration:none;">Dashboard</a>
+        </div>
+        <div class="sidebar-body" id="talhoes-list">
+            <div style="text-align:center;padding:2rem;color:#94a3b8;font-size:0.813rem;">Carregando...</div>
+        </div>
+        <div class="sidebar-footer">
+            <button onclick="abrirModalNovo()" style="width:100%;padding:0.5rem;font-size:0.813rem;font-weight:600;border-radius:0.375rem;background:var(--cor-primaria);color:#fff;border:none;cursor:pointer;">
+                <i class="bi bi-plus-lg"></i> Novo Talhão
+            </button>
+        </div>
+    </div>
+    <div class="map-container">
+        <div id="map"></div>
+        <div class="map-toolbar">
+            <button class="map-btn" onclick="toggleDrawMode()" id="btn-draw"><i class="bi bi-pencil"></i> Desenhar</button>
+            <button class="map-btn" onclick="toggleEditMode()" id="btn-edit"><i class="bi bi-arrows-move"></i> Editar</button>
+            <button class="map-btn" onclick="fitAll()" id="btn-fit"><i class="bi bi-arrows-fullscreen"></i> Ver Todos</button>
+        </div>
+        <div class="legend" id="legend"></div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modal-talhao">
+    <div class="modal-content">
+        <h3 id="modal-title">Novo Talhão</h3>
+        <input type="hidden" id="modal-geojson" />
+        <input type="text" class="modal-input" id="modal-nome" placeholder="Nome do talhão" />
+        <select class="modal-input" id="modal-cultura" style="padding:0.5rem 0.75rem;border:1px solid #e2e8f0;border-radius:0.375rem;font-size:0.875rem;">
+            <option value="">Selecione a cultura</option>
+            <option value="Soja">Soja</option>
+            <option value="Milho">Milho</option>
+            <option value="Algodão">Algodão</option>
+            <option value="Café">Café</option>
+            <option value="Cana-de-açúcar">Cana</option>
+            <option value="Arroz">Arroz</option>
+            <option value="Feijão">Feijão</option>
+            <option value="Trigo">Trigo</option>
+        </select>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
+            <button class="btn-save" onclick="salvarTalhao()">Salvar</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="{% static 'vendor/leaflet-1.9.4.js' %}"></script>
+<script src="{% static 'vendor/leaflet-draw-1.0.4.js' %}"></script>
+<script>
+const CULTURA_COLORS = {
+    'Soja': '#22c55e', 'Milho': '#f59e0b', 'Algodão': '#ec4899',
+    'Café': '#8b5cf6', 'Cana-de-açúcar': '#ef4444', 'Arroz': '#06b6d4',
+    'Feijão': '#f97316', 'Trigo': '#84cc16',
+};
+const DEFAULT_COLORS = ['#3b82f6', '#6366f1', '#14b8a6', '#f43f5e', '#a855f7'];
+
+let map, drawnItems, drawControl, editMode = false, drawMode = false;
+let talhoesData = [], selectedId = null;
+
+function initMap() {
+    map = L.map('map', { zoomControl: false }).setView([-14.235, -51.925], 4);
+    L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap',
+        maxZoom: 18,
+    }).addTo(map);
+
+    drawnItems = new L.FeatureGroup();
+    map.addLayer(drawnItems);
+
+    drawControl = new L.Control.Draw({
+        edit: { featureGroup: drawnItems, remove: true },
+        draw: {
+            polygon: { allowIntersection: false, shapeOptions: { color: '#0f9d6e', weight: 2 } },
+            polyline: false, circle: false, circlemarker: false, rectangle: true,
+        }
+    });
+
+    map.on(L.Draw.Event.CREATED, function(e) {
+        var layer = e.layer;
+        drawnItems.addLayer(layer);
+        var geojson = layer.toGeoJSON();
+        document.getElementById('modal-geojson').value = JSON.stringify(geojson);
+        document.getElementById('modal-talhao').classList.add('active');
+    });
+
+    map.on(L.Draw.Event.DELETED, function(e) {
+        e.layers.eachLayer(function(layer) {
+            if (layer._talhaoId) {
+                fetch('/api/talhoes-geometria/' + layer._geometriaId + '/', {
+                    method: 'DELETE', headers: { 'X-CSRFToken': getCSRF() }
+                });
+            }
+        });
+    });
+
+    carregarTalhoes();
+}
+
+function carregarTalhoes() {
+    fetch('/api/talhoes-geometria-fc/')
+        .then(r => r.ok ? r.json() : { features: [] })
+        .then(data => {
+            talhoesData = data.features || [];
+            renderSidebar();
+            renderMap();
+            renderLegend();
+        })
+        .catch(() => {
+            document.getElementById('talhoes-list').innerHTML = '<div style="text-align:center;padding:2rem;color:#94a3b8;">Nenhum talhão encontrado</div>';
+        });
+}
+
+function renderSidebar() {
+    const container = document.getElementById('talhoes-list');
+    if (talhoesData.length === 0) {
+        container.innerHTML = '<div style="text-align:center;padding:2rem;color:#94a3b8;font-size:0.813rem;">Nenhum talhão com geometria.<br>Use "Desenhar" para criar.</div>';
+        return;
+    }
+    container.innerHTML = talhoesData.map((f, i) => {
+        const p = f.properties || {};
+        const cor = CULTURA_COLORS[p.cultura] || DEFAULT_COLORS[i % DEFAULT_COLORS.length];
+        const active = selectedId === p.talhao_id ? ' active' : '';
+        return '<div class="talhao-card' + active + '" onclick="focusTalhao(' + p.talhao_id + ')">' +
+            '<div class="talhao-nome"><span class="talhao-cor" style="background:' + cor + ';"></span>' + (p.nome || 'Talhão ' + p.talhao_id) + '</div>' +
+            '<div class="talhao-meta">' + (p.cultura || '-') + ' · ' + (p.area_ha || 0).toFixed(1) + ' ha</div>' +
+        '</div>';
+    }).join('');
+}
+
+function renderMap() {
+    drawnItems.clearLayers();
+    talhoesData.forEach((f, i) => {
+        if (!f.geometry) return;
+        const p = f.properties || {};
+        const cor = CULTURA_COLORS[p.cultura] || DEFAULT_COLORS[i % DEFAULT_COLORS.length];
+        const layer = L.geoJSON(f, {
+            style: { color: cor, weight: 2, fillColor: cor, fillOpacity: 0.25 },
+        }).addTo(drawnItems);
+        layer._talhaoId = p.talhao_id;
+        layer._geometriaId = p.geometria_id;
+        layer.bindPopup(
+            '<strong>' + (p.nome || 'Talhão') + '</strong><br>' +
+            (p.cultura || '-') + '<br>' +
+            (p.area_ha || 0).toFixed(1) + ' ha<br>' +
+            '<button onclick="editarTalhao(' + p.talhao_id + ')" style="margin-top:0.5rem;padding:0.25rem 0.5rem;font-size:0.688rem;background:#0f9d6e;color:#fff;border:none;border-radius:0.25rem;cursor:pointer;">Editar</button>'
+        );
+    });
+    if (talhoesData.length > 0) fitAll();
+}
+
+function renderLegend() {
+    const used = {};
+    talhoesData.forEach(f => {
+        const c = f.properties?.cultura;
+        if (c) used[c] = true;
+    });
+    const legend = document.getElementById('legend');
+    const keys = Object.keys(used);
+    if (keys.length === 0) { legend.style.display = 'none'; return; }
+    legend.style.display = 'block';
+    legend.innerHTML = '<div style="font-weight:600;margin-bottom:0.375rem;font-size:0.688rem;color:#64748b;">LEGENDA</div>' +
+        keys.map((k, i) => '<div class="legend-item"><span class="legend-color" style="background:' + (CULTURA_COLORS[k] || DEFAULT_COLORS[i % DEFAULT_COLORS.length]) + ';"></span>' + k + '</div>').join('');
+}
+
+function focusTalhao(id) {
+    selectedId = id;
+    renderSidebar();
+    const f = talhoesData.find(t => t.properties?.talhao_id === id);
+    if (f && f.geometry) {
+        const layer = L.geoJSON(f);
+        map.fitBounds(layer.getBounds(), { padding: [50, 50], maxZoom: 15 });
+    }
+}
+
+function fitAll() {
+    if (drawnItems.getLayers().length > 0) {
+        map.fitBounds(drawnItems.getBounds(), { padding: [50, 50] });
+    }
+}
+
+function toggleDrawMode() {
+    if (drawMode) {
+        drawControl.disable();
+        drawMode = false;
+        document.getElementById('btn-draw').classList.remove('active');
+    } else {
+        if (editMode) toggleEditMode();
+        drawControl.enable();
+        drawMode = true;
+        document.getElementById('btn-draw').classList.add('active');
+        new L.Draw.Polygon(map, drawControl.options.draw.polygon).enable();
+    }
+}
+
+function toggleEditMode() {
+    if (editMode) {
+        drawControl.disable();
+        editMode = false;
+        document.getElementById('btn-edit').classList.remove('active');
+    } else {
+        if (drawMode) toggleDrawMode();
+        drawControl.editHandler.enable();
+        editMode = true;
+        document.getElementById('btn-edit').classList.add('active');
+    }
+}
+
+function abrirModalNovo() {
+    document.getElementById('modal-title').textContent = 'Novo Talhão';
+    document.getElementById('modal-nome').value = '';
+    document.getElementById('modal-cultura').value = '';
+    document.getElementById('modal-geojson').value = '';
+    toggleDrawMode();
+}
+
+function fecharModal() {
+    document.getElementById('modal-talhao').classList.remove('active');
+    if (drawMode) toggleDrawMode();
+}
+
+function editarTalhao(id) {
+    const f = talhoesData.find(t => t.properties?.talhao_id === id);
+    if (!f) return;
+    document.getElementById('modal-title').textContent = 'Editar Talhão';
+    document.getElementById('modal-nome').value = f.properties?.nome || '';
+    document.getElementById('modal-cultura').value = f.properties?.cultura || '';
+    document.getElementById('modal-geometria-id').value = f.properties?.geometria_id || '';
+    document.getElementById('modal-talhao-id').value = id;
+    document.getElementById('modal-talhao').classList.add('active');
+}
+
+function salvarTalhao() {
+    const nome = document.getElementById('modal-nome').value.trim();
+    const geojson = document.getElementById('modal-geojson').value;
+    const talhaoId = document.getElementById('modal-talhao-id')?.value;
+
+    if (!nome) { alert('Informe o nome do talhão'); return; }
+
+    if (geojson && talhaoId) {
+        fetch('/api/salvar-geometria/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRF() },
+            body: JSON.stringify({ talhao_id: parseInt(talhaoId), geojson: JSON.parse(geojson) })
+        })
+        .then(r => r.json())
+        .then(d => {
+            fecharModal();
+            carregarTalhoes();
+        });
+    } else {
+        fecharModal();
+    }
+}
+
+function getCSRF() { return document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''; }
+
+document.addEventListener('DOMContentLoaded', initMap);
+</script>
+
+<input type="hidden" id="modal-geometria-id" value="" />
+<input type="hidden" id="modal-talhao-id" value="" />
+{% endblock %}

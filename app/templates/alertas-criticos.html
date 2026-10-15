@@ -1,0 +1,131 @@
+{% extends base_template %}
+{% load static %}
+
+{% block title %}Ampliagro - Alertas Críticos{% endblock %}
+
+{% block extra_css %}
+
+{% endblock %}
+
+{% block dashboard_appbar %}{% endblock %}
+
+{% block content %}
+<div class="section-container">
+    <div class="section-header">
+        <h1 class="section-title"><i class="bi bi-exclamation-triangle-fill"></i> Alertas Críticos</h1>
+        <a href="{% url 'index_spa' %}" class="btn-secondary btn-sm"><i class="bi bi-arrow-left"></i> Voltar</a>
+    </div>
+
+    <div class="stats-grid" id="stats-grid">
+        <div class="stat-card"><div class="stat-label">Total</div><div class="stat-value stat-alert" id="stat-total">-</div></div>
+        <div class="stat-card"><div class="stat-label">Manutenção</div><div class="stat-value" id="stat-manut">-</div></div>
+        <div class="stat-card"><div class="stat-label">Estoque</div><div class="stat-value" id="stat-estoque">-</div></div>
+        <div class="stat-card"><div class="stat-label">Safra</div><div class="stat-value" id="stat-safra">-</div></div>
+    </div>
+
+    <div class="content-card">
+        <div class="filter-bar">
+            <label style="font-size:0.75rem;font-weight:600;color:#64748b;text-transform:uppercase;">Filtrar</label>
+            <select id="filtro-tipo" onchange="filtrar()">
+                <option value="todos">Todos</option>
+                <option value="manutencao">Manutenção</option>
+                <option value="estoque">Estoque</option>
+                <option value="safra">Safra</option>
+                <option value="clima">Clima</option>
+                <option value="financeiro">Financeiro</option>
+            </select>
+        </div>
+        <div class="table-wrap">
+            <table id="tabela-alertas">
+                <thead>
+                    <tr><th>Categoria</th><th>Descrição</th><th>Prioridade</th><th>Ações</th></tr>
+                </thead>
+                <tbody id="alertas-body">
+                    <tr><td colspan="4" class="empty-state"><i class="bi bi-hourglass-split" style="font-size:1.5rem;display:block;margin-bottom:0.5rem;"></i>Carregando alertas...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+const CATEGORIA_ICONS = {
+    manutencao: 'bi-tools', estoque: 'bi-box-seam', safra: 'bi-plant',
+    clima: 'bi-cloud-lightning', financeiro: 'bi-cash-coin',
+};
+const CATEGORIA_BADGE = {
+    manutencao: 'badge-manutencao', estoque: 'badge-estoque',
+    safra: 'badge-safra', clima: 'badge-clima', financeiro: 'badge-financeiro',
+};
+
+function detectarCategoria(alerta) {
+    const t = (alerta.titulo + ' ' + alerta.mensagem).toLowerCase();
+    if (t.includes('manuten') || t.includes('trator') || t.includes('pulveriz')) return 'manutencao';
+    if (t.includes('estoque') || t.includes('insumo') || t.includes('vencid')) return 'estoque';
+    if (t.includes('safra') || t.includes('colheit') || t.includes('plantio')) return 'safra';
+    if (t.includes('clima') || t.includes('geada') || t.includes('chuva') || t.includes('calor')) return 'clima';
+    if (t.includes('despes') || t.includes('receita') || t.includes('financ')) return 'financeiro';
+    return 'manutencao';
+}
+
+async function carregarAlertas() {
+    const tbody = document.getElementById('alertas-body');
+    try {
+        const r = await fetch('/api/notificacoes/?nivel=critical&apenas_nao_lidas=1');
+        if (!r.ok) throw new Error('Erro ' + r.status);
+        const data = await r.json();
+        const alertas = (data.results || data).filter(a => a.nivel === 'critical');
+
+        if (alertas.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" class="empty-state"><i class="bi bi-check-circle" style="font-size:1.5rem;display:block;margin-bottom:0.5rem;color:#22c55e;"></i>Nenhum alerta crítico pendente!</td></tr>';
+            document.getElementById('stat-total').textContent = '0';
+            return;
+        }
+
+        // Stats
+        const cats = { manutencao: 0, estoque: 0, safra: 0, clima: 0, financeiro: 0 };
+        alertas.forEach(a => { cats[detectarCategoria(a)]++; });
+        document.getElementById('stat-total').textContent = alertas.length;
+        document.getElementById('stat-manut').textContent = cats.manutencao;
+        document.getElementById('stat-estoque').textContent = cats.estoque;
+        document.getElementById('stat-safra').textContent = cats.safra;
+
+        tbody.innerHTML = alertas.map(a => {
+            const cat = detectarCategoria(a);
+            const icon = CATEGORIA_ICONS[cat] || 'bi-exclamation-triangle';
+            const badge = CATEGORIA_BADGE[cat] || 'badge-manutencao';
+            return '<tr data-tipo="' + cat + '">' +
+                '<td><span class="badge ' + badge + '"><i class="bi ' + icon + '"></i> ' + cat.charAt(0).toUpperCase() + cat.slice(1) + '</span></td>' +
+                '<td><strong>' + a.titulo + '</strong><br><span style="font-size:0.75rem;color:#64748b;">' + a.mensagem + '</span></td>' +
+                '<td><span class="badge badge-critical">Crítico</span></td>' +
+                '<td><button class="btn-resolver" onclick="resolverAlerta(' + a.id + ')"><i class="bi bi-check-lg"></i> Resolver</button></td>' +
+            '</tr>';
+        }).join('');
+    } catch (e) {
+        tbody.innerHTML = '<tr><td colspan="4" class="empty-state"><i class="bi bi-exclamation-triangle" style="font-size:1.5rem;display:block;margin-bottom:0.5rem;"></i>Erro: ' + e.message + '</td></tr>';
+    }
+}
+
+async function resolverAlerta(id) {
+    try {
+        await fetch('/api/notificacao/' + id + '/ler/', { method: 'POST', headers: { 'X-CSRFToken': getCSRF() } });
+        carregarAlertas();
+    } catch (e) { console.error(e); }
+}
+
+function getCSRF() { return document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''; }
+
+function filtrar() {
+    const tipo = document.getElementById('filtro-tipo').value;
+    document.querySelectorAll('#tabela-alertas tbody tr').forEach(tr => {
+        if (!tr.dataset.tipo) return;
+        tr.style.display = (tipo === 'todos' || tr.dataset.tipo === tipo) ? '' : 'none';
+    });
+}
+
+document.addEventListener('DOMContentLoaded', carregarAlertas);
+</script>
+{% endblock %}

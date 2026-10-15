@@ -1,0 +1,1406 @@
+/* ═══════════════════════════════════════════════════════════
+   AMPLIAGRO — Widgetbar Windows 11
+   Estende #dashboard-appbar para visual/taskbar do Windows 11
+   Mantém compatibilidade total com IDs existentes
+
+   ALTURA: uma variável, e só uma. `--widgetbar-altura` (56px) é a
+   verdade, e o resto do projeto consome ela em vez de repetir o número.
+
+   Isto não é preciosismo. Este arquivo dizia 40px no CSS e 48px no
+   cabeçalho; `soft-ui.css` dizia `min-height: 58px`; `liquid-glass.css`
+   e este próprio arquivo reservavam 56px em `bottom`. QUATRO alturas
+   para o mesmo elemento, em quatro lugares, sem nenhum conflictedizer.
+
+   O efeito não eraesthetic. `#ia-dock` (o menu da IA) ancorava o
+   `bottom` para não ficar debaixo da barra, e a conta não fechava
+   porque ninguém sabia a altura real: sobrava ou faltava espaço, e o
+   sintoma era o chat da IA atrás da barra. Uma regra que precisa de
+   adivinhação do número alheio não é uma regra, é uma aposta.
+   ═══════════════════════════════════════════════════════════ */
+
+:root {
+  /* A altura real da barra. Se mudar, muda AQUI e em nenhum outro lugar. */
+  --widgetbar-altura: 56px;
+}
+
+/* ── Barra principal — Mica — altura pela variável ── */
+#dashboard-appbar {
+  height: var(--widgetbar-altura) !important;
+  min-height: var(--widgetbar-altura) !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  padding: 4px 12px !important;
+  gap: 8px !important;
+  background: rgba(243, 243, 243, 0.78) !important;
+  backdrop-filter: blur(20px) saturate(1.2) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(1.2) !important;
+  border-top: none !important;
+  box-shadow:
+    0 -1px 1px rgba(0, 0, 0, 0.03),
+    0 -4px 16px rgba(0, 0, 0, 0.05) !important;
+  align-items: center !important;
+  box-sizing: border-box !important;
+  display: grid !important;
+}
+html.dark #dashboard-appbar {
+  background: rgba(32, 32, 32, 0.86) !important;
+  border-top-color: rgba(255, 255, 255, 0.07) !important;
+  box-shadow:
+    0 -1px 2px rgba(0, 0, 0, 0.3),
+    0 -8px 32px rgba(0, 0, 0, 0.35) !important;
+}
+@supports not (backdrop-filter: blur(24px)) {
+  #dashboard-appbar {
+    background: var(--cor-nav-fundo) !important;
+  }
+  html.dark #dashboard-appbar {
+    background: var(--cor-nav-fundo-rolagem) !important;
+  }
+}
+
+/* ── Taskbar layout — Windows centrado ── */
+#dashboard-appbar {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+}
+.widgetbar-section-core {
+  flex: 1 1 0 !important;
+  justify-content: flex-start !important;
+  display: flex !important;
+  gap: 8px !important;
+  align-items: center !important;
+}
+.widgetbar-spacer {
+  display: none !important;
+}
+#dashboard-appbar.editing .widgetbar-spacer {
+  display: flex !important;
+  flex: 1 1 auto !important;
+  justify-content: center !important;
+  align-items: center !important;
+  min-width: 0 !important;
+}
+#widgetbar-selection-indicator {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 4px 10px !important;
+  border-radius: 999px !important;
+  background: rgba(0, 0, 0, 0.06) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  color: var(--cor-nav-texto, #1e293b) !important;
+  font-size: 0.6875rem !important;
+  font-weight: 600 !important;
+  max-width: min(360px, 28vw) !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  line-height: 1 !important;
+}
+html.dark #widgetbar-selection-indicator {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  color: var(--cor-nav-texto, #e2e8f0) !important;
+}
+#widgetbar-selection-indicator.hidden {
+  display: none !important;
+}
+.right-section-normal {
+  flex: 1 1 0 !important;
+  justify-content: flex-end !important;
+  display: flex !important;
+  gap: 8px !important;
+  align-items: center !important;
+}
+/* Presets — ao lado da lupa/engrenagem (sem centralizar no meio) */
+#presets-carousel {
+  flex: 0 0 auto !important;
+  position: relative !important;
+  left: auto !important;
+  transform: none !important;
+  margin: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 6px !important;
+  padding: 0 !important;
+  max-width: min(460px, 34vw) !important;
+  overflow: visible !important;
+  overflow-x: visible !important;
+  scrollbar-width: none !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+}
+#presets-carousel::-webkit-scrollbar {
+  display: none !important;
+}
+
+/* ── Reveal + Fluent ── */
+.preset-block,
+.widgetbar-pill-icon,
+.widgetbar-search-btn,
+.edit-pill,
+.widgetbar-pill {
+  transition:
+    background 120ms cubic-bezier(0.2, 0, 0, 1),
+    transform 120ms cubic-bezier(0.2, 0, 0, 1),
+    color 120ms ease,
+    border-color 150ms ease !important;
+}
+.preset-block:hover,
+.widgetbar-pill-icon:hover,
+.widgetbar-search-btn:hover,
+.edit-pill:hover {
+  transform: scale(1.03) !important;
+}
+.preset-block:active,
+.widgetbar-pill-icon:active,
+.edit-pill:active {
+  transform: scale(0.97) !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .preset-block,
+  .widgetbar-pill-icon,
+  .edit-pill {
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+/* ── Preset como App — 32px Windows (ícone 18px Windows) ── */
+.preset-block {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 6px !important;
+  flex-shrink: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: visible !important;
+}
+.preset-block i,
+.preset-block svg {
+  font-size: 18px !important;
+  line-height: 1 !important;
+}
+/* indicador ativo usa ::before para liberar ::after para o tooltip (igual .edit-pill) */
+.preset-block::before {
+  content: '' !important;
+  position: absolute !important;
+  bottom: 2px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: 0 !important;
+  height: 3px !important;
+  background: var(--pal-accent, var(--cor-nav-primaria, #0f9d6e)) !important;
+  border-radius: 999px !important;
+  opacity: 0 !important;
+  transition:
+    width 0.18s ease,
+    opacity 0.18s ease !important;
+  pointer-events: none !important;
+}
+.preset-block.active-preset {
+  background: transparent !important;
+  border: none !important;
+}
+html.dark .preset-block.active-preset {
+  background: transparent !important;
+}
+.preset-block.active-preset::before {
+  width: 16px !important;
+  opacity: 1 !important;
+}
+/* neutraliza antigo ::after do navbar-premium (que usava ::after para a barrinha) — agora tooltip usa ::after */
+.preset-block::after {
+  bottom: auto !important;
+  height: auto !important;
+  width: auto !important;
+  background: transparent !important;
+  opacity: 0 !important;
+  border-radius: 0 !important;
+}
+
+/* ── Preset Drag (fluid, Y-locked, hold 1s + FLIP) ── */
+.preset-block.dragging,
+.preset-ghost {
+  opacity: 0.75 !important;
+  transform: scale(1.05) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22) !important;
+  z-index: 2147483647 !important;
+  pointer-events: none !important;
+  will-change: transform !important;
+}
+.preset-ghost {
+  position: fixed !important;
+  left: 0 !important;
+  top: 0 !important;
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 6px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: var(--cor-nav-fundo, #fff) !important;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+}
+html.dark .preset-ghost {
+  background: var(--cor-nav-fundo-rolagem, #2b2b2b) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+.preset-block.placeholder {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 6px !important;
+  background: var(--pal-accent, #0f9d6e) !important;
+  opacity: 0.18 !important;
+  border: 2px dashed var(--pal-accent, #0f9d6e) !important;
+  flex-shrink: 0 !important;
+  box-sizing: border-box !important;
+}
+#presets-carousel.drag-active .preset-block.placeholder {
+  opacity: 0.28 !important;
+  box-shadow: inset 0 0 0 1px var(--pal-accent, #0f9d6e) !important;
+}
+.preset-block.holding {
+  transform: scale(0.96) !important;
+  opacity: 0.9 !important;
+  transition:
+    transform 120ms ease,
+    opacity 120ms ease !important;
+}
+
+/* Animation for other presets making space */
+#presets-carousel .preset-block:not(.dragging):not(.placeholder) {
+  transition:
+    transform 180ms cubic-bezier(0.2, 0, 0, 1),
+    opacity 180ms cubic-bezier(0.2, 0, 0, 1) !important;
+}
+
+#presets-carousel.drag-active .preset-block:not(.dragging):not(.placeholder) {
+  /* Will be controlled by JS for insertion animation */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .preset-block.dragging {
+    transform: none !important;
+    transition: none !important;
+  }
+  .preset-block.placeholder {
+    transition: none !important;
+  }
+  #presets-carousel .preset-block:not(.dragging):not(.placeholder) {
+    transition: none !important;
+  }
+}
+
+/* ── Gear / Search — 32px Windows (ícone 18px) ── */
+#widgetbar-mode-toggle .widgetbar-pill-icon {
+  width: 32px !important;
+  height: 32px !important;
+  min-height: 32px !important; /* derruba min-height:34px do soft-ui */
+  border-radius: 6px !important;
+  background: transparent !important;
+  border: none !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+}
+#widgetbar-mode-toggle .widgetbar-pill-icon i,
+#widgetbar-mode-toggle .widgetbar-pill-icon svg {
+  font-size: 18px !important;
+  line-height: 1 !important;
+}
+#widgetbar-mode-toggle .widgetbar-pill-icon:hover {
+  background: rgba(0, 0, 0, 0.06) !important;
+}
+html.dark #widgetbar-mode-toggle .widgetbar-pill-icon:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+.widgetbar-search-btn {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 6px !important;
+  background: transparent !important;
+  border: none !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+}
+.widgetbar-search-btn i,
+.widgetbar-search-btn svg {
+  font-size: 18px !important;
+  line-height: 1 !important;
+}
+html.dark .widgetbar-search-btn {
+  background: transparent !important;
+  border-color: transparent !important;
+}
+.widgetbar-search-btn:hover {
+  background: rgba(0, 0, 0, 0.08) !important;
+}
+html.dark .widgetbar-search-btn:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* ── Edit pills — 32px Windows (ícone 18px, hover reveal igual presets) ── */
+.edit-pill {
+  width: 32px !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  border-radius: 6px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+  background: transparent !important;
+  border: none !important;
+  color: var(--cor-nav-texto-medio) !important;
+  gap: 0 !important;
+  transition:
+    background 120ms cubic-bezier(0.2, 0, 0, 1),
+    transform 120ms cubic-bezier(0.2, 0, 0, 1),
+    color 120ms ease !important;
+}
+.edit-pill i,
+.edit-pill svg {
+  font-size: 18px !important;
+  line-height: 1 !important;
+}
+.edit-pill span {
+  display: none !important;
+} /* só ícone na taskbar, label no tooltip */
+.edit-pill:hover {
+  background: rgba(0, 0, 0, 0.06) !important;
+  color: var(--cor-nav-primaria) !important;
+}
+html.dark .edit-pill:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+.edit-pill:disabled {
+  opacity: 0.38 !important;
+  pointer-events: none !important;
+}
+.edit-pill.danger:hover {
+  background: rgba(239, 68, 68, 0.12) !important;
+  color: #ef4444 !important;
+}
+.edit-pill.restore {
+  box-shadow: 0 0 0 1.5px var(--pal-accent, #0f9d6e) !important;
+}
+
+#edit-mode-section {
+  gap: 6px !important;
+  display: flex !important;
+  align-items: center !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  transition: opacity 150ms cubic-bezier(0.2, 0, 0, 1) !important;
+}
+/* grupo Restaurar com setas de histórico (undo/redo) */
+.restore-group {
+  display: flex !important;
+  align-items: center !important;
+  gap: 2px !important;
+  padding: 2px !important;
+  border-radius: 8px !important;
+  background: rgba(0, 0, 0, 0.04) !important;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+}
+html.dark .restore-group {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+.history-arrow {
+  width: 24px !important;
+  height: 24px !important;
+  min-height: 24px !important;
+  border-radius: 6px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: transparent !important;
+  border: none !important;
+  color: var(--cor-nav-texto-medio) !important;
+  cursor: pointer !important;
+  position: relative !important;
+  overflow: visible !important;
+  transition:
+    background 120ms ease,
+    color 120ms ease,
+    opacity 120ms ease,
+    transform 120ms ease !important;
+}
+.history-arrow i {
+  font-size: 12px !important;
+  line-height: 1 !important;
+}
+.history-arrow:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.08) !important;
+  color: var(--cor-nav-primaria) !important;
+  transform: scale(1.05) !important;
+}
+html.dark .history-arrow:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+.history-arrow:disabled {
+  opacity: 0.28 !important;
+  pointer-events: none !important;
+}
+.history-arrow:active:not(:disabled) {
+  transform: scale(0.95) !important;
+}
+/* badge com contador de passos (estilo Windows badge) */
+.history-arrow[data-count]:not([data-count='0'])::after {
+  content: attr(data-count) !important;
+  position: absolute !important;
+  top: -5px !important;
+  right: -5px !important;
+  min-width: 14px !important;
+  height: 14px !important;
+  padding: 0 3px !important;
+  font-size: 9px !important;
+  font-weight: 700 !important;
+  line-height: 14px !important;
+  text-align: center !important;
+  background: var(--pal-accent, #0f9d6e) !important;
+  color: #fff !important;
+  border-radius: 999px !important;
+  border: 1.5px solid var(--cor-nav-fundo, #fff) !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15) !important;
+  pointer-events: none !important;
+}
+html.dark .history-arrow[data-count]:not([data-count='0'])::after {
+  border-color: var(--cor-nav-fundo-rolagem, #202020) !important;
+}
+
+/* ── Edit Mode Groups & Layout ── */
+#edit-mode-section {
+  gap: 8px !important;
+  display: flex !important;
+  align-items: center !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  transition: opacity 150ms cubic-bezier(0.2, 0, 0, 1) !important;
+  flex-wrap: nowrap !important;
+}
+
+/* Grupos visuais com divisores */
+.edit-group {
+  display: flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  padding: 0 6px !important;
+  height: 32px !important;
+}
+.edit-group:not(:last-child)::after {
+  content: '' !important;
+  width: 1px !important;
+  height: 20px !important;
+  background: linear-gradient(
+    to bottom,
+    transparent 20%,
+    rgba(0, 0, 0, 0.08) 50%,
+    transparent 80%
+  ) !important;
+  margin-left: 8px !important;
+  flex-shrink: 0 !important;
+}
+html.dark .edit-group:not(:last-child)::after {
+  background: linear-gradient(
+    to bottom,
+    transparent 20%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 80%
+  ) !important;
+}
+
+/* Divisores explícitos */
+.edit-divider {
+  width: 1px !important;
+  height: 20px !important;
+  background: linear-gradient(
+    to bottom,
+    transparent 20%,
+    rgba(0, 0, 0, 0.08) 50%,
+    transparent 80%
+  ) !important;
+  margin: 0 6px !important;
+  flex-shrink: 0 !important;
+}
+html.dark .edit-divider {
+  background: linear-gradient(
+    to bottom,
+    transparent 20%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 80%
+  ) !important;
+}
+
+/* Grupos específicos */
+.restore-group {
+  background: linear-gradient(90deg, rgba(15, 157, 110, 0.06), transparent) !important;
+  border-radius: 8px !important;
+  padding: 2px 6px !important;
+  border: 1px solid rgba(15, 157, 110, 0.12) !important;
+}
+html.dark .restore-group {
+  background: linear-gradient(90deg, rgba(62, 196, 143, 0.08), transparent) !important;
+  border-color: rgba(62, 196, 143, 0.15) !important;
+}
+
+/* History arrows already styled - ensure they work in restore-group */
+.restore-group .history-arrow {
+  width: 24px !important;
+  height: 24px !important;
+  min-height: 24px !important;
+}
+
+/* Edit pills inside groups - compact */
+.edit-group .edit-pill {
+  padding: 0 8px !important;
+  gap: 4px !important;
+}
+.edit-group .edit-pill span {
+  display: inline !important;
+  font-size: 0.625rem !important;
+  font-weight: 500 !important;
+  white-space: nowrap !important;
+}
+
+/* ── Modo edição: esquerda FIXA (gear→diquete, lupa, presets), direita troca sliders por gama de edição ── */
+#dashboard-appbar:not(.editing) #edit-mode-section {
+  display: none !important;
+}
+#dashboard-appbar.editing #drag-slider-group {
+  display: none !important;
+}
+#dashboard-appbar.editing #edit-mode-section {
+  display: flex !important;
+}
+#dashboard-appbar.editing #quick-settings-btn {
+  display: none !important;
+}
+/* Fluent: fade entre sliders e gama edição */
+.drag-slider-group,
+#edit-mode-section {
+  will-change: opacity !important;
+}
+
+/* ── Sliders — Windows 11 Settings (track pílula + fill gradiente + thumb) ── */
+.drag-slider-group {
+  gap: 16px !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+}
+/* Solta em qualquer lugar (visual 40px) */
+.drag-slider {
+  width: 150px !important;
+  height: 32px !important;
+  display: flex !important;
+  align-items: center !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  cursor: pointer !important;
+  position: relative !important;
+}
+/* trilha — pílula macia com sombra interna */
+.drag-slider-track {
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  height: 8px !important;
+  left: 0 !important;
+  right: 0 !important;
+  background: rgba(100, 116, 139, 0.18) !important;
+  border-radius: 999px !important;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+}
+html.dark .drag-slider-track {
+  background: rgba(255, 255, 255, 0.14) !important;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25) !important;
+}
+/* preenchimento — gradiente accent com brilho suave */
+.drag-slider-fill {
+  position: absolute !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  left: 0 !important;
+  height: 8px !important;
+  background: linear-gradient(
+    90deg,
+    rgba(15, 157, 110, 0.45),
+    var(--pal-accent, #0f9d6e)
+  ) !important;
+  border-radius: 999px !important;
+  box-shadow: 0 0 10px rgba(15, 157, 110, 0.28) !important;
+  pointer-events: none !important;
+}
+html.dark .drag-slider-fill {
+  background: linear-gradient(
+    90deg,
+    rgba(62, 196, 143, 0.45),
+    var(--pal-accent, #3ec48f)
+  ) !important;
+}
+/* thumb — retângulo pílula com label (dia/semana...), estilo Windows 11 */
+.drag-slider-thumb {
+  top: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: auto !important;
+  min-width: 56px !important;
+  height: 22px !important;
+  padding: 0 10px !important;
+  background: #ffffff !important;
+  border: 1.5px solid var(--pal-accent, #0f9d6e) !important;
+  box-shadow:
+    0 1px 4px rgba(0, 0, 0, 0.12),
+    0 2px 8px rgba(0, 0, 0, 0.08) !important;
+  border-radius: 999px !important;
+  font-size: 0.6875rem !important;
+  font-weight: 600 !important;
+  color: #0f172a !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  white-space: nowrap !important;
+  cursor: grab !important;
+  user-select: none !important;
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease,
+    border-color 120ms ease,
+    background 120ms ease !important;
+  line-height: 1 !important;
+}
+.drag-slider:active .drag-slider-thumb {
+  cursor: grabbing !important;
+  transform: translate(-50%, -50%) scale(1.04) !important;
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.16),
+    0 0 0 4px rgba(15, 157, 110, 0.12) !important;
+}
+.drag-slider:hover .drag-slider-thumb {
+  border-color: var(--pal-accent, #0f9d6e) !important;
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.14),
+    0 0 0 3px rgba(15, 157, 110, 0.1) !important;
+}
+html.dark .drag-slider-thumb {
+  background: #2b2b2b !important;
+  border-color: var(--pal-accent, #3ec48f) !important;
+  color: #e5f5ee !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3) !important;
+}
+html.dark .drag-slider:hover .drag-slider-thumb {
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    0 0 0 3px rgba(62, 196, 143, 0.15) !important;
+}
+html.dark .drag-slider:active .drag-slider-thumb {
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    0 0 0 4px rgba(62, 196, 143, 0.18) !important;
+}
+html.dark .drag-slider-thumb span {
+  color: #e5f5ee !important;
+}
+.drag-slider-thumb span {
+  display: block !important;
+  font-size: 0.6875rem !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+  pointer-events: none !important;
+  color: #0f172a !important;
+  overflow: visible !important;
+  white-space: nowrap !important;
+}
+/* remove badge antigo — label agora dentro do thumb */
+.drag-slider-thumb::after,
+.drag-slider-thumb::before {
+  display: none !important;
+}
+/* Botão flyout quick-settings — 32px sem fundo/borda (ícone 18px) */
+.quick-settings-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent !important;
+  border: none !important;
+  color: var(--cor-nav-texto-medio);
+  cursor: pointer;
+  transition: all 120ms ease;
+  font-size: 18px;
+  line-height: 1;
+}
+.quick-settings-btn:hover {
+  background: rgba(0, 0, 0, 0.08);
+  color: var(--cor-nav-primaria);
+  transform: scale(1.03);
+}
+html.dark .quick-settings-btn {
+  background: transparent !important;
+  border-color: transparent !important;
+}
+html.dark .quick-settings-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* ── Flyouts — Start & Quick Settings (acrylic) ── */
+.widgetbar-search-wrap {
+  position: relative !important;
+}
+body .search-menu,
+#dashboard-appbar .search-menu {
+  width: 640px !important;
+  max-width: min(640px, calc(100vw - 16px)) !important;
+  bottom: var(--widgetbar-altura, 56px) !important;
+  left: 12px !important;
+  right: auto !important;
+  transform: translateY(6px) scale(0.97) !important;
+  transform-origin: bottom left !important;
+  border-radius: 12px !important;
+  padding: 14px !important;
+  max-height: min(520px, calc(100vh - 72px)) !important;
+  overflow-y: auto !important;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+  box-shadow:
+    0 16px 48px rgba(0, 0, 0, 0.14),
+    0 4px 16px rgba(0, 0, 0, 0.08) !important;
+  backdrop-filter: blur(28px) saturate(1.3) !important;
+}
+html.dark body .search-menu,
+html.dark #dashboard-appbar .search-menu {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4) !important;
+}
+body .search-menu.open,
+#dashboard-appbar .search-menu.open {
+  left: 12px !important;
+  transform: translateY(0) scale(1) !important;
+}
+/* Start grid 2 colunas */
+.search-menu .search-menu-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 10px;
+}
+@media (max-width: 520px) {
+  .search-menu .search-menu-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .search-menu {
+    width: calc(100vw - 16px) !important;
+    left: 8px !important;
+    right: 8px !important;
+  }
+}
+
+/* Quick Settings flyout */
+.quick-settings-flyout {
+  position: fixed;
+  bottom: var(--widgetbar-altura, 56px);
+  right: 12px;
+  width: min(360px, calc(100vw - 16px));
+  background: var(--cor-nav-dropdown-fundo);
+  backdrop-filter: blur(24px) saturate(1.3);
+  -webkit-backdrop-filter: blur(24px) saturate(1.3);
+  border: 1px solid var(--cor-nav-dropdown-borda);
+  border-radius: 12px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.14);
+  padding: 14px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(6px) scale(0.97);
+  transition: all 200ms cubic-bezier(0.2, 0, 0, 1);
+  z-index: 2147483646;
+}
+.quick-settings-flyout.open {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+.quick-settings-flyout h4 {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--cor-nav-texto);
+  margin: 0 0 10px;
+}
+.quick-settings-flyout .qs-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--cor-nav-separador);
+}
+.quick-settings-flyout .qs-row:last-child {
+  border-bottom: none;
+}
+
+/* ── Preset preview — taskbar thumbnail ── */
+.preset-preview-card {
+  bottom: var(--widgetbar-altura, 56px) !important;
+  border-radius: 10px !important;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.14) !important;
+}
+.preset-preview-card.visible {
+  transform: translateY(0) scale(1) !important;
+}
+
+/* ── Snap Layouts — Windows 11 style ── */
+.snap-layouts {
+  position: absolute;
+  inset: 8px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 8px;
+  pointer-events: none;
+  z-index: 5;
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+.matrix-container.drag-active .snap-layouts {
+  opacity: 1;
+}
+.snap-zone {
+  border: 1.5px dashed rgba(15, 157, 110, 0.35);
+  border-radius: 10px;
+  background: rgba(15, 157, 110, 0.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: rgba(15, 157, 110, 0.7);
+  backdrop-filter: blur(4px);
+}
+.snap-zone.snap-active {
+  background: rgba(15, 157, 110, 0.12);
+  border-color: #0f9d6e;
+  color: #0f9d6e;
+}
+.snap-zone.snap-invalid {
+  border-color: rgba(239, 68, 68, 0.35);
+  background: rgba(239, 68, 68, 0.04);
+  color: rgba(239, 68, 68, 0.6);
+}
+
+/* ── Context menu — Windows 11 ── */
+.widget-context-menu {
+  position: fixed;
+  min-width: 180px;
+  background: var(--cor-nav-dropdown-fundo);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--cor-nav-dropdown-borda);
+  border-radius: 10px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.14);
+  padding: 6px;
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.96);
+  transition:
+    opacity 120ms ease,
+    transform 120ms ease;
+  z-index: 2147483645;
+}
+.widget-context-menu.open {
+  opacity: 1;
+  pointer-events: auto;
+  transform: scale(1);
+}
+.widget-context-menu button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--cor-nav-texto);
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+}
+.widget-context-menu button:hover {
+  background: var(--cor-nav-pilula-hover);
+  color: var(--cor-nav-primaria);
+}
+.widget-context-menu button.danger:hover {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+}
+.widget-context-menu hr {
+  border: none;
+  height: 1px;
+  background: var(--cor-nav-separador);
+  margin: 4px 0;
+}
+
+/* ── Tooltip Windows 11 — caixa com nome ACIMA do botão (todos os elementos, igual .edit-pill) ── */
+.preset-block,
+#widgetbar-mode-toggle .widgetbar-pill-icon,
+.widgetbar-search-btn,
+.quick-settings-btn,
+.edit-pill {
+  position: relative !important;
+  overflow: visible !important;
+}
+.preset-block[title]:hover::after,
+#widgetbar-mode-toggle .widgetbar-pill-icon[title]:hover::after,
+.widgetbar-search-btn[title]:hover::after,
+.quick-settings-btn[title]:hover::after,
+.edit-pill[title]:hover::after {
+  content: attr(title) !important;
+  position: absolute !important;
+  bottom: calc(100% + 10px) !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  background: rgba(30, 32, 38, 0.95) !important;
+  color: #f9fafb !important;
+  font-size: 0.6875rem !important;
+  font-weight: 500 !important;
+  line-height: 1.3 !important;
+  padding: 5px 10px !important;
+  border-radius: 7px !important;
+  white-space: nowrap !important;
+  pointer-events: none !important;
+  z-index: 2147483644 !important;
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.2),
+    0 1px 3px rgba(0, 0, 0, 0.12) !important;
+  width: max-content !important;
+  max-width: 220px !important;
+  height: auto !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  transition: opacity 100ms ease 90ms !important;
+}
+/* estado base (sem hover) — invisível */
+.preset-block[title]::after,
+#widgetbar-mode-toggle .widgetbar-pill-icon[title]::after,
+.widgetbar-search-btn[title]::after,
+.quick-settings-btn[title]::after,
+.edit-pill[title]::after {
+  content: attr(title) !important;
+  position: absolute !important;
+  bottom: calc(100% + 10px) !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  background: rgba(30, 32, 38, 0.95) !important;
+  color: #f9fafb !important;
+  font-size: 0.6875rem !important;
+  font-weight: 500 !important;
+  line-height: 1.3 !important;
+  padding: 5px 10px !important;
+  border-radius: 7px !important;
+  white-space: nowrap !important;
+  pointer-events: none !important;
+  z-index: 2147483644 !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2) !important;
+  width: max-content !important;
+  max-width: 220px !important;
+  height: auto !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  transition:
+    opacity 100ms ease 90ms,
+    visibility 100ms ease 90ms !important;
+}
+.preset-block[title]:hover::after,
+#widgetbar-mode-toggle .widgetbar-pill-icon[title]:hover::after,
+.widgetbar-search-btn[title]:hover::after,
+.quick-settings-btn[title]:hover::after,
+.edit-pill[title]:hover::after {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* ── Responsivo — Windows taskbar collapse ── */
+@media (max-width: 900px) {
+  #presets-carousel {
+    max-width: 30vw !important;
+  }
+  .drag-slider {
+    width: 110px !important;
+  }
+}
+@media (max-width: 640px) {
+  #dashboard-appbar {
+    padding: 0 8px !important;
+  }
+  #presets-carousel {
+    max-width: 28vw !important;
+  }
+  .drag-slider {
+    display: none !important;
+  } /* vira flyout */
+  .quick-settings-btn {
+    display: flex !important;
+  }
+}
+@media (min-width: 641px) {
+  .quick-settings-btn {
+    display: none !important;
+  }
+}
+
+/* ── Container precisa de padding bottom para não ficar atrás da taskbar 42px ── */
+#content {
+  padding-bottom: 50px !important;
+}
+
+/* ── Widgets — mantém borda original (não transparente) ── */
+/* Fundo transparente removido — widgets voltam ao padrão tailwind (borda + sombra) para contraste */
+
+/* ── Preset preview — corrige espaço reservado nome/preview ── */
+.preset-preview-card {
+  padding: 10px !important;
+  gap: 0 !important;
+}
+.preset-preview-card .preview-header {
+  margin-bottom: 8px !important;
+  padding-bottom: 8px !important;
+  gap: 10px !important;
+}
+.preset-preview-card .preview-title {
+  font-size: 0.8125rem !important;
+  line-height: 1.2 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  max-width: 200px !important;
+}
+.preset-preview-card .preview-subtitle {
+  font-size: 0.6875rem !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  max-width: 200px !important;
+}
+.preset-preview-card .preview-image {
+  height: 92px !important;
+  min-height: 92px !important;
+  max-height: 92px !important;
+  margin-bottom: 8px !important;
+  background: var(--cor-fundo, #f8fafc) !important;
+  border: 1px solid var(--cor-nav-separador) !important;
+  border-radius: 8px !important;
+}
+.preset-preview-card .preview-meta {
+  margin-top: 0 !important;
+  padding-top: 6px !important;
+  border-top: 1px solid var(--cor-nav-separador) !important;
+}
+.preset-preview-card .preview-actions {
+  margin-top: 8px !important;
+  padding-top: 8px !important;
+}
+
+/* ────────────────────────────────────────────────────────────────────────
+   PERFORMANCE: will-change / contain para elementos de drag/resize
+   ──────────────────────────────────────────────────────────────────────── */
+
+/* Elementos sendo arrastados - otimiza composição e paint */
+body .drag-origin,
+body .drag-ghost,
+body .drag-ghost *,
+body .resize-blocked,
+body .bento-block.dragging,
+body .widget-live-preview,
+body .matrix-drop-overlay,
+body .grid-drop-hint,
+#dashboard-appbar .drag-ghost,
+.matrix-container .grid-drop-hint {
+  will-change: transform, grid-column, grid-row;
+  contain: layout paint;
+  pointer-events: none !important;
+}
+
+/* Hint de drop - isolado do layout principal */
+.grid-drop-hint {
+  will-change: transform, left, top;
+  contain: paint;
+}
+
+/* Sliders - thumb e fill animados */
+.drag-slider-thumb {
+  will-change: transform, left;
+  contain: paint;
+}
+.drag-slider-fill {
+  will-change: width;
+  contain: paint;
+}
+
+/* Presets carousel - isolamento para scroll suave */
+#presets-carousel {
+  contain: layout style;
+}
+
+/* Matrix container - isolamento de layout dos widgets */
+.matrix-container {
+  contain: layout style;
+  position: relative;
+}
+
+/* Flyouts - isolamento para animações */
+.search-menu,
+.quick-settings-flyout,
+.preset-preview-card,
+.edit-dropdown {
+  will-change: transform, opacity;
+  contain: paint;
+}
+
+/* Modo edição - reduz paint durante edição */
+#dashboard-appbar.editing {
+  contain: layout;
+}
+
+/* Reduz layout thrashing em containers com muitos filhos */
+.widgetbar-section-core,
+.right-section-normal,
+.widgetbar-search-wrap {
+  contain: layout;
+}
+
+/* ────────────────────────────────────────────────────────────────────────
+   ACCESSIBILITY: reduced motion support
+   ──────────────────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .drag-origin,
+  .drag-ghost,
+  .bento-block.dragging,
+  .drag-slider-thumb,
+  .drag-slider-fill,
+  .history-arrow,
+  .edit-pill,
+  .preset-block,
+  .history-arrow:active:not(:disabled),
+  .history-arrow:hover:not(:disabled) {
+    transition: none !important;
+    animation: none !important;
+  }
+  .drag-ghost {
+    will-change: auto !important;
+  }
+  .drag-origin {
+    will-change: auto !important;
+  }
+}
+
+/* ────────────────────────────────────────────────────────────────────────
+   CENTRALIZADO — Pesquisar e Cor de Fundo no centro da tela
+   ──────────────────────────────────────────────────────────────────────── */
+body .search-menu,
+#dashboard-appbar .search-menu {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  bottom: auto !important;
+  right: auto !important;
+  transform: translate(-50%, -50%) scale(0.97) !important;
+  transform-origin: center center !important;
+  width: min(640px, calc(100vw - 32px)) !important;
+  max-width: min(640px, calc(100vw - 32px)) !important;
+  max-height: min(520px, calc(100vh - 32px)) !important;
+  margin: 0 !important;
+  z-index: 1000 !important;
+}
+body .search-menu.open,
+#dashboard-appbar .search-menu.open {
+  transform: translate(-50%, -50%) scale(1) !important;
+}
+#bg-color-dropdown.edit-dropdown {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  bottom: auto !important;
+  right: auto !important;
+  transform: translate(-50%, -50%) scale(0.96) !important;
+  transform-origin: center center !important;
+  width: min(320px, calc(100vw - 32px)) !important;
+  max-width: min(320px, calc(100vw - 32px)) !important;
+  max-height: min(420px, calc(100vh - 32px)) !important;
+  overflow-y: auto !important;
+  z-index: 1000 !important;
+}
+#bg-color-dropdown.edit-dropdown.open {
+  transform: translate(-50%, -50%) scale(1) !important;
+}
+/* Backdrop para ambos */
+body.search-menu-open::before,
+body.bg-dropdown-open::before {
+  content: '';
+  position: fixed !important;
+  inset: 0 !important;
+  background: rgba(0, 0, 0, 0.35) !important;
+  backdrop-filter: blur(4px) !important;
+  -webkit-backdrop-filter: blur(4px) !important;
+  z-index: 999 !important;
+  pointer-events: auto !important;
+}
+html.dark body.search-menu-open::before,
+html.dark body.bg-dropdown-open::before {
+  background: rgba(0, 0, 0, 0.5) !important;
+}
+
+/* ────────────────────────────────────────────────────────────────────────
+   HIGH CONTRAST MODE SUPPORT
+   ──────────────────────────────────────────────────────────────────────── */
+@media (forced-colors: active) {
+  .history-arrow[data-count]::after {
+    border: 2px solid currentColor;
+  }
+  .drag-slider-thumb {
+    border: 2px solid CanvasText;
+    background: Canvas;
+  }
+  .drag-slider-track {
+    border: 1px solid CanvasText;
+  }
+  .restore-group,
+  .history-arrow {
+    border: 1px solid CanvasText;
+  }
+}
+
+/* ────────────────────────────────────────────────────────────────────────
+   TAMANHO DO TEXTO DOS WIDGETS — auto-escala pelo tamanho (--wfs via JS)
+   .bento-block recebe --wfs (fator, 1 = atual); o conteúdo textual escala
+   junto via zoom (proporcional, como lupa). Valor fixo por widget usa a
+   mesma variável (fontSizePx/16) e marca data-font-fixed no bloco.
+   ──────────────────────────────────────────────────────────────────────── */
+.bento-block .widget-content {
+  zoom: var(--wfs, 1);
+}
+
+/* Campo de tamanho do texto no dropdown de edição */
+#font-size-dropdown .font-size-row input[type='number'] {
+  width: 58px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  border: 1px solid var(--cor-nav-separador);
+  font-size: 0.75rem;
+  background: var(--cor-nav-fundo, #fff);
+  color: var(--cor-nav-texto, inherit);
+}
+#font-size-dropdown .font-size-row input[type='range'] {
+  flex: 1;
+  cursor: pointer;
+  accent-color: var(--cor-primaria, #0f9d6e);
+}
+#font-size-dropdown .font-size-row #font-size-pct {
+  font-size: 0.625rem;
+  min-width: 38px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Redesenho da widget bar no celular.
+
+   O que o medidor mostrou a 393px: a barra tinha slider de periodo (Dia/Semana/
+   Mes/Semestre/Ano) e slider financeiro (Lucros/Ambos/Gastos) na secao direita.
+   Dois sliders com trilha e thumb nao sao operaveis com o dedo — o alvo util e
+   pequeno e o gesto e horizontal, que conflita com o scroll da tela. Numa barra
+   de 44px de altura, eles ainda espremiam os presets.
+
+   Decisao de projeto: no celular a widget bar fica com DUAS coisas apenas —
+   os presets e o botao de modo de edicao. Os sliders sao recurso de desktop.
+
+   Em modo de edicao, os botoes (desfazer/refazer/restaurar/preset/widget/fundo/
+   fonte) saem da widget bar e vao para uma barra flutuante ACIMA dela. Motivo:
+   eles nao cabem em 393px dentro da barra de 44px, e enfia-los ali tambem
+   espremia os presets — que sao o que o usuario mais usa no dia a dia.
+
+   O markup NAO foi duplicado: #edit-mode-section e #drag-slider-group ja
+   existem. Aqui so mudam de lugar por media query. O desktop nao muda.
+   ───────────────────────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  /* A regra base deste arquivo usa !important com especificidade de ID
+     (#widgetbar-mode-toggle .widgetbar-pill-icon), entao nada em outro arquivo
+     vence. O override precisa repetir o !important e a mesma especificidade,
+     e ficar DEPOIS no cascade. Medido a 390px: renderizava 32x32, abaixo dos
+     44px do WCAG 2.5.5. */
+  #widgetbar-mode-toggle .widgetbar-pill-icon {
+    min-width: 44px !important;
+    min-height: 44px !important;
+    width: 44px !important;
+    height: 44px !important;
+  }
+
+  /* altura real da barra: a flutuante se apoia nela */
+  #dashboard-appbar {
+  }
+
+  /* sliders fora do celular */
+  #drag-slider-group {
+    display: none !important;
+  }
+
+  /* a barra de edicao sobe para flutuar acima da widget bar */
+  #edit-mode-section {
+    position: fixed !important;
+    left: 8px;
+    right: 8px;
+    bottom: calc(var(--widgetbar-altura, 56px) + 8px);
+    z-index: 90;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    padding: 8px;
+    border-radius: 14px;
+    background: var(--cor-nav-fundo-rolagem);
+    backdrop-filter: blur(18px) saturate(1.3);
+    -webkit-backdrop-filter: blur(18px) saturate(1.3);
+    border: 1px solid var(--cor-nav-borda);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+  }
+  /* os dropdowns dentro da barra flutuante (Cor do Fundo, Tamanho da fonte)
+     ficariam presos atrás dela: abrem para cima */
+  #edit-mode-section .edit-dropdown {
+    bottom: calc(100% + 6px);
+    top: auto;
+    max-width: calc(100vw - 24px);
+  }
+
+  /* presets e modo de edicao ganham a barra inteira */
+  #widgetbar-left-section {
+    flex: 1 1 auto;
+    justify-content: flex-start;
+  }
+  #presets-carousel {
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  #presets-carousel::-webkit-scrollbar {
+    display: none;
+  }
+  /* o indicador de selecao ia para o meio e nao ha espaco: sobe junto */
+  #widgetbar-center-section {
+    display: none;
+  }
+}

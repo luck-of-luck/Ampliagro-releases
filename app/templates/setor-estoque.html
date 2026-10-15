@@ -1,0 +1,141 @@
+{% extends base_template %}
+{% load static %}
+
+{% block title %}Ampliagro - Setor Estoque{% endblock %}
+
+{% block extra_css %}
+
+{% endblock %}
+
+{% block dashboard_appbar %}{% endblock %}
+
+{% block content %}
+<div class="section-container">
+    <div class="section-header">
+        <h1 class="section-title"><i class="bi bi-box-seam"></i> Setor Estoque</h1>
+        <a href="{% url 'index_spa' %}" class="btn-secondary btn-sm"><i class="bi bi-arrow-left"></i> Voltar ao Dashboard</a>
+    </div>
+
+    <div class="stats-grid">
+        {% comment %}
+        Os quatro numeros abaixo eram LITERAIS no HTML enquanto a view passava
+        `itens` do banco e esta tela nunca o lia. Agora sao medidos em
+        setor_estoque_view.
+        {% endcomment %}
+        <div class="stat-card">
+            <div class="stat-label">Total Itens</div>
+            <div class="stat-value">{{ total_itens|default:"0" }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Categorias</div>
+            <div class="stat-value">{{ total_categorias|default:"0" }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Valor Estimado</div>
+            {% if valor_medido %}
+            <div class="stat-value">R$ {{ valor_total|floatformat:2 }}</div>
+            {% else %}
+            {% comment %}
+            `valor_unitario` nao esta no serializer: so o admin o preenche.
+            Mostrar R$ 0,00 diria que o estoque vale nada, que e' uma
+            afirmacao. `sem dado` diz o que sabemos: nada foi medido.
+            {% endcomment %}
+            <div class="stat-value" title="valor_unitario nao e' gravavel pela API">sem dado</div>
+            {% endif %}
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Alertas</div>
+            <div class="stat-value{% if alertas %} stat-alert{% endif %}">{{ alertas|default:"0" }}</div>
+        </div>
+    </div>
+
+    <div class="content-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+            <h2 style="font-size:1rem;font-weight:600;color:var(--ncs-green-dark);">Movimentações Recentes</h2>
+            <a href="{% url 'cadastro-estoque' %}" class="btn-primary btn-sm"><i class="bi bi-plus-lg"></i> Novo Item</a>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Item</th>
+                        <th>Categoria</th>
+                        <th>Tipo</th>
+                        <th>Quantidade</th>
+                        <th>Valor (R$)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% comment %}
+                    Nao ha ledger. Ver a nota em setor_estoque_view: os dois
+                    modelos de movimentacao existem e ninguem escreve neles.
+                    {% endcomment %}
+                    <tr>
+                        <td colspan="6" style="padding:1.5rem;text-align:center;opacity:.7">
+                            {% if tem_ledger %}
+                                Ha movimentacoes registadas. A tabela ainda nao foi
+                                ligada ao ledger.
+                            {% else %}
+                                <strong>Sem dado.</strong> Nao existe registo de
+                                entrada e saida de estoque.<br>
+                                Os modelos existem, mas nada escreve neles — por
+                                isso a Curva ABC e o alerta de ruptura sao menos
+                                confiaveis do que parecem.
+                            {% endif %}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="content-card">
+        <h2 style="font-size:1rem;font-weight:600;margin-bottom:1rem;color:var(--ncs-green-dark);">
+            Itens com Alerta
+        </h2>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Estoque Atual</th>
+                        <th>Estoque Minimo</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% comment %}
+                    MEDIDO: `em_ruptura` vem de quantidade < quantidade_minima.
+                    Antes eram tres linhas literais (Defensivo B, Fertilizante
+                    Ureia, Oleo Lubrificante) que nenhuma producer viu.
+                    {% endcomment %}
+                    {% for item in em_ruptura %}
+                    <tr>
+                        <td><strong>{{ item.nome }}</strong></td>
+                        <td>{{ item.quantidade|floatformat:2 }}</td>
+                        <td>{{ item.quantidade_minima|floatformat:2 }}</td>
+                        <td>
+                            <span class="badge badge-alert">
+                                {% widthratio item.quantidade item.quantidade_minima 100 as pct %}
+                                {% if pct < 50 %}Critico{% else %}Atencao{% endif %}
+                            </span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" style="padding:1.5rem;text-align:center;opacity:.7">
+                            {% if total_itens == 0 %}
+                                Nenhum item cadastrado.
+                            {% else %}
+                                Nenhum item abaixo do minimo.
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

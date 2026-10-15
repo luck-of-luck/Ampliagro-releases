@@ -1,0 +1,115 @@
+Felipe Ribeiro interrompeu a entrevista e virou de costas para se proteger. Segundos depois, uma nuvem de poeira se formou enquanto um drone levantava voo para pulverizar parte da lavoura na Fazenda Nova Esperança . A cena já não surpreende o produtor e engenheiro agrônomo à frente da propriedade em Cesário Lange, no interior de São Paulo.
+
+Nos 1.000 hectares cultivados com soja , milho , feijão , trigo e aveia , do plantio à colheita, a tecnologia está presente em todos os processos – do mais simples ao mais complexo.
+
+Sérgio Ribeiro, pai de Felipe, comprou a fazenda há 36 anos, quando havia áreas de cana-de-açúcar em produção. Com o passar do tempo, uma destilaria de álcool também funcionou por lá – e assim permaneceu por muitos anos. Não por acaso, o município, que tem em torno de 19.000 habitantes, de acordo com o Instituto Brasileiro de Geografia e Estatística (IBGE), está inserido em uma região historicamente dominada pela cana.
+
+“Meu pai é engenheiro civil e sempre esteve muito ligado à tecnologia. Mesmo trabalhando só com cana, ele já utilizava práticas como plantas de cobertura, especialmente nas áreas de reforma. Ou seja, já existia uma preocupação com um manejo mais avançado”, conta Felipe.
+
+Acompanhando o dia a dia da propriedade, algo chamava a atenção do produtor de 42 anos. “Percebemos que a tecnologia voltada para os grãos era mais avançada do que a disponível para a cana.” O diagnóstico marcaria um ponto de inflexão na história da Nova Esperança, que há cerca de 15 anos teve iniciada a transição produtiva para os grãos.
+
+Naquela época, as máquinas utilizadas ainda não contavam com tecnologia embarcada capaz de alterar significativamente a produtividade ou reduzir o uso de insumos. Ainda assim, conceitos considerados elementares já eram aplicados ao manejo, como rotação de culturas e análise de perfil de solo. Era um movimento irreversível. Segundo Felipe, o nível de detalhamento exigido nos grãos é muito maior. “Enquanto na cana o foco é mais por hectare, nos grãos passamos a analisar em um nível quase planta a planta, o que exige mais precisão e tecnologia.”
+
+No dia em que a reportagem esteve na Nova Esperança, Felipe também recebeu a visita de Bruno Pavão, diretor de serviços da Solinftec, agtech que desenvolve tecnologias para diferentes operações no campo. Na fazenda da família Ribeiro, as inovações da empresa estão presentes em praticamente todos os talhões. Bastam poucos minutos andando pela estrada de terra para encontrá-las.
+
+Em meio à lavoura, surge o Solix , robô autônomo voltado ao monitoramento e à pulverização de precisão . Chamativo, ele ajuda a materializar a transformação em curso no campo. Mas a mudança mais profunda é menos visível. Os sistemas embarcados acompanham cada equipamento que opera diariamente na propriedade, coletando dados, aprimorando rotas e orientando decisões em tempo real.
+
+De acordo com o Sebrae Startups Report, do Serviço Brasileiro de Apoio às Micro e Pequenas Empresas, o Brasil registrou 22.869 startups em 2025. Nesse cenário, o agronegócio representa 7,5% do total e aparece como o quarto setor mais representativo, atrás apenas de tecnologia da informação, saúde e bem-estar e educação.
+
+A revolução das inovações desenvolvidas por startups e acopladas a tratores, colheitadeiras ou pulverizadores vive seu auge no Brasil. O setor de máquinas, drones e equipamentos somou 115 empresas no ano passado, 47,5% a mais do que as 78 registradas em 2022 , apontam os dados do Radar Agtech 2025, levantamento feito por Embrapa, SP Ventures e Homo Ludens.
+
+O estudo também aponta que o Brasil ultrapassou, pela primeira vez, a casa das 2.000 agtechs: são 2.075 no total. Deste montante, a categoria de máquinas, drones e equipamentos ocupa a quarta posição, com 5,5% das startups.
+
+Na visão de Aurélio Favarin, analista de inovação aberta da Embrapa e responsável pelo levantamento do Radar, essa categoria está totalmente inserida na etapa chamada dentro da porteira . O crescimento ocorre porque as startups estão criando soluções que participam do dia a dia do produtor, com maior aderência às demandas reais, como evitar riscos e diminuir perdas. “Para adotar tecnologia, o produtor precisa confiar no retorno financeiro”, afirma. E é por isso que o dentro da porteira se destaca tanto.
+
+A parceria entre a Solinftec e a Nova Esperança teve início em 2023. Conforme Bruno Pavão, a propriedade abriga o que há de mais moderno no portfólio para grãos da companhia. As máquinas operam com sistemas de computador de bordo para coleta de dados, como velocidade, rotação por minuto (RPM) e consumo de diesel, ou seja, informações que ajudam a melhorar o desempenho dos equipamentos que rodam no campo.
+
+“Tudo o que envolve a tomada de decisão para conduzir uma lavoura, que normalmente ficaria a cargo do operador dentro da cabine, passa a ser orientado pelo sistema”, resume.
+
+Com sede em Araçatuba (SP), a Solinftec é a única agtech do agro entre as 50 startups latino-americanas listadas pela plataforma de inovação aberta Distrito com potencial para se tornar unicórnio — como são chamadas as startups que atingem valor de mercado superior a US$ 1 bilhão.
+
+Aliás, a única “crise existencial” da Solinftec é ser ou não ser mais uma startup. Com aumento de 15% na receita recorrente, a empresa bateu a marca de R$ 430 milhões de recorrência dos produtos no último ano. É apenas uma questão de tempo para o negócio ganhar a rotulagem de unicórnio, afirma Denis Arroyo Alves, vice-presidente da companhia.
+
+“Acredito que não nos encaixamos mais como uma startup, mas sim como uma ‘agtech dentro da porteira’. São poucas que realmente prosperam nessa etapa da produção.” Para o executivo, é como se a Solinftec hoje tivesse “várias startups” dentro do seu guarda-chuva, como o robô Solix e a inteligência artificial batizada de Alice, que ajuda na tomada de decisão dos produtores.
+
+A trajetória da empresa teve início em 2007, quando sete engenheiros especializados em automação industrial vinculados ao governo cubano vieram ao Brasil para uma visita técnica. Em Araçatuba, eles identificaram um mercado promissor para empreender, desvincularam-se do governo de seu país e criaram a brasileira Solinftec.
+
+“Máquinas trabalhando em conjunto precisam de coordenação. É como organizar um evento, com muita coisa acontecendo ao mesmo tempo — Jorge Leal, CEO da IoTag
+
+Os primeiros passos foram concentrados no setor sucroenergético, com monitoramento de equipamentos e serviços de telemetria, fator determinante para Arroyo notar a Solinftec. Em uma oportunidade, ainda como cliente, ele visitou as operações da empresa e deparou com uma estrutura de pesquisa e desenvolvimento (P D) formada por mais de 100 pessoas. “O Britaldo Hernandez (CEO e fundador) me dizia que, se formos capazes de entender o real problema do produtor, é possível desenvolver a solução. Eu, como diretor de usina, cansava de receber soluções mirabolantes, mas que não entendiam meus problemas de verdade.”
+
+O que chamava sua atenção era o controle que as tecnologias da empresa tinham sobre as lavouras de cana. “Era possível saber onde cada máquina estava, qual operador, a velocidade, e na época, há cerca de 15 anos, isso era tão absurdo que fiquei abismado.” A relação entre a Solinftec e Arroyo mudou definitivamente em 2024, quando ele passou a integrar o time. “Eu juro que nunca pensei em trabalhar na companhia, era só um admirador”, admite.
+
+O executivo conta que os cubanos têm um perfil extremamente discreto na comunicação, mas seguem até hoje na parte de P D, liderando a área de inovação. Hoje, a companhia conta com cerca de 800 funcionários, tem atuação em 13 países e escritórios nos Estados Unidos, na Colômbia, no Canadá e na China.
+
+Quatro anos antes de a Solinftec surgir, um empreendedor brasileiro deu seu primeiro passo em direção ao negócio da sua vida. Em 2003, Jorge Leal se formava em engenharia eletrônica na Universidade Tecnológica Federal do Paraná (UTFPR). No mesmo ano, ele foi de Curitiba até Nobres, em Mato Grosso, visitar o sogro e subiu pela primeira vez em um trator. “Esse trator que subi era da John Deere, e 23 anos depois minha startup foi escolhida pelo programa global de seleção de agtechs da companhia.”
+
+Por meio do programa John Deere Startup Collaborator, a fabricante americana seleciona startups ao redor do mundo para trabalhar em conjunto com seus interesses. Em 2026, a brasileira IoTag, de Leal, foi selecionada junto com outras quatro da Austrália, da África do Sul, da Inglaterra e dos Estados Unidos.
+
+A premissa é conectar uma frota de máquinas entre elas e coordená-las para que produzam o máximo possível. Segundo o CEO da agtech, a tecnologia faz sentido se instalada em 50 equipamentos ou mais. “Máquinas trabalhando em conjunto precisam de coordenação. Qual máquina entra em qual hora? É como organizar um evento, com muita coisa acontecendo ao mesmo tempo”, exemplifica Leal.
+
+Estela Dias, gerente de marketing tático da John Deere para a América Latina, explica que o programa seleciona agtechs para complementar o portfólio da companhia. “Essa é a segunda startup brasileira que conseguimos colocar no programa. Agora, ela vai receber orientação financeira e de como se tornar uma empresa mais profissionalizada junto das grandes corporações.”
+
+Para a especialista, a IoTag se destacou ao atender à necessidade dos clientes da John Deere de gerenciar suas operações de maneira simples. “O produtor pluga o dispositivo da IoTag em sua máquina, se conecta ao nosso ‘centro de operações’ e gerencia todo o processo.” Estela lembra também que o aparelho criado por Leal é capaz de conectar máquinas de outras fabricantes ao mesmo centro de operações da John Deere.
+
+Claro que desenvolver esse plug não foi tão simples. Jorge Leal conta que a inspiração veio da Climate Corp, primeiro unicórnio do agro norte-americano, vendida para a Monsanto em 2013, por cerca de US$ 1 bilhão. A empresa usava big data e inteligência artificial nas máquinas para aumentar a produtividade. A premissa da IoTag é a mesma. “Nossa meta desde 2018 é conectar máquinas à internet”, destaca Leal.
+
+Em 2022, a agtech entrou no radar da John Deere, que quis testar a ferramenta no campo, com seus clientes. Entre eles, a BrasilAgro, gigante que atua com aquisição e venda de terras agrícolas. André Guillaumon, presidente-executivo da empresa, participou dos primeiros testes até a consolidação da tecnologia da IoTag nas lavouras da companhia. Para ele, poder controlar a velocidade das suas máquinas, cruzar a informação com a intensidade do vento, com a umidade do ar e outros fatores é o que dá poder à sua operação. “A IoTag surgiu para ser uma solução de conexão”, descreve.
+
+Para Guillaumon, a revolução tecnológica das máquinas passa diretamente pelo aumento de conectividade no campo, desafio importante, mas que demonstra evolução nos últimos anos. O executivo considera que houve um “grande salto” na agricultura brasileira após a chegada da Starlink, serviço de internet via satélite desenvolvido pela SpaceX, empresa de Elon Musk. “Para conectar uma fazenda, eram necessários R$ 2 milhões de investimento em torres de operadoras até meados de 2023. Hoje, ronda os R$ 60.000”, aponta.
+
+De acordo com a ConectarAgro, associação que acompanha a expansão do acesso à internet no campo, a cobertura 4G ou 5G está presente em 33,9% da área agricultável em território brasileiro . O número, que era de 19% em 2024, considera as localidades ativas no Cadastro Ambiental Rural (CAR).
+
+Entre as criadoras da ConectarAgro estão Solinftec, AGCO e CNH Industrial, além de TIM, Nokia, Jacto, Trimble e Climate FieldView. Paulo Máximo, diretor de inovação da CNH, concorda com o pensamento de Guillaumon. Para ele, o desafio da conexão no campo é o ponto crítico para o avanço das tecnologias que já estão disponíveis. “Não acreditamos que o setor evolua sem conectividade. Nossa máquina precisa estar conectada para aproveitar tudo que é oferecido.”
+
+Dentro da agenda de inovação, a fabricante, dona de marcas como New Holland e Case IH, tem forte presença em rodadas de investimento em agtechs. E a sua “queridinha” é a BemAgro, startup de Ribeirão Preto (SP) que utiliza inteligência artificial e visão computacional para monitorar lavouras por meio de máquinas agrícolas , drones e satélites.
+
+A CNH participou de duas rodadas com investimentos que superam os R$ 45 milhões na BemAgro, em uma relação que começou em 2018. Nesse mesmo ano, Johann Coelho, CEO e fundador da startup, era aluno da Faculdade de Economia, Administração, Contabilidade e Atuária da Universidade de São Paulo (FEA-USP).
+
+Durante uma aula, a tese do seu professor era sobre a necessidade de o agronegócio produzir mais e gastar menos. Ele, então, teve um insight para iniciar um novo negócio. “Encomendei uma pesquisa de mercado para entender os principais desafios do setor e de que forma a tecnologia poderia contribuir”, revela.
+
+Segundo o empreendedor, foram realizadas visitas a produtores de cana-de-açúcar em Ribeirão Preto e de grãos no Triângulo Mineiro, onde foram realizados testes com captura de imagens aéreas com drones e, posteriormente, gerados relatórios com base nas visitas. A validação do negócio aconteceu quando um produtor se dispôs a pagar por um relatório de ação feito a partir dessas imagens.
+
+Oito anos depois, a BemAgro já monitorou mais de 7 milhões de hectares de culturas como soja, milho, algodão, cana-de-açúcar e florestas, com atuação, além do Brasil, na Argentina, Colômbia, Paraguai, México, Honduras, Indonésia, Austrália e Tailândia. A tecnologia identifica características topográficas da lavoura e determina as melhores rotas para o plantio e a pulverização. O objetivo é conseguir máxima eficiência operacional, com menor tempo de trabalho e menor consumo de diesel”, resume Coelho.
+
+As análises são enviadas para as máquinas, que operam com piloto automático, e seguem as trajetórias definidas pela inteligência artificial da BemAgro. “Em máxima eficiência, temos casos de redução de até 85% no uso de químicos e herbicidas.”
+
+Em um contexto de margens apertadas, a Associação Brasileira da Indústria de Máquinas e Equipamentos (Abimaq) prevê que o faturamento total do setor recue cerca de 8% em 2026.
+
+Na avaliação de Henrique Galvani, CEO da Arara Seed, plataforma digital especializada em campanhas de financiamento coletivo de startups do agro, essa retração tem um lado positivo para as agtechs, já que coloca pressão nos fabricantes e produtores por mais eficiência, o que tende a acelerar a adoção de tecnologia. “Ou seja, menos capital investido em máquinas novas e mais foco em otimização, dados e eficiência sobre o que já está no campo”, considera Galvani.
+
+Do ponto de vista de investimento, área de atuação da Arara, o especialista enxerga um mercado mais seletivo em comparação aos últimos anos. “Não basta ter tecnologia, é preciso gerar impacto direto na margem do produtor e ter um modelo escalável.”
+
+O Radar AgTech da Embrapa identificou 367 agentes de investimento no Brasil, incluindo fundos de venture capital e outros veículos de capital de risco. Desse total, 65 têm o agro como um setor prioritário e 14 são especializados em agro, incluindo a Arara Seed .
+
+A Move Agro, startup mineira de gestão de máquinas, deve trilhar o caminho dos investimentos em 2027, mas, até lá, quer ganhar escala com seu público-alvo: os pequenos e médios produtores. Em quatro anos de operação, a agtech prestou consultoria para citricultores de São Paulo e Minas Gerais – e agora está prestes a lançar seu aplicativo desenvolvido para gerenciar operações citrícolas.
+
+A agtech está inserida em um contexto geográfico relevante, já que o Sudeste concentra 1.146 agtechs (55,2% do total nacional). A liderança histórica do estado de São Paulo, com 851 startups (ou 41% do total brasileiro), é seguida por Minas Gerais, segundo principal polo do Brasil, com 187 agtechs (9% do total). “A região apresenta um crescimento consistente desde 2019”, afirma Aurélio Favarin, da Embrapa.
+
+A CEO da Move Agro, Marcella Freitas, explica que o app para smartphone foi criado para ser manejado com facilidade. Como um motorista de aplicativo de transporte, o operador registra o início e o fim do percurso das laranjas, assim como qualquer intercorrência durante o trajeto. Com esses poucos registros, o sistema passa a organizar informações da jornada de cada máquina: quanto tempo trabalhou, quanto ficou parada, onde houve perda de eficiência. “A partir desses registros, começam a surgir os indicadores”, detalha.
+
+O aplicativo, batizado de Opere+, passa por testes em 30 máquinas de oito propriedades citrícolas há cerca de seis meses. Entre elas, a do agricultor Evânio Zanin, que produz laranjas de mesa há 30 anos em Visconde do Rio Branco, na Zona da Mata mineira.
+
+“Não estamos na fase de buscar capital, pensamos nisso para o próximo ano. Agora, é hora de validar e lançar o produto” — Marcella Freitas, CEO da Move Agro
+
+O mercado de drones agrícolas no Brasil cresce, em média, 30% ao ano, informa o Sindicato Nacional das Empresas de Aviação Agrícola (Sindag). A expansão é impulsionada pela busca por soluções de agricultura de precisão e caminha ao lado das tecnologias embarcadas nas máquinas. A projeção do Sindag é que, até 2030, o setor movimente cerca de US$ 6 bilhões e que o uso desses equipamentos se torne tão comum quanto o de tratores. A previsão é compatível com a relevância que o veículo aéreo não tripulado passou a ter nas propriedades que caminham na vanguarda tecnológica.
+
+Na Fazenda Nova Esperança, comandada por Felipe Ribeiro, o uso do drone é realidade há cerca de três meses. Na avaliação do produtor, existem várias vantagens, como os valores de aquisição e manutenção “incomparáveis aos de um pulverizador terrestre”. Na prática, a aplicação localizada, feita a partir do mapeamento aéreo, representa um ganho significativo em relação ao método convencional, com economia de água e de insumos. Mas, com as novidades, também surgem os desafios. Para o produtor, a mão de obra é um dos principais gargalos.
+
+Por isso, ele investe em treinamento contínuo dos colaboradores. Jeferson Pereira trabalha há oito anos na Nova Esperança e é um dos responsáveis por operar o pulverizador. Há pouco tempo, foi apresentado ao seu novo companheiro tecnológico voador e ficou empolgado. Segundo o operador, no início, o drone parecia apenas um complemento do que já estava em curso nas lavouras, porém, ele notou que ali havia um potencial para transformar a operação.
+
+“Há maior precisão na aplicação e redução do amassamento das plantas que acontece com o uso de pulverizadores terrestres”, afirma.
+
+Com 200 hectares de citros, divididos em quatro áreas separadas, o principal gargalo de Zanin é transportar a produção da lavoura para a unidade de beneficiamento em uma área com sinal fraco de internet. E aí entra uma das funcionalidades da ferramenta da Move Agro: o app funciona offline e atualiza assim que o sinal de internet retorna ao celular.
+
+“Em cima do tempo de viagem, nós conseguimos traçar rotas melhores de trabalho e diminuir muito as horas extras dos funcionários”, diz Zanin. Segundo ele, os deslocamentos da lavoura às unidades de beneficiamento chegam a levar uma hora. Além disso, mesmo com o sinal ruim, agora é possível saber quanto cada caminhão gasta em tempo e combustível a cada viagem.
+
+Em última análise, o produtor quer manter a satisfação dos seus clientes. “Nós trabalhamos com mercado de mesa, só vendemos frutas frescas. Ou seja, só colhemos sob encomenda. Temos horário marcado para entregarmos as frutas, então precisamos de tudo perfeito para ter o melhor produto possível.”
+
+Marcella afirma que a startup está em fase de validação, com o produto rodando em condições reais, e avança para o lançamento no mercado durante a Agrishow 2026. Ela ressalta ainda que um dos diferenciais do app é a conexão com tratores antigos, típicos de pequenos produtores que não têm capital para investir em novas máquinas com alto nível de tecnologia embarcada. “Não estamos na fase de buscar capital, pensamos nisso para o próximo ano. Agora, é hora de validar e lançar o produto.”
+
+Giancarlo Fasolin, gerente sênior de marketing estratégico da PTx para a América do Sul, avalia que houve uma “transformação radical” nos últimos anos, muito por conta da atuação das startups. “Há 15 anos, a agricultura de precisão era privilégio de poucos, dependia de equipamentos caros, dados difíceis de interpretar e baixa conectividade no campo.”
+
+Para os próximos anos, porém, a tendência é de simplificação. “Precisaremos de tecnologias mais acessíveis, mais fáceis de usar e mais conectadas à tomada de decisão do produtor”, afirma o executivo da empresa, que é uma joint venture entre a AGCO e a Trimble.
+
+Na visão de Ricardo Inamasu, pesquisador da Embrapa Instrumentação, hoje as agtechs são responsáveis por transformar a máquina que entra no campo em uma grande geradora de dados. Ele acredita que a era das criações tecnológicas chegou a um grau elevado de maturidade e, agora, vivemos o gargalo do tratamento das informações. “O processamento de dados é a nova grande fronteira.”

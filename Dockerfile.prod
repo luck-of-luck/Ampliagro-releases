@@ -1,0 +1,127 @@
+# ============================================================
+# BUILD-01: Dockerfile.prod — imagem de producao (multi-stage)
+#
+# Consumida pelo docker-compose.prod.yml e pelo CD (ghcr.io).
+# O Dockerfile (raiz) segue como imagem de desenvolvimento.
+#
+# Correcoes frente a versao anterior:
+#  1. O CMD apontava para o modulo `Ampliagro.wsgi`, que nao existe (o
+#     pacote do projeto e `config`, com config.settings.*). O container
+#     morria no boot com ModuleNotFoundError.
+#  2. Faltavam as libs GIS de RUNTIME (libgdal/libproj/libgeos). O build
+#     compilava dependencias, mas o estagio final nao tinha com o que
+#     carregar GDAL/rasterio em execucao.
+#  3. collectstatic rodava no BUILD, onde nao existe SECRET_KEY nem banco
+#     — e ainda estava mascarado por `|| true`, entao a imagem subia sem
+#     static nenhum. Foi para o entrypoint (runtime).
+#  4. Python 3.12 divergia do 3.11 do Dockerfile de dev e do CI.
+# ============================================================
+
+# ───────────────────────── Stage 1: dependências ─────────────────────────
+FROM python:3.11-slim-bookworm AS deps
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# build-essential/libpq-dev sao so de build; git cobre dependencia via VCS.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        build-essential \
+        libpq-dev \
+        git \
+    && rm -rf /var/lib/apt/lists/*
+
+# venv em /opt/venv: evita o truque de `pip install --user` com copia de
+# /root/.local para dentro da home do usuario sem --chown.
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+COPY requirements.txt /tmp/requirements.txt
+RUN pip install --upgrade pip && pip install -r /tmp/requirements.txt
+
+# ───────────────────────── Stage 1b: bundle do frontend ────────────────────
+# PORQUÊ ESTE ESTAGIO EXISTE
+# ============================
+# `base.html` serve o bundle com `{% vite_asset 'app/static/js/main.js' %}`.
+# Com `DEBUG=False` o django-vite NAO fala com o dev-server: le
+# `staticfiles/dist/.vite/manifest.json`. Sem esse manifest, a tag levanta
+# `DjangoViteAssetNotFoundError` e **toda a pagina que estende base.html da
+# 500**.
+#
+# E o manifest nao se inventa: `staticfiles/` esta no `.gitignore`, portanto o
+# `COPY . /app/` de baixo traz o SOURCE e nao o bundle. Nem o `entrypoint.sh`
+# (que so corre `migrate` e `collectstatic`) nem o `.github/workflows/cd.yml`
+# fazem `npm run build`. MEDIDO: na versao anterior, o `main.js` nunca era
+# servido em producao — mas por ACCIDENTE, porque a tag estava dentro de um
+# `{% if VITE_ATIVO %}` que so e' verdadeiro com um dev-server de pe.
+# Retirar esse `if` (ja feito no template) torna o manifest obrigatorio.
+FROM node:22-bookworm-slim AS frontend
+
+WORKDIR /build
+# Copiar primeiro só os manifestos: uma mudanca em `main.js` nao invalida a
+# camada de `npm ci`, que e' a parte lenta.
+COPY package.json package-lock.json ./
+RUN npm ci --no-audit --no-fund
+COPY vite.config.ts tsconfig.json tsconfig.node.json ./
+COPY src ./src
+COPY app/static/js ./app/static/js
+# `npx vite build` e' deliberado, e nao `npm run build`: esse script e'
+# `tsc && vite build`, e o `tsc` falha com TS18003 ("No inputs were found")
+# porque na V0 o React foi removido e `src/` ficou so com um CSS. O tipo e'
+# verificado pelo lint e pelo CI, onde ha contexto; num build de imagem o que
+# interessa e o bundle.
+RUN npx vite build
+
+# ───────────────────────── Stage 2: runtime ─────────────────────────────
+FROM python:3.11-slim-bookworm AS runtime
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PATH="/opt/venv/bin:$PATH" \
+    DJANGO_SETTINGS_MODULE=config.settings.prod
+
+# libs de runtime: Postgres + stack GIS (GDAL/PROJ/GEOS) + curl p/ health.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        libpq5 \
+        libgdal34 \
+        libproj22 \
+        libgeos-3.11.2 \
+        curl \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=deps /opt/venv /opt/venv
+# O bundle compilado. Vai para `staticfiles/dist`, que e' o `outDir` do
+# vite.config.ts e o caminho que o `manifest_path` do DJANGO_VITE aponta.
+COPY --from=frontend /build/staticfiles/dist /app/staticfiles/dist
+
+RUN groupadd -r ampliagro && useradd -r -g ampliagro -d /app -s /bin/bash ampliagro
+
+WORKDIR /app
+COPY --chown=ampliagro:ampliagro . /app/
+
+# staticfiles/media/logs precisam existir E pertencer ao usuario: no compose
+# eles vem de volumes nomeados, que nascem com root.
+RUN mkdir -p /app/staticfiles /app/media /app/logs \
+    && chown -R ampliagro:ampliagro /app/staticfiles /app/media /app/logs \
+    && chmod +x /app/docker/entrypoint.sh
+
+USER ampliagro
+EXPOSE 8000
+
+# /healthz/ (config/urls.py) e sem auth; /api/healthz/ responde 503 quando
+# o banco cai. start-period generoso: o primeiro boot ainda roda migrate,
+# que em base grande leva um tempo.
+HEALTHCHECK --interval=30s --timeout=10s --start-period=90s --retries=3 \
+    CMD curl -fsS http://localhost:8000/healthz/ || exit 1
+
+ENTRYPOINT ["/app/docker/entrypoint.sh"]
+
+# config.wsgi:application — o modulo correto (o antigo dizia Ampliagro.wsgi)
+CMD ["gunicorn", "config.wsgi:application", \
+     "--bind", "0.0.0.0:8000", \
+     "--workers", "4", \
+     "--threads", "2", \
+     "--timeout", "120", \
+     "--access-logfile", "-", \
+     "--error-logfile", "-"]

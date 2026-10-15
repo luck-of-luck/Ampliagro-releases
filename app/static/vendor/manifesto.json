@@ -1,0 +1,366 @@
+{
+  "gerado_em": "2026-10-12T12:43:49",
+  "total_bytes": 2577659,
+  "entradas": [
+    {
+      "chave": "bootstrap@5.3.2/bootstrap-5.3.2.min.css",
+      "ficheiro": "bootstrap-5.3.2.min.css",
+      "url": "https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css",
+      "bytes": 232948,
+      "reutilizado": true
+    },
+    {
+      "chave": "bootstrap@5.3.2/bootstrap-5.3.2.bundle.min.js",
+      "ficheiro": "bootstrap-5.3.2.bundle.min.js",
+      "url": "https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js",
+      "bytes": 80663,
+      "reutilizado": true
+    },
+    {
+      "chave": "bootstrap-icons@1.11.3/bootstrap-icons-1.11.3.min.css",
+      "ficheiro": "bootstrap-icons-1.11.3.min.css",
+      "url": "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css",
+      "bytes": 85875,
+      "reutilizado": true
+    },
+    {
+      "chave": "bootstrap-icons@1.11.3/fonts/bootstrap-icons.woff2",
+      "ficheiro": "fonts/bootstrap-icons.woff2",
+      "url": "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/fonts/bootstrap-icons.woff2",
+      "bytes": 130396,
+      "reutilizado": true
+    },
+    {
+      "chave": "bootstrap-icons@1.11.3/fonts/bootstrap-icons.woff",
+      "ficheiro": "fonts/bootstrap-icons.woff",
+      "url": "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/fonts/bootstrap-icons.woff",
+      "bytes": 176032,
+      "reutilizado": true
+    },
+    {
+      "chave": "chart.js@4.4.7/chart.umd-4.4.7.min.js",
+      "ficheiro": "chart.umd-4.4.7.min.js",
+      "url": "https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js",
+      "bytes": 205889,
+      "reutilizado": true
+    },
+    {
+      "chave": "htmx@1.9.10/htmx-1.9.10.min.js",
+      "ficheiro": "htmx-1.9.10.min.js",
+      "url": "https://unpkg.com/htmx.org@1.9.10",
+      "bytes": 47755,
+      "reutilizado": true
+    },
+    {
+      "chave": "leaflet@1.9.4/leaflet-1.9.4.js",
+      "ficheiro": "leaflet-1.9.4.js",
+      "url": "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js",
+      "bytes": 147552,
+      "reutilizado": true
+    },
+    {
+      "chave": "leaflet@1.9.4/leaflet-1.9.4.css",
+      "ficheiro": "leaflet-1.9.4.css",
+      "url": "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css",
+      "bytes": 14806,
+      "reutilizado": true
+    },
+    {
+      "chave": "leaflet@1.9.4/images/marker-icon.png",
+      "ficheiro": "images/marker-icon.png",
+      "url": "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+      "bytes": 1466,
+      "reutilizado": true
+    },
+    {
+      "chave": "leaflet@1.9.4/images/marker-shadow.png",
+      "ficheiro": "images/marker-shadow.png",
+      "url": "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+      "bytes": 618,
+      "reutilizado": true
+    },
+    {
+      "chave": "leaflet@1.9.4/images/layers.png",
+      "ficheiro": "images/layers.png",
+      "url": "https://unpkg.com/leaflet@1.9.4/dist/images/layers.png",
+      "bytes": 696,
+      "reutilizado": true
+    },
+    {
+      "chave": "leaflet@1.9.4/images/layers-2x.png",
+      "ficheiro": "images/layers-2x.png",
+      "url": "https://unpkg.com/leaflet@1.9.4/dist/images/layers-2x.png",
+      "bytes": 1259,
+      "reutilizado": true
+    },
+    {
+      "chave": "leaflet-draw@1.0.4/leaflet-draw-1.0.4.js",
+      "ficheiro": "leaflet-draw-1.0.4.js",
+      "url": "https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js",
+      "bytes": 67484,
+      "reutilizado": true
+    },
+    {
+      "chave": "leaflet-draw@1.0.4/leaflet-draw-1.0.4.css",
+      "ficheiro": "leaflet-draw-1.0.4.css",
+      "url": "https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css",
+      "bytes": 5267,
+      "reutilizado": true
+    },
+    {
+      "chave": "leaflet-draw@1.0.4/images/spritesheet.png",
+      "ficheiro": "images/spritesheet.png",
+      "url": "https://unpkg.com/leaflet-draw@1.0.4/dist/images/spritesheet.png",
+      "bytes": 1906,
+      "reutilizado": true
+    },
+    {
+      "chave": "leaflet-draw@1.0.4/images/spritesheet.svg",
+      "ficheiro": "images/spritesheet.svg",
+      "url": "https://unpkg.com/leaflet-draw@1.0.4/dist/images/spritesheet.svg",
+      "bytes": 5551,
+      "reutilizado": true
+    },
+    {
+      "chave": "leaflet-draw@1.0.4/images/spritesheet-2x.png",
+      "ficheiro": "images/spritesheet-2x.png",
+      "url": "https://unpkg.com/leaflet-draw@1.0.4/dist/images/spritesheet-2x.png",
+      "bytes": 3581,
+      "reutilizado": true
+    },
+    {
+      "chave": "sweetalert2@11.22.4/sweetalert2-11.22.4.all.min.js",
+      "ficheiro": "sweetalert2-11.22.4.all.min.js",
+      "url": "https://cdn.jsdelivr.net/npm/sweetalert2@11.22.4/dist/sweetalert2.all.min.js",
+      "bytes": 78479,
+      "reutilizado": true
+    },
+    {
+      "chave": "qrcodejs@1.0.0/qrcodejs-1.0.0.min.js",
+      "ficheiro": "qrcodejs-1.0.0.min.js",
+      "url": "https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js",
+      "bytes": 19927,
+      "reutilizado": true
+    },
+    {
+      "chave": "html5-qrcode@2.3.8/html5-qrcode-2.3.8.min.js",
+      "ficheiro": "html5-qrcode-2.3.8.min.js",
+      "url": "https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js",
+      "bytes": 375364,
+      "reutilizado": true
+    },
+    {
+      "chave": "imagem/fundos/login-1000.jpg",
+      "ficheiro": "fundos/login-1000.jpg",
+      "url": "https://images.unsplash.com/photo-1586771107445-d3ca888129ff?q=80&w=1000&auto=format&fit=crop",
+      "bytes": 163809,
+      "sha256": "03fb3763a7242c5d419d369707c0f29e1f1c41c214e94ae36a7083d97b59f1c7",
+      "licenca": "Unsplash License",
+      "nota": "Fundo decorativo. Vendorizado porque é a única coisa da página de login que pedia rede."
+    },
+    {
+      "chave": "imagem/fundos/login-600.jpg",
+      "ficheiro": "fundos/login-600.jpg",
+      "url": "https://images.unsplash.com/photo-1512314889357-e157c22f938d?q=80&w=600&auto=format&fit=crop",
+      "bytes": 90892,
+      "sha256": "1e70f9d996271701b8ae274cf34c768eec42e54f5d0a61a94d789be3f8759042",
+      "licenca": "Unsplash License",
+      "nota": "Fundo decorativo. Vendorizado porque é a única coisa da página de login que pedia rede."
+    },
+    {
+      "chave": "imagem/fundos/telemetria-1000.jpg",
+      "ficheiro": "fundos/telemetria-1000.jpg",
+      "url": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1000&auto=format&fit=crop",
+      "bytes": 94984,
+      "sha256": "673a66468f62bc858463b77c9876719c0542905f586f66f665a3a52b777881bd",
+      "licenca": "Unsplash License",
+      "nota": "Fundo decorativo. Vendorizado porque é a única coisa da página de login que pedia rede."
+    },
+    {
+      "chave": "imagem/fundos/telemetria-600.jpg",
+      "ficheiro": "fundos/telemetria-600.jpg",
+      "url": "https://images.unsplash.com/photo-1555421689-491a97ff2040?q=80&w=600&auto=format&fit=crop",
+      "bytes": 29050,
+      "sha256": "9dbf60b0fe04931d69e63b989ce56d4cb616eaab5d06f7739bfee4f4ee674767",
+      "licenca": "Unsplash License",
+      "nota": "Fundo decorativo. Vendorizado porque é a única coisa da página de login que pedia rede."
+    },
+    {
+      "chave": "fonte/f000-zYXzKVElMYYaJe8bpLHnCwDKr932-G7dytD-Dmu1syxQKYbABA.woff2",
+      "ficheiro": "fonts/f000-zYXzKVElMYYaJe8bpLHnCwDKr932-G7dytD-Dmu1syxQKYbABA.woff2",
+      "url": "https://fonts.gstatic.com/s/ibmplexsans/v23/zYXzKVElMYYaJe8bpLHnCwDKr932-G7dytD-Dmu1syxQKYbABA.woff2",
+      "bytes": 30964,
+      "sha256": "d160e20920ae4d6556518d352d3af27a74e9b0de3d8fe17b1c1044fc75aa2f81",
+      "licenca": "OFL-1.1"
+    },
+    {
+      "chave": "fonte/f001-zYXzKVElMYYaJe8bpLHnCwDKr932-G7dytD-Dmu1syxRKYbABA.woff2",
+      "ficheiro": "fonts/f001-zYXzKVElMYYaJe8bpLHnCwDKr932-G7dytD-Dmu1syxRKYbABA.woff2",
+      "url": "https://fonts.gstatic.com/s/ibmplexsans/v23/zYXzKVElMYYaJe8bpLHnCwDKr932-G7dytD-Dmu1syxRKYbABA.woff2",
+      "bytes": 13160,
+      "sha256": "73e7f7b1c980416ae0c2461268b14c7cfcce0668e683dc43fbb11a82a227b9f2",
+      "licenca": "OFL-1.1"
+    },
+    {
+      "chave": "fonte/f002-zYXzKVElMYYaJe8bpLHnCwDKr932-G7dytD-Dmu1syxTKYbABA.woff2",
+      "ficheiro": "fonts/f002-zYXzKVElMYYaJe8bpLHnCwDKr932-G7dytD-Dmu1syxTKYbABA.woff2",
+      "url": "https://fonts.gstatic.com/s/ibmplexsans/v23/zYXzKVElMYYaJe8bpLHnCwDKr932-G7dytD-Dmu1syxTKYbABA.woff2",
+      "bytes": 23568,
+      "sha256": "7d0037a170882a49e65a45c38ef195237bb07b1cc791d078379f0ac0d7ae1935",
+      "licenca": "OFL-1.1"
+    },
+    {
+      "chave": "fonte/f003-zYXzKVElMYYaJe8bpLHnCwDKr932-G7dytD-Dmu1syxaKYbABA.woff2",
+      "ficheiro": "fonts/f003-zYXzKVElMYYaJe8bpLHnCwDKr932-G7dytD-Dmu1syxaKYbABA.woff2",
+      "url": "https://fonts.gstatic.com/s/ibmplexsans/v23/zYXzKVElMYYaJe8bpLHnCwDKr932-G7dytD-Dmu1syxaKYbABA.woff2",
+      "bytes": 29512,
+      "sha256": "9409ee21811f0f5272b7e1d828fe8838005b0573481ef906e7e55b63f6610ab0",
+      "licenca": "OFL-1.1"
+    },
+    {
+      "chave": "fonte/f004-zYXzKVElMYYaJe8bpLHnCwDKr932-G7dytD-Dmu1syxdKYbABA.woff2",
+      "ficheiro": "fonts/f004-zYXzKVElMYYaJe8bpLHnCwDKr932-G7dytD-Dmu1syxdKYbABA.woff2",
+      "url": "https://fonts.gstatic.com/s/ibmplexsans/v23/zYXzKVElMYYaJe8bpLHnCwDKr932-G7dytD-Dmu1syxdKYbABA.woff2",
+      "bytes": 19500,
+      "sha256": "f598dd0700f155e2facfaa8ecfacace397d4c2c153e9ce37ab7ad310e8505bc2",
+      "licenca": "OFL-1.1"
+    },
+    {
+      "chave": "fonte/f005-zYXzKVElMYYaJe8bpLHnCwDKr932-G7dytD-Dmu1syxeKYY.woff2",
+      "ficheiro": "fonts/f005-zYXzKVElMYYaJe8bpLHnCwDKr932-G7dytD-Dmu1syxeKYY.woff2",
+      "url": "https://fonts.gstatic.com/s/ibmplexsans/v23/zYXzKVElMYYaJe8bpLHnCwDKr932-G7dytD-Dmu1syxeKYY.woff2",
+      "bytes": 45712,
+      "sha256": "e2291e842cf5af167122a22881a740c7f2dda7716f1e8cd76680264f4a859470",
+      "licenca": "OFL-1.1"
+    },
+    {
+      "chave": "fonte/f006-UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa0ZL7SUc.woff2",
+      "ficheiro": "fonts/f006-UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa0ZL7SUc.woff2",
+      "url": "https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa0ZL7SUc.woff2",
+      "bytes": 18748,
+      "sha256": "71d5ee93cc1e9f1d520a3a8b66456de18c7879d8df09d57fcd2eaff75fef0075",
+      "licenca": "OFL-1.1"
+    },
+    {
+      "chave": "fonte/f007-UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2",
+      "ficheiro": "fonts/f007-UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2",
+      "url": "https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2",
+      "bytes": 48256,
+      "sha256": "3100e775e8616cd2611beecfa23a4263d7037586789b43f035236a2e6fbd4c62",
+      "licenca": "OFL-1.1"
+    },
+    {
+      "chave": "fonte/f008-UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1pL7SUc.woff2",
+      "ficheiro": "fonts/f008-UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1pL7SUc.woff2",
+      "url": "https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1pL7SUc.woff2",
+      "bytes": 18996,
+      "sha256": "1be3448e292fbf05ffe176fe1e43f135013d50b1e7d324ad1a558f623d3bb6f6",
+      "licenca": "OFL-1.1"
+    },
+    {
+      "chave": "fonte/f009-UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa25L7SUc.woff2",
+      "ficheiro": "fonts/f009-UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa25L7SUc.woff2",
+      "url": "https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa25L7SUc.woff2",
+      "bytes": 85068,
+      "sha256": "34b9c504cab7a73e37b746343a449132e56cf7b5481af2cb81dc74dcff25c956",
+      "licenca": "OFL-1.1"
+    },
+    {
+      "chave": "fonte/f010-UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2JL7SUc.woff2",
+      "ficheiro": "fonts/f010-UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2JL7SUc.woff2",
+      "url": "https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2JL7SUc.woff2",
+      "bytes": 25960,
+      "sha256": "ca157063339ac4ad418f214f3abfed119b0798ab4d377386ce5c9e5a7a435ebd",
+      "licenca": "OFL-1.1"
+    },
+    {
+      "chave": "fonte/f011-UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2ZL7SUc.woff2",
+      "ficheiro": "fonts/f011-UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2ZL7SUc.woff2",
+      "url": "https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2ZL7SUc.woff2",
+      "bytes": 11232,
+      "sha256": "6e9e020a25f9b56d418f2c085b1d3c09725a4da23fe693a5b463064606732190",
+      "licenca": "OFL-1.1"
+    },
+    {
+      "chave": "fonte/f012-UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2pL7SUc.woff2",
+      "ficheiro": "fonts/f012-UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2pL7SUc.woff2",
+      "url": "https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2pL7SUc.woff2",
+      "bytes": 10252,
+      "sha256": "5c66f9e07e90c6d4ac4922cc68d60de26c17b1858e677fb5e603fce3952b3ff2",
+      "licenca": "OFL-1.1"
+    },
+    {
+      "chave": "fonte/f013-tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPx3cwhsk.woff2",
+      "ficheiro": "fonts/f013-tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPx3cwhsk.woff2",
+      "url": "https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPx3cwhsk.woff2",
+      "bytes": 1640,
+      "sha256": "62213be8a78b42f1e29d1452d91e2f8b3e745572a9dd98d3941e39fa00b37d76",
+      "licenca": "OFL-1.1"
+    },
+    {
+      "chave": "fonte/f014-tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPx7cwhsk.woff2",
+      "ficheiro": "fonts/f014-tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPx7cwhsk.woff2",
+      "url": "https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPx7cwhsk.woff2",
+      "bytes": 11624,
+      "sha256": "db5ff4db83e580426280e9337a58dc57d3a83784a1b03ad80914651594441d52",
+      "licenca": "OFL-1.1"
+    },
+    {
+      "chave": "fonte/f015-tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwg.woff2",
+      "ficheiro": "fonts/f015-tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwg.woff2",
+      "url": "https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwg.woff2",
+      "bytes": 31432,
+      "sha256": "83c005d49d8a6a50474c73a5a36ac0468076e9c4a29da7bdb14995d80560a5be",
+      "licenca": "OFL-1.1"
+    },
+    {
+      "chave": "fonte/f016-tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxPcwhsk.woff2",
+      "ficheiro": "fonts/f016-tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxPcwhsk.woff2",
+      "url": "https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxPcwhsk.woff2",
+      "bytes": 6836,
+      "sha256": "0a557721b1f8b36d3f3f84442689a71ca4a744300abcb46a1953f51bfc663b66",
+      "licenca": "OFL-1.1"
+    },
+    {
+      "chave": "fonte/f017-tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxTcwhsk.woff2",
+      "ficheiro": "fonts/f017-tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxTcwhsk.woff2",
+      "url": "https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxTcwhsk.woff2",
+      "bytes": 8872,
+      "sha256": "e17cfd15fb96909d64095015f958207063a0c07191da3512df7d560a781aebdf",
+      "licenca": "OFL-1.1"
+    },
+    {
+      "chave": "fonte/f018-tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPx_cwhsk.woff2",
+      "ficheiro": "fonts/f018-tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPx_cwhsk.woff2",
+      "url": "https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPx_cwhsk.woff2",
+      "bytes": 5888,
+      "sha256": "c89b9cc0bc6262bd4f8d8494b6961601f3aefa829d08c2e3635f4d501d3a47c2",
+      "licenca": "OFL-1.1"
+    },
+    {
+      "chave": "fonte/f019-xMQ9uFFYT72X5wkB_18qmnndmSdSnh2BAfO5mnuyOo1lfiQwV6-x.woff2",
+      "ficheiro": "fonts/f019-xMQ9uFFYT72X5wkB_18qmnndmSdSnh2BAfO5mnuyOo1lfiQwV6-x.woff2",
+      "url": "https://fonts.gstatic.com/s/sora/v17/xMQ9uFFYT72X5wkB_18qmnndmSdSnh2BAfO5mnuyOo1lfiQwV6-x.woff2",
+      "bytes": 25284,
+      "sha256": "811e11966d29f3a01fcb19b087b61ac067d380665a55aebb7fcdf2cda95e4a93",
+      "licenca": "OFL-1.1"
+    },
+    {
+      "chave": "fonte/f020-xMQ9uFFYT72X5wkB_18qmnndmSdSnh2BAfO5mnuyOo1lfiQwWa-xsaQ.woff2",
+      "ficheiro": "fonts/f020-xMQ9uFFYT72X5wkB_18qmnndmSdSnh2BAfO5mnuyOo1lfiQwWa-xsaQ.woff2",
+      "url": "https://fonts.gstatic.com/s/sora/v17/xMQ9uFFYT72X5wkB_18qmnndmSdSnh2BAfO5mnuyOo1lfiQwWa-xsaQ.woff2",
+      "bytes": 12156,
+      "sha256": "08e1ba85bcb55277782f56766af09467dfe18cbeea49704203100c5797ac4cc5",
+      "licenca": "OFL-1.1"
+    },
+    {
+      "chave": "fontes/css",
+      "ficheiro": "fontes.css",
+      "url": "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap",
+      "bytes": 30750,
+      "sha256": "1fd91778517be4f055cc7a5f6b9a74a7eceee5b36b9134e8d2f4c5dc6c17f92e",
+      "licenca": "OFL-1.1",
+      "nota": "CSS reescrito: os url() apontam para fonts/ locais"
+    }
+  ]
+}

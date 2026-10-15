@@ -1,0 +1,307 @@
+{% extends "partials/_premium_cadastro_base.html" %}
+{% load static agro_icons %}
+
+{% block title %}Ampliagro - Lançamentos Financeiros{% endblock %}
+
+{% block cadastro_icon %}bi bi-currency-dollar{% endblock %}
+{% block cadastro_title %}Lançamentos Financeiros{% endblock %}
+{% block cadastro_novo_title %}Novo Lançamento{% endblock %}
+{% block cadastro_lista_title %}Lançamentos Cadastrados{% endblock %}
+
+{% block cadastro_subtabs %}
+<div class="pcrud-subtabs" id="cadastroSubTabs">
+    <button class="pcrud-subtab active" data-tab="novo">Novo Lançamento</button>
+    <button class="pcrud-subtab" data-tab="lista">Lançamentos</button>
+    <button class="pcrud-subtab" data-tab="resumo">Resumo Mensal</button>
+</div>
+{% endblock %}
+
+{% block cadastro_stats %}
+<div class="pcrud-stats" id="cadastroStats">
+    <div class="pcrud-stat"><div class="pcrud-stat-label">Receitas Totais</div><div class="pcrud-stat-value" id="statReceitas">R$ {{ receitas_total|floatformat:2 }}</div></div>
+    <div class="pcrud-stat"><div class="pcrud-stat-label">Despesas Totais</div><div class="pcrud-stat-value" id="statDespesas">R$ {{ despesas_total|floatformat:2 }}</div></div>
+    <div class="pcrud-stat"><div class="pcrud-stat-label">Saldo</div><div class="pcrud-stat-value" id="statSaldo">R$ {{ saldo_total|floatformat:2 }}</div></div>
+    <div class="pcrud-stat"><div class="pcrud-stat-label">Lançamentos Mês</div><div class="pcrud-stat-value" id="statLancMes">{{ lancamentos_mes }}</div></div>
+</div>
+{% endblock %}
+
+{% block cadastro_form_novo %}
+<form id="financeiro-form" onsubmit="return submitFinanceiro(event)">
+    {% csrf_token %}
+    <div class="pcrud-form-grid">
+        <div class="pcrud-form-group">
+            <label>Propriedade</label>
+            <select name="propriedade" required onblur="validateField(this)" onchange="carregarTalhoes(this)">
+                <option value="">Selecione...</option>
+                {% for p in propriedades %}
+                <option value="{{ p.id }}">{{ p.nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="pcrud-form-group">
+            <label>Tipo</label>
+            <select name="tipo" required onblur="validateField(this)">
+                <option value="">Selecione...</option>
+                <option value="RECEITA">Receita</option>
+                <option value="DESPESA">Despesa</option>
+            </select>
+        </div>
+        <div class="pcrud-form-group">
+            <label>Categoria</label>
+            <select name="categoria" required onblur="validateField(this)">
+                <option value="">Selecione...</option>
+                <option value="VENDA_PROD">Venda de Produtos</option>
+                <option value="VENDA_ANIMAL">Venda de Animais</option>
+                <option value="VENDA_LEITE">Venda de Leite</option>
+                <option value="INSUMO">Insumos</option>
+                <option value="FOLHA">Folha de Pagamento</option>
+                <option value="MANUTENCAO">Manutenção</option>
+                <option value="COMBUSTIVEL">Combustível</option>
+                <option value="SERVICO">Serviço</option>
+                <option value="IMPOSTO">Imposto</option>
+                <option value="OUTRO">Outro</option>
+            </select>
+        </div>
+        <div class="pcrud-form-group">
+            <label>Valor (R$)</label>
+            <input type="number" step="0.01" name="valor" required placeholder="0,00" onblur="validateField(this)">
+        </div>
+        <div class="pcrud-form-group">
+            <label>Data</label>
+            <input type="date" name="data" value="{{ today|date:'Y-m-d' }}" required onblur="validateField(this)">
+        </div>
+        <div class="pcrud-form-group">
+            <label>Descrição</label>
+            <textarea name="descricao" rows="2" placeholder="Descreva o lançamento"></textarea>
+        </div>
+                    <div class="pcrud-form-group">
+                        <label>Participante (cliente/fornecedor)</label>
+                        <input type="text" name="participante" placeholder="Nome de quem pagou/recebeu">
+                    </div>
+                    <div class="pcrud-form-group">
+                        <label>CPF/CNPJ do participante</label>
+                        <input type="text" name="participante_doc" placeholder="Somente números" inputmode="numeric">
+                    </div>
+                    <div class="pcrud-form-group">
+            <label>Talhão</label>
+            <select name="talhao" id="id_talhao">
+                <option value="">Selecione a propriedade primeiro</option>
+            </select>
+        </div>
+        <div class="pcrud-form-group">
+            <label>Pago</label>
+            <div style="display:flex;align-items:center;gap:8px;">
+                <input type="checkbox" name="pago" id="id_pago" style="width:auto;height:auto;">
+                <label for="id_pago" style="margin:0;font-weight:500;font-size:.813rem;text-transform:none;letter-spacing:0;cursor:pointer;">Lançamento pago</label>
+            </div>
+        </div>
+        <div class="pcrud-form-group">
+            <label>Data de Pagamento</label>
+            <input type="date" name="data_pagamento">
+        </div>
+    </div>
+
+    <!-- Seção: Contabilidade e LCDPR -->
+    <div style="margin-top: 30px; margin-bottom: 20px;">
+        <h3 style="font-size: 1.1rem; color: var(--cor-texto-forte); margin-bottom: 10px; border-bottom: 1px solid var(--cor-borda); padding-bottom: 5px;">
+            <i class="bi bi-bank"></i> Contabilidade e LCDPR
+        </h3>
+        <p style="font-size: 0.85rem; color: var(--cor-texto-medio); margin-bottom: 15px;">
+            Preencha estes campos se desejar exportar esta movimentação no formato SPED/LCDPR.
+        </p>
+
+        <div class="pcrud-form-grid">
+            <div class="pcrud-form-group">
+                <label>Conta Bancária (Reg 0050)</label>
+                <select name="conta_bancaria">
+                    <option value="">Não informar...</option>
+                    {% for c in contas_bancarias %}
+                    <option value="{{ c.id }}">{{ c.banco }} - Ag: {{ c.agencia }} / Cc: {{ c.conta }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="pcrud-form-group">
+                <label>Tipo de Documento</label>
+                <select name="tipo_documento_lcdpr">
+                    <option value="6">6 - Outros</option>
+                    <option value="1">1 - Nota Fiscal</option>
+                    <option value="2">2 - Fatura</option>
+                    <option value="3">3 - Recibo</option>
+                    <option value="4">4 - Contrato</option>
+                    <option value="5">5 - Folha de Pagamento</option>
+                </select>
+            </div>
+
+            <div class="pcrud-form-group">
+                <label>Nº do Documento</label>
+                <input type="text" name="numero_documento" placeholder="Nº da NF, Recibo...">
+            </div>
+
+            <div class="pcrud-form-group">
+                <label>Classificação LCDPR</label>
+                <select name="tipo_lancamento_lcdpr">
+                    <option value="">Não informar (Ocultar do LCDPR)</option>
+                    <option value="1">1 - Receita da Atividade Rural</option>
+                    <option value="2">2 - Despesa de Custeio e Investimento</option>
+                    <option value="3">3 - Produtos p/ Adiantamento de Recursos</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="pcrud-form-actions">
+        <button type="submit" class="pcrud-btn pcrud-btn-primary"><i class="bi bi-check-lg"></i> Salvar Lançamento</button>
+        <button type="reset" class="pcrud-btn pcrud-btn-secondary">Limpar</button>
+    </div>
+</form>
+{% endblock %}
+
+{% block cadastro_tab_lista %}
+{% if lancamentos %}
+<div style="margin-bottom: 15px; display: flex; justify-content: flex-end;">
+    <a class="pcrud-btn pcrud-btn-primary" href="{% url 'central-gestao' %}#fiscal">
+        <i class="bi bi-file-earmark-arrow-down"></i> Revisar e exportar LCDPR
+    </a>
+</div>
+<div class="pcrud-table-wrap">
+    <table class="pcrud-table">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Tipo</th>
+                <th>Categoria</th>
+                <th>Descrição</th>
+                <th>Valor</th>
+                <th>Talhão</th>
+                <th>Pago</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for l in lancamentos %}
+            <tr>
+                <td>{{ l.data|date:"d/m/Y" }}</td>
+                <td>
+                    {% if l.tipo == "RECEITA" %}
+                    <span style="background:var(--cor-sucesso-suave);color:var(--cor-sucesso);padding:2px 8px;border-radius:999px;font-weight:600;font-size:.625rem;">Receita</span>
+                    {% else %}
+                    <span style="background:var(--cor-erro-suave);color:var(--cor-erro);padding:2px 8px;border-radius:999px;font-weight:600;font-size:.625rem;">Despesa</span>
+                    {% endif %}
+                </td>
+                <td>{{ l.get_categoria_display }}</td>
+                <td>{{ l.descricao|default:"—" }}</td>
+                <td class="{% if l.tipo == 'RECEITA' %}" style="color:var(--cor-sucesso);font-weight:600;" {% else %} style="color:var(--cor-erro);font-weight:600;" {% endif %}>R$ {{ l.valor|floatformat:2 }}</td>
+                <td>{{ l.talhao.nome|default:"—" }}</td>
+                <td>{% if l.pago %}<span style="color:var(--cor-sucesso);">● Pago</span>{% else %}<span style="color:var(--cor-aviso);">● Pendente</span>{% endif %}</td>
+                <td>
+                    <div class="action-cell">
+                        <button class="pcrud-btn pcrud-btn-secondary pcrud-btn-sm" onclick="editarFinanceiro({{ l.id }})"><i class="bi bi-pencil"></i> Editar</button>
+                        <button class="pcrud-btn pcrud-btn-danger pcrud-btn-sm" onclick="excluirFinanceiro({{ l.id }})"><i class="bi bi-trash"></i> Excluir</button>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+{% include "partials/_empty_state_cta.html" with empty_icone="bi bi-cash-coin" empty_titulo="Nenhum lançamento financeiro cadastrado" empty_descricao="Registre o primeiro lançamento para alimentar custo por hectare e o DRE." empty_acao="Cadastrar lançamento" empty_aba="novo" %}
+{% endif %}
+{% endblock %}
+
+{% block cadastro_extra_tabs %}
+<!-- Tab: Resumo Mensal -->
+<div class="pcrud-tab" id="tab-resumo">
+    <h2><i class="bi bi-graph-up"></i> Resumo Financeiro Mensal</h2>
+    <div class="pcrud-form-card" style="padding:0;">
+        <div class="pcrud-table-wrap">
+            <table class="pcrud-table">
+                <thead>
+                    <tr>
+                        <th>Mês</th>
+                        <th>Receitas</th>
+                        <th>Despesas</th>
+                        <th>Saldo</th>
+                        <th>Nº Lançamentos</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in resumo_mensal %}
+                    <tr>
+                        <td>{{ r.mes }}</td>
+                        <td style="color:var(--cor-sucesso);font-weight:600;">R$ {{ r.receitas|floatformat:2 }}</td>
+                        <td style="color:var(--cor-erro);font-weight:600;">R$ {{ r.despesas|floatformat:2 }}</td>
+                        <td style="color:{% if r.saldo >= 0 %}var(--cor-sucesso){% else %}var(--cor-erro){% endif %};font-weight:600;">R$ {{ r.saldo|floatformat:2 }}</td>
+                        <td>{{ r.count }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" class="pcrud-empty">Sem dados para resumo mensal.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+(function() {
+    window.carregarTalhoes = function(sel) {
+        const propId = sel.value;
+        const targetSel = document.getElementById('id_talhao');
+        targetSel.innerHTML = '<option value="">Carregando...</option>';
+        if (!propId) {
+            targetSel.innerHTML = '<option value="">Selecione a propriedade primeiro</option>';
+            return;
+        }
+        fetch('/api/talhoes-por-propriedade/?propriedade_id=' + propId)
+            .then(r => r.json())
+            .then(data => {
+                targetSel.innerHTML = '<option value="">Selecione (opcional)...</option>';
+                data.forEach(t => {
+                    targetSel.innerHTML += '<option value="' + t.id + '">' + t.nome + ' (' + t.area_hectare + ' ha)</option>';
+                });
+            })
+            .catch(() => {
+                targetSel.innerHTML = '<option value="">Erro ao carregar</option>';
+            });
+    };
+
+    window.submitFinanceiro = async function(event) {
+        event.preventDefault();
+        if (!validateForm('financeiro-form')) { showToast('Corrija os campos em destaque', 'error'); return false; }
+        const f = document.getElementById('financeiro-form');
+        const data = {
+            propriedade: parseInt(f.propriedade.value),
+            tipo: f.tipo.value,
+            categoria: f.categoria.value,
+            valor: parseFloat(f.valor.value),
+            data: f.data.value,
+            descricao: f.descricao.value || '',
+            participante: f.participante.value || '',
+            participante_doc: (f.participante_doc.value || '').replace(/\D/g, ''),
+            talhao: parseInt(f.talhao.value) || null,
+            pago: f.pago?.checked ?? false,
+            data_pagamento: f.data_pagamento.value || null,
+        };
+        const btn = f.querySelector('.pcrud-btn-primary'); showLoading(btn);
+        try {
+            const resp = await fetch('/api/lancamentos/', { method:'POST', headers:{'Content-Type':'application/json','X-CSRFToken':getCSRFToken()}, body: JSON.stringify(data) });
+            if (resp.ok) { showToast('Lançamento cadastrado!','success'); setTimeout(() => location.reload(), 800); }
+            else { const err = await resp.json(); showToast('Erro: '+JSON.stringify(err),'error'); }
+        } catch(e) { showToast('Erro: '+e.message,'error'); } finally { hideLoading(btn); }
+        return false;
+    };
+
+    window.excluirFinanceiro = function(id) {
+        if (!confirm('Excluir este lançamento?')) return;
+        fetch('/api/lancamentos/'+id+'/', { method:'DELETE', headers:{'X-CSRFToken':getCSRFToken()} })
+            .then(r => { if(r.ok){ showToast('Excluído','success'); setTimeout(() => location.reload(), 500); } else showToast('Erro','error'); });
+    };
+
+})();
+</script>
+{% endblock %}

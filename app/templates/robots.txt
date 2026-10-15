@@ -1,0 +1,30 @@
+User-agent: *
+Disallow: /
+
+# PORQUE "Disallow: /" E' A RESPOSTA CERTA
+# ======================================
+# O Ampliagro e' um ERP de uso privado: nao ha pagina de marketing, nem
+# conteudo a indexar, nem ganho nenhum em ser encontrado. O que um motor de
+# busca ganhava seria o login de um produtor, a estrutura de rotas
+# (/api/amplia/, /api/ia/, /admin/, /rastreabilidade/) e os nomes das
+# entidades do dominio.
+#
+# Afrouxar isto mais tarde e' tentador e o efeito e' silencioso: nenhuma pagina
+# deixa de funcionar, so passa a estar num indice.
+#
+# ISTO NAO E' SEGURANCA
+# =====================
+# robots.txt e' um pedido. Um scraper que o ignora ignora-o. O que protege de
+# facto, e que esta configurado no projecto:
+#
+#   - CONTENT_SECURITY_POLICY (config/settings/base.py) — nao deixa injectar
+#     script numa pagina do produtor. So na passa a valer depois da
+#     migracao para o formato que o django-csp instalado consegue ler; ate
+#     la a politica estava escrita e nao era aplicada.
+#   - autenticacao e o middleware de tenancy em cada /api/.
+#   - `sourcemap: false` no vite.config.ts — o ficheiro .map publicava o
+#     fonte inteiro do frontend a quem quisesse.
+#
+# Para tornar o scraping mais caro, a medida certa e' um WAF (Cloudflare) a
+# frente e rate limiting por IP. Isso e' custo, nao garantia: quem abre a
+# pagina no browser recebe o codigo.

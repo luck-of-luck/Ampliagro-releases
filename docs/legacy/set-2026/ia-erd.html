@@ -1,0 +1,380 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>ER IA x Sistema</title></head>
+<body style="margin:0;background:#f8fafc;font-family:'Segoe UI',Arial;">
+<div style="padding:16px 24px 0;"><span style="background:#f9a8d4;border:1px solid #be185d;border-radius:6px;padding:2px 10px;font-weight:bold;">IA</span> <span style="background:#fcd34d;border:1px solid #b45309;border-radius:6px;padding:2px 10px;font-weight:bold;">NUCLEO</span> <span style="background:#7dd3fc;border:1px solid #0369a1;border-radius:6px;padding:2px 10px;font-weight:bold;">CLIMA_IOT</span> <span style="background:#86efac;border:1px solid #15803d;border-radius:6px;padding:2px 10px;font-weight:bold;">DADO</span></div>
+<div style="padding:8px 0 24px 0;"><svg width="1464" height="1627" xmlns="http://www.w3.org/2000/svg"><rect width="1464" height="1627" fill="#f8fafc"/><text x="24" y="40" font-family="Segoe UI,Arial" font-size="24" font-weight="bold" fill="#111827">Ampliagro — IA Local × Sistema (ER)</text><text x="24" y="64" font-family="Segoe UI,Arial" font-size="13" fill="#6b7280">setas = FOREIGN KEYs (origem → destino). Gerado do DDL real em 2026-09-17.</text><text x="24" y="102" font-family="Segoe UI,Arial" font-size="13" font-weight="bold" fill="#374151">IA LOCAL (artifactory + auditoria)</text><text x="396" y="102" font-family="Segoe UI,Arial" font-size="13" font-weight="bold" fill="#374151">NÚCLEO DO SISTEMA</text><text x="768" y="102" font-family="Segoe UI,Arial" font-size="13" font-weight="bold" fill="#374151">CLIMA / IoT</text><text x="1140" y="102" font-family="Segoe UI,Arial" font-size="13" font-weight="bold" fill="#374151">DADOS (intents leem/criam)</text><path d="M324,403 C360.0,403 360.0,172 396,172" fill="none" stroke="#6b7280" stroke-width="1.4"/><circle cx="396" cy="172" r="3" fill="#6b7280"/><path d="M324,382 C174.0,382 174.0,492 24,492" fill="none" stroke="#6b7280" stroke-width="1.4"/><circle cx="24" cy="492" r="3" fill="#6b7280"/><path d="M324,597 C360.0,597 360.0,172 396,172" fill="none" stroke="#6b7280" stroke-width="1.4"/><circle cx="396" cy="172" r="3" fill="#6b7280"/><path d="M324,791 C360.0,791 360.0,282 396,282" fill="none" stroke="#6b7280" stroke-width="1.4"/><circle cx="396" cy="282" r="3" fill="#6b7280"/><path d="M696,387 C546.0,387 546.0,172 396,172" fill="none" stroke="#6b7280" stroke-width="1.4"/><circle cx="396" cy="172" r="3" fill="#6b7280"/><path d="M1068,256 C732.0,256 732.0,282 396,282" fill="none" stroke="#6b7280" stroke-width="1.4"/><circle cx="396" cy="282" r="3" fill="#6b7280"/><path d="M1068,429 C732.0,429 732.0,282 396,282" fill="none" stroke="#6b7280" stroke-width="1.4"/><circle cx="396" cy="282" r="3" fill="#6b7280"/><path d="M1068,602 C732.0,602 732.0,282 396,282" fill="none" stroke="#6b7280" stroke-width="1.4"/><circle cx="396" cy="282" r="3" fill="#6b7280"/><path d="M1068,623 C918.0,623 918.0,345 768,345" fill="none" stroke="#6b7280" stroke-width="1.4"/><circle cx="768" cy="345" r="3" fill="#6b7280"/><path d="M1068,644 C1104.0,644 1104.0,670 1140,670" fill="none" stroke="#6b7280" stroke-width="1.4"/><circle cx="1140" cy="670" r="3" fill="#6b7280"/><path d="M1068,665 C918.0,665 918.0,172 768,172" fill="none" stroke="#6b7280" stroke-width="1.4"/><circle cx="768" cy="172" r="3" fill="#6b7280"/><path d="M1068,686 C1104.0,686 1104.0,843 1140,843" fill="none" stroke="#6b7280" stroke-width="1.4"/><circle cx="1140" cy="843" r="3" fill="#6b7280"/><path d="M1068,859 C918.0,859 918.0,518 768,518" fill="none" stroke="#6b7280" stroke-width="1.4"/><circle cx="768" cy="518" r="3" fill="#6b7280"/><path d="M1068,880 C732.0,880 732.0,282 396,282" fill="none" stroke="#6b7280" stroke-width="1.4"/><circle cx="396" cy="282" r="3" fill="#6b7280"/><path d="M1068,1032 C918.0,1032 918.0,518 768,518" fill="none" stroke="#6b7280" stroke-width="1.4"/><circle cx="768" cy="518" r="3" fill="#6b7280"/><path d="M1440,256 C918.0,256 918.0,282 396,282" fill="none" stroke="#6b7280" stroke-width="1.4"/><circle cx="396" cy="282" r="3" fill="#6b7280"/><path d="M1440,277 C918.0,277 918.0,476 396,476" fill="none" stroke="#6b7280" stroke-width="1.4"/><circle cx="396" cy="476" r="3" fill="#6b7280"/><path d="M1440,298 C1290.0,298 1290.0,670 1140,670" fill="none" stroke="#6b7280" stroke-width="1.4"/><circle cx="1140" cy="670" r="3" fill="#6b7280"/><path d="M1440,408 C1290.0,408 1290.0,172 1140,172" fill="none" stroke="#6b7280" stroke-width="1.4"/><circle cx="1140" cy="172" r="3" fill="#6b7280"/><path d="M1440,581 C1290.0,581 1290.0,387 1140,387" fill="none" stroke="#6b7280" stroke-width="1.4"/><circle cx="1140" cy="387" r="3" fill="#6b7280"/><path d="M1440,733 C918.0,733 918.0,282 396,282" fill="none" stroke="#6b7280" stroke-width="1.4"/><circle cx="396" cy="282" r="3" fill="#6b7280"/><path d="M1440,754 C918.0,754 918.0,476 396,476" fill="none" stroke="#6b7280" stroke-width="1.4"/><circle cx="396" cy="476" r="3" fill="#6b7280"/><path d="M1440,906 C918.0,906 918.0,282 396,282" fill="none" stroke="#6b7280" stroke-width="1.4"/><circle cx="396" cy="282" r="3" fill="#6b7280"/><path d="M1440,1058 C918.0,1058 918.0,282 396,282" fill="none" stroke="#6b7280" stroke-width="1.4"/><circle cx="396" cy="282" r="3" fill="#6b7280"/><path d="M1440,1189 C1290.0,1189 1290.0,995 1140,995" fill="none" stroke="#6b7280" stroke-width="1.4"/><circle cx="1140" cy="995" r="3" fill="#6b7280"/><path d="M1440,1362 C918.0,1362 918.0,282 396,282" fill="none" stroke="#6b7280" stroke-width="1.4"/><circle cx="396" cy="282" r="3" fill="#6b7280"/><path d="M1440,1535 C918.0,1535 918.0,282 396,282" fill="none" stroke="#6b7280" stroke-width="1.4"/><circle cx="396" cy="282" r="3" fill="#6b7280"/><path d="M1440,1556 C1290.0,1556 1290.0,172 1140,172" fill="none" stroke="#6b7280" stroke-width="1.4"/><circle cx="1140" cy="172" r="3" fill="#6b7280"/><g><rect x="24" y="120" width="300" height="294" rx="8" fill="#ffffff" stroke="#be185d" stroke-width="2"/>
+<rect x="24" y="120" width="300" height="34" rx="8" fill="#f9a8d4"/>
+<rect x="24" y="146" width="300" height="8" fill="#f9a8d4"/>
+<text x="36" y="142" font-family="Segoe UI,Arial" font-size="13" font-weight="bold" fill="#1f2937">app_iaexecucao</text>
+<text x="36" y="177" font-family="Consolas,monospace" font-size="12" fill="#b45309">🔑 id</text>
+<text x="312" y="177" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">int</text>
+<line x1="32" y1="183" x2="316" y2="183" stroke="#e5e7eb"/>
+<text x="36" y="198" font-family="Consolas,monospace" font-size="12" fill="#374151">intent</text>
+<text x="312" y="198" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">varchar</text>
+<line x1="32" y1="204" x2="316" y2="204" stroke="#e5e7eb"/>
+<text x="36" y="219" font-family="Consolas,monospace" font-size="12" fill="#374151">params</text>
+<text x="312" y="219" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">json</text>
+<line x1="32" y1="225" x2="316" y2="225" stroke="#e5e7eb"/>
+<text x="36" y="240" font-family="Consolas,monospace" font-size="12" fill="#374151">flags</text>
+<text x="312" y="240" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">json</text>
+<line x1="32" y1="246" x2="316" y2="246" stroke="#e5e7eb"/>
+<text x="36" y="261" font-family="Consolas,monospace" font-size="12" fill="#374151">fontes</text>
+<text x="312" y="261" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">json</text>
+<line x1="32" y1="267" x2="316" y2="267" stroke="#e5e7eb"/>
+<text x="36" y="282" font-family="Consolas,monospace" font-size="12" fill="#374151">via</text>
+<text x="312" y="282" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">varchar</text>
+<line x1="32" y1="288" x2="316" y2="288" stroke="#e5e7eb"/>
+<text x="36" y="303" font-family="Consolas,monospace" font-size="12" fill="#374151">ok</text>
+<text x="312" y="303" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">bool</text>
+<line x1="32" y1="309" x2="316" y2="309" stroke="#e5e7eb"/>
+<text x="36" y="324" font-family="Consolas,monospace" font-size="12" fill="#374151">resposta</text>
+<text x="312" y="324" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">text</text>
+<line x1="32" y1="330" x2="316" y2="330" stroke="#e5e7eb"/>
+<text x="36" y="345" font-family="Consolas,monospace" font-size="12" fill="#374151">duracao_ms</text>
+<text x="312" y="345" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">int</text>
+<line x1="32" y1="351" x2="316" y2="351" stroke="#e5e7eb"/>
+<text x="36" y="366" font-family="Consolas,monospace" font-size="12" fill="#374151">satisfeito</text>
+<text x="312" y="366" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">bool</text>
+<line x1="32" y1="372" x2="316" y2="372" stroke="#e5e7eb"/>
+<text x="36" y="387" font-family="Consolas,monospace" font-size="12" fill="#0369a1">🔗 artefato_id</text>
+<text x="312" y="387" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">bigint</text>
+<line x1="32" y1="393" x2="316" y2="393" stroke="#e5e7eb"/>
+<text x="36" y="408" font-family="Consolas,monospace" font-size="12" fill="#0369a1">🔗 user_id</text>
+<text x="312" y="408" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">int</text>
+</g><g><rect x="24" y="440" width="300" height="168" rx="8" fill="#ffffff" stroke="#be185d" stroke-width="2"/>
+<rect x="24" y="440" width="300" height="34" rx="8" fill="#f9a8d4"/>
+<rect x="24" y="466" width="300" height="8" fill="#f9a8d4"/>
+<text x="36" y="462" font-family="Segoe UI,Arial" font-size="13" font-weight="bold" fill="#1f2937">app_iaartefato</text>
+<text x="36" y="497" font-family="Consolas,monospace" font-size="12" fill="#b45309">🔑 id</text>
+<text x="312" y="497" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">int</text>
+<line x1="32" y1="503" x2="316" y2="503" stroke="#e5e7eb"/>
+<text x="36" y="518" font-family="Consolas,monospace" font-size="12" fill="#374151">chave</text>
+<text x="312" y="518" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">varchar</text>
+<line x1="32" y1="524" x2="316" y2="524" stroke="#e5e7eb"/>
+<text x="36" y="539" font-family="Consolas,monospace" font-size="12" fill="#374151">tipo</text>
+<text x="312" y="539" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">varchar</text>
+<line x1="32" y1="545" x2="316" y2="545" stroke="#e5e7eb"/>
+<text x="36" y="560" font-family="Consolas,monospace" font-size="12" fill="#374151">dados</text>
+<text x="312" y="560" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">json</text>
+<line x1="32" y1="566" x2="316" y2="566" stroke="#e5e7eb"/>
+<text x="36" y="581" font-family="Consolas,monospace" font-size="12" fill="#374151">origem</text>
+<text x="312" y="581" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">varchar</text>
+<line x1="32" y1="587" x2="316" y2="587" stroke="#e5e7eb"/>
+<text x="36" y="602" font-family="Consolas,monospace" font-size="12" fill="#0369a1">🔗 user_id</text>
+<text x="312" y="602" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">int</text>
+</g><g><rect x="24" y="634" width="300" height="168" rx="8" fill="#ffffff" stroke="#be185d" stroke-width="2"/>
+<rect x="24" y="634" width="300" height="34" rx="8" fill="#f9a8d4"/>
+<rect x="24" y="660" width="300" height="8" fill="#f9a8d4"/>
+<text x="36" y="656" font-family="Segoe UI,Arial" font-size="13" font-weight="bold" fill="#1f2937">app_fontedadosexterna</text>
+<text x="36" y="691" font-family="Consolas,monospace" font-size="12" fill="#b45309">🔑 id</text>
+<text x="312" y="691" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">int</text>
+<line x1="32" y1="697" x2="316" y2="697" stroke="#e5e7eb"/>
+<text x="36" y="712" font-family="Consolas,monospace" font-size="12" fill="#374151">tipo</text>
+<text x="312" y="712" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">varchar</text>
+<line x1="32" y1="718" x2="316" y2="718" stroke="#e5e7eb"/>
+<text x="36" y="733" font-family="Consolas,monospace" font-size="12" fill="#374151">nome</text>
+<text x="312" y="733" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">varchar</text>
+<line x1="32" y1="739" x2="316" y2="739" stroke="#e5e7eb"/>
+<text x="36" y="754" font-family="Consolas,monospace" font-size="12" fill="#374151">config</text>
+<text x="312" y="754" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">json</text>
+<line x1="32" y1="760" x2="316" y2="760" stroke="#e5e7eb"/>
+<text x="36" y="775" font-family="Consolas,monospace" font-size="12" fill="#374151">ativo</text>
+<text x="312" y="775" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">bool</text>
+<line x1="32" y1="781" x2="316" y2="781" stroke="#e5e7eb"/>
+<text x="36" y="796" font-family="Consolas,monospace" font-size="12" fill="#0369a1">🔗 propriedade_id</text>
+<text x="312" y="796" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">bigint</text>
+</g><g><rect x="396" y="120" width="300" height="84" rx="8" fill="#ffffff" stroke="#b45309" stroke-width="2"/>
+<rect x="396" y="120" width="300" height="34" rx="8" fill="#fcd34d"/>
+<rect x="396" y="146" width="300" height="8" fill="#fcd34d"/>
+<text x="408" y="142" font-family="Segoe UI,Arial" font-size="13" font-weight="bold" fill="#1f2937">auth_user</text>
+<text x="408" y="177" font-family="Consolas,monospace" font-size="12" fill="#b45309">🔑 id</text>
+<text x="684" y="177" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">int</text>
+<line x1="404" y1="183" x2="688" y2="183" stroke="#e5e7eb"/>
+<text x="408" y="198" font-family="Consolas,monospace" font-size="12" fill="#374151">username</text>
+<text x="684" y="198" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">varchar</text>
+</g><g><rect x="396" y="230" width="300" height="168" rx="8" fill="#ffffff" stroke="#b45309" stroke-width="2"/>
+<rect x="396" y="230" width="300" height="34" rx="8" fill="#fcd34d"/>
+<rect x="396" y="256" width="300" height="8" fill="#fcd34d"/>
+<text x="408" y="252" font-family="Segoe UI,Arial" font-size="13" font-weight="bold" fill="#1f2937">app_propriedade</text>
+<text x="408" y="287" font-family="Consolas,monospace" font-size="12" fill="#b45309">🔑 id</text>
+<text x="684" y="287" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">int</text>
+<line x1="404" y1="293" x2="688" y2="293" stroke="#e5e7eb"/>
+<text x="408" y="308" font-family="Consolas,monospace" font-size="12" fill="#374151">nome</text>
+<text x="684" y="308" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">varchar</text>
+<line x1="404" y1="314" x2="688" y2="314" stroke="#e5e7eb"/>
+<text x="408" y="329" font-family="Consolas,monospace" font-size="12" fill="#374151">cidade/uf</text>
+<text x="684" y="329" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">varchar</text>
+<line x1="404" y1="335" x2="688" y2="335" stroke="#e5e7eb"/>
+<text x="408" y="350" font-family="Consolas,monospace" font-size="12" fill="#374151">latitude</text>
+<text x="684" y="350" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">float</text>
+<line x1="404" y1="356" x2="688" y2="356" stroke="#e5e7eb"/>
+<text x="408" y="371" font-family="Consolas,monospace" font-size="12" fill="#374151">longitude</text>
+<text x="684" y="371" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">float</text>
+<line x1="404" y1="377" x2="688" y2="377" stroke="#e5e7eb"/>
+<text x="408" y="392" font-family="Consolas,monospace" font-size="12" fill="#0369a1">🔗 user_id</text>
+<text x="684" y="392" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">int</text>
+</g><g><rect x="396" y="424" width="300" height="105" rx="8" fill="#ffffff" stroke="#b45309" stroke-width="2"/>
+<rect x="396" y="424" width="300" height="34" rx="8" fill="#fcd34d"/>
+<rect x="396" y="450" width="300" height="8" fill="#fcd34d"/>
+<text x="408" y="446" font-family="Segoe UI,Arial" font-size="13" font-weight="bold" fill="#1f2937">app_cultura</text>
+<text x="408" y="481" font-family="Consolas,monospace" font-size="12" fill="#b45309">🔑 id</text>
+<text x="684" y="481" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">int</text>
+<line x1="404" y1="487" x2="688" y2="487" stroke="#e5e7eb"/>
+<text x="408" y="502" font-family="Consolas,monospace" font-size="12" fill="#374151">nome</text>
+<text x="684" y="502" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">varchar</text>
+<line x1="404" y1="508" x2="688" y2="508" stroke="#e5e7eb"/>
+<text x="408" y="523" font-family="Consolas,monospace" font-size="12" fill="#374151">grupo</text>
+<text x="684" y="523" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">varchar</text>
+</g><g><rect x="768" y="120" width="300" height="147" rx="8" fill="#ffffff" stroke="#0369a1" stroke-width="2"/>
+<rect x="768" y="120" width="300" height="34" rx="8" fill="#7dd3fc"/>
+<rect x="768" y="146" width="300" height="8" fill="#7dd3fc"/>
+<text x="780" y="142" font-family="Segoe UI,Arial" font-size="13" font-weight="bold" fill="#1f2937">app_estacaometeo</text>
+<text x="780" y="177" font-family="Consolas,monospace" font-size="12" fill="#b45309">🔑 id</text>
+<text x="1056" y="177" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">int</text>
+<line x1="776" y1="183" x2="1060" y2="183" stroke="#e5e7eb"/>
+<text x="780" y="198" font-family="Consolas,monospace" font-size="12" fill="#374151">nome</text>
+<text x="1056" y="198" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">varchar</text>
+<line x1="776" y1="204" x2="1060" y2="204" stroke="#e5e7eb"/>
+<text x="780" y="219" font-family="Consolas,monospace" font-size="12" fill="#374151">latitude</text>
+<text x="1056" y="219" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">decimal</text>
+<line x1="776" y1="225" x2="1060" y2="225" stroke="#e5e7eb"/>
+<text x="780" y="240" font-family="Consolas,monospace" font-size="12" fill="#374151">longitude</text>
+<text x="1056" y="240" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">decimal</text>
+<line x1="776" y1="246" x2="1060" y2="246" stroke="#e5e7eb"/>
+<text x="780" y="261" font-family="Consolas,monospace" font-size="12" fill="#0369a1">🔗 propriedade_id</text>
+<text x="1056" y="261" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">bigint</text>
+</g><g><rect x="768" y="293" width="300" height="147" rx="8" fill="#ffffff" stroke="#0369a1" stroke-width="2"/>
+<rect x="768" y="293" width="300" height="34" rx="8" fill="#7dd3fc"/>
+<rect x="768" y="319" width="300" height="8" fill="#7dd3fc"/>
+<text x="780" y="315" font-family="Segoe UI,Arial" font-size="13" font-weight="bold" fill="#1f2937">app_gateway</text>
+<text x="780" y="350" font-family="Consolas,monospace" font-size="12" fill="#b45309">🔑 id</text>
+<text x="1056" y="350" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">int</text>
+<line x1="776" y1="356" x2="1060" y2="356" stroke="#e5e7eb"/>
+<text x="780" y="371" font-family="Consolas,monospace" font-size="12" fill="#374151">nome</text>
+<text x="1056" y="371" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">varchar</text>
+<line x1="776" y1="377" x2="1060" y2="377" stroke="#e5e7eb"/>
+<text x="780" y="392" font-family="Consolas,monospace" font-size="12" fill="#374151">gateway_eui</text>
+<text x="1056" y="392" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">varchar</text>
+<line x1="776" y1="398" x2="1060" y2="398" stroke="#e5e7eb"/>
+<text x="780" y="413" font-family="Consolas,monospace" font-size="12" fill="#374151">api_key</text>
+<text x="1056" y="413" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">varchar</text>
+<line x1="776" y1="419" x2="1060" y2="419" stroke="#e5e7eb"/>
+<text x="780" y="434" font-family="Consolas,monospace" font-size="12" fill="#0369a1">🔗 propriedade_id</text>
+<text x="1056" y="434" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">bigint</text>
+</g><g><rect x="768" y="466" width="300" height="231" rx="8" fill="#ffffff" stroke="#0369a1" stroke-width="2"/>
+<rect x="768" y="466" width="300" height="34" rx="8" fill="#7dd3fc"/>
+<rect x="768" y="492" width="300" height="8" fill="#7dd3fc"/>
+<text x="780" y="488" font-family="Segoe UI,Arial" font-size="13" font-weight="bold" fill="#1f2937">app_device</text>
+<text x="780" y="523" font-family="Consolas,monospace" font-size="12" fill="#b45309">🔑 id</text>
+<text x="1056" y="523" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">int</text>
+<line x1="776" y1="529" x2="1060" y2="529" stroke="#e5e7eb"/>
+<text x="780" y="544" font-family="Consolas,monospace" font-size="12" fill="#374151">device_eui</text>
+<text x="1056" y="544" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">varchar</text>
+<line x1="776" y1="550" x2="1060" y2="550" stroke="#e5e7eb"/>
+<text x="780" y="565" font-family="Consolas,monospace" font-size="12" fill="#374151">nome</text>
+<text x="1056" y="565" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">varchar</text>
+<line x1="776" y1="571" x2="1060" y2="571" stroke="#e5e7eb"/>
+<text x="780" y="586" font-family="Consolas,monospace" font-size="12" fill="#374151">tipo</text>
+<text x="1056" y="586" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">varchar</text>
+<line x1="776" y1="592" x2="1060" y2="592" stroke="#e5e7eb"/>
+<text x="780" y="607" font-family="Consolas,monospace" font-size="12" fill="#0369a1">🔗 propriedade_id</text>
+<text x="1056" y="607" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">bigint</text>
+<line x1="776" y1="613" x2="1060" y2="613" stroke="#e5e7eb"/>
+<text x="780" y="628" font-family="Consolas,monospace" font-size="12" fill="#0369a1">🔗 gateway_id</text>
+<text x="1056" y="628" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">bigint</text>
+<line x1="776" y1="634" x2="1060" y2="634" stroke="#e5e7eb"/>
+<text x="780" y="649" font-family="Consolas,monospace" font-size="12" fill="#0369a1">🔗 talhao_id</text>
+<text x="1056" y="649" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">bigint</text>
+<line x1="776" y1="655" x2="1060" y2="655" stroke="#e5e7eb"/>
+<text x="780" y="670" font-family="Consolas,monospace" font-size="12" fill="#0369a1">🔗 estacao_id</text>
+<text x="1056" y="670" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">bigint</text>
+<line x1="776" y1="676" x2="1060" y2="676" stroke="#e5e7eb"/>
+<text x="780" y="691" font-family="Consolas,monospace" font-size="12" fill="#0369a1">🔗 animal_id</text>
+<text x="1056" y="691" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">bigint</text>
+</g><g><rect x="768" y="723" width="300" height="168" rx="8" fill="#ffffff" stroke="#0369a1" stroke-width="2"/>
+<rect x="768" y="723" width="300" height="34" rx="8" fill="#7dd3fc"/>
+<rect x="768" y="749" width="300" height="8" fill="#7dd3fc"/>
+<text x="780" y="745" font-family="Segoe UI,Arial" font-size="13" font-weight="bold" fill="#1f2937">app_telemetrydata</text>
+<text x="780" y="780" font-family="Consolas,monospace" font-size="12" fill="#b45309">🔑 id</text>
+<text x="1056" y="780" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">int</text>
+<line x1="776" y1="786" x2="1060" y2="786" stroke="#e5e7eb"/>
+<text x="780" y="801" font-family="Consolas,monospace" font-size="12" fill="#374151">metric</text>
+<text x="1056" y="801" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">varchar</text>
+<line x1="776" y1="807" x2="1060" y2="807" stroke="#e5e7eb"/>
+<text x="780" y="822" font-family="Consolas,monospace" font-size="12" fill="#374151">value</text>
+<text x="1056" y="822" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">decimal</text>
+<line x1="776" y1="828" x2="1060" y2="828" stroke="#e5e7eb"/>
+<text x="780" y="843" font-family="Consolas,monospace" font-size="12" fill="#374151">timestamp</text>
+<text x="1056" y="843" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">datetime</text>
+<line x1="776" y1="849" x2="1060" y2="849" stroke="#e5e7eb"/>
+<text x="780" y="864" font-family="Consolas,monospace" font-size="12" fill="#0369a1">🔗 device_id</text>
+<text x="1056" y="864" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">bigint</text>
+<line x1="776" y1="870" x2="1060" y2="870" stroke="#e5e7eb"/>
+<text x="780" y="885" font-family="Consolas,monospace" font-size="12" fill="#0369a1">🔗 propriedade_id</text>
+<text x="1056" y="885" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">bigint</text>
+</g><g><rect x="768" y="917" width="300" height="126" rx="8" fill="#ffffff" stroke="#0369a1" stroke-width="2"/>
+<rect x="768" y="917" width="300" height="34" rx="8" fill="#7dd3fc"/>
+<rect x="768" y="943" width="300" height="8" fill="#7dd3fc"/>
+<text x="780" y="939" font-family="Segoe UI,Arial" font-size="13" font-weight="bold" fill="#1f2937">app_comandodevice</text>
+<text x="780" y="974" font-family="Consolas,monospace" font-size="12" fill="#b45309">🔑 id</text>
+<text x="1056" y="974" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">int</text>
+<line x1="776" y1="980" x2="1060" y2="980" stroke="#e5e7eb"/>
+<text x="780" y="995" font-family="Consolas,monospace" font-size="12" fill="#374151">comando</text>
+<text x="1056" y="995" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">varchar</text>
+<line x1="776" y1="1001" x2="1060" y2="1001" stroke="#e5e7eb"/>
+<text x="780" y="1016" font-family="Consolas,monospace" font-size="12" fill="#374151">status</text>
+<text x="1056" y="1016" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">varchar</text>
+<line x1="776" y1="1022" x2="1060" y2="1022" stroke="#e5e7eb"/>
+<text x="780" y="1037" font-family="Consolas,monospace" font-size="12" fill="#0369a1">🔗 device_id</text>
+<text x="1056" y="1037" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">bigint</text>
+</g><g><rect x="1140" y="120" width="300" height="189" rx="8" fill="#ffffff" stroke="#15803d" stroke-width="2"/>
+<rect x="1140" y="120" width="300" height="34" rx="8" fill="#86efac"/>
+<rect x="1140" y="146" width="300" height="8" fill="#86efac"/>
+<text x="1152" y="142" font-family="Segoe UI,Arial" font-size="13" font-weight="bold" fill="#1f2937">app_safra</text>
+<text x="1152" y="177" font-family="Consolas,monospace" font-size="12" fill="#b45309">🔑 id</text>
+<text x="1428" y="177" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">int</text>
+<line x1="1148" y1="183" x2="1432" y2="183" stroke="#e5e7eb"/>
+<text x="1152" y="198" font-family="Consolas,monospace" font-size="12" fill="#374151">ano</text>
+<text x="1428" y="198" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">int</text>
+<line x1="1148" y1="204" x2="1432" y2="204" stroke="#e5e7eb"/>
+<text x="1152" y="219" font-family="Consolas,monospace" font-size="12" fill="#374151">area_plantada</text>
+<text x="1428" y="219" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">decimal</text>
+<line x1="1148" y1="225" x2="1432" y2="225" stroke="#e5e7eb"/>
+<text x="1152" y="240" font-family="Consolas,monospace" font-size="12" fill="#374151">producao_total</text>
+<text x="1428" y="240" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">decimal</text>
+<line x1="1148" y1="246" x2="1432" y2="246" stroke="#e5e7eb"/>
+<text x="1152" y="261" font-family="Consolas,monospace" font-size="12" fill="#0369a1">🔗 propriedade_id</text>
+<text x="1428" y="261" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">bigint</text>
+<line x1="1148" y1="267" x2="1432" y2="267" stroke="#e5e7eb"/>
+<text x="1152" y="282" font-family="Consolas,monospace" font-size="12" fill="#0369a1">🔗 cultura_id</text>
+<text x="1428" y="282" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">bigint</text>
+<line x1="1148" y1="288" x2="1432" y2="288" stroke="#e5e7eb"/>
+<text x="1152" y="303" font-family="Consolas,monospace" font-size="12" fill="#0369a1">🔗 talhao_id</text>
+<text x="1428" y="303" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">bigint</text>
+</g><g><rect x="1140" y="335" width="300" height="84" rx="8" fill="#ffffff" stroke="#15803d" stroke-width="2"/>
+<rect x="1140" y="335" width="300" height="34" rx="8" fill="#86efac"/>
+<rect x="1140" y="361" width="300" height="8" fill="#86efac"/>
+<text x="1152" y="357" font-family="Segoe UI,Arial" font-size="13" font-weight="bold" fill="#1f2937">app_planosafra</text>
+<text x="1152" y="392" font-family="Consolas,monospace" font-size="12" fill="#b45309">🔑 id</text>
+<text x="1428" y="392" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">int</text>
+<line x1="1148" y1="398" x2="1432" y2="398" stroke="#e5e7eb"/>
+<text x="1152" y="413" font-family="Consolas,monospace" font-size="12" fill="#0369a1">🔗 safra_id</text>
+<text x="1428" y="413" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">bigint</text>
+</g><g><rect x="1140" y="445" width="300" height="147" rx="8" fill="#ffffff" stroke="#15803d" stroke-width="2"/>
+<rect x="1140" y="445" width="300" height="34" rx="8" fill="#86efac"/>
+<rect x="1140" y="471" width="300" height="8" fill="#86efac"/>
+<text x="1152" y="467" font-family="Segoe UI,Arial" font-size="13" font-weight="bold" fill="#1f2937">app_atividadeplanejada</text>
+<text x="1152" y="502" font-family="Consolas,monospace" font-size="12" fill="#b45309">🔑 id</text>
+<text x="1428" y="502" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">int</text>
+<line x1="1148" y1="508" x2="1432" y2="508" stroke="#e5e7eb"/>
+<text x="1152" y="523" font-family="Consolas,monospace" font-size="12" fill="#374151">nome</text>
+<text x="1428" y="523" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">varchar</text>
+<line x1="1148" y1="529" x2="1432" y2="529" stroke="#e5e7eb"/>
+<text x="1152" y="544" font-family="Consolas,monospace" font-size="12" fill="#374151">data_prevista</text>
+<text x="1428" y="544" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">date</text>
+<line x1="1148" y1="550" x2="1432" y2="550" stroke="#e5e7eb"/>
+<text x="1152" y="565" font-family="Consolas,monospace" font-size="12" fill="#374151">concluida</text>
+<text x="1428" y="565" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">bool</text>
+<line x1="1148" y1="571" x2="1432" y2="571" stroke="#e5e7eb"/>
+<text x="1152" y="586" font-family="Consolas,monospace" font-size="12" fill="#0369a1">🔗 plano_id</text>
+<text x="1428" y="586" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">bigint</text>
+</g><g><rect x="1140" y="618" width="300" height="147" rx="8" fill="#ffffff" stroke="#15803d" stroke-width="2"/>
+<rect x="1140" y="618" width="300" height="34" rx="8" fill="#86efac"/>
+<rect x="1140" y="644" width="300" height="8" fill="#86efac"/>
+<text x="1152" y="640" font-family="Segoe UI,Arial" font-size="13" font-weight="bold" fill="#1f2937">app_talhao</text>
+<text x="1152" y="675" font-family="Consolas,monospace" font-size="12" fill="#b45309">🔑 id</text>
+<text x="1428" y="675" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">int</text>
+<line x1="1148" y1="681" x2="1432" y2="681" stroke="#e5e7eb"/>
+<text x="1152" y="696" font-family="Consolas,monospace" font-size="12" fill="#374151">nome</text>
+<text x="1428" y="696" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">varchar</text>
+<line x1="1148" y1="702" x2="1432" y2="702" stroke="#e5e7eb"/>
+<text x="1152" y="717" font-family="Consolas,monospace" font-size="12" fill="#374151">area_hectare</text>
+<text x="1428" y="717" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">decimal</text>
+<line x1="1148" y1="723" x2="1432" y2="723" stroke="#e5e7eb"/>
+<text x="1152" y="738" font-family="Consolas,monospace" font-size="12" fill="#0369a1">🔗 propriedade_id</text>
+<text x="1428" y="738" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">bigint</text>
+<line x1="1148" y1="744" x2="1432" y2="744" stroke="#e5e7eb"/>
+<text x="1152" y="759" font-family="Consolas,monospace" font-size="12" fill="#0369a1">🔗 cultura_atual_id</text>
+<text x="1428" y="759" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">bigint</text>
+</g><g><rect x="1140" y="791" width="300" height="126" rx="8" fill="#ffffff" stroke="#15803d" stroke-width="2"/>
+<rect x="1140" y="791" width="300" height="34" rx="8" fill="#86efac"/>
+<rect x="1140" y="817" width="300" height="8" fill="#86efac"/>
+<text x="1152" y="813" font-family="Segoe UI,Arial" font-size="13" font-weight="bold" fill="#1f2937">app_animal</text>
+<text x="1152" y="848" font-family="Consolas,monospace" font-size="12" fill="#b45309">🔑 id</text>
+<text x="1428" y="848" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">int</text>
+<line x1="1148" y1="854" x2="1432" y2="854" stroke="#e5e7eb"/>
+<text x="1152" y="869" font-family="Consolas,monospace" font-size="12" fill="#374151">especie</text>
+<text x="1428" y="869" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">varchar</text>
+<line x1="1148" y1="875" x2="1432" y2="875" stroke="#e5e7eb"/>
+<text x="1152" y="890" font-family="Consolas,monospace" font-size="12" fill="#374151">quantidade</text>
+<text x="1428" y="890" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">int</text>
+<line x1="1148" y1="896" x2="1432" y2="896" stroke="#e5e7eb"/>
+<text x="1152" y="911" font-family="Consolas,monospace" font-size="12" fill="#0369a1">🔗 propriedade_id</text>
+<text x="1428" y="911" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">bigint</text>
+</g><g><rect x="1140" y="943" width="300" height="126" rx="8" fill="#ffffff" stroke="#15803d" stroke-width="2"/>
+<rect x="1140" y="943" width="300" height="34" rx="8" fill="#86efac"/>
+<rect x="1140" y="969" width="300" height="8" fill="#86efac"/>
+<text x="1152" y="965" font-family="Segoe UI,Arial" font-size="13" font-weight="bold" fill="#1f2937">app_loteaquatico</text>
+<text x="1152" y="1000" font-family="Consolas,monospace" font-size="12" fill="#b45309">🔑 id</text>
+<text x="1428" y="1000" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">int</text>
+<line x1="1148" y1="1006" x2="1432" y2="1006" stroke="#e5e7eb"/>
+<text x="1152" y="1021" font-family="Consolas,monospace" font-size="12" fill="#374151">especie</text>
+<text x="1428" y="1021" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">varchar</text>
+<line x1="1148" y1="1027" x2="1432" y2="1027" stroke="#e5e7eb"/>
+<text x="1152" y="1042" font-family="Consolas,monospace" font-size="12" fill="#374151">quantidade</text>
+<text x="1428" y="1042" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">int</text>
+<line x1="1148" y1="1048" x2="1432" y2="1048" stroke="#e5e7eb"/>
+<text x="1152" y="1063" font-family="Consolas,monospace" font-size="12" fill="#0369a1">🔗 propriedade_id</text>
+<text x="1428" y="1063" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">bigint</text>
+</g><g><rect x="1140" y="1095" width="300" height="105" rx="8" fill="#ffffff" stroke="#15803d" stroke-width="2"/>
+<rect x="1140" y="1095" width="300" height="34" rx="8" fill="#86efac"/>
+<rect x="1140" y="1121" width="300" height="8" fill="#86efac"/>
+<text x="1152" y="1117" font-family="Segoe UI,Arial" font-size="13" font-weight="bold" fill="#1f2937">app_despesca</text>
+<text x="1152" y="1152" font-family="Consolas,monospace" font-size="12" fill="#b45309">🔑 id</text>
+<text x="1428" y="1152" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">int</text>
+<line x1="1148" y1="1158" x2="1432" y2="1158" stroke="#e5e7eb"/>
+<text x="1152" y="1173" font-family="Consolas,monospace" font-size="12" fill="#374151">quantidade_kg</text>
+<text x="1428" y="1173" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">decimal</text>
+<line x1="1148" y1="1179" x2="1432" y2="1179" stroke="#e5e7eb"/>
+<text x="1152" y="1194" font-family="Consolas,monospace" font-size="12" fill="#0369a1">🔗 lote_id</text>
+<text x="1428" y="1194" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">bigint</text>
+</g><g><rect x="1140" y="1226" width="300" height="147" rx="8" fill="#ffffff" stroke="#15803d" stroke-width="2"/>
+<rect x="1140" y="1226" width="300" height="34" rx="8" fill="#86efac"/>
+<rect x="1140" y="1252" width="300" height="8" fill="#86efac"/>
+<text x="1152" y="1248" font-family="Segoe UI,Arial" font-size="13" font-weight="bold" fill="#1f2937">app_insumo</text>
+<text x="1152" y="1283" font-family="Consolas,monospace" font-size="12" fill="#b45309">🔑 id</text>
+<text x="1428" y="1283" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">int</text>
+<line x1="1148" y1="1289" x2="1432" y2="1289" stroke="#e5e7eb"/>
+<text x="1152" y="1304" font-family="Consolas,monospace" font-size="12" fill="#374151">nome</text>
+<text x="1428" y="1304" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">varchar</text>
+<line x1="1148" y1="1310" x2="1432" y2="1310" stroke="#e5e7eb"/>
+<text x="1152" y="1325" font-family="Consolas,monospace" font-size="12" fill="#374151">quantidade</text>
+<text x="1428" y="1325" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">decimal</text>
+<line x1="1148" y1="1331" x2="1432" y2="1331" stroke="#e5e7eb"/>
+<text x="1152" y="1346" font-family="Consolas,monospace" font-size="12" fill="#374151">estoque_minimo</text>
+<text x="1428" y="1346" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">decimal</text>
+<line x1="1148" y1="1352" x2="1432" y2="1352" stroke="#e5e7eb"/>
+<text x="1152" y="1367" font-family="Consolas,monospace" font-size="12" fill="#0369a1">🔗 propriedade_id</text>
+<text x="1428" y="1367" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">bigint</text>
+</g><g><rect x="1140" y="1399" width="300" height="168" rx="8" fill="#ffffff" stroke="#15803d" stroke-width="2"/>
+<rect x="1140" y="1399" width="300" height="34" rx="8" fill="#86efac"/>
+<rect x="1140" y="1425" width="300" height="8" fill="#86efac"/>
+<text x="1152" y="1421" font-family="Segoe UI,Arial" font-size="13" font-weight="bold" fill="#1f2937">app_lancamentofinanceiro</text>
+<text x="1152" y="1456" font-family="Consolas,monospace" font-size="12" fill="#b45309">🔑 id</text>
+<text x="1428" y="1456" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">int</text>
+<line x1="1148" y1="1462" x2="1432" y2="1462" stroke="#e5e7eb"/>
+<text x="1152" y="1477" font-family="Consolas,monospace" font-size="12" fill="#374151">tipo</text>
+<text x="1428" y="1477" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">varchar</text>
+<line x1="1148" y1="1483" x2="1432" y2="1483" stroke="#e5e7eb"/>
+<text x="1152" y="1498" font-family="Consolas,monospace" font-size="12" fill="#374151">valor</text>
+<text x="1428" y="1498" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">decimal</text>
+<line x1="1148" y1="1504" x2="1432" y2="1504" stroke="#e5e7eb"/>
+<text x="1152" y="1519" font-family="Consolas,monospace" font-size="12" fill="#374151">data</text>
+<text x="1428" y="1519" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">date</text>
+<line x1="1148" y1="1525" x2="1432" y2="1525" stroke="#e5e7eb"/>
+<text x="1152" y="1540" font-family="Consolas,monospace" font-size="12" fill="#0369a1">🔗 propriedade_id</text>
+<text x="1428" y="1540" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">bigint</text>
+<line x1="1148" y1="1546" x2="1432" y2="1546" stroke="#e5e7eb"/>
+<text x="1152" y="1561" font-family="Consolas,monospace" font-size="12" fill="#0369a1">🔗 safra_id</text>
+<text x="1428" y="1561" font-family="Consolas,monospace" font-size="11" fill="#9ca3af" text-anchor="end">bigint</text>
+</g></svg></div>
+</body></html>

@@ -1,0 +1,71 @@
+{
+  "name": "ampliagro",
+  "version": "3.0.0",
+  "description": "> **The Operating System for Brazilian Agriculture.**   > A vertically integrated, AI-powered agricultural management platform built for the world's largest food-producing nation.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext js,ts --report-unused-disable-directives --max-warnings 0",
+    "format": "prettier --write \"src/**/*.{ts,json,css,md}\"",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run && npm run test:cjs",
+    "test:vitest": "vitest run",
+    "test:cjs": "node scripts/rodar_testes_cjs.mjs",
+    "test:ui": "vitest --ui",
+    "test:e2e": "playwright test",
+    "test:a11y": "playwright test --project=a11y",
+    "test:responsive": "playwright test --project=a11y responsive.a11y.spec.ts",
+    "build:css": "npx @tailwindcss/cli --input ./src/styles/globals.css --output ./app/static/css/tailwind-compiled.css",
+    "watch:css": "npx @tailwindcss/cli --input ./src/styles/globals.css --output ./app/static/css/tailwind-compiled.css --watch"
+  },
+  "keywords": [
+    "agriculture",
+    "farm-management",
+    "typescript",
+    "vite"
+  ],
+  "author": "Ampliagro Team",
+  "license": "ISC",
+  "dependencies": {
+    "date-fns": "^4.1.0",
+    "workbox-window": "^7.1.0"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.0",
+    "@eslint/js": "^9.10.0",
+    "@playwright/test": "^1.47.2",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@tailwindcss/vite": "^4.0.0",
+    "@testing-library/jest-dom": "^6.5.0",
+    "@types/node": "^22.5.5",
+    "@vitest/ui": "^2.1.1",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^9.10.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.5.6",
+    "jsdom": "^25.0.0",
+    "postcss": "^8.4.47",
+    "prettier": "^3.3.3",
+    "prettier-plugin-tailwindcss": "^0.6.6",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.6.2",
+    "vite": "^5.4.8",
+    "vite-plugin-pwa": "^0.20.5",
+    "vite-tsconfig-paths": "^5.0.1",
+    "vitest": "^2.1.1"
+  },
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/luck-of-luck/Ampliagro.git"
+  },
+  "bugs": {
+    "url": "https://github.com/luck-of-luck/Ampliagro/issues"
+  },
+  "homepage": "https://github.com/luck-of-luck/Ampliagro#readme"
+}

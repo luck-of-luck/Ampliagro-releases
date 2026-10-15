@@ -1,0 +1,137 @@
+{% extends base_template %}
+{% load static %}
+
+{% block title %}Ampliagro - Modo Claro{% endblock %}
+
+{% block extra_css %}
+
+{% endblock %}
+
+{% block dashboard_appbar %}{% endblock %}
+
+{% block content %}
+<div class="section-container">
+    <div class="section-header">
+        <h1 class="section-title"><i class="bi bi-sun me-2"></i>Modo Claro</h1>
+    </div>
+
+    <div class="content-card">
+        <h2 class="section-subtitle"><i class="bi bi-sliders me-2"></i>Preferências do Modo Claro</h2>
+
+        <div class="toggle-row">
+            <div>
+                <div class="toggle-label">Modo Claro</div>
+                <div class="toggle-desc">Forçar tema claro independente da preferência do sistema</div>
+            </div>
+            <label class="toggle-switch">
+                <input type="checkbox" id="modo-claro" data-key="modo_claro">
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+
+        <div class="toggle-row">
+            <div>
+                <div class="toggle-label">Brilho Automático</div>
+                <div class="toggle-desc">Ajustar brilho da interface conforme horário do dia</div>
+            </div>
+            <label class="toggle-switch">
+                <input type="checkbox" id="brilho-auto" data-key="brilho_automatico">
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+
+        <div class="toggle-row">
+            <div>
+                <div class="toggle-label">Fonte Padrão</div>
+                <div class="toggle-desc">Família tipográfica para toda a interface</div>
+            </div>
+            <select class="form-select" id="fonte-padrao" data-key="fonte_padrao">
+                <option value="system">Sistema</option>
+                <option value="sans">Sans-serif</option>
+                <option value="serif">Serif</option>
+                <option value="mono">Monospace</option>
+            </select>
+        </div>
+
+        <div class="toggle-row">
+            <div>
+                <div class="toggle-label">Tamanho da Fonte</div>
+                <div class="toggle-desc">Escala de tamanho do texto na interface</div>
+            </div>
+            <select class="form-select" id="tamanho-fonte" data-key="tamanho_fonte">
+                <option value="small">Pequeno</option>
+                <option value="medium">Médio</option>
+                <option value="large">Grande</option>
+            </select>
+        </div>
+
+        <div class="toggle-row">
+            <div>
+                <div class="toggle-label">Compactar Navbar</div>
+                <div class="toggle-desc">Reduzir altura e padding da barra de navegação</div>
+            </div>
+            <label class="toggle-switch">
+                <input type="checkbox" id="compactar-navbar" data-key="compactar_navbar">
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+
+        <div class="toggle-row" style="border-bottom:none;">
+            <div>
+                <div class="toggle-label">Mostrar Segunda Navbar</div>
+                <div class="toggle-desc">Exibir barra de navegação secundária no topo</div>
+            </div>
+            <label class="toggle-switch">
+                <input type="checkbox" id="mostrar-segunda-navbar" data-key="mostrar_segunda_navbar">
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+
+        <div style="margin-top:1.5rem;">
+            <button class="btn-primary" onclick="salvarPreferencias()"><i class="bi bi-check-lg"></i> Salvar Preferências</button>
+        </div>
+    </div>
+</div>
+
+<div id="toast" class="toast"></div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+    const STORAGE_KEY = 'ampliagro_config_dia';
+
+    function carregarPreferencias() {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (!saved) return;
+        const prefs = JSON.parse(saved);
+        document.querySelectorAll('[data-key]').forEach(el => {
+            const key = el.dataset.key;
+            if (el.type === 'checkbox') {
+                el.checked = prefs[key] === true;
+            } else {
+                el.value = prefs[key] || el.options[0].value;
+            }
+        });
+    }
+
+    function salvarPreferencias() {
+        const prefs = {};
+        document.querySelectorAll('[data-key]').forEach(el => {
+            const key = el.dataset.key;
+            if (el.type === 'checkbox') {
+                prefs[key] = el.checked;
+            } else {
+                prefs[key] = el.value;
+            }
+        });
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs));
+        const t = document.getElementById('toast');
+        t.textContent = 'Preferências salvas com sucesso!';
+        t.className = 'toast toast-success show';
+        setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    document.addEventListener('DOMContentLoaded', carregarPreferencias);
+</script>
+{% endblock %}

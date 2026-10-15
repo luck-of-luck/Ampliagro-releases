@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 133 133" fill="none" role="img" aria-labelledby="logo-title">
+  <title id="logo-title">Ampliagro</title>
+  <defs>
+    <linearGradient id="ampliagro-green" x1="0" y1="66.5" x2="133" y2="66.5" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0e9d78"/>
+      <stop offset="1" stop-color="#3bb68f"/>
+    </linearGradient>
+  </defs>
+  <rect width="133" height="133" rx="21" fill="url(#ampliagro-green)"/>
+  <path d="M18 105 49 22 61.5 55.5 45 105Z" fill="#fff"/>
+  <path d="M52 18H80L115 105H86L82.5 95.5H53L59.5 78H75L52 18Z" fill="#fff"/>
+</svg>

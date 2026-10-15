@@ -1,0 +1,52 @@
+   }
+      }
+    });
+  });
+
+  describe('os botoes que produzem pecas', () => {
+    it('planilha e grafico mandam um pedido COMPLETO, nao um spiritinho', () => {
+      window.IaRail.passar('iaCriarPlanilha');
+      window.IaRail.passar('iaCriarGrafico');
+      const pedidos = window.AmpliaChamado.pedirChat.mock.calls.map((c) => c[0]);
+      expect(pedidos).toHaveLength(2);
+      for (const p of pedidos) {
+        /* Completo = diz a peça E os dados. "Faça uma planilha" gasta o clique
+           e devolve "de quê?". */
+        expect(p.length).toBeGreaterThan(100);
+        expect(p).toMatch(/safra/i);
+      }
+      expect(pedidos[0].toLowerCase()).toContain('planilha');
+      expect(pedidos[1].toLowerCase()).toContain('gráfico');
+    });
+
+    it('"com os widgets que ja existem" nomeia widgets do catalogo do servidor', async () => {
+      window.IaRail.passar('iaCriarNoPainel');
+      await new Promise((r) => setTimeout(r, 0));
+      const pedido = window.AmpliaChamado.pedirChat.mock.calls.at(-1)[0];
+      expect(pedido).toContain('kpi-custo');
+      /* E a DESCRICAO vem do servidor. Ler por `AmpliaPalco.CATALOGO_MESA` dava
+         sempre `undefined` — é exportada por valor e `carregaCatalogo`
+         reatribui a variável. */
+      expect(pedido).toContain('Custo total');
+      /* E pede confirmação: o preset é do produtor. */
+      expect(pedido.toLowerCase()).toContain('pergunta');
+    });
+
+    it('"widgets vazios + valores" NAO nomeia widget nenhum', async () => {
+      window.IaRail.passar('iaResponderNoPainel');
+      await new Promise((r) => setTimeout(r, 0));
+      const pedido = window.AmpliaChamado.pedirChat.mock.calls.at(-1)[0];
+      /* A escolha é da IA: um id aqui seria uma escolha nossa. */
+      expect(pedido).not.toMatch(/kpi-custo|chart-safras/);
+      expect(pedido).toMatch(/escolhe tu/i);
+      /* E diz para não inventar número — a regra de `chamado.py`. */
+      expect(pedido.toLowerCase()).toContain('não inventes');
+    });
+
+    it('sem pipeline, o botao DIZ que não há — não finge', () => {
+      window.AmpliaChamado = { pedirChat: vi.fn(() => ({ ok: false, motivo: 'sem_pipeline' })) };
+      window.IaRail.passar('iaCriarPlanilha');
+      const fala = window.iaLocalMsg.mock.calls.at(-1)[0];
+      expect(fala).toMatch(/não tem a conversa|Conversa/i);
+    });
+  }

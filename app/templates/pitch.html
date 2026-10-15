@@ -1,0 +1,196 @@
+﻿{% load static %}<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    {% include "partials/brand-head.html" %}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ampliagro â€” Do campo Ã  cooperativa</title>
+<meta name="description" content="Ampliagro â€” do campo Ã  cooperativa. Intro cinematogrÃ¡fica scroll-driven.">
+<link rel="stylesheet" href="{% static 'vendor/bootstrap-icons-1.11.3.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/paginas/pitch-cinema.css' %}?v=6">
+</head>
+<body class="cinema">
+<a class="skip" href="#final">Pular intro e ir ao conteÃºdo</a>
+<div class="cine" id="cine" data-phase="A">
+  <nav class="rail" aria-label="Progresso da intro">
+    <a class="brand" href="/pitch/"><i class="bi bi-clipboard-data-fill"></i>AMPLIAGRO</a>
+    <div class="chapters" role="group" aria-label="CapÃ­tulos">
+      <button type="button" data-goto="A" aria-current="true">01 CAMPO</button>
+      <button type="button" data-goto="B" aria-current="false">02 CORTE</button>
+      <button type="button" data-goto="C" aria-current="false">03 5 FAIXAS</button>
+      <button type="button" data-goto="D" aria-current="false">04 MARCA</button>
+      <button type="button" data-goto="E" aria-current="false">05 APP</button>
+    </div>
+    <span class="sp"></span>
+    <span class="meter"><span class="bar"><i id="cineBar"></i></span><span id="cinePct">000%</span></span>
+    <button class="railbtn" id="cineAuto" type="button"><i class="bi bi-pause-fill"></i> Pausar</button>
+    <button class="railbtn" id="cineReplay" type="button"><i class="bi bi-arrow-counterclockwise"></i> Rever</button>
+  </nav>
+  <section class="stage" id="cineStage" aria-label="Intro: do campo a cooperativa">
+    <div class="viewport">
+      <div class="track">
+        <article class="pane" data-k="campo" style="left:0;width:50%">
+          <div class="bg"></div><div class="gridlines"></div><div class="scan"></div><div class="shade"></div>
+          <div class="glyph"><i class="bi bi-tree-fill"></i></div>
+          <div class="in">
+            <div class="kick">Origem Â· 01</div>
+            <h2>Do campo<span class="thin">onde o dado nasce</span></h2>
+            <p class="lead">Culturas, talhÃµes e maquinÃ¡rio. O registro comeÃ§a no talhÃ£o â€” mesmo sem sinal.</p>
+            <div class="meta"><span>TALHÃƒO</span><span>OFFLINE-FIRST</span><span>MAQUINÃRIO</span></div>
+          </div>
+          <span class="big">01</span>
+          <div class="foot"><span class="n">CAMÂ·01</span><span>Culturas e maquinÃ¡rio</span></div>
+        </article>
+        <article class="pane" data-k="tudo" style="left:50%;width:0.1%">
+          <div class="bg"></div><div class="shade"></div>
+          <div class="glyph"><i class="bi bi-layers-fill"></i></div>
+          <div class="in">
+            <div class="kick">Plataforma Â· 02</div>
+            <h2>Tudo em um<span class="thin">sem 4 softwares</span></h2>
+            <p class="lead">Campo, estoque, financeiro e fiscal numa Ãºnica governanÃ§a.</p>
+            <div class="meta"><span>1 LOGIN</span><span>1 LEDGER</span></div>
+          </div>
+          <span class="big">02</span>
+          <div class="foot"><span class="n">PLTÂ·02</span><span>GovernanÃ§a absoluta</span></div>
+        </article>
+        <article class="pane" data-k="log" style="left:50%;width:0.1%">
+          <div class="bg"></div><div class="shade"></div>
+          <div class="glyph"><i class="bi bi-truck"></i></div>
+          <div class="in">
+            <div class="kick">Movimento Â· 03</div>
+            <h2>A logÃ­stica<span class="thin">cada carga rastreada</span></h2>
+            <p class="lead">Rotas, romaneios e fretes amarrados ao lote â€” do talhÃ£o ao armazÃ©m.</p>
+            <div class="meta"><span>ROMANEIO</span><span>LOTE + QR</span></div>
+          </div>
+          <span class="big">03</span>
+          <div class="foot"><span class="n">LOGÂ·03</span><span>Telemetria e rotas</span></div>
+        </article>
+        <article class="pane" data-k="feito" style="left:50%;width:0.1%">
+          <div class="bg"></div><div class="shade"></div>
+          <div class="glyph"><i class="bi bi-stars"></i></div>
+          <div class="in">
+            <div class="kick">Prova Â· 04</div>
+            <h2>Feito p/ vocÃª<span class="thin">relatÃ³rio em 1 clique</span></h2>
+            <p class="lead">PDF com fotos, financeiro e QR de rastreabilidade. Sem esconder lacunas.</p>
+            <div class="meta"><span>PDF+QR</span><span>LCDPR</span></div>
+          </div>
+          <span class="big">04</span>
+          <div class="foot"><span class="n">PRVÂ·04</span><span>Fonte declarada</span></div>
+        </article>
+        <article class="pane" data-k="coop" style="right:0;width:50%">
+          <div class="bg"></div><div class="gridlines"></div><div class="scan"></div><div class="shade"></div>
+          <div class="glyph"><i class="bi bi-diagram-3-fill"></i></div>
+          <div class="in">
+            <div class="kick">Destino Â· 05</div>
+            <h2>A cooperativa<span class="thin">o dado vira decisÃ£o</span></h2>
+            <p class="lead">Estoque, DRE e LCDPR sincronizados entre sede, tÃ©cnico e produtor.</p>
+            <div class="meta"><span>DRE</span><span>SYNC</span><span>KANBAN</span></div>
+          </div>
+          <span class="big">05</span>
+          <div class="foot"><span class="n">COPÂ·05</span><span>Sede + tÃ©cnico + produtor</span></div>
+        </article>
+        <div class="cut" style="left:50%"><span class="wheel"></span></div>
+        <div class="flash"></div>
+        <div class="brandphase">
+          <div>
+            <div class="over">O SISTEMA OPERACIONAL DO AGRO</div>
+            <h1>AMPLIAGRO</h1>
+            <p>Uma plataforma offline-first. Sem conexÃµes perdidas, sem planilhas quebradas â€” do campo Ã  cooperativa.</p>
+          </div>
+        </div>
+        <p class="hint"><span class="dot"></span><span>Role para acelerar â€” o scroll conduz a cena</span></p>
+      </div>
+  <section class="finale" id="final" tabindex="-1" aria-label="Baixe o Ampliagro">
+    <div class="fwrap">
+      <span class="fkicker"><i class="bi bi-lightning-charge-fill"></i> O MOTOR DO AGRONEGÃ“CIO</span>
+      <h2>Baixe agora. Instale a governanÃ§a na sua operaÃ§Ã£o.</h2>
+      <p class="sub">Uma Ãºnica plataforma offline-first. Sem conexÃµes perdidas, sem planilhas quebradas. Capacidades auditadas: <strong>{{ n_catalogo }}</strong> Â· operacionais <strong>{{ n_existe }}</strong> Â· parciais <strong>{{ n_parcial }}</strong>.</p>
+      <div class="fgrid">
+        <div>
+          <div class="card" style="margin-bottom:1.2rem">
+            <h3><i class="bi bi-phone-fill"></i> Dispositivos mÃ³veis</h3>
+            <p>Para o talhÃ£o, trator e trabalho de campo. Instala como app (PWA).</p>
+            <div class="dl">
+              <a class="btn dark" href="/demo/"><i class="bi bi-android2"></i> Android</a>
+              <a class="btn light" href="/demo/"><i class="bi bi-apple"></i> iOS / iPad</a>
+            </div>
+            <div id="pitchInstall" style="margin-top:.8rem">
+              <button type="button" id="pitchInstallBtn" class="btn green" style="width:100%;border:none;cursor:pointer" aria-label="Instalar o Ampliagro no celular" hidden><i class="bi bi-download"></i> Instalar no celular</button>
+              <p id="pitchInstallIos" style="color:#47605a;font-size:.9rem" hidden><i class="bi bi-share"></i> No iPhone/iPad: Compartilhar â†’ Adicionar Ã  Tela de InÃ­cio.</p>
+            </div>
+          </div>
+          <div class="card">
+            <h3><i class="bi bi-display-fill"></i> EscritÃ³rio e estaÃ§Ãµes</h3>
+            <p>VisÃ£o panorÃ¢mica para gestores, tÃ©cnicos e contadores.</p>
+            <div class="dl" style="grid-template-columns:1fr 1fr 1fr">
+              <a class="btn blue" href="/demo/"><i class="bi bi-windows"></i> Windows</a>
+              <a class="btn dark" href="/demo/"><i class="bi bi-apple"></i> macOS</a>
+              <a class="btn amber" href="/demo/"><i class="bi bi-ubuntu"></i> Linux</a>
+            </div>
+          </div>
+        </div>
+        <div class="reviews">
+          <div class="rev">
+            <div class="stars">â˜…â˜…â˜…â˜…â˜…</div>
+            <p>"Abandonei os 4 softwares que usava. A NF-e bate, o estoque diminui e o LCDPR sai pronto. Um nÃ­vel de governanÃ§a que nunca tivemos."</p>
+            <div class="who"><span class="ava" style="background:#065f46">CT</span><span><strong>Carlos Teixeira</strong><br><small style="color:#5eead4">Produtor de grÃ£os Â· 1.200 ha</small></span></div>
+          </div>
+          <div class="rev">
+            <div class="stars">â˜…â˜…â˜…â˜…â˜…</div>
+            <p>"Sinal no talhÃ£o Ã© mito. Com o app offline, lanÃ§o as mediÃ§Ãµes do rebanho e finalizo a OS na hora. A sede sincroniza tudo."</p>
+            <div class="who"><span class="ava" style="background:#1e40af">MR</span><span><strong>Marcos Ribeiro</strong><br><small style="color:#93c5fd">Gestor de maquinÃ¡rio</small></span></div>
+          </div>
+          <a class="btn green" href="/demo/"><i class="bi bi-lightning-charge-fill"></i> Testar demo agora â€” 1 clique, jÃ¡ logado</a>
+        </div>
+      </div>
+      <div class="foot2">
+        <span>Â© 2026 Ampliagro OS â€” Sistema Operacional Livre do AgronegÃ³cio.</span>
+        <span><a href="/demo/">Demo</a> Â· <a href="/api/docs/">API</a> Â· <a href="/privacidade/">Privacidade</a></span>
+      </div>
+    </div>
+    <!-- Carousel de fases / features auto-scroll -->
+    <section class="fcarousel" aria-label="Fases em destaque">
+      <div class="fcwrap">
+        <button class="fcprev" aria-label="F anterior"><i class="bi bi-chevron-left"></i></button>
+        <div class="fitems">
+          <article class="fitem"><h3>Do campo</h3><p>Origem dos dados, cultivo e maquinÃ¡rio</p></article>
+          <article class="fitem"><h3>Tudo em um</h3><p>GestÃ£o unificada de campo a cooperativa</p></article>
+          <article class="fitem"><h3>LogÃ­stica</h3><p>Rastreamento de cargas e rotas</p></article>
+          <article class="fitem"><h3>5 FAIXAS</h3><p>GovernanÃ§a em cinco pilares</p></article>
+          <article class="fitem"><h3>Aplicativo</h3><p>App nativo: offline-first, multi-plataforma</p></article>
+        </div>
+        <button class="fcnext" aria-label="F prÃ³xima"><i class="bi bi-chevron-right"></i></button>
+      </div>
+    </section>
+  </section></div>
+<script src="{% static 'js/pitch-cinema.js' %}?v=6"></script>
+<script>
+(function () {
+  'use strict';
+  var btn = document.getElementById('pitchInstallBtn');
+  var iosHint = document.getElementById('pitchInstallIos');
+  if (!btn || !iosHint) return;
+  var ua = navigator.userAgent || '';
+  var isIOS = /iPhone|iPad|iPod/.test(ua) && !/Macintosh/.test(ua);
+  var mq = window.matchMedia ? window.matchMedia('(display-mode: standalone)') : null;
+  var standalone = (mq && mq.matches) || window.navigator.standalone === true;
+  if (standalone) return;
+  if (isIOS) { iosHint.hidden = false; return; }
+  var deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', function (e) {
+    e.preventDefault(); deferredPrompt = e; btn.hidden = false;
+  });
+  btn.addEventListener('click', function () {
+    if (!deferredPrompt) { btn.hidden = true; return; }
+    btn.hidden = true; deferredPrompt.prompt();
+    if (deferredPrompt.userChoice && deferredPrompt.userChoice.then) {
+      deferredPrompt.userChoice.then(function () { deferredPrompt = null; });
+    } else { deferredPrompt = null; }
+  });
+  window.addEventListener('appinstalled', function () { deferredPrompt = null; btn.hidden = true; });
+})();
+</script>
+</body>
+</html>
+
+

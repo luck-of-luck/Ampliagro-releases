@@ -1,0 +1,38 @@
+{# Empty state com Call-to-Action. A critica (./console, secao 1) pede: em vez de bloco morto com "Sem dados", algo que reduza o numero de cliques ate a acao. #}
+{# Aqui o CTA e um botao de verdade que ja abre a aba certa — os .pcrud-empty antigos so diziam "Use a aba X" em texto, deixando o usuario procurar o botao. #}
+{# IMPORTANTE: o {% include %} do call-site tem de ser de LINHA UNICA (veja app/tests_templates.py). #}
+{#   Django 5.2 compila as tags com tag_re SEM re.DOTALL: qualquer tag partida em linha #}
+{#   sai no HTML como texto literal. Este arquivo e a razao de o include ser escrito assim. #}
+{# Uso: chame com include ... with, tudo em uma linha. #}
+{# Exemplo: {% include "partials/_empty_state_cta.html" with empty_icone="bi bi-inbox" empty_titulo="Nenhum talhao cadastrado" empty_descricao="Cadastre o primeiro talhao para vincular safras." empty_acao="Cadastrar talhao" empty_aba="novo" %} #}
+{# Se empty_aba vier vazio, o CTA vira link (empty_href) ou some. #}
+<div class="pcrud-empty empty-state-cta">
+  <i class="bi {{ empty_icone|default:'bi-inbox' }}"></i>
+  <p class="empty-state-cta__titulo">{{ empty_titulo|default:"Nada aqui ainda" }}</p>
+  {% if empty_descricao %}
+    <p class="empty-state-cta__descricao">{{ empty_descricao }}</p>
+  {% endif %}
+  {% if empty_aba %}
+    <button type="button" class="pcrud-btn pcrud-btn-primary empty-state-cta__acao"
+            data-empty-cta-aba="{{ empty_aba }}">
+      <i class="bi bi-plus-lg"></i> {{ empty_acao|default:"Adicionar" }}
+    </button>
+  {% elif empty_href %}
+    <a href="{{ empty_href }}" class="pcrud-btn pcrud-btn-primary empty-state-cta__acao">
+      <i class="bi bi-plus-lg"></i> {{ empty_acao|default:"Adicionar" }}
+    </a>
+  {% endif %}
+</div>
+{% if empty_aba %}
+<script>
+// Dispara o mesmo caminho de clique dos .pcrud-subtab, entao nao duplica a
+// logica de troca de aba: o handler existente no _premium_cadastro_base.html
+// continua sendo a unica fonte de verdade.
+document.addEventListener('click', function (ev) {
+  var btn = ev.target.closest ? ev.target.closest('[data-empty-cta-aba]') : null;
+  if (!btn) return;
+  var alvo = document.querySelector('.pcrud-subtab[data-tab="' + btn.getAttribute('data-empty-cta-aba') + '"]');
+  if (alvo) alvo.click();
+});
+</script>
+{% endif %}

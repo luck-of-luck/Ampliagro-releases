@@ -1,0 +1,10 @@
+# Ferramentas de BUILD do Ampliagro Desktop.
+#
+# Não entram no pacote. São o que transformam `requirements-desktop.txt`
+# num executável, e só o CI precisa delas.
+#
+# `requirements-desktop.txt` é o que CORRE no computador do produtor.
+# Este ficheiro é o que CORRE na máquina que constrói. Confundi-los é
+# como entra um `pyinstaller` de 10 MB num produto de 300 MB.
+
+pyinstaller>=6.0,<7.0

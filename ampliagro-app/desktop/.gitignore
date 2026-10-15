@@ -1,0 +1,42 @@
+# Build do Ampliagro Desktop.
+#
+# O `.gitignore` da raiz cobre `build/` e `dist/`, mas NÃO
+# `build-runtime/` nem `dist-runtime/`. Sem esta pasta, `git status`
+# mostrava mais de 5.000 ficheiros do runtime congelado como untracked —
+# incluindo a pasta inteira de fusos horários do `tzdata`.
+#
+# `git status --untracked-files=all` num repositório com isto é inútil:
+# ninguém lê a lista, e o dia em que alguém fizer `git add -A` o
+# histórico fica com 5.000 binários.
+
+node_modules/
+
+# Saída do PyInstaller (`backend/congelar.py`).
+build-runtime/
+dist-runtime/
+
+# Artefactos do Vite/Tailwind, caso venham a ser gerados aqui.
+*.tsbuildinfo
+
+# Logs e dados de execuções locais do runtime.
+.desktop-data/
+*.log
+# uild/ NAO e' so artefacto nesta pasta.
+#
+# O .gitignore da raiz tem 'build/' na linha 70, e isso engole
+# mpliagro-app/desktop/build/ tambem. Duas coisas que sao FONTE vivem la e
+# nunca foram versionadas:
+#
+#   - license.txt — o package.json aponta para ela
+#     (build.license = 'build/license.txt'), e o electron-builder mete-a no
+#     instalador. MEDIDO 14/10/2026: o build do Windows morria com
+#     'cannot find specified resource build/license.txt'.
+#   - entitlements.mac.plist — o macOS usa para o hardened runtime.
+#
+# Passou sempre local porque os dois ficheiros existem na maquina de quem
+# constroi. O CI nunca os viu. Um 'build/' que engole ficheiros de que o
+# build depende e' a mesma armadilha do workflow que vivia num subdirectorio:
+# localmente funciona, no GitHub nunca chega a correr.
+!build/
+!build/license.txt
+!build/entitlements.mac.plist

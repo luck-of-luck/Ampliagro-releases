@@ -1,0 +1,185 @@
+/* ═══════════════════════════════════════════════════════════
+   AMPLIAGRO — Variáveis de Tema (Claro / Escuro)
+   ───────────────────────────────────────────────────────────
+   Usadas por todo o sistema. O JS theme-system.js sobrescreve
+   estes valores dinamicamente conforme o modo ativo.
+   ═══════════════════════════════════════════════════════════ */
+
+:root {
+  --cor-fundo: #fdfefe;
+  --cor-texto: #1d2421;
+  --cor-primaria: #0f9d6e;
+  --cor-secundaria: #1d2421;
+  --cor-acento: #3ec48f;
+  --cor-borda: #e5e7eb;
+  --cor-hover: rgba(15, 157, 110, 0.1);
+  --cor-suave: #f3f7f5;
+  --cor-texto-suave: #5f6b66;
+  --cor-texto-fraco: #8b9792;
+  --cor-sombra: rgba(29, 36, 33, 0.12);
+  --cor-fundo-navbar: #fdfefe;
+  --cor-fundo-card: #fdfefe;
+  --cor-fundo-card-aninhado: #f3f7f5;
+  --cor-sucesso: #0f9d6e;
+  --cor-alerta: #c98a24;
+  --cor-erro: #d93a3a;
+}
+
+html.dark {
+  --cor-fundo: #0b0f0e;
+  --cor-texto: #e9eeec;
+  --cor-primaria: #3ec48f;
+  --cor-secundaria: #0b0f0e;
+  --cor-acento: #57d7a0;
+  --cor-borda: #33413f;
+  --cor-hover: rgba(62, 196, 143, 0.1);
+  --cor-suave: #131917;
+  --cor-texto-suave: #8b9792;
+  --cor-texto-fraco: #5f6b66;
+  --cor-sombra: rgba(0, 0, 0, 0.5);
+  --cor-fundo-navbar: #131917;
+  --cor-fundo-card: #151b19;
+  --cor-fundo-card-aninhado: #1a211f;
+  --cor-sucesso: #3ec48f;
+  --cor-alerta: #e0a84e;
+  --cor-erro: #ef6a6a;
+}
+
+/* Aplicação base */
+body {
+  background-color: var(--cor-fundo);
+  color: var(--cor-texto);
+  font-family:
+    'Inter',
+    system-ui,
+    -apple-system,
+    sans-serif;
+  min-height: 100vh;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+/* Classes utilitárias semânticas (usam as variáveis) */
+.cor-primaria {
+  color: var(--cor-primaria) !important;
+}
+.cor-secundaria {
+  color: var(--cor-secundaria) !important;
+}
+.cor-texto-suave {
+  color: var(--cor-texto-suave) !important;
+}
+.cor-texto-fraco {
+  color: var(--cor-texto-fraco) !important;
+}
+.fundo-primario {
+  background-color: var(--cor-primaria) !important;
+}
+.fundo-suave {
+  background-color: var(--cor-suave) !important;
+}
+.fundo-card {
+  background-color: var(--cor-fundo-card) !important;
+}
+.borda-suave {
+  border-color: var(--cor-borda) !important;
+}
+
+/* Cards e painéis padrão */
+.card-padrao {
+  background-color: var(--cor-fundo-card);
+  border: 1px solid var(--cor-borda);
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px var(--cor-sombra);
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Dropdown de Modo (painel de aparência da navbar)
+   Os cards (.nav-mode-card) são estilizados em navbar-premium.css;
+   aqui ficam apenas o rodapé e o botão Personalizar.
+   ═══════════════════════════════════════════════════════════ */
+.mode-dropdown-footer {
+  padding: 0.625rem 0.75rem;
+  border-top: 1px solid var(--cor-borda);
+  display: flex;
+  justify-content: center;
+}
+
+.btn-personalizar-mode {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.6rem;
+  border: 1px solid var(--cor-primaria);
+  background: transparent;
+  color: var(--cor-primaria);
+  font-weight: 600;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    transform 0.15s ease;
+}
+
+.btn-personalizar-mode:hover {
+  background: var(--cor-hover);
+}
+
+.btn-personalizar-mode:active {
+  transform: scale(0.98);
+}
+/* ═══════════════════════════════════════════════════════════
+   Variáveis Globais Incrementadas — Customização Total
+   Mantém padrão #0f9d6e, adiciona fluidez premium
+   ═══════════════════════════════════════════════════════════ */
+:root {
+  /* Culturas — cores por tipo (mantém esmeralda como base) */
+  --cor-cultura-graos: #0f9d6e;
+  --cor-cultura-frutas: #e67e22;
+  --cor-cultura-hortalicas: #27ae60;
+  --cor-cultura-tuberculos: #8e44ad;
+  --cor-cultura-ervas: #16a085;
+  /* Fluidez — transições premium */
+  --transicao-fluida: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transicao-rapida: 0.15s ease;
+  --raio-premium: 28px;
+  --raio-medio: 16px;
+  --raio-suave: 12px;
+  --sombra-premium: 0 8px 32px rgba(15, 157, 110, 0.12);
+  --sombra-suave: 0 4px 16px rgba(15, 157, 110, 0.08);
+  /* Lógica avançada — espaçamento fluido */
+  --espaco-xs: 0.25rem;
+  --espaco-sm: 0.5rem;
+  --espaco-md: 1rem;
+  --espaco-lg: 1.5rem;
+  --espaco-xl: 2rem;
+  /* Personalização usuário */
+  --fonte-display: 'Sora', sans-serif;
+  --fonte-corpo: 'Inter', system-ui, sans-serif;
+  --fonte-mono: 'JetBrains Mono', monospace;
+}
+
+html.dark {
+  --cor-cultura-graos: #3ec48f;
+  --cor-cultura-frutas: #f39c12;
+  --sombra-premium: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+/* Classes utilitárias premium — mesmo padrão, mais liberdade */
+.fluido {
+  transition: all var(--transicao-fluida);
+}
+.premium-card {
+  background: var(--cor-fundo-card);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-premium);
+  box-shadow: var(--sombra-premium);
+  transition: all var(--transicao-fluida);
+}
+.premium-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(15, 157, 110, 0.16);
+}

@@ -1,0 +1,71 @@
+{% extends base_template %}
+{% load static %}
+
+{% block title %}Ampliagro - Agenda da Equipe{% endblock %}
+
+{% block extra_css %}
+
+{% endblock %}
+
+{% block dashboard_appbar %}{% endblock %}
+
+{% block content %}
+<div class="section-container">
+    <div class="section-header">
+        <h1 class="section-title">Agenda da Equipe</h1>
+        <div>
+            <a href="{% url 'equipe-empregados' %}" class="btn-secondary btn-sm"><i class="bi bi-people"></i> Empregados</a>
+            <a href="{% url 'adicionar-funcionario' %}" class="btn-secondary btn-sm"><i class="bi bi-person-plus"></i> Cadastro</a>
+            <a href="{% url 'index_spa' %}" class="btn-secondary btn-sm">Voltar ao Dashboard</a>
+        </div>
+    </div>
+
+    <div class="agenda-layout">
+        <div class="calendar-grid">
+            <div class="cal-header">
+                <div></div>
+                <div>Seg</div>
+                <div>Ter</div>
+                <div>Qua</div>
+                <div>Qui</div>
+                <div>Sex</div>
+            </div>
+            <div class="cal-body">
+                <div class="cal-row"><div class="cal-time">06:00</div><div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell"></div></div>
+                <div class="cal-row"><div class="cal-time">08:00</div><div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell"></div></div>
+                <div class="cal-row"><div class="cal-time">10:00</div><div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell"></div></div>
+                <div class="cal-row"><div class="cal-time">12:00</div><div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell"></div></div>
+                <div class="cal-row"><div class="cal-time">14:00</div><div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell"></div></div>
+                <div class="cal-row"><div class="cal-time">16:00</div><div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell"></div></div>
+                <div class="cal-row"><div class="cal-time">18:00</div><div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell"></div></div>
+            </div>
+        </div>
+
+        <div class="today-list">
+            <h3><i class="bi bi-calendar-day"></i> Agenda de Hoje</h3>
+            {% if agenda_hoje %}
+            {% for item in agenda_hoje %}
+            <div class="today-item">
+                <div class="avatar">{{ item.funcionario.nome|first|default:"?" }}</div>
+                <div class="info">
+                    <div class="name">{{ item.funcionario.nome }}</div>
+                    <div class="task">{{ item.titulo }}</div>
+                    <div class="time">{{ item.hora_inicio }} - {{ item.hora_fim }}</div>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="empty-state"><i class="bi bi-calendar-check" style="font-size:1.5rem;display:block;margin-bottom:0.5rem;"></i>Nenhum compromisso hoje.</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+function getCSRFToken() { return document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''; }
+function showToast(msg, type) { const t = document.getElementById('toast'); t.textContent = msg; t.className = 'toast toast-' + type + ' show'; setTimeout(() => t.classList.remove('show'), 3000); }
+</script>
+{% endblock %}

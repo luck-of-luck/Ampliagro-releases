@@ -1,0 +1,209 @@
+<nav id="dashboard-appbar" role="toolbar" aria-label="Barra de widgets — estilo Windows">
+  <div class="widgetbar-edge" aria-hidden="true"></div>
+
+  <!-- LEFT SECTION: Gear + Search + Presets — FIXO em todos os modos -->
+  <div class="widgetbar-section-core" id="widgetbar-left-section">
+    <!-- Gear (normal) → diquete/check Salvar (modo edição) — botão único -->
+    <div id="widgetbar-mode-toggle" class="flex items-center gap-1">
+      <button id="custom-mode-btn" onclick="toggleCustomMode()" class="widgetbar-pill-icon" title="Modo Edição" aria-label="Modo Edição">
+        <i class="bi bi-gear"></i>
+      </button>
+    </div>
+
+    <!-- Search button -->
+    <div class="widgetbar-search-wrap">
+      <button onclick="toggleSearchMenu()" class="widgetbar-search-btn" title="Pesquisar">
+        <i class="bi bi-search"></i>
+      </button>
+      <div id="search-menu" class="search-menu" role="dialog" aria-label="Iniciar — Ampliagro" aria-hidden="true">
+        <div class="relative" style="margin-bottom:10px">
+          <i class="bi bi-search search-icon"></i>
+          <input type="text" id="search-menu-input" placeholder="Pesquisar widgets, módulos, ações..." onkeyup="handleSearchMenuKey(event)" autocomplete="off" aria-label="Pesquisar">
+        </div>
+        <!-- Windows Start — 2 colunas -->
+        <div class="search-menu-grid" id="search-menu-grid">
+          <div class="search-menu-col">
+            <div class="search-menu-section" id="search-section-recents">
+              <div class="search-menu-header"><i class="bi bi-clock-history me-1"></i> Recentes</div>
+              <div class="search-menu-item muted"><i class="bi bi-clock"></i><span>Nenhum widget recente</span></div>
+            </div>
+            <div class="search-menu-section" id="search-section-favs" style="margin-top:10px;">
+              <div class="search-menu-header"><i class="bi bi-star me-1"></i> Favoritos</div>
+              <div class="search-menu-item muted"><i class="bi bi-star"></i><span>Sem favoritos</span></div>
+            </div>
+          </div>
+          <div class="search-menu-col">
+            <div class="search-menu-section" id="search-section-suggested">
+              <div class="search-menu-header"><i class="bi bi-magic me-1"></i> Sugerido para você</div>
+              <div class="search-menu-item muted"><i class="bi bi-lightbulb"></i><span>IA analisando seu uso...</span></div>
+            </div>
+            <div class="search-menu-section" id="search-section-actions" style="margin-top:10px;">
+              <div class="search-menu-header">Ações rápidas</div>
+              <div class="search-menu-item" onclick="searchAction('dashboard')"><i class="bi bi-speedometer2"></i><span>Ir para Dashboard</span><span class="shortcut">Ctrl+1</span></div>
+              <div class="search-menu-item" onclick="searchAction('financeiro')"><i class="bi bi-cash-stack"></i><span>Ir para Financeiro</span><span class="shortcut">Ctrl+2</span></div>
+              <div class="search-menu-item" onclick="searchAction('campo')"><i class="bi bi-geo-alt"></i><span>Ir para Campo</span><span class="shortcut">Ctrl+3</span></div>
+              <div class="search-menu-item" onclick="searchAction('estoque')"><i class="bi bi-box-seam"></i><span>Ir para Estoque</span><span class="shortcut">Ctrl+4</span></div>
+              <div class="search-menu-divider" style="margin:8px 0;"></div>
+              <div class="search-menu-item" onclick="openCommandPalette()" style="cursor:pointer"><i class="bi bi-command"></i><span>Paleta de Comandos</span><span class="shortcut">Ctrl+K</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="search-menu-footer">
+          <span><i class="bi bi-windows me-1"></i> Ampliagro OS</span>
+          <span>↵ Enter para ir • Esc para fechar</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Presets carousel - ALWAYS VISIBLE, mesmo lugar nos dois modos -->
+    <div id="presets-carousel" class="flex items-center" style="gap:2px"></div>
+  </div>
+
+  <!-- MIDDLE: Selecionado (só em modo edição) -->
+  <div class="widgetbar-spacer" id="widgetbar-center-section">
+    <div id="widgetbar-selection-indicator" class="hidden" title="Widget selecionado">
+      <i class="bi bi-crosshair" style="font-size:10px;opacity:0.8"></i>
+      <span id="widgetbar-selection-text" style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Nenhum selecionado</span>
+      <button onclick="clearWidgetSelection()" title="Limpar seleção" style="width:18px;height:18px;display:grid;place-items:center;border-radius:999px;border:none;background:rgba(0,0,0,0.08);color:inherit;cursor:pointer;flex-shrink:0"><i class="bi bi-x" style="font-size:10px"></i></button>
+    </div>
+  </div>
+
+  <!-- RIGHT SECTION: Sliders (normal) ↔ Gama completa de edição (editing) -->
+  <div class="right-section-normal" id="widgetbar-right-section">
+    <div id="active-filters-tags" class="hidden">
+      <button onclick="clearAllFilters()"><i class="bi bi-x"></i></button>
+    </div>
+
+    <!-- Drag Sliders — só no modo normal -->
+    <div class="drag-slider-group" id="drag-slider-group" title="Arraste ou clique em qualquer lugar">
+      <!-- Period Drag Slider -->
+      <div class="drag-slider" id="period-slider" data-values="Dia,Semana,Mês,Semestre,Ano" data-index="2">
+        <div class="drag-slider-track"></div>
+        <div class="drag-slider-fill" style="width:50%"></div>
+        <div class="drag-slider-thumb"><span>Dia</span></div>
+      </div>
+      <!-- Financial Drag Slider -->
+      <div class="drag-slider" id="financial-slider" data-values="Lucros,Ambos,Gastos" data-index="1">
+        <div class="drag-slider-track"></div>
+        <div class="drag-slider-fill" style="width:50%"></div>
+        <div class="drag-slider-thumb"><span>Ambos</span></div>
+      </div>
+    </div>
+
+    <!-- Gama completa de edição — só no modo edição, no lugar dos sliders -->
+    <div id="edit-mode-section" class="hidden">
+      <div id="restore-group" class="restore-group">
+        <button id="layout-undo-btn" onclick="undoLayoutHistory()" class="history-arrow" title="Desfazer (Ctrl+Z)" aria-label="Desfazer">
+          <i class="bi bi-chevron-left"></i>
+        </button>
+        <button onclick="restoreWidgetsLayout()" class="edit-pill restore" title="Restaurar meu layout">
+          <i class="bi bi-arrow-counterclockwise"></i><span>Meu</span>
+        </button>
+        <button id="layout-redo-btn" onclick="redoLayoutHistory()" class="history-arrow" title="Refazer (Ctrl+Y)" aria-label="Refazer">
+          <i class="bi bi-chevron-right"></i>
+        </button>
+      </div>
+      <button onclick="openPresetModal()" class="edit-pill" title="Adicionar Preset">
+        <i class="bi bi-layout-three-columns"></i><span>Preset</span>
+      </button>
+      <button onclick="openAddWidgetModal()" class="edit-pill" title="Adicionar Widget">
+        <i class="bi bi-plus-lg"></i><span>Widget</span>
+      </button>
+      <div class="relative">
+        <button onclick="toggleEditDropdown('bg-color-dropdown')" class="edit-pill" title="Plano de Fundo">
+          <i class="bi bi-palette"></i><span>Fundo</span>
+        </button>
+        <div id="bg-color-dropdown" class="edit-dropdown" style="width:320px">
+          <div class="edit-dropdown-header">Cor do Fundo — Preview em tempo real</div>
+          <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--cor-nav-separador)">
+            <label style="font-size:0.625rem;color:var(--cor-nav-texto-medio)">Personalizada:</label>
+            <input type="color" oninput="previewWidgetBg(this.value)" onchange="previewWidgetBg(this.value)" style="width:36px;height:28px;padding:2px;border-radius:6px;cursor:pointer;border:1px solid var(--cor-nav-separador)" value="#0f9d6e" id="bg-custom-color-input">
+          </div>
+          <div class="bg-color-grid" id="bg-color-grid">
+            <div onclick="previewWidgetBg('rgba(255,255,255,0.95)')" class="bg-color-swatch" style="background:#fff" title="Branco"></div>
+            <div onclick="previewWidgetBg('rgba(15,157,110,0.1)')" class="bg-color-swatch" style="background:rgba(15,157,110,0.15)" title="Verde claro"></div>
+            <div onclick="previewWidgetBg('rgba(59,130,246,0.1)')" class="bg-color-swatch" style="background:rgba(59,130,246,0.15)" title="Azul claro"></div>
+            <div onclick="previewWidgetBg('rgba(245,158,11,0.1)')" class="bg-color-swatch" style="background:rgba(245,158,11,0.15)" title="Âmbar claro"></div>
+            <div onclick="previewWidgetBg('rgba(239,68,68,0.1)')" class="bg-color-swatch" style="background:rgba(239,68,68,0.15)" title="Vermelho claro"></div>
+            <div onclick="previewWidgetBg('rgba(168,85,247,0.1)')" class="bg-color-swatch" style="background:rgba(168,85,247,0.15)" title="Roxo claro"></div>
+            <div onclick="previewWidgetBg('rgba(0,77,99,0.95)')" class="bg-color-swatch" style="background:rgba(0,77,99,0.95)" title="Petróleo"></div>
+            <div onclick="previewWidgetBg('rgba(0,107,104,0.95)')" class="bg-color-swatch" style="background:rgba(0,107,104,0.95)" title="Verde petróleo"></div>
+            <div onclick="previewWidgetBg('rgba(30,41,59,0.95)')" class="bg-color-swatch" style="background:rgba(30,41,59,0.95)" title="Slate escuro"></div>
+            <div onclick="previewWidgetBg('rgba(15,23,42,0.95)')" class="bg-color-swatch" style="background:rgba(15,23,42,0.95)" title="Slate bem escuro"></div>
+            <div onclick="previewWidgetBg('rgba(249,250,251,0.95)')" class="bg-color-swatch" style="background:rgba(249,250,251,0.95)" title="Cinza bem claro"></div>
+            <div onclick="previewWidgetBg('')" class="bg-color-swatch" style="display:flex;align-items:center;justify-content:center;color:#ef4444;font-size:12px;border-color:#fca5a5" title="Transparente (padrão)"><i class="bi bi-x"></i></div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border-top:1px solid var(--cor-nav-separador);margin-top:8px;background:var(--cor-nav-fundo, #f8fafc);border-radius:0 0 12px 12px">
+            <span id="bg-preview-status" style="font-size:0.625rem;color:var(--cor-nav-texto-medio);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Selecione um widget</span>
+            <div style="display:flex;gap:6px;flex-shrink:0">
+              <button onclick="clearWidgetBgTheme()" class="px-3 py-1.5 text-xs font-medium rounded-full border border-amber-300 dark:border-amber-600 bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-all" title="Seguir claro/escuro do sistema (remove cor fixa)"><i class="bi bi-circle-half me-1"></i>Claro/Escuro</button>
+              <button onclick="revertWidgetBg()" class="px-3 py-1.5 text-xs font-medium rounded-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-600 transition-all" title="Voltar à cor original"><i class="bi bi-arrow-counterclockwise me-1"></i>Reverter</button>
+              <button onclick="saveWidgetBg()" class="px-3 py-1.5 text-xs font-semibold rounded-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm transition-all" title="Salvar cor no preset"><i class="bi bi-check-lg me-1"></i>Salvar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="relative">
+        <button onclick="toggleEditDropdown('font-size-dropdown')" class="edit-pill" title="Tamanho do texto do widget selecionado">
+          <i class="bi bi-type"></i><span>Texto</span>
+        </button>
+        <div id="font-size-dropdown" class="edit-dropdown" style="width:320px">
+          <div class="edit-dropdown-header">Tamanho do Texto — Preview em tempo real</div>
+          <div style="padding:10px 12px;border-bottom:1px solid var(--cor-nav-separador)">
+            <div class="font-size-row" style="display:flex;align-items:center;gap:8px">
+              <input type="number" id="font-size-input" min="8" max="64" step="1" value="16" oninput="previewWidgetFontSize(this.value)" title="Tamanho em px (16 = atual)">
+              <span style="font-size:0.625rem;color:var(--cor-nav-texto-medio)">px</span>
+              <input type="range" id="font-size-range" min="8" max="64" step="1" value="16" oninput="previewWidgetFontSize(this.value)" title="Arraste para ajustar">
+              <span id="font-size-pct">100%</span>
+            </div>
+            <div style="font-size:0.6rem;color:var(--cor-nav-texto-medio);margin-top:6px">16px = tamanho atual • sem fixar, o texto acompanha o tamanho do widget</div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;background:var(--cor-nav-fundo, #f8fafc);border-radius:0 0 12px 12px">
+            <span id="font-size-status" style="font-size:0.625rem;color:var(--cor-nav-texto-medio);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Selecione um widget</span>
+            <div style="display:flex;gap:6px;flex-shrink:0">
+              <button onclick="clearWidgetFontSize()" class="px-3 py-1.5 text-xs font-medium rounded-full border border-amber-300 dark:border-amber-600 bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/50 transition-all" title="Voltar ao automático (texto acompanha o tamanho)"><i class="bi bi-magic me-1"></i>Auto</button>
+              <button onclick="revertWidgetFontSize()" class="px-3 py-1.5 text-xs font-medium rounded-full border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-600 transition-all" title="Voltar ao valor original"><i class="bi bi-arrow-counterclockwise me-1"></i>Reverter</button>
+              <button onclick="saveWidgetFontSize()" class="px-3 py-1.5 text-xs font-semibold rounded-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm transition-all" title="Salvar tamanho no preset"><i class="bi bi-check-lg me-1"></i>Salvar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button id="edit-selected-btn" onclick="openEditSelectedWidget()" class="edit-pill" title="Editar Widget Selecionado">
+        <i class="bi bi-pencil-square"></i><span>Editar</span>
+      </button>
+      <button id="delete-selected-btn" onclick="deleteSelectedWidget()" class="edit-pill danger" title="Excluir Widget">
+        <i class="bi bi-trash3"></i><span>Excluir</span>
+      </button>
+    </div>
+
+    <!-- Quick Settings button (mobile — Windows System Tray) -->
+    <button id="quick-settings-btn" class="quick-settings-btn" onclick="toggleQuickSettings()" title="Configurações rápidas" aria-label="Configurações rápidas" aria-expanded="false">
+      <i class="bi bi-sliders"></i>
+    </button>
+  </div>
+
+  <!-- Windows-like Flyouts (fora do fluxo) -->
+  <div id="quick-settings-flyout" class="quick-settings-flyout" role="dialog" aria-label="Configurações rápidas" aria-hidden="true">
+    <h4><i class="bi bi-sliders me-1"></i> Controles</h4>
+    <div class="qs-row">
+      <span style="font-size:0.75rem; color:var(--cor-nav-texto-medio); min-width:64px;">Período</span>
+      <div id="qs-period-slider" style="flex:1;"></div>
+    </div>
+    <div class="qs-row">
+      <span style="font-size:0.75rem; color:var(--cor-nav-texto-medio); min-width:64px;">Financeiro</span>
+      <div id="qs-financial-slider" style="flex:1;"></div>
+    </div>
+    <div class="qs-row" style="justify-content:flex-end; border:none; padding-top:6px;">
+      <button onclick="toggleQuickSettings()" style="font-size:0.6875rem; padding:4px 10px; border-radius:6px; border:1px solid var(--cor-nav-separador); background:transparent; color:var(--cor-nav-texto); cursor:pointer;">Fechar</button>
+    </div>
+  </div>
+
+  <!-- Context menu Windows 11 para widgets -->
+  <div id="widget-context-menu" class="widget-context-menu" role="menu" aria-hidden="true">
+    <button role="menuitem" onclick="handleContextEdit()"><i class="bi bi-pencil-square"></i> Editar</button>
+    <button role="menuitem" onclick="handleContextDuplicate()"><i class="bi bi-copy"></i> Duplicar</button>
+    <button role="menuitem" onclick="handleContextBg()"><i class="bi bi-palette"></i> Cor de fundo</button>
+    <hr>
+    <button role="menuitem" class="danger" onclick="handleContextDelete()"><i class="bi bi-trash3"></i> Excluir</button>
+  </div>
+</nav>

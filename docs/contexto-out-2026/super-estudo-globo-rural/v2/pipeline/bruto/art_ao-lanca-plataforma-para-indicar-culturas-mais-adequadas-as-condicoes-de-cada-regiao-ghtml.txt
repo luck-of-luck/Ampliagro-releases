@@ -1,0 +1,15 @@
+A Organização das Nações Unidas para a Alimentação e a Agricultura (FAO) lançou uma plataforma digital voltada ao planejamento agrícola. Chamada de CropSuit, a ferramenta permite identificar quais culturas apresentam maior aptidão para uma determinada área a partir da análise de fatores como solo, clima, relevo e cobertura vegetal.
+
+Desenvolvida para atender produtores, técnicos, pesquisadores e formuladores de políticas públicas, a plataforma reúne dados geoespaciais e modelos agronômicos para avaliar o potencial de diferentes culturas em cada localidade. O objetivo é apoiar decisões sobre o uso da terra, reduzir riscos na produção e favorecer práticas agrícolas mais sustentáveis.
+
+Segundo a FAO, o CropSuit ajuda a direcionar o cultivo para áreas com maior potencial produtivo, contribuindo para o aumento da eficiência no uso de insumos, como água e fertilizantes , além de fortalecer a adaptação da agricultura às mudanças climáticas .
+
+No aplicativo, o usuário marca as coordenadas da propriedade, seleciona características da produção — como uso de insumos e irrigação — e o software gera um relatório, destacando quais culturas são aptas para as particularidades da fazenda.
+
+De acordo com a organização, o CropSuit foi desenvolvido para ser adaptado às bases de dados de diferentes países. À medida que novas informações sobre solos e clima são incorporadas, a ferramenta passa a oferecer avaliações mais precisas sobre a aptidão agrícola de cada região, auxiliando tanto produtores rurais quanto gestores públicos na definição de estratégias para a produção de alimentos.
+
+O aplicativo já foi testado na prática com testes na Zâmbia. Utilizando mapas detalhados de solo em conjunto com dados de precipitação e outras informações ambientais, o CropSuit revelou que, embora o milho apresentasse bom desempenho em algumas áreas, lotes vizinhos com características de solo diferentes eram mais adequados para culturas como mandioca , feijão -caupi e fônio (cereal ancestral nativo da África Ocidental).
+
+“O desafio não é mais saber se a agricultura inteligente funciona. É saber se conseguimos garantir que essas ferramentas cheguem aos agricultores que mais precisam delas”, disse o diretor de Terras e Águas da FAO, Lifeng Li.
+
+A plataforma integra o programa SoilFER, iniciativa da FAO voltada ao fortalecimento dos sistemas de informação sobre solos. O programa também contempla ações de mapeamento, modernização de laboratórios, padronização de análises e desenvolvimento de ferramentas digitais para ampliar o acesso a informações técnicas que apoiem o planejamento agrícola.

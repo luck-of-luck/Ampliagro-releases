@@ -1,0 +1,255 @@
+# ============================================================
+# Producao — Ampliagro
+#
+# A imagem NAO e buildada aqui: ela vem do GHCR, construida pelo
+# .github/workflows/cd.yml a partir do Dockerfile.prod. Antes o servico
+# `app` tinha `build: {dockerfile: Dockerfile}` + `image: ampliagro:latest`,
+# entao `docker compose pull` nao buscava nada e `up -d` buildava de novo
+# com o Dockerfile de DEV — a imagem endurecida nunca chegava a producao.
+#
+# Variaveis obrigatorias (do .env do servidor / ambiente):
+#   POSTGRES_USER, POSTGRES_PASSWORD   → banco
+#   SECRET_KEY                         → config/settings/base.py levanta
+#                                       ValueError sem ela
+#   ALLOWED_HOSTS                      → sem isso, todo request com Host
+#                                       real cai em DisallowedHost (400)
+#   APP_IMAGE                          → imagem do GHCR (cd.yml injeta)
+# O `:?` faz o compose falhar na hora com mensagem, em vez de subir um
+# container que morre no boot — que era o sintoma: prod.py exige
+# DATABASE_URL e o compose nao passava nenhuma.
+# ============================================================
+
+# Env comum a web/celery. `config.settings.prod` le DATABASE_URL (nao
+# POSTGRES_*), REDIS_URL e CELERY_*.
+x-app-env: &app-env
+  DJANGO_SETTINGS_MODULE: config.settings.prod
+  DATABASE_URL: 'postgresql://${POSTGRES_USER:?POSTGRES_USER obrigatorio}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD obrigatorio}@postgres:5432/${POSTGRES_DB:-ampliagro}'
+  SECRET_KEY: ${SECRET_KEY:?SECRET_KEY obrigatorio}
+  ALLOWED_HOSTS: ${ALLOWED_HOSTS:?ALLOWED_HOSTS obrigatorio}
+  # O Caddy e a borda. `SECURE_PROXY_SSL_HEADER` (ver prod.py) ja resolve o
+  # 301-em-loop: o Django passou a ler o X-Forwarded-Proto do Caddy.
+  #
+  # MEDIDO 2026-10-05: esta linha estava `${SECURE_SSL_REDIRECT:-False}`.
+  #
+  # O comentario de cima explicava o porque: sem certificado (Caddy com
+  # `auto_https off`), `True` devolvia 301 para https que ninguem servia. Mas a
+  # CAUSA desse 301 — o Django nao ver o TLS atras do proxy — ja' estava
+  # CORRIGIDA na mesma linha (`SECURE_PROXY_SSL_HEADER`). O contorno ficou.
+  #
+  # O que isso custava: era o unico dos cinco flags de transporte que o
+  # compose nao passava, e por isso o unico que chegava em `False`. Os outros
+  # quatro herdam o default seguro de `prod.py`. So este tinha um default
+  # INSEGURO explicito — e o efeito era: `http://ampliagro.com.br` servia a
+  # aplicacao em claro, com o cookie de sessao aceite.
+  #
+  # Passa a `True`, alinhado com o default de `prod.py`. Um default seguro no
+  # compose e' a unica defence contra o `.env` de desenvolvimento: um
+  # default inseguro e' uma porta que ninguem fechou.
+  #
+  # Instalacao SEM certificado (Caddy `auto_https off`, rede privada): ponha
+  # `SECURE_SSL_REDIRECT=False` E `AMPLIAGRO_ALLOW_INSECURE_PROD=1`. O segundo
+  # e' obrigatorio — `prod.py` recusa o arranque sem ele, porque essa
+  # instalacao e' uma escolha de risco assumida e nao um default. Ver
+  # `tests/test_transporte_de_producao.py`.
+  SECURE_SSL_REDIRECT: ${SECURE_SSL_REDIRECT:-True}
+  AMPLIAGRO_ALLOW_INSECURE_PROD: ${AMPLIAGRO_ALLOW_INSECURE_PROD:-0}
+  REDIS_URL: redis://redis:6379/0
+  CELERY_BROKER_URL: redis://redis:6379/1
+  CELERY_RESULT_BACKEND: redis://redis:6379/2
+  # AGENDADOR DA VARREDURA PROATIVA, AQUI NO LUGAR CERTO.
+  #
+  # MEDIDO 2026-10-08: o `celery_beat` deste ficheiro (linha ~164) arrancava com
+  # `BEAT_SCHEDULE = {}` e nao havia erro nenhum — contentor de pe, zero tarefas,
+  # zero aviso. A causa: `app/ia/proativo_tasks.py:291-300` so devolve o
+  # `BEAT_SCHEDULE` quando `AMPLIA_CELERY_BEAT == "1"`, e a variavel nao estava
+  # neste bloco nem no `.env.prod.example`. A regra da chuva, das contas e do
+  # desvio de orcado nunca correram em producao.
+  #
+  # Aqui e' "1" porque este alvo e' um contentor Linux: nao existe Agendador de
+  # Tarefas do Windows dentro de um contentor. O `docker-compose.yml` de DESENVOLVIMENTO
+  # e' que tem de ficar a `0`, porque em Windows quem agenda e' o
+  # `tools\bat\setup_tarefa_proativo.bat`.
+  #
+  # A porta nao esta desligada, esta apontada para o sitio certo. Ligar os dois
+  # ao mesmo tempo faz a varredura correr duas vezes por dia — e o dedup esconde
+  # o alerta duplicado, que e' o pior sitio para isso acontecer. O guarda e'
+  # `tests/test_agendador_unico.py`.
+  AMPLIA_CELERY_BEAT: ${AMPLIA_CELERY_BEAT:-1}
+  TIMESCALEDB_HOST: timescaledb
+  TIMESCALEDB_PORT: 5432
+  TIMESCALEDB_NAME: ${TIMESCALEDB_DB:-ampliagro_ts}
+  TZ: ${TZ:-America/Sao_Paulo}
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ampliagro-db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-ampliagro}
+      POSTGRES_USER: ${POSTGRES_USER:?POSTGRES_USER obrigatorio}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD obrigatorio}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      # Sem este init a extension timescaledb nunca era criada no banco da
+      # serie temporal, apesar do shared_preload_libraries — e a primeira
+      # hypertable falhava.
+      - ./init-scripts:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - ampliagro-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: ampliagro-redis
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - ampliagro-network
+
+  timescaledb:
+    image: timescale/timescaledb:latest-pg16
+    container_name: ampliagro-timeseries
+    environment:
+      POSTGRES_DB: ${TIMESCALEDB_DB:-ampliagro_ts}
+      POSTGRES_USER: ${POSTGRES_USER:?POSTGRES_USER obrigatorio}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD obrigatorio}
+    volumes:
+      - timeseries_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d:ro
+    command: >
+      postgres -c shared_preload_libraries=timescaledb
+               -c max_connections=200
+               -c shared_buffers=256MB
+               -c effective_cache_size=1GB
+               -c maintenance_work_mem=256MB
+               -c checkpoint_completion_target=0.9
+               -c wal_buffers=16MB
+               -c default_statistics_target=100
+               -c random_page_cost=1.1
+               -c effective_io_concurrency=200
+               -c work_mem=4MB
+               -c min_wal_size=1GB
+               -c max_wal_size=4GB
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - ampliagro-network
+
+  app:
+    image: ${APP_IMAGE:?APP_IMAGE obrigatorio}
+    container_name: ampliagro-app
+    environment: *app-env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      timescaledb:
+        condition: service_healthy
+    # Só em 127.0.0.1. Publicar 0.0.0.0:8000 permitia contornar o Caddy
+    # inteiro — sem rate limit, sem os headers da borda — e permitia a um
+    # cliente mandar `X-Forwarded-Proto: https` à mão e enganar o
+    # SECURE_PROXY_SSL_HEADER (ver config/settings/prod.py).
+    # O Caddy continua a alcançar app:8000 pela rede do compose.
+    ports:
+      - '127.0.0.1:8000:8000'
+    volumes:
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+      - ./logs:/app/logs
+    restart: unless-stopped
+    networks:
+      - ampliagro-network
+
+  celery_worker:
+    image: ${APP_IMAGE:?APP_IMAGE obrigatorio}
+    container_name: ampliagro-celery
+    # O entrypoint so roda migrate/collectstatic para o papel web
+    # (gunicorn/daphne); celery entra direto no comando.
+    command: celery -A config worker -l INFO -Q default,iot,alerts,reports -c 4 --max-tasks-per-child=100
+    environment: *app-env
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 1G
+    restart: unless-stopped
+    networks:
+      - ampliagro-network
+
+  celery_beat:
+    image: ${APP_IMAGE:?APP_IMAGE obrigatorio}
+    container_name: ampliagro-beat
+    command: celery -A config beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    environment: *app-env
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - ampliagro-network
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: ampliagro-caddy
+    environment:
+      # O Caddyfile usa {$DOMAIN}; sem isso ele cai no default (localhost).
+      DOMAIN: ${DOMAIN:-localhost}
+    ports:
+      - '80:80'
+      - '443:443'
+      - '443:443/udp'
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      # O Caddyfile serve /static e /media direto do volume. Sem estes
+      # mounts o Caddy respondia 404 em tudo (WhiteNoise cobre o /static
+      # de qualquer forma, mas /media so o Caddy serve em prod).
+      - static_volume:/app/staticfiles:ro
+      - media_volume:/app/media:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      app:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      - ampliagro-network
+
+volumes:
+  postgres_data:
+  redis_data:
+  timeseries_data:
+  static_volume:
+  media_volume:
+  caddy_data:
+  caddy_config:
+
+networks:
+  ampliagro-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16

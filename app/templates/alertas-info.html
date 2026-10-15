@@ -1,0 +1,128 @@
+{% extends base_template %}
+{% load static %}
+
+{% block title %}Ampliagro - Alertas Informativos{% endblock %}
+
+{% block extra_css %}
+
+{% endblock %}
+
+{% block dashboard_appbar %}{% endblock %}
+
+{% block content %}
+<div class="section-container">
+    <div class="section-header">
+        <h1 class="section-title"><i class="bi bi-info-circle-fill"></i> Alertas Informativos</h1>
+        <a href="{% url 'index_spa' %}" class="btn-secondary btn-sm"><i class="bi bi-arrow-left"></i> Voltar</a>
+    </div>
+
+    <div class="stats-grid" id="stats-grid">
+        <div class="stat-card"><div class="stat-label">Total</div><div class="stat-value" id="stat-total">-</div></div>
+        <div class="stat-card"><div class="stat-label">Clima</div><div class="stat-value" id="stat-clima">-</div></div>
+        <div class="stat-card"><div class="stat-label">Estoque</div><div class="stat-value" id="stat-estoque">-</div></div>
+        <div class="stat-card"><div class="stat-label">Sistema</div><div class="stat-value" id="stat-sistema">-</div></div>
+    </div>
+
+    <div class="content-card">
+        <div class="filter-bar">
+            <label style="font-size:0.75rem;font-weight:600;color:#64748b;text-transform:uppercase;">Filtrar</label>
+            <select id="filtro-tipo" onchange="filtrar()">
+                <option value="todos">Todos</option>
+                <option value="clima">Clima</option>
+                <option value="estoque">Estoque</option>
+                <option value="safra">Safra</option>
+                <option value="financeiro">Financeiro</option>
+                <option value="sistema">Sistema</option>
+            </select>
+        </div>
+        <div class="table-wrap">
+            <table id="tabela-alertas">
+                <thead>
+                    <tr><th>Categoria</th><th>Descrição</th><th>Ações</th></tr>
+                </thead>
+                <tbody id="alertas-body">
+                    <tr><td colspan="3" class="empty-state"><i class="bi bi-hourglass-split" style="font-size:1.5rem;display:block;margin-bottom:0.5rem;"></i>Carregando...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+const CATEGORIA_ICONS = {
+    clima: 'bi-cloud-sun', estoque: 'bi-box-seam', safra: 'bi-plant',
+    financeiro: 'bi-cash-coin', sistema: 'bi-gear',
+};
+const CATEGORIA_BADGE = {
+    clima: 'badge-clima', estoque: 'badge-estoque', safra: 'badge-safra',
+    financeiro: 'badge-financeiro', sistema: 'badge-sistema',
+};
+
+function detectarCategoria(alerta) {
+    const t = (alerta.titulo + ' ' + alerta.mensagem).toLowerCase();
+    if (t.includes('clima') || t.includes('tempo') || t.includes('previs')) return 'clima';
+    if (t.includes('estoque') || t.includes('insumo') || t.includes('colmeia')) return 'estoque';
+    if (t.includes('safra') || t.includes('colheit') || t.includes('plantio')) return 'safra';
+    if (t.includes('despes') || t.includes('receita') || t.includes('financ')) return 'financeiro';
+    return 'sistema';
+}
+
+async function carregarAlertas() {
+    const tbody = document.getElementById('alertas-body');
+    try {
+        const r = await fetch('/api/notificacoes/?nivel=info&apenas_nao_lidas=1');
+        if (!r.ok) throw new Error('Erro ' + r.status);
+        const data = await r.json();
+        const alertas = (data.results || data).filter(a => a.nivel === 'info');
+
+        if (alertas.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3" class="empty-state"><i class="bi bi-check-circle" style="font-size:1.5rem;display:block;margin-bottom:0.5rem;color:#22c55e;"></i>Nenhum alerta informativo pendente</td></tr>';
+            document.getElementById('stat-total').textContent = '0';
+            return;
+        }
+
+        const cats = { clima: 0, estoque: 0, safra: 0, financeiro: 0, sistema: 0 };
+        alertas.forEach(a => { cats[detectarCategoria(a)]++; });
+        document.getElementById('stat-total').textContent = alertas.length;
+        document.getElementById('stat-clima').textContent = cats.clima;
+        document.getElementById('stat-estoque').textContent = cats.estoque;
+        document.getElementById('stat-sistema').textContent = cats.sistema;
+
+        tbody.innerHTML = alertas.map(a => {
+            const cat = detectarCategoria(a);
+            const icon = CATEGORIA_ICONS[cat] || 'bi-info-circle';
+            const badge = CATEGORIA_BADGE[cat] || 'badge-info';
+            return '<tr data-tipo="' + cat + '">' +
+                '<td><span class="badge ' + badge + '"><i class="bi ' + icon + '"></i> ' + cat.charAt(0).toUpperCase() + cat.slice(1) + '</span></td>' +
+                '<td><strong>' + a.titulo + '</strong><br><span style="font-size:0.75rem;color:#64748b;">' + a.mensagem + '</span></td>' +
+                '<td><button class="btn-resolver" onclick="resolverAlerta(' + a.id + ')"><i class="bi bi-check-lg"></i> Marcar como lido</button></td>' +
+            '</tr>';
+        }).join('');
+    } catch (e) {
+        tbody.innerHTML = '<tr><td colspan="3" class="empty-state"><i class="bi bi-exclamation-triangle" style="font-size:1.5rem;display:block;margin-bottom:0.5rem;"></i>Erro: ' + e.message + '</td></tr>';
+    }
+}
+
+async function resolverAlerta(id) {
+    try {
+        await fetch('/api/notificacao/' + id + '/ler/', { method: 'POST', headers: { 'X-CSRFToken': getCSRF() } });
+        carregarAlertas();
+    } catch (e) { console.error(e); }
+}
+
+function getCSRF() { return document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''; }
+
+function filtrar() {
+    const tipo = document.getElementById('filtro-tipo').value;
+    document.querySelectorAll('#tabela-alertas tbody tr').forEach(tr => {
+        if (!tr.dataset.tipo) return;
+        tr.style.display = (tipo === 'todos' || tr.dataset.tipo === tipo) ? '' : 'none';
+    });
+}
+
+document.addEventListener('DOMContentLoaded', carregarAlertas);
+</script>
+{% endblock %}

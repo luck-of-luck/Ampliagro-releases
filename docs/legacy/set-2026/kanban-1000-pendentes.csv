@@ -1,0 +1,402 @@
+ordem,estagio,descricao,prioridade,status,concluida
+0,Alertas,Irrigar talhão soja V0-R8 — umidade 60% — umidade_solo abaixo do limite: 55.0 < 60.0000%,media,pendente,False
+1000,Graos 180,[PENDENTE1000 001] Graos — pendente #1,alta,pendente,False
+1001,Pecuaria 300,[PENDENTE1000 002] Pecuaria — pendente #2,alta,pendente,False
+1002,Avicultura 180,[PENDENTE1000 003] Avicultura — pendente #3,alta,pendente,False
+1003,Suino-Tilapia 240,[PENDENTE1000 004] Suino-Tilapia — pendente #4,alta,pendente,False
+1004,Cafe-Laranja 180,[PENDENTE1000 005] Cafe — pendente #5,alta,pendente,False
+1005,Agrofloresta 420,[PENDENTE1000 006] Laranja — pendente #6,alta,pendente,False
+1006,ERP 240,[PENDENTE1000 007] Agrofloresta — pendente #7,alta,pendente,False
+1007,SoloAgua 60,[PENDENTE1000 008] ERP — pendente #8,alta,pendente,False
+1008,Nicho 300,[PENDENTE1000 009] SoloAgua — pendente #9,alta,pendente,False
+1009,Fora 360,[PENDENTE1000 010] Nicho — pendente #10,alta,pendente,False
+1010,TOP Globais 120,[PENDENTE1000 011] Graos — pendente #11,alta,pendente,False
+1011,Graos 180,[PENDENTE1000 012] Pecuaria — pendente #12,alta,pendente,False
+1012,Pecuaria 300,[PENDENTE1000 013] Avicultura — pendente #13,alta,pendente,False
+1013,Avicultura 180,[PENDENTE1000 014] Suino-Tilapia — pendente #14,alta,pendente,False
+1014,Suino-Tilapia 240,[PENDENTE1000 015] Cafe — pendente #15,alta,pendente,False
+1015,Cafe-Laranja 180,[PENDENTE1000 016] Laranja — pendente #16,alta,pendente,False
+1016,Agrofloresta 420,[PENDENTE1000 017] Agrofloresta — pendente #17,alta,pendente,False
+1017,ERP 240,[PENDENTE1000 018] ERP — pendente #18,alta,pendente,False
+1018,SoloAgua 60,[PENDENTE1000 019] SoloAgua — pendente #19,alta,pendente,False
+1019,Nicho 300,[PENDENTE1000 020] Nicho — pendente #20,alta,pendente,False
+1020,Fora 360,[PENDENTE1000 021] Graos — pendente #21,alta,pendente,False
+1021,TOP Globais 120,[PENDENTE1000 022] Pecuaria — pendente #22,alta,pendente,False
+1022,Graos 180,[PENDENTE1000 023] Avicultura — pendente #23,alta,pendente,False
+1023,Pecuaria 300,[PENDENTE1000 024] Suino-Tilapia — pendente #24,alta,pendente,False
+1024,Avicultura 180,[PENDENTE1000 025] Cafe — pendente #25,alta,pendente,False
+1025,Suino-Tilapia 240,[PENDENTE1000 026] Laranja — pendente #26,alta,pendente,False
+1026,Cafe-Laranja 180,[PENDENTE1000 027] Agrofloresta — pendente #27,alta,pendente,False
+1027,Agrofloresta 420,[PENDENTE1000 028] ERP — pendente #28,alta,pendente,False
+1028,ERP 240,[PENDENTE1000 029] SoloAgua — pendente #29,alta,pendente,False
+1029,SoloAgua 60,[PENDENTE1000 030] Nicho — pendente #30,alta,pendente,False
+1030,Nicho 300,[PENDENTE1000 031] Graos — pendente #31,alta,pendente,False
+1031,Fora 360,[PENDENTE1000 032] Pecuaria — pendente #32,alta,pendente,False
+1032,TOP Globais 120,[PENDENTE1000 033] Avicultura — pendente #33,alta,pendente,False
+1033,Graos 180,[PENDENTE1000 034] Suino-Tilapia — pendente #34,alta,pendente,False
+1034,Pecuaria 300,[PENDENTE1000 035] Cafe — pendente #35,alta,pendente,False
+1035,Avicultura 180,[PENDENTE1000 036] Laranja — pendente #36,alta,pendente,False
+1036,Suino-Tilapia 240,[PENDENTE1000 037] Agrofloresta — pendente #37,alta,pendente,False
+1037,Cafe-Laranja 180,[PENDENTE1000 038] ERP — pendente #38,alta,pendente,False
+1038,Agrofloresta 420,[PENDENTE1000 039] SoloAgua — pendente #39,alta,pendente,False
+1039,ERP 240,[PENDENTE1000 040] Nicho — pendente #40,alta,pendente,False
+1040,SoloAgua 60,[PENDENTE1000 041] Graos — pendente #41,alta,pendente,False
+1041,Nicho 300,[PENDENTE1000 042] Pecuaria — pendente #42,alta,pendente,False
+1042,Fora 360,[PENDENTE1000 043] Avicultura — pendente #43,alta,pendente,False
+1043,TOP Globais 120,[PENDENTE1000 044] Suino-Tilapia — pendente #44,alta,pendente,False
+1044,Graos 180,[PENDENTE1000 045] Cafe — pendente #45,alta,pendente,False
+1045,Pecuaria 300,[PENDENTE1000 046] Laranja — pendente #46,alta,pendente,False
+1046,Avicultura 180,[PENDENTE1000 047] Agrofloresta — pendente #47,alta,pendente,False
+1047,Suino-Tilapia 240,[PENDENTE1000 048] ERP — pendente #48,alta,pendente,False
+1048,Cafe-Laranja 180,[PENDENTE1000 049] SoloAgua — pendente #49,alta,pendente,False
+1049,Agrofloresta 420,[PENDENTE1000 050] Nicho — pendente #50,alta,pendente,False
+1050,ERP 240,[PENDENTE1000 051] Graos — pendente #51,alta,pendente,False
+1051,SoloAgua 60,[PENDENTE1000 052] Pecuaria — pendente #52,alta,pendente,False
+1052,Nicho 300,[PENDENTE1000 053] Avicultura — pendente #53,alta,pendente,False
+1053,Fora 360,[PENDENTE1000 054] Suino-Tilapia — pendente #54,alta,pendente,False
+1054,TOP Globais 120,[PENDENTE1000 055] Cafe — pendente #55,alta,pendente,False
+1055,Graos 180,[PENDENTE1000 056] Laranja — pendente #56,alta,pendente,False
+1056,Pecuaria 300,[PENDENTE1000 057] Agrofloresta — pendente #57,alta,pendente,False
+1057,Avicultura 180,[PENDENTE1000 058] ERP — pendente #58,alta,pendente,False
+1058,Suino-Tilapia 240,[PENDENTE1000 059] SoloAgua — pendente #59,alta,pendente,False
+1059,Cafe-Laranja 180,[PENDENTE1000 060] Nicho — pendente #60,alta,pendente,False
+1060,Agrofloresta 420,[PENDENTE1000 061] Graos — pendente #61,media,pendente,False
+1061,ERP 240,[PENDENTE1000 062] Pecuaria — pendente #62,media,pendente,False
+1062,SoloAgua 60,[PENDENTE1000 063] Avicultura — pendente #63,media,pendente,False
+1063,Nicho 300,[PENDENTE1000 064] Suino-Tilapia — pendente #64,media,pendente,False
+1064,Fora 360,[PENDENTE1000 065] Cafe — pendente #65,media,pendente,False
+1065,TOP Globais 120,[PENDENTE1000 066] Laranja — pendente #66,media,pendente,False
+1066,Graos 180,[PENDENTE1000 067] Agrofloresta — pendente #67,media,pendente,False
+1067,Pecuaria 300,[PENDENTE1000 068] ERP — pendente #68,media,pendente,False
+1068,Avicultura 180,[PENDENTE1000 069] SoloAgua — pendente #69,media,pendente,False
+1069,Suino-Tilapia 240,[PENDENTE1000 070] Nicho — pendente #70,media,pendente,False
+1070,Cafe-Laranja 180,[PENDENTE1000 071] Graos — pendente #71,media,pendente,False
+1071,Agrofloresta 420,[PENDENTE1000 072] Pecuaria — pendente #72,media,pendente,False
+1072,ERP 240,[PENDENTE1000 073] Avicultura — pendente #73,media,pendente,False
+1073,SoloAgua 60,[PENDENTE1000 074] Suino-Tilapia — pendente #74,media,pendente,False
+1074,Nicho 300,[PENDENTE1000 075] Cafe — pendente #75,media,pendente,False
+1075,Fora 360,[PENDENTE1000 076] Laranja — pendente #76,media,pendente,False
+1076,TOP Globais 120,[PENDENTE1000 077] Agrofloresta — pendente #77,media,pendente,False
+1077,Graos 180,[PENDENTE1000 078] ERP — pendente #78,media,pendente,False
+1078,Pecuaria 300,[PENDENTE1000 079] SoloAgua — pendente #79,media,pendente,False
+1079,Avicultura 180,[PENDENTE1000 080] Nicho — pendente #80,media,pendente,False
+1080,Suino-Tilapia 240,[PENDENTE1000 081] Graos — pendente #81,media,pendente,False
+1081,Cafe-Laranja 180,[PENDENTE1000 082] Pecuaria — pendente #82,media,pendente,False
+1082,Agrofloresta 420,[PENDENTE1000 083] Avicultura — pendente #83,media,pendente,False
+1083,ERP 240,[PENDENTE1000 084] Suino-Tilapia — pendente #84,media,pendente,False
+1084,SoloAgua 60,[PENDENTE1000 085] Cafe — pendente #85,media,pendente,False
+1085,Nicho 300,[PENDENTE1000 086] Laranja — pendente #86,media,pendente,False
+1086,Fora 360,[PENDENTE1000 087] Agrofloresta — pendente #87,media,pendente,False
+1087,TOP Globais 120,[PENDENTE1000 088] ERP — pendente #88,media,pendente,False
+1088,Graos 180,[PENDENTE1000 089] SoloAgua — pendente #89,media,pendente,False
+1089,Pecuaria 300,[PENDENTE1000 090] Nicho — pendente #90,media,pendente,False
+1090,Avicultura 180,[PENDENTE1000 091] Graos — pendente #91,media,pendente,False
+1091,Suino-Tilapia 240,[PENDENTE1000 092] Pecuaria — pendente #92,media,pendente,False
+1092,Cafe-Laranja 180,[PENDENTE1000 093] Avicultura — pendente #93,media,pendente,False
+1093,Agrofloresta 420,[PENDENTE1000 094] Suino-Tilapia — pendente #94,media,pendente,False
+1094,ERP 240,[PENDENTE1000 095] Cafe — pendente #95,media,pendente,False
+1095,SoloAgua 60,[PENDENTE1000 096] Laranja — pendente #96,media,pendente,False
+1096,Nicho 300,[PENDENTE1000 097] Agrofloresta — pendente #97,media,pendente,False
+1097,Fora 360,[PENDENTE1000 098] ERP — pendente #98,media,pendente,False
+1098,TOP Globais 120,[PENDENTE1000 099] SoloAgua — pendente #99,media,pendente,False
+1099,Graos 180,[PENDENTE1000 100] Nicho — pendente #100,media,pendente,False
+1100,Pecuaria 300,[PENDENTE1000 101] Graos — pendente #101,media,pendente,False
+1101,Avicultura 180,[PENDENTE1000 102] Pecuaria — pendente #102,media,pendente,False
+1102,Suino-Tilapia 240,[PENDENTE1000 103] Avicultura — pendente #103,media,pendente,False
+1103,Cafe-Laranja 180,[PENDENTE1000 104] Suino-Tilapia — pendente #104,media,pendente,False
+1104,Agrofloresta 420,[PENDENTE1000 105] Cafe — pendente #105,media,pendente,False
+1105,ERP 240,[PENDENTE1000 106] Laranja — pendente #106,media,pendente,False
+1106,SoloAgua 60,[PENDENTE1000 107] Agrofloresta — pendente #107,media,pendente,False
+1107,Nicho 300,[PENDENTE1000 108] ERP — pendente #108,media,pendente,False
+1108,Fora 360,[PENDENTE1000 109] SoloAgua — pendente #109,media,pendente,False
+1109,TOP Globais 120,[PENDENTE1000 110] Nicho — pendente #110,media,pendente,False
+1110,Graos 180,[PENDENTE1000 111] Graos — pendente #111,media,pendente,False
+1111,Pecuaria 300,[PENDENTE1000 112] Pecuaria — pendente #112,media,pendente,False
+1112,Avicultura 180,[PENDENTE1000 113] Avicultura — pendente #113,media,pendente,False
+1113,Suino-Tilapia 240,[PENDENTE1000 114] Suino-Tilapia — pendente #114,media,pendente,False
+1114,Cafe-Laranja 180,[PENDENTE1000 115] Cafe — pendente #115,media,pendente,False
+1115,Agrofloresta 420,[PENDENTE1000 116] Laranja — pendente #116,media,pendente,False
+1116,ERP 240,[PENDENTE1000 117] Agrofloresta — pendente #117,media,pendente,False
+1117,SoloAgua 60,[PENDENTE1000 118] ERP — pendente #118,media,pendente,False
+1118,Nicho 300,[PENDENTE1000 119] SoloAgua — pendente #119,media,pendente,False
+1119,Fora 360,[PENDENTE1000 120] Nicho — pendente #120,media,pendente,False
+1120,TOP Globais 120,[PENDENTE1000 121] Graos — pendente #121,media,pendente,False
+1121,Graos 180,[PENDENTE1000 122] Pecuaria — pendente #122,media,pendente,False
+1122,Pecuaria 300,[PENDENTE1000 123] Avicultura — pendente #123,media,pendente,False
+1123,Avicultura 180,[PENDENTE1000 124] Suino-Tilapia — pendente #124,media,pendente,False
+1124,Suino-Tilapia 240,[PENDENTE1000 125] Cafe — pendente #125,media,pendente,False
+1125,Cafe-Laranja 180,[PENDENTE1000 126] Laranja — pendente #126,media,pendente,False
+1126,Agrofloresta 420,[PENDENTE1000 127] Agrofloresta — pendente #127,media,pendente,False
+1127,ERP 240,[PENDENTE1000 128] ERP — pendente #128,media,pendente,False
+1128,SoloAgua 60,[PENDENTE1000 129] SoloAgua — pendente #129,media,pendente,False
+1129,Nicho 300,[PENDENTE1000 130] Nicho — pendente #130,media,pendente,False
+1130,Fora 360,[PENDENTE1000 131] Graos — pendente #131,media,pendente,False
+1131,TOP Globais 120,[PENDENTE1000 132] Pecuaria — pendente #132,media,pendente,False
+1132,Graos 180,[PENDENTE1000 133] Avicultura — pendente #133,media,pendente,False
+1133,Pecuaria 300,[PENDENTE1000 134] Suino-Tilapia — pendente #134,media,pendente,False
+1134,Avicultura 180,[PENDENTE1000 135] Cafe — pendente #135,media,pendente,False
+1135,Suino-Tilapia 240,[PENDENTE1000 136] Laranja — pendente #136,media,pendente,False
+1136,Cafe-Laranja 180,[PENDENTE1000 137] Agrofloresta — pendente #137,media,pendente,False
+1137,Agrofloresta 420,[PENDENTE1000 138] ERP — pendente #138,media,pendente,False
+1138,ERP 240,[PENDENTE1000 139] SoloAgua — pendente #139,media,pendente,False
+1139,SoloAgua 60,[PENDENTE1000 140] Nicho — pendente #140,media,pendente,False
+1140,Nicho 300,[PENDENTE1000 141] Graos — pendente #141,media,pendente,False
+1141,Fora 360,[PENDENTE1000 142] Pecuaria — pendente #142,media,pendente,False
+1142,TOP Globais 120,[PENDENTE1000 143] Avicultura — pendente #143,media,pendente,False
+1143,Graos 180,[PENDENTE1000 144] Suino-Tilapia — pendente #144,media,pendente,False
+1144,Pecuaria 300,[PENDENTE1000 145] Cafe — pendente #145,media,pendente,False
+1145,Avicultura 180,[PENDENTE1000 146] Laranja — pendente #146,media,pendente,False
+1146,Suino-Tilapia 240,[PENDENTE1000 147] Agrofloresta — pendente #147,media,pendente,False
+1147,Cafe-Laranja 180,[PENDENTE1000 148] ERP — pendente #148,media,pendente,False
+1148,Agrofloresta 420,[PENDENTE1000 149] SoloAgua — pendente #149,media,pendente,False
+1149,ERP 240,[PENDENTE1000 150] Nicho — pendente #150,media,pendente,False
+1150,SoloAgua 60,[PENDENTE1000 151] Graos — pendente #151,media,pendente,False
+1151,Nicho 300,[PENDENTE1000 152] Pecuaria — pendente #152,media,pendente,False
+1152,Fora 360,[PENDENTE1000 153] Avicultura — pendente #153,media,pendente,False
+1153,TOP Globais 120,[PENDENTE1000 154] Suino-Tilapia — pendente #154,media,pendente,False
+1154,Graos 180,[PENDENTE1000 155] Cafe — pendente #155,media,pendente,False
+1155,Pecuaria 300,[PENDENTE1000 156] Laranja — pendente #156,media,pendente,False
+1156,Avicultura 180,[PENDENTE1000 157] Agrofloresta — pendente #157,media,pendente,False
+1157,Suino-Tilapia 240,[PENDENTE1000 158] ERP — pendente #158,media,pendente,False
+1158,Cafe-Laranja 180,[PENDENTE1000 159] SoloAgua — pendente #159,media,pendente,False
+1159,Agrofloresta 420,[PENDENTE1000 160] Nicho — pendente #160,media,pendente,False
+1160,ERP 240,[PENDENTE1000 161] Graos — pendente #161,media,pendente,False
+1161,SoloAgua 60,[PENDENTE1000 162] Pecuaria — pendente #162,media,pendente,False
+1162,Nicho 300,[PENDENTE1000 163] Avicultura — pendente #163,media,pendente,False
+1163,Fora 360,[PENDENTE1000 164] Suino-Tilapia — pendente #164,media,pendente,False
+1164,TOP Globais 120,[PENDENTE1000 165] Cafe — pendente #165,media,pendente,False
+1165,Graos 180,[PENDENTE1000 166] Laranja — pendente #166,media,pendente,False
+1166,Pecuaria 300,[PENDENTE1000 167] Agrofloresta — pendente #167,media,pendente,False
+1167,Avicultura 180,[PENDENTE1000 168] ERP — pendente #168,media,pendente,False
+1168,Suino-Tilapia 240,[PENDENTE1000 169] SoloAgua — pendente #169,media,pendente,False
+1169,Cafe-Laranja 180,[PENDENTE1000 170] Nicho — pendente #170,media,pendente,False
+1170,Agrofloresta 420,[PENDENTE1000 171] Graos — pendente #171,media,pendente,False
+1171,ERP 240,[PENDENTE1000 172] Pecuaria — pendente #172,media,pendente,False
+1172,SoloAgua 60,[PENDENTE1000 173] Avicultura — pendente #173,media,pendente,False
+1173,Nicho 300,[PENDENTE1000 174] Suino-Tilapia — pendente #174,media,pendente,False
+1174,Fora 360,[PENDENTE1000 175] Cafe — pendente #175,media,pendente,False
+1175,TOP Globais 120,[PENDENTE1000 176] Laranja — pendente #176,media,pendente,False
+1176,Graos 180,[PENDENTE1000 177] Agrofloresta — pendente #177,media,pendente,False
+1177,Pecuaria 300,[PENDENTE1000 178] ERP — pendente #178,media,pendente,False
+1178,Avicultura 180,[PENDENTE1000 179] SoloAgua — pendente #179,media,pendente,False
+1179,Suino-Tilapia 240,[PENDENTE1000 180] Nicho — pendente #180,media,pendente,False
+1180,Cafe-Laranja 180,[PENDENTE1000 181] Graos — pendente #181,media,pendente,False
+1181,Agrofloresta 420,[PENDENTE1000 182] Pecuaria — pendente #182,media,pendente,False
+1182,ERP 240,[PENDENTE1000 183] Avicultura — pendente #183,media,pendente,False
+1183,SoloAgua 60,[PENDENTE1000 184] Suino-Tilapia — pendente #184,media,pendente,False
+1184,Nicho 300,[PENDENTE1000 185] Cafe — pendente #185,media,pendente,False
+1185,Fora 360,[PENDENTE1000 186] Laranja — pendente #186,media,pendente,False
+1186,TOP Globais 120,[PENDENTE1000 187] Agrofloresta — pendente #187,media,pendente,False
+1187,Graos 180,[PENDENTE1000 188] ERP — pendente #188,media,pendente,False
+1188,Pecuaria 300,[PENDENTE1000 189] SoloAgua — pendente #189,media,pendente,False
+1189,Avicultura 180,[PENDENTE1000 190] Nicho — pendente #190,media,pendente,False
+1190,Suino-Tilapia 240,[PENDENTE1000 191] Graos — pendente #191,media,pendente,False
+1191,Cafe-Laranja 180,[PENDENTE1000 192] Pecuaria — pendente #192,media,pendente,False
+1192,Agrofloresta 420,[PENDENTE1000 193] Avicultura — pendente #193,media,pendente,False
+1193,ERP 240,[PENDENTE1000 194] Suino-Tilapia — pendente #194,media,pendente,False
+1194,SoloAgua 60,[PENDENTE1000 195] Cafe — pendente #195,media,pendente,False
+1195,Nicho 300,[PENDENTE1000 196] Laranja — pendente #196,media,pendente,False
+1196,Fora 360,[PENDENTE1000 197] Agrofloresta — pendente #197,media,pendente,False
+1197,TOP Globais 120,[PENDENTE1000 198] ERP — pendente #198,media,pendente,False
+1198,Graos 180,[PENDENTE1000 199] SoloAgua — pendente #199,media,pendente,False
+1199,Pecuaria 300,[PENDENTE1000 200] Nicho — pendente #200,media,pendente,False
+1200,Avicultura 180,[PENDENTE1000 201] Graos — pendente #201,media,pendente,False
+1201,Suino-Tilapia 240,[PENDENTE1000 202] Pecuaria — pendente #202,media,pendente,False
+1202,Cafe-Laranja 180,[PENDENTE1000 203] Avicultura — pendente #203,media,pendente,False
+1203,Agrofloresta 420,[PENDENTE1000 204] Suino-Tilapia — pendente #204,media,pendente,False
+1204,ERP 240,[PENDENTE1000 205] Cafe — pendente #205,media,pendente,False
+1205,SoloAgua 60,[PENDENTE1000 206] Laranja — pendente #206,media,pendente,False
+1206,Nicho 300,[PENDENTE1000 207] Agrofloresta — pendente #207,media,pendente,False
+1207,Fora 360,[PENDENTE1000 208] ERP — pendente #208,media,pendente,False
+1208,TOP Globais 120,[PENDENTE1000 209] SoloAgua — pendente #209,media,pendente,False
+1209,Graos 180,[PENDENTE1000 210] Nicho — pendente #210,media,pendente,False
+1210,Pecuaria 300,[PENDENTE1000 211] Graos — pendente #211,media,pendente,False
+1211,Avicultura 180,[PENDENTE1000 212] Pecuaria — pendente #212,media,pendente,False
+1212,Suino-Tilapia 240,[PENDENTE1000 213] Avicultura — pendente #213,media,pendente,False
+1213,Cafe-Laranja 180,[PENDENTE1000 214] Suino-Tilapia — pendente #214,media,pendente,False
+1214,Agrofloresta 420,[PENDENTE1000 215] Cafe — pendente #215,media,pendente,False
+1215,ERP 240,[PENDENTE1000 216] Laranja — pendente #216,media,pendente,False
+1216,SoloAgua 60,[PENDENTE1000 217] Agrofloresta — pendente #217,media,pendente,False
+1217,Nicho 300,[PENDENTE1000 218] ERP — pendente #218,media,pendente,False
+1218,Fora 360,[PENDENTE1000 219] SoloAgua — pendente #219,media,pendente,False
+1219,TOP Globais 120,[PENDENTE1000 220] Nicho — pendente #220,media,pendente,False
+1220,Graos 180,[PENDENTE1000 221] Graos — pendente #221,media,pendente,False
+1221,Pecuaria 300,[PENDENTE1000 222] Pecuaria — pendente #222,media,pendente,False
+1222,Avicultura 180,[PENDENTE1000 223] Avicultura — pendente #223,media,pendente,False
+1223,Suino-Tilapia 240,[PENDENTE1000 224] Suino-Tilapia — pendente #224,media,pendente,False
+1224,Cafe-Laranja 180,[PENDENTE1000 225] Cafe — pendente #225,media,pendente,False
+1225,Agrofloresta 420,[PENDENTE1000 226] Laranja — pendente #226,media,pendente,False
+1226,ERP 240,[PENDENTE1000 227] Agrofloresta — pendente #227,media,pendente,False
+1227,SoloAgua 60,[PENDENTE1000 228] ERP — pendente #228,media,pendente,False
+1228,Nicho 300,[PENDENTE1000 229] SoloAgua — pendente #229,media,pendente,False
+1229,Fora 360,[PENDENTE1000 230] Nicho — pendente #230,media,pendente,False
+1230,TOP Globais 120,[PENDENTE1000 231] Graos — pendente #231,media,pendente,False
+1231,Graos 180,[PENDENTE1000 232] Pecuaria — pendente #232,media,pendente,False
+1232,Pecuaria 300,[PENDENTE1000 233] Avicultura — pendente #233,media,pendente,False
+1233,Avicultura 180,[PENDENTE1000 234] Suino-Tilapia — pendente #234,media,pendente,False
+1234,Suino-Tilapia 240,[PENDENTE1000 235] Cafe — pendente #235,media,pendente,False
+1235,Cafe-Laranja 180,[PENDENTE1000 236] Laranja — pendente #236,media,pendente,False
+1236,Agrofloresta 420,[PENDENTE1000 237] Agrofloresta — pendente #237,media,pendente,False
+1237,ERP 240,[PENDENTE1000 238] ERP — pendente #238,media,pendente,False
+1238,SoloAgua 60,[PENDENTE1000 239] SoloAgua — pendente #239,media,pendente,False
+1239,Nicho 300,[PENDENTE1000 240] Nicho — pendente #240,media,pendente,False
+1240,Fora 360,[PENDENTE1000 241] Graos — pendente #241,media,pendente,False
+1241,TOP Globais 120,[PENDENTE1000 242] Pecuaria — pendente #242,media,pendente,False
+1242,Graos 180,[PENDENTE1000 243] Avicultura — pendente #243,media,pendente,False
+1243,Pecuaria 300,[PENDENTE1000 244] Suino-Tilapia — pendente #244,media,pendente,False
+1244,Avicultura 180,[PENDENTE1000 245] Cafe — pendente #245,media,pendente,False
+1245,Suino-Tilapia 240,[PENDENTE1000 246] Laranja — pendente #246,media,pendente,False
+1246,Cafe-Laranja 180,[PENDENTE1000 247] Agrofloresta — pendente #247,media,pendente,False
+1247,Agrofloresta 420,[PENDENTE1000 248] ERP — pendente #248,media,pendente,False
+1248,ERP 240,[PENDENTE1000 249] SoloAgua — pendente #249,media,pendente,False
+1249,SoloAgua 60,[PENDENTE1000 250] Nicho — pendente #250,media,pendente,False
+1250,Nicho 300,[PENDENTE1000 251] Graos — pendente #251,media,pendente,False
+1251,Fora 360,[PENDENTE1000 252] Pecuaria — pendente #252,media,pendente,False
+1252,TOP Globais 120,[PENDENTE1000 253] Avicultura — pendente #253,media,pendente,False
+1253,Graos 180,[PENDENTE1000 254] Suino-Tilapia — pendente #254,media,pendente,False
+1254,Pecuaria 300,[PENDENTE1000 255] Cafe — pendente #255,media,pendente,False
+1255,Avicultura 180,[PENDENTE1000 256] Laranja — pendente #256,media,pendente,False
+1256,Suino-Tilapia 240,[PENDENTE1000 257] Agrofloresta — pendente #257,media,pendente,False
+1257,Cafe-Laranja 180,[PENDENTE1000 258] ERP — pendente #258,media,pendente,False
+1258,Agrofloresta 420,[PENDENTE1000 259] SoloAgua — pendente #259,media,pendente,False
+1259,ERP 240,[PENDENTE1000 260] Nicho — pendente #260,media,pendente,False
+1260,SoloAgua 60,[PENDENTE1000 261] Graos — pendente #261,media,pendente,False
+1261,Nicho 300,[PENDENTE1000 262] Pecuaria — pendente #262,media,pendente,False
+1262,Fora 360,[PENDENTE1000 263] Avicultura — pendente #263,media,pendente,False
+1263,TOP Globais 120,[PENDENTE1000 264] Suino-Tilapia — pendente #264,media,pendente,False
+1264,Graos 180,[PENDENTE1000 265] Cafe — pendente #265,media,pendente,False
+1265,Pecuaria 300,[PENDENTE1000 266] Laranja — pendente #266,media,pendente,False
+1266,Avicultura 180,[PENDENTE1000 267] Agrofloresta — pendente #267,media,pendente,False
+1267,Suino-Tilapia 240,[PENDENTE1000 268] ERP — pendente #268,media,pendente,False
+1268,Cafe-Laranja 180,[PENDENTE1000 269] SoloAgua — pendente #269,media,pendente,False
+1269,Agrofloresta 420,[PENDENTE1000 270] Nicho — pendente #270,media,pendente,False
+1270,ERP 240,[PENDENTE1000 271] Graos — pendente #271,media,pendente,False
+1271,SoloAgua 60,[PENDENTE1000 272] Pecuaria — pendente #272,media,pendente,False
+1272,Nicho 300,[PENDENTE1000 273] Avicultura — pendente #273,media,pendente,False
+1273,Fora 360,[PENDENTE1000 274] Suino-Tilapia — pendente #274,media,pendente,False
+1274,TOP Globais 120,[PENDENTE1000 275] Cafe — pendente #275,media,pendente,False
+1275,Graos 180,[PENDENTE1000 276] Laranja — pendente #276,media,pendente,False
+1276,Pecuaria 300,[PENDENTE1000 277] Agrofloresta — pendente #277,media,pendente,False
+1277,Avicultura 180,[PENDENTE1000 278] ERP — pendente #278,media,pendente,False
+1278,Suino-Tilapia 240,[PENDENTE1000 279] SoloAgua — pendente #279,media,pendente,False
+1279,Cafe-Laranja 180,[PENDENTE1000 280] Nicho — pendente #280,media,pendente,False
+1280,Agrofloresta 420,[PENDENTE1000 281] Graos — pendente #281,media,pendente,False
+1281,ERP 240,[PENDENTE1000 282] Pecuaria — pendente #282,media,pendente,False
+1282,SoloAgua 60,[PENDENTE1000 283] Avicultura — pendente #283,media,pendente,False
+1283,Nicho 300,[PENDENTE1000 284] Suino-Tilapia — pendente #284,media,pendente,False
+1284,Fora 360,[PENDENTE1000 285] Cafe — pendente #285,media,pendente,False
+1285,TOP Globais 120,[PENDENTE1000 286] Laranja — pendente #286,media,pendente,False
+1286,Graos 180,[PENDENTE1000 287] Agrofloresta — pendente #287,media,pendente,False
+1287,Pecuaria 300,[PENDENTE1000 288] ERP — pendente #288,media,pendente,False
+1288,Avicultura 180,[PENDENTE1000 289] SoloAgua — pendente #289,media,pendente,False
+1289,Suino-Tilapia 240,[PENDENTE1000 290] Nicho — pendente #290,media,pendente,False
+1290,Cafe-Laranja 180,[PENDENTE1000 291] Graos — pendente #291,media,pendente,False
+1291,Agrofloresta 420,[PENDENTE1000 292] Pecuaria — pendente #292,media,pendente,False
+1292,ERP 240,[PENDENTE1000 293] Avicultura — pendente #293,media,pendente,False
+1293,SoloAgua 60,[PENDENTE1000 294] Suino-Tilapia — pendente #294,media,pendente,False
+1294,Nicho 300,[PENDENTE1000 295] Cafe — pendente #295,media,pendente,False
+1295,Fora 360,[PENDENTE1000 296] Laranja — pendente #296,media,pendente,False
+1296,TOP Globais 120,[PENDENTE1000 297] Agrofloresta — pendente #297,media,pendente,False
+1297,Graos 180,[PENDENTE1000 298] ERP — pendente #298,media,pendente,False
+1298,Pecuaria 300,[PENDENTE1000 299] SoloAgua — pendente #299,media,pendente,False
+1299,Avicultura 180,[PENDENTE1000 300] Nicho — pendente #300,media,pendente,False
+1300,Suino-Tilapia 240,[PENDENTE1000 301] Graos — pendente #301,media,pendente,False
+1301,Cafe-Laranja 180,[PENDENTE1000 302] Pecuaria — pendente #302,media,pendente,False
+1302,Agrofloresta 420,[PENDENTE1000 303] Avicultura — pendente #303,media,pendente,False
+1303,ERP 240,[PENDENTE1000 304] Suino-Tilapia — pendente #304,media,pendente,False
+1304,SoloAgua 60,[PENDENTE1000 305] Cafe — pendente #305,media,pendente,False
+1305,Nicho 300,[PENDENTE1000 306] Laranja — pendente #306,media,pendente,False
+1306,Fora 360,[PENDENTE1000 307] Agrofloresta — pendente #307,media,pendente,False
+1307,TOP Globais 120,[PENDENTE1000 308] ERP — pendente #308,media,pendente,False
+1308,Graos 180,[PENDENTE1000 309] SoloAgua — pendente #309,media,pendente,False
+1309,Pecuaria 300,[PENDENTE1000 310] Nicho — pendente #310,media,pendente,False
+1310,Avicultura 180,[PENDENTE1000 311] Graos — pendente #311,media,pendente,False
+1311,Suino-Tilapia 240,[PENDENTE1000 312] Pecuaria — pendente #312,media,pendente,False
+1312,Cafe-Laranja 180,[PENDENTE1000 313] Avicultura — pendente #313,media,pendente,False
+1313,Agrofloresta 420,[PENDENTE1000 314] Suino-Tilapia — pendente #314,media,pendente,False
+1314,ERP 240,[PENDENTE1000 315] Cafe — pendente #315,media,pendente,False
+1315,SoloAgua 60,[PENDENTE1000 316] Laranja — pendente #316,media,pendente,False
+1316,Nicho 300,[PENDENTE1000 317] Agrofloresta — pendente #317,media,pendente,False
+1317,Fora 360,[PENDENTE1000 318] ERP — pendente #318,media,pendente,False
+1318,TOP Globais 120,[PENDENTE1000 319] SoloAgua — pendente #319,media,pendente,False
+1319,Graos 180,[PENDENTE1000 320] Nicho — pendente #320,media,pendente,False
+1320,Pecuaria 300,[PENDENTE1000 321] TOP JD Ops piloto 2.5cm real — pendente,alta,pendente,False
+1321,Avicultura 180,[PENDENTE1000 322] TOP FieldView NDVI Sentinel real — pendente,alta,pendente,False
+1322,Suino-Tilapia 240,[PENDENTE1000 323] TOP Trimble Guidance A-B — pendente,alta,pendente,False
+1323,Cafe-Laranja 180,[PENDENTE1000 324] TOP Solinftec CAN Bus RPM real — pendente,alta,pendente,False
+1324,Agrofloresta 420,[PENDENTE1000 325] TOP Weigh Scale real — pendente,alta,pendente,False
+1325,ERP 240,[PENDENTE1000 326] TOP Chuva 1km INMET — pendente,alta,pendente,False
+1326,SoloAgua 60,[PENDENTE1000 327] TOP Seguro parametrico — pendente,alta,pendente,False
+1327,Nicho 300,[PENDENTE1000 328] TOP LCDPR SPED 0040 — pendente,alta,pendente,False
+1328,Fora 360,[PENDENTE1000 329] TOP Mombak carbono 1bi — pendente,alta,pendente,False
+1329,TOP Globais 120,[PENDENTE1000 330] TOP SAP JBS 10M — pendente,alta,pendente,False
+1330,Graos 180,[PENDENTE1000 331] TOP JD Ops piloto 2.5cm real — pendente,alta,pendente,False
+1331,Pecuaria 300,[PENDENTE1000 332] TOP FieldView NDVI Sentinel real — pendente,alta,pendente,False
+1332,Avicultura 180,[PENDENTE1000 333] TOP Trimble Guidance A-B — pendente,alta,pendente,False
+1333,Suino-Tilapia 240,[PENDENTE1000 334] TOP Solinftec CAN Bus RPM real — pendente,alta,pendente,False
+1334,Cafe-Laranja 180,[PENDENTE1000 335] TOP Weigh Scale real — pendente,alta,pendente,False
+1335,Agrofloresta 420,[PENDENTE1000 336] TOP Chuva 1km INMET — pendente,alta,pendente,False
+1336,ERP 240,[PENDENTE1000 337] TOP Seguro parametrico — pendente,alta,pendente,False
+1337,SoloAgua 60,[PENDENTE1000 338] TOP LCDPR SPED 0040 — pendente,alta,pendente,False
+1338,Nicho 300,[PENDENTE1000 339] TOP Mombak carbono 1bi — pendente,alta,pendente,False
+1339,Fora 360,[PENDENTE1000 340] TOP SAP JBS 10M — pendente,alta,pendente,False
+1340,TOP Globais 120,[PENDENTE1000 341] TOP JD Ops piloto 2.5cm real — pendente,alta,pendente,False
+1341,Graos 180,[PENDENTE1000 342] TOP FieldView NDVI Sentinel real — pendente,alta,pendente,False
+1342,Pecuaria 300,[PENDENTE1000 343] TOP Trimble Guidance A-B — pendente,alta,pendente,False
+1343,Avicultura 180,[PENDENTE1000 344] TOP Solinftec CAN Bus RPM real — pendente,alta,pendente,False
+1344,Suino-Tilapia 240,[PENDENTE1000 345] TOP Weigh Scale real — pendente,alta,pendente,False
+1345,Cafe-Laranja 180,[PENDENTE1000 346] TOP Chuva 1km INMET — pendente,alta,pendente,False
+1346,Agrofloresta 420,[PENDENTE1000 347] TOP Seguro parametrico — pendente,alta,pendente,False
+1347,ERP 240,[PENDENTE1000 348] TOP LCDPR SPED 0040 — pendente,alta,pendente,False
+1348,SoloAgua 60,[PENDENTE1000 349] TOP Mombak carbono 1bi — pendente,alta,pendente,False
+1349,Nicho 300,[PENDENTE1000 350] TOP SAP JBS 10M — pendente,alta,pendente,False
+1350,Fora 360,[PENDENTE1000 351] TOP JD Ops piloto 2.5cm real — pendente,alta,pendente,False
+1351,TOP Globais 120,[PENDENTE1000 352] TOP FieldView NDVI Sentinel real — pendente,alta,pendente,False
+1352,Graos 180,[PENDENTE1000 353] TOP Trimble Guidance A-B — pendente,alta,pendente,False
+1353,Pecuaria 300,[PENDENTE1000 354] TOP Solinftec CAN Bus RPM real — pendente,alta,pendente,False
+1354,Avicultura 180,[PENDENTE1000 355] TOP Weigh Scale real — pendente,alta,pendente,False
+1355,Suino-Tilapia 240,[PENDENTE1000 356] TOP Chuva 1km INMET — pendente,alta,pendente,False
+1356,Cafe-Laranja 180,[PENDENTE1000 357] TOP Seguro parametrico — pendente,alta,pendente,False
+1357,Agrofloresta 420,[PENDENTE1000 358] TOP LCDPR SPED 0040 — pendente,alta,pendente,False
+1358,ERP 240,[PENDENTE1000 359] TOP Mombak carbono 1bi — pendente,alta,pendente,False
+1359,SoloAgua 60,[PENDENTE1000 360] TOP SAP JBS 10M — pendente,alta,pendente,False
+1360,Nicho 300,[PENDENTE1000 361] TOP JD Ops piloto 2.5cm real — pendente,alta,pendente,False
+1361,Fora 360,[PENDENTE1000 362] TOP FieldView NDVI Sentinel real — pendente,alta,pendente,False
+1362,TOP Globais 120,[PENDENTE1000 363] TOP Trimble Guidance A-B — pendente,alta,pendente,False
+1363,Graos 180,[PENDENTE1000 364] TOP Solinftec CAN Bus RPM real — pendente,alta,pendente,False
+1364,Pecuaria 300,[PENDENTE1000 365] TOP Weigh Scale real — pendente,alta,pendente,False
+1365,Avicultura 180,[PENDENTE1000 366] TOP Chuva 1km INMET — pendente,alta,pendente,False
+1366,Suino-Tilapia 240,[PENDENTE1000 367] TOP Seguro parametrico — pendente,alta,pendente,False
+1367,Cafe-Laranja 180,[PENDENTE1000 368] TOP LCDPR SPED 0040 — pendente,alta,pendente,False
+1368,Agrofloresta 420,[PENDENTE1000 369] TOP Mombak carbono 1bi — pendente,alta,pendente,False
+1369,ERP 240,[PENDENTE1000 370] TOP SAP JBS 10M — pendente,alta,pendente,False
+1370,SoloAgua 60,[PENDENTE1000 371] TOP JD Ops piloto 2.5cm real — pendente,alta,pendente,False
+1371,Nicho 300,[PENDENTE1000 372] TOP FieldView NDVI Sentinel real — pendente,alta,pendente,False
+1372,Fora 360,[PENDENTE1000 373] TOP Trimble Guidance A-B — pendente,alta,pendente,False
+1373,TOP Globais 120,[PENDENTE1000 374] TOP Solinftec CAN Bus RPM real — pendente,alta,pendente,False
+1374,Graos 180,[PENDENTE1000 375] TOP Weigh Scale real — pendente,alta,pendente,False
+1375,Pecuaria 300,[PENDENTE1000 376] TOP Chuva 1km INMET — pendente,alta,pendente,False
+1376,Avicultura 180,[PENDENTE1000 377] TOP Seguro parametrico — pendente,alta,pendente,False
+1377,Suino-Tilapia 240,[PENDENTE1000 378] TOP LCDPR SPED 0040 — pendente,alta,pendente,False
+1378,Cafe-Laranja 180,[PENDENTE1000 379] TOP Mombak carbono 1bi — pendente,alta,pendente,False
+1379,Agrofloresta 420,[PENDENTE1000 380] TOP SAP JBS 10M — pendente,alta,pendente,False
+1380,ERP 240,[PENDENTE1000 381] TOP JD Ops piloto 2.5cm real — pendente,alta,pendente,False
+1381,SoloAgua 60,[PENDENTE1000 382] TOP FieldView NDVI Sentinel real — pendente,alta,pendente,False
+1382,Nicho 300,[PENDENTE1000 383] TOP Trimble Guidance A-B — pendente,alta,pendente,False
+1383,Fora 360,[PENDENTE1000 384] TOP Solinftec CAN Bus RPM real — pendente,alta,pendente,False
+1384,TOP Globais 120,[PENDENTE1000 385] TOP Weigh Scale real — pendente,alta,pendente,False
+1385,Graos 180,[PENDENTE1000 386] TOP Chuva 1km INMET — pendente,alta,pendente,False
+1386,Pecuaria 300,[PENDENTE1000 387] TOP Seguro parametrico — pendente,alta,pendente,False
+1387,Avicultura 180,[PENDENTE1000 388] TOP LCDPR SPED 0040 — pendente,alta,pendente,False
+1388,Suino-Tilapia 240,[PENDENTE1000 389] TOP Mombak carbono 1bi — pendente,alta,pendente,False
+1389,Cafe-Laranja 180,[PENDENTE1000 390] TOP SAP JBS 10M — pendente,alta,pendente,False
+1390,Agrofloresta 420,[PENDENTE1000 391] TOP JD Ops piloto 2.5cm real — pendente,alta,pendente,False
+1391,ERP 240,[PENDENTE1000 392] TOP FieldView NDVI Sentinel real — pendente,alta,pendente,False
+1392,SoloAgua 60,[PENDENTE1000 393] TOP Trimble Guidance A-B — pendente,alta,pendente,False
+1393,Nicho 300,[PENDENTE1000 394] TOP Solinftec CAN Bus RPM real — pendente,alta,pendente,False
+1394,Fora 360,[PENDENTE1000 395] TOP Weigh Scale real — pendente,alta,pendente,False
+1395,TOP Globais 120,[PENDENTE1000 396] TOP Chuva 1km INMET — pendente,alta,pendente,False
+1396,Graos 180,[PENDENTE1000 397] TOP Seguro parametrico — pendente,alta,pendente,False
+1397,Pecuaria 300,[PENDENTE1000 398] TOP LCDPR SPED 0040 — pendente,alta,pendente,False
+1398,Avicultura 180,[PENDENTE1000 399] TOP Mombak carbono 1bi — pendente,alta,pendente,False
+1399,Suino-Tilapia 240,[PENDENTE1000 400] TOP SAP JBS 10M — pendente,alta,pendente,False

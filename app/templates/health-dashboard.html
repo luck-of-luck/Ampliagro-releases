@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Ampliagro - Health Dashboard{% endblock %}
+{% block extra_css %}
+
+{% endblock %}
+{% block content %}
+<div style="max-width:1100px;margin:1.5rem auto;padding:0 1.5rem">
+  <h1 style="font-size:1.4rem;font-weight:700;color:var(--ncs-green-dark)"><i class="bi bi-heart-pulse"></i> Health Dashboard</h1>
+  <p class="kv">Atualizado em {{ time|date:"d/m/Y H:i:s" }} • DEBUG={{ debug }} • Caches: {{ caches_backend }}</p>
+</div>
+<div class="health-grid">
+  {% for name,check in checks.items %}
+  <div class="health-card">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <strong style="text-transform:capitalize">{{ name }}</strong>
+      <span class="badge badge-{{ check.status }}">{{ check.status }}</span>
+    </div>
+    <div class="kv" style="margin-top:0.6rem">
+      {% if check.latency_ms %}Latência: {{ check.latency_ms }} ms<br>{% endif %}
+      {% if check.backend %}Backend: {{ check.backend }}<br>{% endif %}
+      {% if check.used_pct %}Uso disco: {{ check.used_pct }}% (livre {{ check.free_gb }} GB)<br>{% endif %}
+      {% if check.pending != None %}Migrations pendentes: {{ check.pending }}<br>{% endif %}
+      {% if check.error %}<span style="color:#dc2626">Erro: {{ check.error }}</span>{% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+<div style="max-width:1100px;margin:1rem auto;padding:0 1.5rem" class="kv">
+  <a href="/healthz" target="_blank">Ver JSON /healthz</a> • <a href="/health/">Health check simples</a>
+</div>
+{% endblock %}

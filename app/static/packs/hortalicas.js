@@ -1,0 +1,58 @@
+/**
+ * Pack: Hortalicas (hortalicas)
+ * Gerado automaticamente - NÃO EDITAR MANUALMENTE
+ * Versão do manifest: 2.0.0
+ * Subgrupo: hortalicas (42 culturas)
+ * Grupo: plantio
+ */
+
+(function (global) {
+  'use strict';
+
+  // Dados das culturas deste pack
+  var CULTURES = [{"id":"cult-hortalicas-abobrinha","title":"Abobrinha","icon":"bi-tree","desc":"Abobrinha (Hortalicas)","subgroup":"hortalicas","group":"plantio","django_grupo":"hortalicas","django_nome":"Abobrinha","units":{"default":"kg","available":["kg"]}},{"id":"cult-hortalicas-abóbora","title":"Abóbora","icon":"bi-tree","desc":"Abóbora (Hortalicas)","subgroup":"hortalicas","group":"plantio","django_grupo":"hortalicas","django_nome":"Abóbora","units":{"default":"kg","available":["kg"]}},{"id":"cult-hortalicas-acelga","title":"Acelga","icon":"bi-tree","desc":"Acelga (Hortalicas)","subgroup":"hortalicas","group":"plantio","django_grupo":"hortalicas","django_nome":"Acelga","units":{"default":"kg","available":["kg"]}},{"id":"cult-hortalicas-agriao","title":"Agrião","icon":"bi-tree","desc":"Agrião (Hortalicas)","subgroup":"hortalicas","group":"plantio","django_grupo":"hortalicas","django_nome":"Agrião","units":{"default":"kg","available":["kg"]}},{"id":"cult-hortalicas-aipo","title":"Aipo","icon":"bi-tree","desc":"Aipo (Hortalicas)","subgroup":"hortalicas","group":"plantio","django_grupo":"hortalicas","django_nome":"Aipo","units":{"default":"kg","available":["kg"]}},{"id":"cult-hortalicas-alcachofra","title":"Alcachofra","icon":"bi-tree","desc":"Alcachofra (Hortalicas)","subgroup":"hortalicas","group":"plantio","django_grupo":"hortalicas","django_nome":"Alcachofra","units":{"default":"kg","available":["kg"]}},{"id":"cult-hortalicas-alface","title":"Alface","icon":"bi-tree","desc":"Alface (Hortalicas)","subgroup":"hortalicas","group":"plantio","django_grupo":"hortalicas","django_nome":"Alface","units":{"default":"kg","available":["kg"]}},{"id":"cult-hortalicas-alho","title":"Alho","icon":"bi-tree","desc":"Alho (Hortalicas)","subgroup":"hortalicas","group":"plantio","django_grupo":"hortalicas","django_nome":"Alho","units":{"default":"kg","available":["kg"]}},{"id":"cult-hortalicas-alho-poró","title":"Alho-poró","icon":"bi-tree","desc":"Alho-poró (Hortalicas)","subgroup":"hortalicas","group":"plantio","django_grupo":"hortalicas","django_nome":"Alho-poró","units":{"default":"kg","available":["kg"]}},{"id":"cult-hortalicas-almeirao","title":"Almeirão","icon":"bi-tree","desc":"Almeirão (Hortalicas)","subgroup":"hortalicas","group":"plantio","django_grupo":"hortalicas","django_nome":"Almeirão","units":{"default":"kg","available":["kg"]}},{"id":"cult-hortalicas-aspargo","title":"Aspargo","icon":"bi-tree","desc":"Aspargo (Hortalicas)","subgroup":"hortalicas","group":"plantio","django_grupo":"hortalicas","django_nome":"Aspargo","units":{"default":"kg","available":["kg"]}},{"id":"cult-hortalicas-beringela","title":"Beringela","icon":"bi-tree","desc":"Beringela (Hortalicas)","subgroup":"hortalicas","group":"plantio","django_grupo":"hortalicas","django_nome":"Beringela","units":{"default":"kg","available":["kg"]}},{"id":"cult-hortalicas-berinjela","title":"Berinjela","icon":"bi-tree","desc":"Berinjela (Hortalicas)","subgroup":"hortalicas","group":"plantio","django_grupo":"hortalicas","django_nome":"Berinjela","units":{"default":"kg","available":["kg"]}},{"id":"cult-hortalicas-brocólis","title":"Brocólis","icon":"bi-tree","desc":"Brocólis (Hortalicas)","subgroup":"hortalicas","group":"plantio","django_grupo":"hortalicas","django_nome":"Brocólis","units":{"default":"kg","available":["kg"]}},{"id":"cult-hortalicas-brócolis","title":"Brócolis","icon":"bi-tree","desc":"Brócolis (Hortalicas)","subgroup":"hortalicas","group":"plantio","django_grupo":"hortalicas","django_nome":"Brócolis","units":{"default":"kg","available":["kg"]}},{"id":"cult-hortalicas-cebola","title":"Cebola","icon":"bi-tree","desc":"Cebola (Hortalicas)","subgroup":"hortalicas","group":"plantio","django_grupo":"hortalicas","django_nome":"Cebola","units":{"default":"kg","available":["kg"]}},{"id":"cult-hortalicas-cebolinha","title":"Cebolinha","icon":"bi-tree","desc":"Cebolinha (Hortalicas)","subgroup":"hortalicas","group":"plantio","django_grupo":"hortalicas","django_nome":"Cebolinha","units":{"default":"kg","available":["kg"]}},{"id":"cult-hortalicas-cenoura","title":"Cenoura","icon":"bi-tree","desc":"Cenoura (Hortalicas)","subgroup":"hortalicas","group":"plantio","django_grupo":"hortalicas","django_nome":"Cenoura","units":{"default":"kg","available":["kg"]}},{"id":"cult-hortalicas-chicória","title":"Chicória","icon":"bi-tree","desc":"Chicória (Hortalicas)","subgroup":"hortalicas","group":"plantio","django_grupo":"hortalicas","django_nome":"Chicória","units":{"default":"kg","available":["kg"]}},{"id":"cult-hortalicas-chuchu","title":"Chuchu","icon":"bi-tree","desc":"Chuchu (Hortalicas)","subgroup":"hortalicas","group":"plantio","django_grupo":"hortalicas","django_nome":"Chuchu","units":{"default":"kg","available":["kg"]}},{"id":"cult-hortalicas-coentro","title":"Coentro","icon":"bi-tree","desc":"Coentro (Hortalicas)","subgroup":"hortalicas","group":"plantio","django_grupo":"hortalicas","django_nome":"Coentro","units":{"default":"kg","available":["kg"]}},{"id":"cult-hortalicas-couve","title":"Couve","icon":"bi-tree","desc":"Couve (Hortalicas)","subgroup":"hortalicas","group":"plantio","django_grupo":"hortalicas","django_nome":"Couve","units":{"default":"kg","available":["kg"]}},{"id":"cult-hortalicas-couve-flor","title":"Couve-flor","icon":"bi-tree","desc":"Couve-flor (Hortalicas)","subgroup":"hortalicas","group":"plantio","django_grupo":"hortalicas","django_nome":"Couve-flor","units":{"default":"kg","available":["kg"]}},{"id":"cult-hortalicas-couves-de-bruxelas","title":"Couves-de-bruxelas","icon":"bi-tree","desc":"Couves-de-bruxelas (Hortalicas)","subgroup":"hortalicas","group":"plantio","django_grupo":"hortalicas","django_nome":"Couves-de-bruxelas","units":{"default":"kg","available":["kg"]}},{"id":"cult-hortalicas-endívia","title":"Endívia","icon":"bi-tree","desc":"Endívia (Hortalicas)","subgroup":"hortalicas","group":"plantio","django_grupo":"hortalicas","django_nome":"Endívia","units":{"default":"kg","available":["kg"]}},{"id":"cult-hortalicas-ervilha-torta","title":"Ervilha-torta","icon":"bi-tree","desc":"Ervilha-torta (Hortalicas)","subgroup":"hortalicas","group":"plantio","django_grupo":"hortalicas","django_nome":"Ervilha-torta","units":{"default":"kg","available":["kg"]}},{"id":"cult-hortalicas-espinafre","title":"Espinafre","icon":"bi-tree","desc":"Espinafre (Hortalicas)","subgroup":"hortalicas","group":"plantio","django_grupo":"hortalicas","django_nome":"Espinafre","units":{"default":"kg","available":["kg"]}},{"id":"cult-hortalicas-jiló","title":"Jiló","icon":"bi-tree","desc":"Jiló (Hortalicas)","subgroup":"hortalicas","group":"plantio","django_grupo":"hortalicas","django_nome":"Jiló","units":{"default":"kg","available":["kg"]}},{"id":"cult-hortalicas-maxixe","title":"Maxixe","icon":"bi-tree","desc":"Maxixe (Hortalicas)","subgroup":"hortalicas","group":"plantio","django_grupo":"hortalicas","django_nome":"Maxixe","units":{"default":"kg","available":["kg"]}},{"id":"cult-hortalicas-nabica","title":"Nabiça","icon":"bi-tree","desc":"Nabiça (Hortalicas)","subgroup":"hortalicas","group":"plantio","django_grupo":"hortalicas","django_nome":"Nabiça","units":{"default":"kg","available":["kg"]}},{"id":"cult-hortalicas-palmito","title":"Palmito","icon":"bi-tree","desc":"Palmito (Hortalicas)","subgroup":"hortalicas","group":"plantio","django_grupo":"hortalicas","django_nome":"Palmito","units":{"default":"kg","available":["kg"]}},{"id":"cult-hortalicas-pepino","title":"Pepino","icon":"bi-tree","desc":"Pepino (Hortalicas)","subgroup":"hortalicas","group":"plantio","django_grupo":"hortalicas","django_nome":"Pepino","units":{"default":"kg","available":["kg"]}},{"id":"cult-hortalicas-pimentao","title":"Pimentão","icon":"bi-tree","desc":"Pimentão (Hortalicas)","subgroup":"hortalicas","group":"plantio","django_grupo":"hortalicas","django_nome":"Pimentão","units":{"default":"kg","available":["kg"]}},{"id":"cult-hortalicas-pimentao-doce","title":"Pimentão-doce","icon":"bi-tree","desc":"Pimentão-doce (Hortalicas)","subgroup":"hortalicas","group":"plantio","django_grupo":"hortalicas","django_nome":"Pimentão-doce","units":{"default":"kg","available":["kg"]}},{"id":"cult-hortalicas-quiabo","title":"Quiabo","icon":"bi-tree","desc":"Quiabo (Hortalicas)","subgroup":"hortalicas","group":"plantio","django_grupo":"hortalicas","django_nome":"Quiabo","units":{"default":"kg","available":["kg"]}},{"id":"cult-hortalicas-repolho","title":"Repolho","icon":"bi-tree","desc":"Repolho (Hortalicas)","subgroup":"hortalicas","group":"plantio","django_grupo":"hortalicas","django_nome":"Repolho","units":{"default":"kg","available":["kg"]}},{"id":"cult-hortalicas-repolho-roxo","title":"Repolho-roxo","icon":"bi-tree","desc":"Repolho-roxo (Hortalicas)","subgroup":"hortalicas","group":"plantio","django_grupo":"hortalicas","django_nome":"Repolho-roxo","units":{"default":"kg","available":["kg"]}},{"id":"cult-hortalicas-rúcula","title":"Rúcula","icon":"bi-tree","desc":"Rúcula (Hortalicas)","subgroup":"hortalicas","group":"plantio","django_grupo":"hortalicas","django_nome":"Rúcula","units":{"default":"kg","available":["kg"]}},{"id":"cult-hortalicas-salsa","title":"Salsa","icon":"bi-tree","desc":"Salsa (Hortalicas)","subgroup":"hortalicas","group":"plantio","django_grupo":"hortalicas","django_nome":"Salsa","units":{"default":"kg","available":["kg"]}},{"id":"cult-hortalicas-salsao","title":"Salsão","icon":"bi-tree","desc":"Salsão (Hortalicas)","subgroup":"hortalicas","group":"plantio","django_grupo":"hortalicas","django_nome":"Salsão","units":{"default":"kg","available":["kg"]}},{"id":"cult-hortalicas-tomate","title":"Tomate","icon":"bi-tree","desc":"Tomate (Hortalicas)","subgroup":"hortalicas","group":"plantio","django_grupo":"hortalicas","django_nome":"Tomate","units":{"default":"kg","available":["kg"]}},{"id":"cult-hortalicas-vagem","title":"Vagem","icon":"bi-tree","desc":"Vagem (Hortalicas)","subgroup":"hortalicas","group":"plantio","django_grupo":"hortalicas","django_nome":"Vagem","units":{"default":"kg","available":["kg"]}}];
+
+  // Metadados do pack
+  var PACK_META = {
+    id: 'hortalicas',
+    title: 'Hortalicas',
+    icon: 'bi-flower3',
+    group: 'plantio',
+    culture_count: 42,
+  };
+
+  // Regista as culturas no registry global
+  function registerCultures() {
+    if (!global.AmpliagroRegistry) return;
+    CULTURES.forEach(function (c) {
+      if (!global.AmpliagroRegistry.cultures) {
+        global.AmpliagroRegistry.cultures = {};
+      }
+      global.AmpliagroRegistry.cultures[c.id] = c;
+    });
+  }
+
+  // Auto-regista quando carregado
+  if (typeof window !== 'undefined' && window.AmpliagroRegistry) {
+    registerCultures();
+  } else if (typeof window !== 'undefined') {
+    // Aguarda registry estar pronto
+    var checkRegistry = setInterval(function () {
+      if (window.AmpliagroRegistry) {
+        clearInterval(checkRegistry);
+        registerCultures();
+      }
+    }, 100);
+  }
+
+  // Exporta para PackLoader
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { PACK_META: PACK_META, CULTURES: CULTURES };
+  }
+
+  // Sinaliza pack carregado
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('packloaded', { detail: { pack: 'hortalicas' } }));
+  }
+
+})(typeof window !== 'undefined' ? window : this);

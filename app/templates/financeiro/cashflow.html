@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+{% load static breadcrumbs %}
+
+{% block title %}Fluxo de Caixa Projetado{% endblock %}
+
+{% block content %}
+<div class="main-content flex-1 bg-[var(--bg-secondary)] overflow-y-auto w-full p-4 md:p-8">
+  <div class="max-w-7xl mx-auto w-full space-y-8">
+
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-2xl font-bold text-[var(--text-primary)]">Fluxo de Caixa</h1>
+        {% breadcrumb "Financeiro" "/financeiro/" "Fluxo de Caixa Projetado" %}
+      </div>
+
+      <div class="flex items-center gap-2">
+        <select id="meses_projecao" class="form-input text-sm" onchange="carregarFluxo()">
+          <option value="6">Próximos 6 meses</option>
+          <option value="12" selected>Próximos 12 meses</option>
+          <option value="24">Próximos 24 meses</option>
+        </select>
+        <button onclick="carregarFluxo()" class="btn btn--primary btn--sm">Atualizar</button>
+      </div>
+    </div>
+
+    <!-- Chart Card -->
+    <div class="card p-6">
+      <h3 class="text-lg font-semibold mb-4 text-[var(--text-primary)]">Projeção Mensal</h3>
+      <div id="chart-container" style="height: 300px; width: 100%;">
+        <div class="flex h-full items-center justify-center text-[var(--text-secondary)]">
+          Carregando gráfico...
+        </div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="card p-0 overflow-hidden">
+      <table class="table w-full hidden" id="fluxo-table">
+        <thead>
+          <tr>
+            <th class="px-6 py-3 border-b text-left text-xs font-semibold uppercase tracking-wider">Mês</th>
+            <th class="px-6 py-3 border-b text-right text-xs font-semibold uppercase tracking-wider text-[var(--color-success-600)]">Receitas</th>
+            <th class="px-6 py-3 border-b text-right text-xs font-semibold uppercase tracking-wider text-[var(--color-danger-600)]">Despesas</th>
+            <th class="px-6 py-3 border-b text-right text-xs font-semibold uppercase tracking-wider">Saldo Mensal</th>
+            <th class="px-6 py-3 border-b text-right text-xs font-semibold uppercase tracking-wider">Acumulado</th>
+          </tr>
+        </thead>
+        <tbody id="fluxo-body">
+          <!-- via JS -->
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Incluir ECharts ou Chart.js (Vamos usar Chart.js) -->
+<script src="{% static 'vendor/chart.umd-4.4.7.min.js' %}"></script>
+
+<script>
+  let fluxoChart = null;
+
+  function formatCurrency(val) {
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
+  }
+
+  function carregarFluxo() {
+    const meses = document.getElementById('meses_projecao').value;
+
+    fetch(`/api/financeiro/cashflow/?meses=${meses}`)
+      .then(res => res.json())
+      .then(data => {
+        if(data.error) {
+          showError(data.error);
+          return;
+        }
+        renderTable(data.fluxo);
+        renderChart(data.fluxo);
+      })
+      .catch(err => showError('Erro ao carregar Fluxo de Caixa'));
+  }
+
+  function renderTable(fluxo) {
+    let html = '';
+    fluxo.forEach(item => {
+      html += `
+        <tr>
+          <td class="px-6 py-4 border-b font-medium text-[var(--text-primary)]">${item.mes}</td>
+          <td class="px-6 py-4 border-b text-right text-[var(--color-success-600)]">${formatCurrency(item.receitas)}</td>
+          <td class="px-6 py-4 border-b text-right text-[var(--color-danger-600)]">${formatCurrency(item.despesas)}</td>
+          <td class="px-6 py-4 border-b text-right font-medium ${item.saldo_mensal < 0 ? 'text-[var(--color-danger-500)]' : 'text-[var(--text-primary)]'}">${formatCurrency(item.saldo_mensal)}</td>
+          <td class="px-6 py-4 border-b text-right font-bold ${item.saldo_acumulado < 0 ? 'text-[var(--color-danger-500)]' : 'text-[var(--text-primary)]'}">${formatCurrency(item.saldo_acumulado)}</td>
+        </tr>
+      `;
+    });
+
+    document.getElementById('fluxo-body').innerHTML = html;
+    document.getElementById('fluxo-table').classList.remove('hidden');
+  }
+
+  function renderChart(fluxo) {
+    const ctx = document.createElement('canvas');
+    const container = document.getElementById('chart-container');
+    container.innerHTML = '';
+    container.appendChild(ctx);
+
+    const labels = fluxo.map(i => i.mes.split(' ')[0]);
+    const receitas = fluxo.map(i => i.receitas);
+    const despesas = fluxo.map(i => i.despesas);
+    const acumulado = fluxo.map(i => i.saldo_acumulado);
+
+    const isDark = document.documentElement.classList.contains('dark');
+    const textColor = isDark ? '#94a3b8' : '#64748b';
+    const gridColor = isDark ? '#334155' : '#e2e8f0';
+
+    fluxoChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: 'Receitas',
+            data: receitas,
+            backgroundColor: '#10b981', // success-500
+            order: 2
+          },
+          {
+            label: 'Despesas',
+            data: despesas,
+            backgroundColor: '#ef4444', // danger-500
+            order: 3
+          },
+          {
+            label: 'Acumulado',
+            data: acumulado,
+            type: 'line',
+            borderColor: '#3b82f6', // primary-500
+            backgroundColor: 'transparent',
+            borderWidth: 2,
+            tension: 0.3,
+            order: 1
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            labels: { color: textColor }
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                let label = context.dataset.label || '';
+                if (label) label += ': ';
+                if (context.parsed.y !== null) {
+                  label += new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(context.parsed.y);
+                }
+                return label;
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            grid: { color: gridColor },
+            ticks: { color: textColor }
+          },
+          x: {
+            grid: { display: false },
+            ticks: { color: textColor }
+          }
+        }
+      }
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', carregarFluxo);
+</script>
+{% endblock %}

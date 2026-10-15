@@ -1,0 +1,558 @@
+{% extends base_template %}
+{% load static %}
+
+{% block title %}Ampliagro - Adicionar Funcionário{% endblock %}
+
+{% block extra_css %}
+
+{% endblock %}
+
+{% block dashboard_appbar %}{% endblock %}
+
+{% block content %}
+<div class="wizard-container">
+    <div class="wizard-header">
+        <h1 class="wizard-title">Adicionar Funcionário</h1>
+        <a href="{% url 'equipe-empregados' %}" class="btn-secondary"><i class="bi bi-arrow-left"></i> Voltar</a>
+    </div>
+
+    <!-- Progress Steps -->
+    <div class="wizard-progress">
+        <div class="step active" data-step="1">
+            <div class="step-circle">1</div>
+            <div class="step-label">Pessoal</div>
+        </div>
+        <div class="step" data-step="2">
+            <div class="step-circle">2</div>
+            <div class="step-label">Profissional</div>
+        </div>
+        <div class="step" data-step="3">
+            <div class="step-circle">3</div>
+            <div class="step-label">Acesso</div>
+        </div>
+        <div class="step" data-step="4">
+            <div class="step-circle">4</div>
+            <div class="step-label">Revisão</div>
+        </div>
+    </div>
+
+    <form id="wizard-form" onsubmit="return submitWizard(event)">
+        {% csrf_token %}
+
+        <!-- Step 1: Dados Pessoais -->
+        <div class="wizard-step active" data-step="1">
+            <div class="step-card">
+                <h2><i class="bi bi-person"></i> Dados Pessoais</h2>
+
+                <div class="photo-upload">
+                    <div class="photo-preview" id="photo-preview">
+                        <i class="bi bi-person"></i>
+                    </div>
+                    <div class="photo-actions">
+                        <button type="button" class="btn-secondary" onclick="document.getElementById('foto-input').click()">
+                            <i class="bi bi-camera"></i> Escolher Foto
+                        </button>
+                        <input type="file" id="foto-input" name="foto" accept="image/*" onchange="previewPhoto(event)">
+                        <span class="form-hint">Opcional. JPG ou PNG, até 2MB.</span>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label>Nome Completo *</label>
+                        <input type="text" name="nome" required placeholder="Nome completo do funcionário">
+                    </div>
+                    <div class="form-group">
+                        <label>CPF</label>
+                        <input type="text" name="cpf" placeholder="000.000.000-00" maxlength="14" oninput="maskCPF(this)">
+                    </div>
+                    <div class="form-group">
+                        <label>RG</label>
+                        <input type="text" name="rg" placeholder="00.000.000-0">
+                    </div>
+                    <div class="form-group">
+                        <label>Data de Nascimento</label>
+                        <input type="date" name="data_nascimento">
+                    </div>
+                    <div class="form-group">
+                        <label>Telefone</label>
+                        <input type="text" name="telefone" placeholder="(00) 00000-0000" maxlength="15" oninput="maskPhone(this)">
+                    </div>
+                    <div class="form-group">
+                        <label>E-mail</label>
+                        <input type="email" name="email" placeholder="email@exemplo.com">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Endereço</label>
+                        <input type="text" name="endereco" placeholder="Rua, número, complemento">
+                    </div>
+                    <div class="form-group">
+                        <label>Cidade</label>
+                        <input type="text" name="cidade" placeholder="Nome da cidade">
+                    </div>
+                    <div class="form-group">
+                        <label>Estado</label>
+                        <select name="estado">
+                            <option value="">Selecione...</option>
+                            <option value="AC">Acre</option><option value="AL">Alagoas</option>
+                            <option value="AP">Amapá</option><option value="AM">Amazonas</option>
+                            <option value="BA">Bahia</option><option value="CE">Ceará</option>
+                            <option value="DF">Distrito Federal</option><option value="ES">Espírito Santo</option>
+                            <option value="GO">Goiás</option><option value="MA">Maranhão</option>
+                            <option value="MT">Mato Grosso</option><option value="MS">Mato Grosso do Sul</option>
+                            <option value="MG">Minas Gerais</option><option value="PA">Pará</option>
+                            <option value="PB">Paraíba</option><option value="PR">Paraná</option>
+                            <option value="PE">Pernambuco</option><option value="PI">Piauí</option>
+                            <option value="RJ">Rio de Janeiro</option><option value="RN">Rio Grande do Norte</option>
+                            <option value="RS">Rio Grande do Sul</option><option value="RO">Rondônia</option>
+                            <option value="RR">Roraima</option><option value="SC">Santa Catarina</option>
+                            <option value="SP">São Paulo</option><option value="SE">Sergipe</option>
+                            <option value="TO">Tocantins</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>CEP</label>
+                        <input type="text" name="cep" placeholder="00000-000" maxlength="9" oninput="maskCEP(this)">
+                    </div>
+                </div>
+            </div>
+
+            <div class="wizard-nav">
+                <div></div>
+                <div class="btn-group">
+                    <button type="button" class="btn-primary" onclick="nextStep()">Próximo <i class="bi bi-arrow-right"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Dados Profissionais -->
+        <div class="wizard-step" data-step="2">
+            <div class="step-card">
+                <h2><i class="bi bi-briefcase"></i> Dados Profissionais</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Propriedade *</label>
+                        <select name="propriedade" required>
+                            <option value="">Selecione...</option>
+                            {% for p in propriedades %}
+                            <option value="{{ p.id }}">{{ p.nome }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Cargo *</label>
+                        <select name="cargo" required>
+                            <option value="">Selecione...</option>
+                            <option value="GERENTE">Gerente</option>
+                            <option value="TRATORISTA">Tratorista</option>
+                            <option value="VAQUEIRO">Vaqueiro</option>
+                            <option value="ADMIN">Administrativo</option>
+                            <option value="SERVICO">Serviços Gerais</option>
+                            <option value="TECNICO">Técnico Agrícola</option>
+                            <option value="ENGENHEIRO">Engenheiro Agrônomo</option>
+                            <option value="OUTRO">Outro</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Salário (R$) *</label>
+                        <input type="number" step="0.01" name="salario" required placeholder="0,00">
+                    </div>
+                    <div class="form-group">
+                        <label>Data de Admissão *</label>
+                        <input type="date" name="data_admissao" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Carga Horária Semanal (h)</label>
+                        <input type="number" step="0.5" name="carga_horaria" placeholder="Ex: 44">
+                        <span class="form-hint">Ex: 44, 40, 36</span>
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select name="ativo">
+                            <option value="true">Ativo</option>
+                            <option value="false">Inativo</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-card">
+                <h2><i class="bi bi-shield-check"></i> EPIs Obrigatórios</h2>
+                <div class="epis-grid">
+                    <div class="epi-item">
+                        <input type="checkbox" id="epi-botas" name="epis" value="Botas">
+                        <label for="epi-botas">Botas</label>
+                    </div>
+                    <div class="epi-item">
+                        <input type="checkbox" id="epi-oculos" name="epis" value="Óculos de Proteção">
+                        <label for="epi-oculos">Óculos de Proteção</label>
+                    </div>
+                    <div class="epi-item">
+                        <input type="checkbox" id="epi-luvas" name="epis" value="Luvas">
+                        <label for="epi-luvas">Luvas</label>
+                    </div>
+                    <div class="epi-item">
+                        <input type="checkbox" id="epi-capacete" name="epis" value="Capacete">
+                        <label for="epi-capacete">Capacete</label>
+                    </div>
+                    <div class="epi-item">
+                        <input type="checkbox" id="epi-protetor" name="epis" value="Protetor Solar">
+                        <label for="epi-protetor">Protetor Solar</label>
+                    </div>
+                    <div class="epi-item">
+                        <input type="checkbox" id="epi-uv" name="epis" value="Protetor UV">
+                        <label for="epi-uv">Protetor UV</label>
+                    </div>
+                    <div class="epi-item">
+                        <input type="checkbox" id="epi-oculos-sol" name="epis" value="Óculos de Sol">
+                        <label for="epi-oculos-sol">Óculos de Sol</label>
+                    </div>
+                    <div class="epi-item">
+                        <input type="checkbox" id="epi-fone" name="epis" value="Fone de Ouvido">
+                        <label for="epi-fone">Fone de Ouvido</label>
+                    </div>
+                    <div class="epi-item">
+                        <input type="checkbox" id="epi-respirador" name="epis" value="Respirador">
+                        <label for="epi-respirador">Respirador</label>
+                    </div>
+                    <div class="epi-item">
+                        <input type="checkbox" id="epi-aventais" name="epis" value="Avental">
+                        <label for="epi-aventais">Avental</label>
+                    </div>
+                    <div class="epi-item">
+                        <input type="checkbox" id="epi-calca" name="epis" value="Calça de Proteção">
+                        <label for="epi-calca">Calça de Proteção</label>
+                    </div>
+                    <div class="epi-item">
+                        <input type="checkbox" id="epi-outro" name="epis" value="Outro">
+                        <label for="epi-outro">Outro</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-card">
+                <h2><i class="bi bi-telephone"></i> Contato de Emergência</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Nome do Contato</label>
+                        <input type="text" name="contato_emergencia" placeholder="Nome completo">
+                    </div>
+                    <div class="form-group">
+                        <label>Telefone</label>
+                        <input type="text" name="telefone_emergencia" placeholder="(00) 00000-0000" maxlength="15" oninput="maskPhone(this)">
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-card">
+                <h2><i class="bi bi-text-left"></i> Observações</h2>
+                <div class="form-group full-width">
+                    <textarea name="observacoes" rows="3" placeholder="Observações adicionais sobre o funcionário..."></textarea>
+                </div>
+            </div>
+
+            <div class="wizard-nav">
+                <button type="button" class="btn-secondary" onclick="prevStep()"><i class="bi bi-arrow-left"></i> Anterior</button>
+                <div class="btn-group">
+                    <button type="button" class="btn-primary" onclick="nextStep()">Próximo <i class="bi bi-arrow-right"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Acesso ao Sistema (Opcional) -->
+        <div class="wizard-step" data-step="3">
+            <div class="step-card">
+                <h2><i class="bi bi-key"></i> Acesso ao Sistema (Opcional)</h2>
+                <p style="font-size:0.875rem;color:#64748b;margin-bottom:1.5rem;">
+                    Crie um login para que o funcionário acesse o sistema como operário. Isso é opcional.
+                </p>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Criar Login?</label>
+                        <select name="criar_login" id="criar-login" onchange="toggleLoginFields()">
+                            <option value="nao">Não</option>
+                            <option value="sim">Sim</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="login-fields" style="display:none;margin-top:1.5rem;">
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label>Nome da Fazenda (para login)</label>
+                            <input type="text" name="nome_fazenda_login" id="nome-fazenda-login" placeholder="Nome da fazenda no sistema">
+                            <span class="form-hint">O funcionário usará este nome + usuário/senha para acessar.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="wizard-nav">
+                <button type="button" class="btn-secondary" onclick="prevStep()"><i class="bi bi-arrow-left"></i> Anterior</button>
+                <div class="btn-group">
+                    <button type="button" class="btn-primary" onclick="nextStep()">Próximo <i class="bi bi-arrow-right"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 4: Revisão -->
+        <div class="wizard-step" data-step="4">
+            <div class="step-card">
+                <h2><i class="bi bi-check-circle"></i> Revisão dos Dados</h2>
+
+                <div class="review-section">
+                    <h3>Dados Pessoais</h3>
+                    <div class="review-grid">
+                        <div class="review-item">
+                            <span class="label">Nome</span>
+                            <span class="value" id="rev-nome">-</span>
+                        </div>
+                        <div class="review-item">
+                            <span class="label">CPF</span>
+                            <span class="value" id="rev-cpf">-</span>
+                        </div>
+                        <div class="review-item">
+                            <span class="label">RG</span>
+                            <span class="value" id="rev-rg">-</span>
+                        </div>
+                        <div class="review-item">
+                            <span class="label">Data de Nascimento</span>
+                            <span class="value" id="rev-nascimento">-</span>
+                        </div>
+                        <div class="review-item">
+                            <span class="label">Telefone</span>
+                            <span class="value" id="rev-telefone">-</span>
+                        </div>
+                        <div class="review-item">
+                            <span class="label">E-mail</span>
+                            <span class="value" id="rev-email">-</span>
+                        </div>
+                        <div class="review-item">
+                            <span class="label">Endereço</span>
+                            <span class="value" id="rev-endereco">-</span>
+                        </div>
+                        <div class="review-item">
+                            <span class="label">Cidade/UF</span>
+                            <span class="value" id="rev-cidade">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="review-section">
+                    <h3>Dados Profissionais</h3>
+                    <div class="review-grid">
+                        <div class="review-item">
+                            <span class="label">Propriedade</span>
+                            <span class="value" id="rev-propriedade">-</span>
+                        </div>
+                        <div class="review-item">
+                            <span class="label">Cargo</span>
+                            <span class="value" id="rev-cargo">-</span>
+                        </div>
+                        <div class="review-item">
+                            <span class="label">Salário</span>
+                            <span class="value" id="rev-salario">-</span>
+                        </div>
+                        <div class="review-item">
+                            <span class="label">Data de Admissão</span>
+                            <span class="value" id="rev-admissao">-</span>
+                        </div>
+                        <div class="review-item">
+                            <span class="label">Carga Horária</span>
+                            <span class="value" id="rev-carga">-</span>
+                        </div>
+                        <div class="review-item">
+                            <span class="label">Status</span>
+                            <span class="value" id="rev-ativo">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="review-section">
+                    <h3>EPIs</h3>
+                    <div id="rev-epis" style="font-size:0.875rem;color:#334155;">-</div>
+                </div>
+
+                <div class="review-section">
+                    <h3>Contato de Emergência</h3>
+                    <div class="review-grid">
+                        <div class="review-item">
+                            <span class="label">Nome</span>
+                            <span class="value" id="rev-emergencia-nome">-</span>
+                        </div>
+                        <div class="review-item">
+                            <span class="label">Telefone</span>
+                            <span class="value" id="rev-emergencia-tel">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="wizard-nav">
+                <button type="button" class="btn-secondary" onclick="prevStep()"><i class="bi bi-arrow-left"></i> Anterior</button>
+                <div class="btn-group">
+                    <button type="submit" class="btn-success" id="btn-submit">
+                        <i class="bi bi-check-lg"></i> Salvar Funcionário
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<div id="toast" class="toast"></div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+var currentStep = 1;
+var totalSteps = 4;
+
+function nextStep() {
+    if (currentStep < totalSteps) {
+        if (currentStep === 3) updateReview();
+        document.querySelector('.wizard-step[data-step="' + currentStep + '"]').classList.remove('active');
+        document.querySelector('.step[data-step="' + currentStep + '"]').classList.add('completed');
+        currentStep++;
+        document.querySelector('.wizard-step[data-step="' + currentStep + '"]').classList.add('active');
+        document.querySelector('.step[data-step="' + currentStep + '"]').classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+}
+
+function prevStep() {
+    if (currentStep > 1) {
+        document.querySelector('.wizard-step[data-step="' + currentStep + '"]').classList.remove('active');
+        document.querySelector('.step[data-step="' + currentStep + '"]').classList.remove('active');
+        currentStep--;
+        document.querySelector('.wizard-step[data-step="' + currentStep + '"]').classList.add('active');
+        document.querySelector('.step[data-step="' + currentStep + '"]').classList.remove('completed');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+}
+
+function toggleLoginFields() {
+    var show = document.getElementById('criar-login').value === 'sim';
+    document.getElementById('login-fields').style.display = show ? 'block' : 'none';
+}
+
+function updateReview() {
+    var f = document.getElementById('wizard-form');
+    document.getElementById('rev-nome').textContent = f.nome.value || '-';
+    document.getElementById('rev-cpf').textContent = f.cpf.value || '-';
+    document.getElementById('rev-rg').textContent = f.rg.value || '-';
+    document.getElementById('rev-nascimento').textContent = f.data_nascimento.value ? new Date(f.data_nascimento.value).toLocaleDateString('pt-BR') : '-';
+    document.getElementById('rev-telefone').textContent = f.telefone.value || '-';
+    document.getElementById('rev-email').textContent = f.email.value || '-';
+    document.getElementById('rev-endereco').textContent = f.endereco.value || '-';
+    var cidade = f.cidade.value;
+    var estado = f.estado.options[f.estado.selectedIndex]?.text || '';
+    document.getElementById('rev-cidade').textContent = cidade && estado && estado !== 'Selecione...' ? cidade + ' - ' + estado : (cidade || '-');
+
+    var propSelect = f.propriedade;
+    document.getElementById('rev-propriedade').textContent = propSelect.options[propSelect.selectedIndex]?.text || '-';
+    var cargoSelect = f.cargo;
+    document.getElementById('rev-cargo').textContent = cargoSelect.options[cargoSelect.selectedIndex]?.text || '-';
+    document.getElementById('rev-salario').textContent = f.salario.value ? 'R$ ' + parseFloat(f.salario.value).toFixed(2) : '-';
+    document.getElementById('rev-admissao').textContent = f.data_admissao.value ? new Date(f.data_admissao.value).toLocaleDateString('pt-BR') : '-';
+    document.getElementById('rev-carga').textContent = f.carga_horaria.value ? f.carga_horaria.value + 'h/semana' : '-';
+    document.getElementById('rev-ativo').textContent = f.ativo.value === 'true' ? 'Ativo' : 'Inativo';
+
+    var epis = [];
+    document.querySelectorAll('input[name="epis"]:checked').forEach(function(cb) { epis.push(cb.value); });
+    document.getElementById('rev-epis').textContent = epis.length > 0 ? epis.join(', ') : 'Nenhum';
+
+    document.getElementById('rev-emergencia-nome').textContent = f.contato_emergencia.value || '-';
+    document.getElementById('rev-emergencia-tel').textContent = f.telefone_emergencia.value || '-';
+}
+
+function previewPhoto(e) {
+    var file = e.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+        document.getElementById('photo-preview').innerHTML = '<img src="' + ev.target.result + '">';
+    };
+    reader.readAsDataURL(file);
+}
+
+function maskCPF(v) {
+    var x = v.value.replace(/\D/g, '').substring(0, 11);
+    v.value = x.replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+}
+function maskPhone(v) {
+    var x = v.value.replace(/\D/g, '').substring(0, 11);
+    v.value = x.replace(/(\d{2})(\d)/, '($1) $2').replace(/(\d{5})(\d)/, '$1-$2');
+}
+function maskCEP(v) {
+    var x = v.value.replace(/\D/g, '').substring(0, 8);
+    v.value = x.replace(/(\d{5})(\d)/, '$1-$2');
+}
+
+function showToast(msg, type) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast toast-' + type + ' show';
+    setTimeout(function() { t.classList.remove('show'); }, 3000);
+}
+
+function submitWizard(e) {
+    e.preventDefault();
+    var f = document.getElementById('wizard-form');
+
+    if (!f.nome.value.trim()) { showToast('Preencha o nome', 'error'); return false; }
+    if (!f.propriedade.value) { showToast('Selecione a propriedade', 'error'); return false; }
+    if (!f.cargo.value) { showToast('Selecione o cargo', 'error'); return false; }
+    if (!f.salario.value) { showToast('Preencha o salário', 'error'); return false; }
+    if (!f.data_admissao.value) { showToast('Preencha a data de admissão', 'error'); return false; }
+
+    var epis = [];
+    document.querySelectorAll('input[name="epis"]:checked').forEach(function(cb) { epis.push(cb.value); });
+
+    var data = {
+        propriedade: parseInt(f.propriedade.value),
+        nome: f.nome.value.trim(),
+        cargo: f.cargo.value,
+        salario: parseFloat(f.salario.value),
+        data_admissao: f.data_admissao.value,
+        telefone: f.telefone.value || '',
+        email: f.email.value || '',
+        ativo: f.ativo.value === 'true',
+        cpf: f.cpf.value || '',
+        rg: f.rg.value || '',
+        data_nascimento: f.data_nascimento.value || null,
+        endereco: f.endereco.value || '',
+        cidade: f.cidade.value || '',
+        estado: f.estado.value || '',
+        cep: f.cep.value || '',
+        carga_horaria: f.carga_horaria.value ? parseFloat(f.carga_horaria.value) : null,
+        epis: epis,
+        contato_emergencia: f.contato_emergencia.value || '',
+        telefone_emergencia: f.telefone_emergencia.value || '',
+        observacoes: f.observacoes.value || '',
+        nome_fazenda_login: f.nome_fazenda_login ? f.nome_fazenda_login.value : '',
+    };
+
+    var btn = document.getElementById('btn-submit');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="loading-spinner"></span> Salvando...';
+
+    fetch('/api/funcionarios/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() },
+        body: JSON.stringify(data)
+    })
+    .then(function(r) {
+        if (r.ok) { showToast('Funcionário cadastrado com sucesso!', 'success'); setTimeout(function() { window.location.href = '{% url "equipe-empregados" %}'; }, 1000); }
+        else { return r.json().then(function(e) { showToast('Erro: ' + JSON.stringify(e), 'error'); }); }
+    })
+    .catch(function(err) { showToast('Erro: ' + err.message, 'error'); })
+    .finally(function() { btn.disabled = false; btn.innerHTML = '<i class="bi bi-check-lg"></i> Salvar Funcionário'; });
+
+    return false;
+}
+
+function getCSRFToken() {
+    return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+}
+</script>
+{% endblock %}

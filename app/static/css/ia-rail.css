@@ -1,0 +1,1807 @@
+/* A barra lateral do AmplIA e a lista de campos.
+ *
+ * FICHEIRO NOVO, E NAO `extracted-components.css`
+ * ================================================
+ * `extracted-components.css` esta a ser editado por outro trabalho e tem um
+ * paragrafo inteiro sobre duas regras `!important` com o mesmo id que se
+ * decidem pela ordem de carga. Um `bottom: auto` posto aqui no lugar errado
+ * desce o chat para debaixo da barra inferior. Por isso isto e' um ficheiro
+ * proprio, carregado DEPOIS, e mexe so' em ids que nao existem la.
+ *
+ * A BARRA EXPANDE POR BOTAO, NAO POR HOVER
+ * ========================================
+ * MEDIDO 2026-10-10: a barra era `position:absolute` filha do `#ia-dock` e
+ * abria no `:hover`. Como o `#ia-dock` nao tem area propria (o `#ia-chat` e'
+ * `display:none` quando fechado), a barra ficava orfa: `left:0` resolvia
+ * contra a borda esquerda do ecra e um pedaco de 42px aparecia na tela mesmo
+ * com o chat guardado. E abrir no hover fazia a janela saltar so' de passar
+ * o rato por cima.
+ *
+ * Agora: guardado = `display:none` (some tudo, nao fica lasca nenhuma);
+ * expandir/recolher e' CLASSE `.aberta` ligada por botao (`iaRailToggle`),
+ * nunca `:hover`. O `:hover` que existia foi removido de proposito: duas
+ * formas de abrir (hover + botao) divergem — uma abre e a outra nao sabe.
+ */
+
+.ia-rail {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 42px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 8px 0;
+  /* A PALETA DA CASA — NADA DE CINZA FIXO.
+   * Os tokens do `theme.css` ja' alternam sozinhos entre claro e escuro, e e'
+   * o mesmo card/borda do resto da app: o que o produtor ve no painel e' o
+   * mesmo branco-esverdeado de sempre no claro, e o mesmo card quase-preto
+   * harmonizado no escuro — nao outro cinza a mais. */
+  background: var(--cor-fundo-card, #fdfefe);
+  border-right: 1px solid var(--cor-borda, #e5e7eb);
+  /* ARREDONDADA, e nao quadrada: a barra encosta nos cantos esquerdos do chat,
+   * que tem `border-radius:16px`. Cantos retos salientavam-se por fora da
+   * moldura redonda da janela — "essa borda dura" que se via. */
+  border-radius: 16px 0 0 16px;
+  overflow: visible;
+  /* Sem delay nenhum: abrir/guardar e' botao, nao gesto de rato. O delay de
+   * 0.8s que vivia aqui fazia a barra demorar a recolher depois do clique. */
+  transition:
+    width 0.16s ease,
+    box-shadow 0.16s ease;
+  transition-delay: 0s;
+  z-index: 5;
+}
+
+/* Guardada = some por completo. E' isto que elimina o pedaco de 42px que
+ * ficava na tela com o chat fechado: `width:0` sem `display:none` deixava a
+ * borda e o padding visiveis. */
+.ia-rail.ia-rail-guardada {
+  display: none;
+}
+
+/* Expandida por BOTAO (classe `.aberta`), nunca por `:hover`. O botao e' o
+ * primeiro item da propria rail (`alternar-barra`, icone `bi-layout-sidebar`,
+ * no topo dela) — e nao um botao solto no cabecalho: assim ele vai junto
+ * quando a rail guarda (`display:none` some tudo, sem lasca). */
+.ia-rail.aberta {
+  width: 212px;
+  box-shadow: 4px 0 14px var(--cor-sombra, rgba(29, 36, 33, 0.12));
+}
+
+/* O BOTAO EXPANDIR/GUARDAR MORA NA RAIL (primeiro item, `alternar-barra`).
+ * Nao ha CSS proprio aqui de proposito: ele usa o `.ia-rail-item` da casa
+ * (36px, icone 20px, texto que cresce com a `.aberta`) — um estilo a' parte
+ * para o mesmo botao seria dois botoes para manter. */
+
+.ia-rail-item {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  width: 100%;
+  min-height: 36px;
+  padding: 0 9px;
+  /* BORDA SEMPRE PRESENTE, so' transparente. E' o que permite o hover pintar
+   * o contorno verde sem empurrar nada: `box-sizing: border-box` (preflight
+   * do Tailwind) + borda transparente = zero deslocamento no clique. Uma
+   * borda que nasce no hover moveria o icone 3px nesse dia. */
+  border: 1.5px solid transparent;
+  border-radius: 8px;
+  /* ICONE E TEXTO EM VERDE ESMERALDA — o `--cor-primaria` da casa (#0f9d6e
+   * claro, #3ec48f escuro). Os SVG usam `currentColor`, por isso pintar o
+   * botao pinta o traco todo, sem mexer em cada icone. */
+  background: transparent;
+  color: var(--cor-primaria, #0f9d6e);
+  cursor: pointer;
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  transition:
+    color 0.12s ease,
+    border-color 0.12s ease;
+  text-align: left;
+}
+/* AO PASSAR O CURSOR: BORDA VERDE EM VOLTA — pedido do produtor. E' contorno,
+ * nao fundo: nada de mancha colorida por tras do icone. O verde e' o
+ * `--cor-primaria`, o mesmo do hover das abas do sistema
+ * (`panels-premium.css`: `border-color` no hover, sem tocar no fundo). */
+.ia-rail-item:hover {
+  background: transparent;
+  border-color: var(--cor-primaria, #0f9d6e);
+  color: var(--cor-acento, #3ec48f);
+}
+/* O cursor dentro dela e' o sinal. Sem isto, quem chega com o rato e' o dono
+ * do rato, e o dono do rato nem sempre sabe que ali ha texto escondido. */
+.ia-rail.aberta .ia-rail-item {
+  gap: 9px;
+}
+.ia-rail-item:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+.ia-rail-item svg {
+  flex: 0 0 20px;
+  width: 20px;
+  height: 20px;
+}
+.ia-rail-txt {
+  flex: 1 1 auto;
+  max-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition:
+    max-width 0.16s ease,
+    opacity 0.12s ease;
+  font-weight: 600;
+}
+.ia-rail.aberta .ia-rail-txt {
+  max-width: 150px;
+  opacity: 1;
+}
+/* O icone de menu precisa de dizer que ha mais. Uma seta e' o sinal mais
+ * barato que existe, e sem ela "Criar no painel" e "Exportar conversa" sao
+ * dois botoes com o mesmo peso visual para coisas de peso muito diferente. */
+.ia-rail-seta {
+  flex: 0 0 auto;
+  margin-left: auto;
+  font-size: 15px;
+  line-height: 1;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+.ia-rail.aberta .ia-rail-seta {
+  opacity: 0.65;
+}
+/* Menu aberto: contorno verde, sem fundo — mesma regra do hover. */
+.ia-rail-item[aria-expanded='true'] {
+  background: transparent;
+  border-color: var(--cor-primaria, #0f9d6e);
+  color: var(--cor-acento, #3ec48f);
+}
+.ia-rail-item[aria-expanded='true'] .ia-rail-seta {
+  opacity: 1;
+  transform: rotate(90deg);
+}
+/* ── O INTERRUPTOR (chave ligada/desligada) ────────────────────────────────
+ *
+ * Cada modo ("Criar no chat/painel", "Usar agente da nuvem") é um switch de
+ * verdade: LIGADO = borda verde no botão + trilho verde com o pino à
+ * direita; DESLIGADO = contorno neutro, pino à esquerda. Sem isso, ligar e
+ * desligar eram indistinguíveis — o estado vivia só no `aria-pressed`,
+ * que ninguém vê.
+ *
+ * O trilho some com a barra recolhida (mesma regra do texto): em 42px não
+ * há espaço para ícone + trilho, e meio trilho para fora é pior que nenhum.
+ * Tudo pelos tokens da casa, nos dois modos. */
+.ia-rail-chave {
+  flex: 0 0 auto;
+  margin-left: auto;
+  width: 30px;
+  height: 17px;
+  max-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  border-radius: 999px;
+  border: 1.5px solid var(--cor-borda, #e5e7eb);
+  background: transparent;
+  position: relative;
+  transition:
+    max-width 0.16s ease,
+    opacity 0.12s ease,
+    border-color 0.12s ease,
+    background 0.12s ease;
+}
+.ia-rail.aberta .ia-rail-chave {
+  max-width: 34px;
+  opacity: 1;
+}
+.ia-rail-chave-knob {
+  position: absolute;
+  top: 50%;
+  left: 2px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--cor-texto-suave, #5f6b66);
+  transform: translateY(-50%);
+  transition:
+    left 0.14s ease,
+    background 0.12s ease;
+}
+html.dark .ia-rail-chave-knob {
+  background: #94a3b8;
+}
+.ia-rail-chave-ligada {
+  border-color: var(--cor-primaria, #0f9d6e);
+  background: var(--cor-hover, rgba(15, 157, 110, 0.1));
+}
+.ia-rail-chave-ligada .ia-rail-chave-knob {
+  left: 15px;
+  background: var(--cor-primaria, #0f9d6e);
+}
+/* A BORDA VERDE NO BOTÃO: o sinal de "ligado" que se vê sem abrir nada.
+ * Contorno, nunca fundo — a mesma regra do hover e do menu aberto. */
+.ia-rail-item.ia-rail-chave-ligada-item {
+  border-color: var(--cor-primaria, #0f9d6e);
+  color: var(--cor-primaria, #0f9d6e);
+}
+.ia-rail-item.ia-rail-chave-ligada-item:hover {
+  border-color: var(--cor-primaria, #0f9d6e);
+  color: var(--cor-acento, #3ec48f);
+}
+/* O separador e' o que separa "falar" de "fazer". Sem ele, seis icones
+ * iguais e' uma lista sem lugares. */
+.ia-rail-sep {
+  width: 26px;
+  height: 1px;
+  margin: 5px 0 5px 8px;
+  background: var(--cor-borda, #e5e7eb);
+  flex: 0 0 1px;
+}
+.ia-rail.aberta .ia-rail-sep {
+  width: calc(100% - 16px);
+}
+
+/* ── OS MENUS ───────────────────────────────────────────────────────────────
+ * O menu e' IRMÃO do item, nunca filho. O `overflow:hidden` do item existe para
+ * o texto não vazar, e um filho some com ele — o submenu abria e desaparecia no
+ * mesmo quadro. Irmão, o `left:100%` põe-no ao lado da barra, que é onde há
+ * espaço, e sobrevive ao `width` a animar. */
+.ia-rail-menu {
+  position: absolute;
+  left: 100%;
+  margin-left: 6px;
+  min-width: 230px;
+  background: var(--cor-fundo-card, #fdfefe);
+  border: 1px solid var(--cor-borda, #e5e7eb);
+  /* MESMO RAIO DA CASA (16px no chat, 12px aqui por ser uma peca menor). */
+  border-radius: 12px;
+  box-shadow: 0 10px 30px var(--cor-sombra, rgba(29, 36, 33, 0.12));
+  padding: 4px;
+  z-index: 20;
+}
+.ia-rail-menu button {
+  display: block;
+  width: 100%;
+  padding: 8px 10px;
+  border: 1.5px solid transparent;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 12.5px;
+  color: var(--cor-texto, #1d2421);
+  text-align: left;
+  transition:
+    color 0.12s ease,
+    border-color 0.12s ease;
+}
+/* SEM fundo colorido no hover do menu: contorno verde, igual aos itens. */
+.ia-rail-menu button:hover:not(:disabled) {
+  background: transparent;
+  border-color: var(--cor-primaria, #0f9d6e);
+  color: var(--cor-primaria, #0f9d6e);
+}
+.ia-rail-menu button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* A barra é ABSOLUTA e o `#ia-chat` tem `overflow: hidden` (vem de
+ * `extracted-components.css`), que a CORTAVA. Medido: o texto ganhava
+ * `max-width:190px` e a barra continuava com 42px — o texto crescia para fora
+ * de uma caixa que o pai não deixa sair. Daí a imagem onde os ícones estão lá
+ * mas os nomes nunca aparecem.
+ *
+ * A barra vive FORA do `#ia-chat`: é filha do `#ia-dock`, que não tem
+ * `overflow:hidden`, e o `#ia-chat` é que recebe `padding-left` para o
+ * conteúdo não ficar por baixo dos ícones. Assim o texto cresce para dentro do
+ * dock, que é onde há espaço, e o `overflow:hidden` do chat deixa de mandar.
+ *
+ * NÃO se escreve `position` em `#ia-dock`.
+ *
+ * MEDIDO: pôr `#ia-dock { position: relative }` neste ficheiro AnULOU o
+ * `position: fixed` que vem de `extracted-components.css:9451`, e o painel
+ * deixou de ser a caixa flutuante de 400px no canto — passou a bloco de
+ * largura total, a 1440px, encostado ao navbar. A regra "a barra é filha do
+ * dock" não precisa de declarar a posição: `fixed` já é bloco contentor para
+ * uma filha `absolute`, exactamente como `relative` era.
+ *
+ * O que este ficheiro faz é o `padding-left` do chat, para o texto não ficar
+ * por baixo dos ícones, e a largura da barra no hover.
+ */
+#ia-chat {
+  padding-left: 52px;
+}
+#ia-chat.ia-chat-sem-barra {
+  padding-left: 0;
+}
+
+@media (max-width: 520px) {
+  .ia-rail.aberta {
+    width: 178px;
+  }
+  .ia-rail.aberta .ia-rail-txt {
+    max-width: 116px;
+  }
+  .ia-rail-menu {
+    min-width: 190px;
+  }
+}
+
+/* ── O PRINT DA TELA ────────────────────────────────────────────────────────
+ * `#ia-print-caixa` entra no DOM ANTES de `#ia-chat-input`, e o `#ia-chat` é
+ * um `flex column`. A ordem do flex é o que o põe ACIMA do campo, sem uma
+ * regra de posicionamento: a caixa do print cresce para cima do campo porque
+ * está antes dele na coluna, e não por causa de um `bottom`.
+ *
+ * O FUNDO DA IMAGEM É CINZENTO, E ISTO É O PONTO
+ * ===============================================
+ * MEDIDO no browser com o CSS real: o print aparecia exactamente onde devia,
+ * medido com `getBoundingClientRect`, e mesmo assim não se via. O motivo é que
+ * o print de um ecrã é, na maior parte das vezes, um ecrã BRANCO — e um
+ * rectângulo branco sobre um cartão branco não tem bordo, não tem sombra e não
+ * tem nada que o faça existir.
+ *
+ * O fundo cinzento não é decoração: é a moldura que dá ao print branco uma
+ * borda contra a qual se vê. E a borda é espessa a propósito, porque uma linha
+ * de 1px sobre fundo branco é um pixel que o ecrã engole. */
+#ia-print-caixa {
+  flex: 0 0 auto;
+  border-top: 2px solid var(--cor-primaria, #0f9d6e);
+  background: var(--cor-fundo-card, #fdfefe);
+  padding: 8px 10px 9px;
+}
+#ia-print-caixa[hidden] {
+  display: none;
+}
+.ia-print-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--cor-primaria, #0f9d6e);
+  margin-bottom: 7px;
+}
+.ia-print-x {
+  border: 1px solid var(--cor-borda, #e5e7eb);
+  background: transparent;
+  color: var(--cor-texto-suave, #5f6b66);
+  border-radius: 6px;
+  width: 22px;
+  height: 22px;
+  line-height: 1;
+  cursor: pointer;
+  font-size: 15px;
+  padding: 0;
+  flex: 0 0 auto;
+}
+.ia-print-x:hover {
+  background: transparent;
+  color: var(--cor-erro, #d93a3a);
+  border-color: var(--cor-erro, #d93a3a);
+}
+/* A fita é a imagem E as acções lado a lado. Uma abaixo da outra rouba altura
+ * ao campo de texto, que é a caixa mais apertada do painel. */
+.ia-print-fita {
+  display: flex;
+  align-items: stretch;
+  gap: 9px;
+}
+.ia-print-img {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  /* O print e' uma MINHATURA, e o painel tem ~340px. MEDIDO: com o tecto nos
+   * 132px de altura, um print tirado ao ecra inteiro ficava com o texto
+   * ilegivel — o produtor via um rectangulo e concluia que nao havia print
+   * nenhum. Por isso o limite passa a ser de ALTURA com folga, e clicar abre
+   * o print em tamanho real. E' o que o "Ler este print" envia para o OCR: um
+   * botao que manda pixeis ilegiveis nao le' nada. */
+  max-height: 260px;
+  object-fit: contain;
+  object-position: center;
+  cursor: zoom-in;
+  /* A moldura que dá existencia a um print branco. O xadrez usa os tons da
+   * casa (--cor-suave e branco), nao cinzas soltos: continua a ser uma
+   * textura de fundo para o print branco se ver, mas sem inventar uma paleta. */
+  border: 1px solid var(--cor-borda, #e5e7eb);
+  border-radius: 8px;
+  background: repeating-conic-gradient(var(--cor-suave, #f3f7f5) 0% 25%, #ffffff 0% 50%) 50% / 16px
+    16px;
+  box-shadow: 0 1px 3px var(--cor-sombra, rgba(29, 36, 33, 0.12));
+}
+
+/* O print aberto por cima de tudo. Um `dialog` do browser em vez de uma caixa
+ * dentro do chat: enquanto o print esta aberto nao ha scroll nem clique por
+ * baixo, que num `position:fixed` com z-index alto acontece sempre. */
+.ia-print-zoom {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  max-width: 96vw;
+  max-height: 96vh;
+}
+.ia-print-zoom::backdrop {
+  background: rgba(15, 23, 42, 0.82);
+}
+.ia-print-zoom img {
+  display: block;
+  max-width: 96vw;
+  max-height: 92vh;
+  object-fit: contain;
+  border-radius: 10px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
+}
+.ia-print-zoom figcaption {
+  color: var(--cor-texto, #e2e8f0);
+  text-align: center;
+  font-size: 12px;
+  padding: 10px 4px 4px;
+}
+.ia-print-acoes {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+}
+.ia-print-acoes .ia-chip {
+  white-space: nowrap;
+  font-size: 11.5px;
+  padding: 5px 10px;
+}
+
+/* ── A LISTA DE CAMPOS ──────────────────────────────────────────────────────
+ * A imagem que mostrou o problema: "Vamos cadastrar uma safra! Cultura? Nome
+ * da safra? Talhao? Ano?" — cinco perguntas em prosa, e nenhuma pista de quantas
+ * faltam. Aqui cada campo e' uma linha, e a que falta e' a que esta a espera.
+ */
+.ia-coleta {
+  margin: 8px 12px;
+  border: 1px solid var(--cor-borda, #e5e7eb);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--cor-fundo-card, #fff);
+}
+.ia-coleta-topo {
+  padding: 7px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--cor-primaria, #0f9d6e);
+  background: var(--cor-suave, #f3f7f5);
+  border-bottom: 1px solid var(--cor-borda, #e5e7eb);
+}
+.ia-coleta-linha {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--cor-borda, #e5e7eb);
+  font-size: 12.5px;
+}
+.ia-coleta-linha:last-child {
+  border-bottom: none;
+}
+.ia-coleta-n {
+  flex: 0 0 20px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  background: var(--cor-suave, #f3f7f5);
+  color: var(--cor-texto-suave, #5f6b66);
+}
+.ia-coleta-rotulo {
+  flex: 0 0 auto;
+  color: var(--cor-texto-suave, #5f6b66);
+}
+/* A linha a pedir e' a unica que se destaca. Demasiado destaque em todas
+ * transforma a lista numa parede de aviso. O alerta e' o --cor-alerta da
+ * casa, que ja' troca entre claro (#c98a24) e escuro (#e0a84e). */
+.ia-coleta-linha.ia-coleta-pedindo {
+  background: var(--cor-suave, #f3f7f5);
+}
+.ia-coleta-linha.ia-coleta-pedindo .ia-coleta-n {
+  background: var(--cor-alerta, #c98a24);
+  color: #fff;
+}
+.ia-coleta-linha.ia-coleta-pedindo .ia-coleta-rotulo {
+  color: var(--cor-alerta, #c98a24);
+  font-weight: 700;
+}
+.ia-coleta-valor {
+  flex: 1 1 auto;
+  min-width: 0;
+  text-align: right;
+  color: var(--cor-texto, #1d2421);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* O "a responder" e' o que ocupa a linha quando o campo esta vazio. Um campo
+ * sem nada e' indistinguivel de um campo preenchido com texto branco. */
+.ia-coleta-vazio {
+  flex: 1 1 auto;
+  text-align: right;
+  color: var(--cor-alerta, #c98a24);
+  font-style: italic;
+  font-weight: 500;
+}
+.ia-coleta-pedindo-btn {
+  border: 1px solid var(--cor-alerta, #c98a24);
+  background: transparent;
+  color: var(--cor-alerta, #c98a24);
+  border-radius: 7px;
+  padding: 3px 9px;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.ia-coleta-pedindo-btn:hover {
+  background: var(--cor-alerta, #c98a24);
+  color: #fff;
+}
+
+/* ── O HISTÓRICO ──────────────────────────────────────────────────────────
+ *
+ * O painel das conversas desta secção. Vive DENTRO do `#ia-chat`, e é isso que
+ * lhe dá a posição: o chat é `position:fixed` com o seu `overflow`, e um
+ * painel solto no `body` ficaria atrás dele.
+ *
+ * MEDIDO: a primeira versão despejava a conversa inteira numa mensagem do
+ * chat. Além de ilegível, apagava o que o produtor estava a ler. Uma lista que
+ * se pode percorrer e onde se clica é o que um histórico é.
+ */
+.ia-historico {
+  position: absolute;
+  /* Cobre o chat inteiro. O `#ia-chat` é `fixed`, e por isso já é bloco
+     contentor para esta filha `absolute` — não precisa de `relative` aqui. */
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  background: var(--cor-fundo-card, #fdfefe);
+  border-top: 1px solid var(--cor-borda, #e5e7eb);
+}
+.ia-hist-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--cor-primaria, #0f9d6e);
+  background: var(--cor-suave, #f3f7f5);
+  border-bottom: 1px solid var(--cor-borda, #e5e7eb);
+}
+.ia-hist-fechar,
+.ia-hist-apagar {
+  border: none;
+  background: transparent;
+  color: var(--cor-texto-suave, #5f6b66);
+  cursor: pointer;
+  line-height: 1;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+.ia-hist-fechar {
+  font-size: 17px;
+}
+.ia-hist-apagar {
+  font-size: 15px;
+  flex: 0 0 auto;
+}
+/* SEM fundo colorido no hover: so' o texto acende para o erro/botao da casa. */
+.ia-hist-fechar:hover,
+.ia-hist-apagar:hover {
+  background: transparent;
+  color: var(--cor-erro, #d93a3a);
+}
+.ia-hist-lista {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  max-height: 200px;
+  padding: 6px;
+  background-image:
+    radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.25), rgba(0, 0, 0, 0) 55%),
+    radial-gradient(circle at 90% 10%, rgba(16, 185, 129, 0.2), rgba(0, 0, 0, 0) 50%),
+    radial-gradient(circle at 30% 80%, rgba(6, 182, 212, 0.25), rgba(0, 0, 0, 0) 60%),
+    radial-gradient(circle at 80% 90%, rgba(139, 92, 246, 0.15), rgba(0, 0, 0, 0) 55%),
+    linear-gradient(rgb(30, 41, 59) 0%, rgb(11, 17, 32) 100%);
+  background-attachment: fixed;
+  width: 100%;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+div#ia-historico {
+  padding-left: 0;
+  padding-right: 0;
+}
+.ia-hist-vazio {
+  padding: 10px;
+  font-size: 12.5px;
+  color: var(--cor-texto-fraco, #8b9792);
+  font-style: italic;
+  text-align: center;
+}
+.ia-hist-linha {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 9px;
+  border-radius: 9px;
+  cursor: pointer;
+}
+/* SEM fundo cinza no hover: o traco acende para o acento. */
+.ia-hist-linha:hover {
+  background: transparent;
+  color: var(--cor-acento, #3ec48f);
+}
+/* A conversa aberta marca-se. Sem isto, a linha onde se está é indistinguível
+   das outras, e o produtor clica nela a pensar que vai a outra conversa.
+   A marca e' a BORDA em esmeralda, nao um fundo verde. */
+.ia-hist-atual {
+  background: transparent;
+  border: 1px solid var(--cor-primaria, #0f9d6e);
+}
+.ia-hist-texto {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.ia-hist-titulo {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--cor-texto, #1d2421);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ia-hist-meta {
+  font-size: 10.5px;
+  color: var(--cor-texto-fraco, #8b9792);
+}
+/* O foco tem de se ver: a linha é `role="button"` e navega-se por teclado. */
+.ia-hist-linha:focus-visible {
+  outline: 2px solid var(--cor-primaria, #0f9d6e);
+  outline-offset: 1px;
+}
+
+/* ── A JANELA DO CHAT NA PALETA DA CASA ────────────────────────────────────
+ *
+ * O `extracted-components.css` pinta o chat com cinzas fixos (#e5e7eb, #fff,
+ * #f8fafc, #64748b…) e um bloco `html.dark` que troca por OUTROS cinzas
+ * (#1e293b, #0f172a, #334155…) — uma segunda paleta que nao e' a do sistema.
+ * Aqui o chat inteiro passa aos TOKENS do `theme.css`: o mesmo card, a mesma
+ * borda, o mesmo verde esmeralda das outras pecas, nos DOIS modos, sem
+ * repetir regra por modo.
+ *
+ * O prefixo `#ia-dock` e' de proposito: dois ids ganham a `html.dark X`
+ * (um id + classe + elemento) sem `!important` — e o portao C8
+ * (`verificar.py`) fecha `!important` contraditorio no dock.
+ *
+ * O BOTAO expandir/guardar (alternar-barra) e os itens da rail ja' estao aqui.
+ * O que vem abaixo e' o que estava cinza na janela. */
+#ia-dock #ia-chat {
+  border-color: var(--cor-borda, #e5e7eb);
+  background: var(--cor-fundo-card, #fdfefe);
+}
+#ia-dock #ia-chat-head {
+  background: var(--cor-fundo-card, #fdfefe);
+  border-bottom-color: var(--cor-borda, #e5e7eb);
+  color: var(--cor-texto, #1d2421);
+}
+#ia-dock #ia-chat-body {
+  background: var(--cor-fundo-card-aninhado, #f3f7f5);
+}
+#ia-dock .ia-msg.bot {
+  background: var(--cor-fundo-card, #fdfefe);
+  border-color: var(--cor-borda, #e5e7eb);
+  color: var(--cor-texto, #1d2421);
+}
+/* A bolha do produtor: verde da casa, nao um verde solto. */
+#ia-dock .ia-msg.user {
+  background: var(--cor-primaria, #0f9d6e);
+  color: #fff;
+}
+/* Chip (sugestao): contorno da casa, sem fundo cinza e sem mancha no hover —
+ * so' o traco e o texto acendem em esmeralda. */
+#ia-dock .ia-chip {
+  background: transparent;
+  border-color: var(--cor-borda, #e5e7eb);
+  color: var(--cor-texto-suave, #5f6b66);
+}
+#ia-dock .ia-chip:hover {
+  background: transparent;
+  border-color: var(--cor-primaria, #0f9d6e);
+  color: var(--cor-primaria, #0f9d6e);
+}
+#ia-dock #ia-chat-input {
+  background: var(--cor-fundo-card, #fdfefe);
+  border-top-color: var(--cor-borda, #e5e7eb);
+}
+#ia-dock #ia-chat-input input {
+  background: var(--cor-fundo-card-aninhado, #f3f7f5);
+  border-color: var(--cor-borda, #e5e7eb);
+  color: var(--cor-texto, #1d2421);
+}
+#ia-dock #ia-chat-input input::placeholder {
+  color: var(--cor-texto-fraco, #8b9792);
+}
+/* O foco do campo: anel verde da casa, nao outro verde. */
+#ia-dock #ia-chat-input input:focus {
+  border-color: var(--cor-primaria, #0f9d6e);
+  box-shadow: 0 0 0 3px var(--cor-hover, rgba(15, 157, 110, 0.1));
+}
+#ia-dock #ia-chat-input button {
+  background: var(--cor-primaria, #0f9d6e);
+  color: #fff;
+}
+#ia-dock #ia-chat-input button:hover {
+  background: var(--cor-primaria, #0f9d6e);
+  filter: brightness(1.08);
+}
+#ia-dock #ia-progress {
+  background: var(--cor-fundo-card-aninhado, #f3f7f5);
+  color: var(--cor-texto-suave, #5f6b66);
+  border-top-color: var(--cor-borda, #e5e7eb);
+}
+#ia-dock #ia-progress i {
+  border-color: var(--cor-primaria, #0f9d6e);
+  border-top-color: transparent;
+}
+#ia-dock #ia-tasks {
+  background: var(--cor-fundo-card, #fdfefe);
+  border-top-color: var(--cor-borda, #e5e7eb);
+}
+#ia-dock #ia-tasks-toggle {
+  color: var(--cor-texto-suave, #5f6b66);
+}
+#ia-dock #ia-tasks-toggle:hover {
+  color: var(--cor-primaria, #0f9d6e);
+}
+#ia-dock .ia-tasks-badge {
+  background: var(--cor-primaria, #0f9d6e);
+  color: #fff;
+}
+#ia-dock .ia-task {
+  background: var(--cor-fundo-card-aninhado, #f3f7f5);
+  border-color: var(--cor-borda, #e5e7eb);
+}
+#ia-dock .ia-task-txt {
+  color: var(--cor-texto, #1d2421);
+}
+#ia-dock .ia-task-txt small {
+  color: var(--cor-texto-fraco, #8b9792);
+}
+#ia-dock .ia-task-done {
+  border-color: var(--cor-primaria, #0f9d6e);
+  color: var(--cor-primaria, #0f9d6e);
+}
+#ia-dock .ia-task-done:hover {
+  background: var(--cor-primaria, #0f9d6e);
+  color: #fff;
+}
+
+/* ── MODO ESCURO: O GRADIENTE AZUL DO SISTEMA ─────────────────────────────
+ *
+ * PEDIDO: "nao quero essas cores cinzas, mas sim o gradiente azul do sistema
+ * no fundo". Os tokens escuros do `theme.css` (--cor-fundo-card #151b19,
+ * --cor-fundo-card-aninhado #1a211f) sao um cinza-esverdeado que destoa do
+ * azul do fundo da app. O sistema ja' tem a resposta para paineis: o MESH
+ * GRADIENTE do `#culture-mini-panel` (`panels-premium.css`) — os mesmos
+ * quatro radiais azul/ciano/roxo sobre #0b1120. Aqui o chat usa ESSE
+ * gradiente, e as seccoes internas passam a translucidas para ele atravessar.
+ *
+ * `background-attachment: fixed` e' o que alinha a faixa da rail com a janela:
+ * o gradiente fica preso a janela do browser, nao a cada caixa, e as duas
+ * mostram exactamente o mesmo pedaco — sem costura visivel entre a barra e o
+ * chat. */
+html.dark .ia-rail,
+html.dark #ia-dock #ia-chat {
+  background-color: #0b1120;
+  background-image:
+    radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.25), transparent 55%),
+    radial-gradient(circle at 90% 10%, rgba(16, 185, 129, 0.2), transparent 50%),
+    radial-gradient(circle at 30% 80%, rgba(6, 182, 212, 0.25), transparent 60%),
+    radial-gradient(circle at 80% 90%, rgba(139, 92, 246, 0.15), transparent 55%),
+    linear-gradient(180deg, #1e293b 0%, #0b1120 100%);
+  background-attachment: fixed;
+}
+/* A moldura do painel no escuro, igual ao painel-premium da casa: verde da
+ * casa + o anel azul do sistema. */
+html.dark #ia-dock #ia-chat {
+  border-color: #0b5e3f;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(59, 130, 246, 0.12);
+}
+
+/* AS SECCOES TRANSLUCIDAS: o gradiente tem de ATRAVESSAR, senao voltamos ao
+ * cinza por baixo. slate-800 a 35% da' contraste sem esconder o azul. */
+html.dark #ia-dock #ia-chat-head,
+html.dark #ia-dock #ia-chat-input,
+html.dark #ia-dock #ia-progress,
+html.dark #ia-dock #ia-tasks {
+  background: rgba(30, 41, 59, 0.35);
+}
+html.dark #ia-dock #ia-chat-body {
+  background: rgba(11, 17, 32, 0.12);
+}
+html.dark #ia-dock .ia-msg.bot {
+  background: rgba(30, 41, 59, 0.55);
+}
+html.dark #ia-dock #ia-chat-input input {
+  background: rgba(15, 23, 42, 0.45);
+}
+html.dark #ia-dock .ia-task,
+html.dark .ia-coleta,
+html.dark .ia-historico {
+  background: rgba(30, 41, 59, 0.35);
+}
+html.dark .ia-coleta-topo,
+html.dark .ia-hist-topo {
+  background: rgba(30, 41, 59, 0.5);
+}
+/* As divisoes internas em azul do gradiente, nao cinza: #334155 sobre #0b1120
+ * le uma linha morta; rgba(59,130,246,.25) le uma linha viva. */
+html.dark #ia-dock #ia-chat-head,
+html.dark #ia-dock #ia-chat-input,
+html.dark #ia-dock #ia-progress,
+html.dark #ia-dock #ia-tasks,
+html.dark #ia-dock .ia-msg.bot,
+html.dark #ia-dock .ia-chip,
+html.dark #ia-dock .ia-task,
+html.dark #ia-dock .ia-task-done,
+html.dark .ia-rail-sep,
+html.dark .ia-rail-menu,
+html.dark .ia-coleta,
+html.dark .ia-coleta-linha,
+html.dark .ia-historico {
+  border-color: rgba(59, 130, 246, 0.25);
+}
+/* O xadrez da moldura do print: branco sobre slate, nao sobre cinza. */
+html.dark #ia-print-caixa {
+  background: rgba(30, 41, 59, 0.35);
+}
+/* O separador e' uma LINHA de 1px: pinta-se por fundo, nao por borda — por
+ * isso vem aqui e nao na lista de bordas acima. */
+html.dark .ia-rail-sep {
+  background: rgba(59, 130, 246, 0.25);
+}
+/* A divisoria entre a faixa e a janela: azul do gradiente, nao cinza. */
+html.dark .ia-rail {
+  border-right-color: rgba(59, 130, 246, 0.25);
+}
+html.dark #ia-dock .ia-print-img {
+  border-color: rgba(59, 130, 246, 0.25);
+}
+
+/* ── WELCOME CARD (primeiro uso do "Selecionar área") ───────────────────────────
+ *
+ * Um card modal bonito que explica a funcionalidade na primeira vez.
+ * Respeita a preferência "não mostrar novamente" no localStorage.
+ */
+
+.ia-print-welcome-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(11, 17, 32, 0.7);
+  backdrop-filter: blur(4px);
+  animation: ia-print-welcome-fade-in 0.2s ease;
+}
+
+@keyframes ia-print-welcome-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.ia-print-welcome-overlay.ia-print-welcome-hiding {
+  animation: ia-print-welcome-fade-out 0.2s ease forwards;
+}
+
+@keyframes ia-print-welcome-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.ia-print-welcome-card {
+  width: 100%;
+  max-width: 440px;
+  margin: 20px;
+  background: var(--cor-fundo-card, #fdfefe);
+  border: 1px solid var(--cor-borda, #e5e7eb);
+  border-radius: 16px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+  animation: ia-print-welcome-slide-up 0.25s ease;
+}
+
+@keyframes ia-print-welcome-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+html.dark .ia-print-welcome-card {
+  background: rgba(30, 41, 59, 0.95);
+  border-color: rgba(59, 130, 246, 0.25);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+}
+
+.ia-print-welcome-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 20px 12px;
+  border-bottom: 1px solid var(--cor-borda, #e5e7eb);
+}
+
+html.dark .ia-print-welcome-header {
+  border-color: rgba(59, 130, 246, 0.25);
+}
+
+.ia-print-welcome-icon {
+  flex: 0 0 40px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--cor-primaria, #0f9d6e), var(--cor-acento, #3ec48f));
+  color: #fff;
+}
+
+.ia-print-welcome-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--cor-texto, #1d2421);
+  letter-spacing: -0.02em;
+}
+
+html.dark .ia-print-welcome-title {
+  color: #e2e8f0;
+}
+
+.ia-print-welcome-body {
+  padding: 16px 20px;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--cor-texto, #1d2421);
+}
+
+html.dark .ia-print-welcome-body {
+  color: #cbd5e1;
+}
+
+.ia-print-welcome-body p {
+  margin: 0 0 12px;
+}
+
+.ia-print-welcome-body p:last-child {
+  margin-bottom: 0;
+}
+
+.ia-print-welcome-body strong {
+  color: var(--cor-texto, #1d2421);
+  font-weight: 700;
+}
+
+html.dark .ia-print-welcome-body strong {
+  color: #e2e8f0;
+}
+
+.ia-print-welcome-body ul {
+  margin: 8px 0 12px;
+  padding-left: 20px;
+}
+
+.ia-print-welcome-body li {
+  margin-bottom: 6px;
+}
+
+.ia-print-welcome-tip {
+  font-size: 12.5px;
+  color: var(--cor-texto-suave, #5f6b66);
+  background: var(--cor-suave, #f3f7f5);
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--cor-borda, #e5e7eb);
+}
+
+html.dark .ia-print-welcome-tip {
+  background: rgba(30, 41, 59, 0.5);
+  border-color: rgba(59, 130, 246, 0.25);
+  color: #94a3b8;
+}
+
+.ia-print-welcome-tip strong {
+  color: var(--cor-primaria, #0f9d6e);
+}
+
+.ia-print-welcome-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 20px 20px;
+  border-top: 1px solid var(--cor-borda, #e5e7eb);
+}
+
+html.dark .ia-print-welcome-footer {
+  border-color: rgba(59, 130, 246, 0.25);
+}
+
+.ia-print-welcome-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--cor-texto, #1d2421);
+  cursor: pointer;
+}
+
+html.dark .ia-print-welcome-checkbox {
+  color: #cbd5e1;
+}
+
+.ia-print-welcome-checkbox input[type='checkbox'] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--cor-primaria, #0f9d6e);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.ia-print-welcome-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.ia-print-welcome-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 18px;
+  font-size: 13.5px;
+  font-weight: 600;
+  border-radius: 10px;
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  min-width: 100px;
+}
+
+.ia-print-welcome-btn-primary {
+  background: var(--cor-primaria, #0f9d6e);
+  color: #fff;
+  border-color: var(--cor-primaria, #0f9d6e);
+}
+
+.ia-print-welcome-btn-primary:hover {
+  filter: brightness(1.08);
+  box-shadow: 0 4px 12px rgba(15, 157, 110, 0.35);
+}
+
+.ia-print-welcome-btn-secondary {
+  background: transparent;
+  color: var(--cor-texto-suave, #5f6b66);
+  border-color: var(--cor-borda, #e5e7eb);
+}
+
+html.dark .ia-print-welcome-btn-secondary {
+  color: #94a3b8;
+  border-color: rgba(59, 130, 246, 0.25);
+}
+
+.ia-print-welcome-btn-secondary:hover {
+  background: var(--cor-suave, #f3f7f5);
+  border-color: var(--cor-primaria, #0f9d6e);
+  color: var(--cor-primaria, #0f9d6e);
+}
+
+html.dark .ia-print-welcome-btn-secondary:hover {
+  background: rgba(30, 41, 59, 0.5);
+}
+
+/* ── PRINT CARD IMPROVADO (acima do campo de chat) ──────────────────────────── */
+
+.ia-print-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--cor-borda, #e5e7eb);
+}
+
+html.dark .ia-print-topo {
+  border-color: rgba(59, 130, 246, 0.25);
+}
+
+.ia-print-topo-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ia-print-topo-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--cor-primaria, #0f9d6e);
+}
+
+.ia-print-topo-size {
+  font-size: 11.5px;
+  color: var(--cor-texto-suave, #5f6b66);
+  font-weight: 500;
+}
+
+html.dark .ia-print-topo-size {
+  color: #94a3b8;
+}
+
+.ia-print-x {
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--cor-borda, #e5e7eb);
+  background: transparent;
+  color: var(--cor-texto-suave, #5f6b66);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  padding: 0;
+}
+
+html.dark .ia-print-x {
+  border-color: rgba(59, 130, 246, 0.25);
+  color: #94a3b8;
+}
+
+.ia-print-x:hover {
+  background: transparent;
+  color: var(--cor-erro, #d93a3a);
+  border-color: var(--cor-erro, #d93a3a);
+}
+
+.ia-print-x svg {
+  width: 14px;
+  height: 14px;
+}
+
+.ia-print-fita {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.ia-print-img {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  max-height: 260px;
+  object-fit: contain;
+  object-position: center;
+  cursor: zoom-in;
+  border: 1px solid var(--cor-borda, #e5e7eb);
+  border-radius: 10px;
+  background: repeating-conic-gradient(var(--cor-suave, #f3f7f5) 0% 25%, #ffffff 0% 50%) 50% / 16px
+    16px;
+  box-shadow: 0 1px 3px var(--cor-sombra, rgba(29, 36, 33, 0.12));
+  transition: box-shadow 0.15s ease;
+}
+
+html.dark .ia-print-img {
+  border-color: rgba(59, 130, 246, 0.25);
+  background: repeating-conic-gradient(
+      rgba(59, 130, 246, 0.15) 0% 25%,
+      rgba(30, 41, 59, 0.5) 0% 50%
+    )
+    50% / 16px 16px;
+}
+
+.ia-print-img:hover {
+  box-shadow: 0 4px 12px var(--cor-sombra, rgba(29, 36, 33, 0.18));
+}
+
+.ia-print-acoes {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 7px;
+}
+
+.ia-print-acao-principal {
+  background: var(--cor-primaria, #0f9d6e) !important;
+  border-color: var(--cor-primaria, #0f9d6e) !important;
+  color: #fff !important;
+}
+
+.ia-print-acao-principal:hover {
+  filter: brightness(1.08) !important;
+  box-shadow: 0 2px 8px rgba(15, 157, 110, 0.35) !important;
+}
+
+.ia-print-acao-principal svg {
+  flex-shrink: 0;
+}
+
+.ia-print-acoes .ia-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 7px 12px;
+  border-radius: 8px;
+  border: 1.5px solid var(--cor-borda, #e5e7eb);
+  background: transparent;
+  color: var(--cor-texto-suave, #5f6b66);
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+html.dark .ia-print-acoes .ia-chip {
+  border-color: rgba(59, 130, 246, 0.25);
+  color: #94a3b8;
+}
+
+.ia-print-acoes .ia-chip:hover {
+  background: transparent;
+  border-color: var(--cor-primaria, #0f9d6e);
+  color: var(--cor-primaria, #0f9d6e);
+}
+
+.ia-print-acoes .ia-chip svg {
+  flex-shrink: 0;
+}
+
+/* ── TOAST DE SUCESSO ─────────────────────────────────────────────────────────
+ *
+ * Um toast bonito que aparece no canto inferior direito ao capturar o print.
+ * Substitui as mensagens baseadas em spans por um card component adequado.
+ */
+
+.ia-print-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 2147483646;
+  opacity: 0;
+  transform: translateX(100%) translateY(10px);
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
+  pointer-events: auto;
+}
+
+.ia-print-toast.ia-print-toast-show {
+  opacity: 1;
+  transform: translateX(0) translateY(0);
+}
+
+.ia-print-toast.ia-print-toast-hide {
+  opacity: 0;
+  transform: translateX(100%) translateY(10px);
+}
+
+.ia-print-toast-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  min-width: 280px;
+  max-width: 380px;
+  background: var(--cor-fundo-card, #fdfefe);
+  border: 1px solid var(--cor-borda, #e5e7eb);
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+}
+
+html.dark .ia-print-toast-content {
+  background: rgba(30, 41, 59, 0.95);
+  border-color: rgba(59, 130, 246, 0.25);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+}
+
+.ia-print-toast-icon {
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--cor-primaria, #0f9d6e), var(--cor-acento, #3ec48f));
+  color: #fff;
+}
+
+.ia-print-toast-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.ia-print-toast-text strong {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--cor-texto, #1d2421);
+}
+
+html.dark .ia-print-toast-text strong {
+  color: #e2e8f0;
+}
+
+.ia-print-toast-text span {
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--cor-texto-suave, #5f6b66);
+}
+
+html.dark .ia-print-toast-text span {
+  color: #94a3b8;
+}
+
+.ia-print-toast-close {
+  flex: 0 0 24px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--cor-texto-fraco, #8b9792);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  padding: 0;
+  transition: all 0.12s ease;
+}
+
+html.dark .ia-print-toast-close {
+  color: #64748b;
+}
+
+.ia-print-toast-close:hover {
+  background: var(--cor-suave, #f3f7f5);
+  color: var(--cor-erro, #d93a3a);
+}
+
+html.dark .ia-print-toast-close:hover {
+  background: rgba(59, 130, 246, 0.15);
+}
+
+/* ── SELETOR DE ÁREA NA PÁGINA (sem captura, sem permissão) ──────────────────
+ *
+ * A camada cobre a viewport com um véu leve; o retângulo é a borda verde da
+ * casa sobre fundo translúcido. Nada de `z-index` tímido: 2147483646 fica
+ * acima do chat do dock, para dar para selecionar inclusive sobre ele. */
+
+.ia-print-seletor {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483646;
+  cursor: crosshair;
+  background: rgba(11, 17, 32, 0.28);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+.ia-print-seletor-rect {
+  position: fixed;
+  border: 2px solid var(--cor-primaria, #0f9d6e);
+  background: rgba(15, 157, 110, 0.1);
+  box-shadow: 0 0 0 9999px rgba(11, 17, 32, 0.35);
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+.ia-print-seletor-dica {
+  position: fixed;
+  left: 50%;
+  bottom: 22px;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.85);
+  color: #fff;
+  font:
+    600 12.5px system-ui,
+    sans-serif;
+  padding: 8px 14px;
+  border-radius: 18px;
+  pointer-events: none;
+  white-space: nowrap;
+  max-width: 94vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* O ✕ do seletor: no celular não há Esc, e sem botão visível a única
+ * saída era recarregar a página. Fixo no canto, acima da dica. */
+.ia-print-seletor-x {
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 0 2px;
+}
+
+.ia-print-seletor-x:hover {
+  background: var(--cor-erro, #d93a3a);
+  border-color: var(--cor-erro, #d93a3a);
+}
+
+/* ── MODAL DA CHAVE (colar -> testar -> confirmar) ─────────────────────────────
+ *
+ * Card no centro da tela, não dentro do chat: colar chave lendo conversa
+ * ao lado é pedir erro de cópia. Mesma língua do welcome card (overlay,
+ * raio, tokens da casa) para não inventar uma segunda paleta. */
+
+.ia-chave-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(11, 17, 32, 0.7);
+  backdrop-filter: blur(4px);
+  animation: ia-print-welcome-fade-in 0.2s ease;
+}
+
+.ia-chave {
+  width: 100%;
+  max-width: 440px;
+  margin: 20px;
+  background: var(--cor-fundo-card, #fdfefe);
+  border: 1px solid var(--cor-borda, #e5e7eb);
+  border-radius: 16px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+  animation: ia-print-welcome-slide-up 0.25s ease;
+}
+
+html.dark .ia-chave {
+  background: rgba(30, 41, 59, 0.95);
+  border-color: rgba(59, 130, 246, 0.25);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+}
+
+.ia-chave-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 16px 20px 12px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--cor-texto, #1d2421);
+  border-bottom: 1px solid var(--cor-borda, #e5e7eb);
+}
+
+html.dark .ia-chave-topo {
+  color: #e2e8f0;
+  border-color: rgba(59, 130, 246, 0.25);
+}
+
+.ia-chave-fechar {
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--cor-borda, #e5e7eb);
+  background: transparent;
+  color: var(--cor-texto-suave, #5f6b66);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  padding: 0;
+}
+
+html.dark .ia-chave-fechar {
+  border-color: rgba(59, 130, 246, 0.25);
+  color: #94a3b8;
+}
+
+.ia-chave-fechar:hover {
+  color: var(--cor-erro, #d93a3a);
+  border-color: var(--cor-erro, #d93a3a);
+}
+
+.ia-chave-corpo {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 20px 20px;
+}
+
+.ia-chave-estado {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.ia-chave-ligada {
+  color: var(--cor-primaria, #0f9d6e);
+}
+
+.ia-chave-desligada {
+  color: var(--cor-texto-suave, #5f6b66);
+}
+
+html.dark .ia-chave-desligada {
+  color: #94a3b8;
+}
+
+.ia-chave-rotulo {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cor-texto, #1d2421);
+}
+
+html.dark .ia-chave-rotulo {
+  color: #e2e8f0;
+}
+
+.ia-chave-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  font-size: 13.5px;
+  border: 1.5px solid var(--cor-borda, #e5e7eb);
+  border-radius: 10px;
+  background: var(--cor-fundo-card-aninhado, #f3f7f5);
+  color: var(--cor-texto, #1d2421);
+}
+
+html.dark .ia-chave-input {
+  background: rgba(15, 23, 42, 0.45);
+  border-color: rgba(59, 130, 246, 0.25);
+  color: #e2e8f0;
+}
+
+.ia-chave-input:focus {
+  outline: none;
+  border-color: var(--cor-primaria, #0f9d6e);
+  box-shadow: 0 0 0 3px var(--cor-hover, rgba(15, 157, 110, 0.1));
+}
+
+.ia-chave-nota {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--cor-texto-suave, #5f6b66);
+}
+
+html.dark .ia-chave-nota {
+  color: #94a3b8;
+}
+
+/* O resultado do teste: verde acende, vermelho avisa. Sem cor, o produtor
+ * não distingue "testada e válida" de "testada e recusada". */
+.ia-chave-teste {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1.5px solid transparent;
+}
+
+.ia-chave-teste[hidden] {
+  display: none;
+}
+
+.ia-chave-teste-ok {
+  color: var(--cor-primaria, #0f9d6e);
+  background: var(--cor-hover, rgba(15, 157, 110, 0.1));
+  border-color: var(--cor-primaria, #0f9d6e);
+}
+
+.ia-chave-teste-erro {
+  color: var(--cor-erro, #d93a3a);
+  background: rgba(217, 58, 58, 0.07);
+  border-color: var(--cor-erro, #d93a3a);
+}
+
+.ia-chave-accoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ia-chave-btn {
+  flex: 1 1 auto;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 10px;
+  border: 1.5px solid var(--cor-borda, #e5e7eb);
+  background: transparent;
+  color: var(--cor-texto-suave, #5f6b66);
+  cursor: pointer;
+  transition: all 0.12s ease;
+  white-space: nowrap;
+}
+
+html.dark .ia-chave-btn {
+  border-color: rgba(59, 130, 246, 0.25);
+  color: #94a3b8;
+}
+
+.ia-chave-btn:hover:not(:disabled) {
+  border-color: var(--cor-primaria, #0f9d6e);
+  color: var(--cor-primaria, #0f9d6e);
+}
+
+.ia-chave-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.ia-chave-gravar:not(:disabled) {
+  background: var(--cor-primaria, #0f9d6e);
+  border-color: var(--cor-primaria, #0f9d6e);
+  color: #fff;
+}
+
+.ia-chave-gravar:not(:disabled):hover {
+  filter: brightness(1.08);
+  color: #fff;
+}
+
+.ia-chave-apagar[hidden] {
+  display: none;
+}
+
+.ia-chave-apagar:hover:not(:disabled) {
+  border-color: var(--cor-erro, #d93a3a);
+  color: var(--cor-erro, #d93a3a);
+}
+
+.ia-chave-aviso {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--cor-alerta, #c98a24);
+}
+
+.ia-chave-aviso[hidden] {
+  display: none;
+}
+
+/* ── MINIATURA NA BOLHA DO CHAT ───────────────────────────────────────────────
+ *
+ * A pergunta sobre a imagem entra na conversa junto da miniatura que a
+ * motivou — sem isso, reler depois é ler uma pergunta sobre uma imagem que
+ * já não está lá. A bolha do produtor é flex column aqui (o global a põe
+ * em linha); a imagem limita a altura para não engolir a conversa. */
+
+.ia-msg-com-imagem {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.ia-msg-img {
+  display: block;
+  width: 100%;
+  max-height: 180px;
+  object-fit: contain;
+  object-position: center;
+  border-radius: 8px;
+  margin-bottom: 6px;
+  background: repeating-conic-gradient(var(--cor-suave, #f3f7f5) 0% 25%, #ffffff 0% 50%) 50% / 16px
+    16px;
+}
+
+html.dark .ia-msg-img {
+  background: repeating-conic-gradient(
+      rgba(59, 130, 246, 0.15) 0% 25%,
+      rgba(30, 41, 59, 0.5) 0% 50%
+    )
+    50% / 16px 16px;
+}
+
+/* Responsivo para mobile */
+@media (max-width: 520px) {
+  .ia-print-welcome-card {
+    margin: 12px;
+    border-radius: 12px;
+  }
+
+  .ia-print-toast {
+    bottom: 16px;
+    right: 16px;
+    left: 16px;
+  }
+
+  .ia-print-toast-content {
+    min-width: 0;
+    max-width: none;
+  }
+
+  .ia-print-caixa {
+    padding: 10px 12px 11px;
+  }
+
+  .ia-print-fita {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .ia-print-acoes {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .ia-print-acoes .ia-chip {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+}

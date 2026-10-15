@@ -1,0 +1,445 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Ampliagro - configuração inicial da sua propriedade.">
+    <title>Ampliagro — Configuração inicial</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Sora:wght@500;600;700;800&display=swap">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<link rel="stylesheet" href="{% static 'css/paginas/onboarding.css' %}">
+</head>
+<body>
+    <main class="onb-layout">
+
+        <!-- ══ COLUNA DA ESQUERDA: MARCA + ETAPAS NO TOPO, MAPA ABAIXO ══ -->
+        <div class="onb-showcase">
+
+            <!-- Cabecalho: marca a esquerda, etapas a direita, na MESMA faixa.
+                 As etapas eram uma coluna lateral de 315px que roubava largura
+                 do mapa e deixava ~380px vazios acima e abaixo dela. -->
+            <header class="onb-topo">
+                <div class="onb-marca">
+                    <h1>Ampliagro</h1>
+                    <p>Sistema de gestão do agro 5.0</p>
+                </div>
+                <ul class="onb-checklist" id="onb-checklist">
+                    <li data-step="1" class="current"><span class="onb-mark">1</span> Boas-vindas</li>
+                    <li data-step="2"><span class="onb-mark">2</span> Desenhar no mapa</li>
+                    <li data-step="3"><span class="onb-mark">3</span> Confirmar</li>
+                </ul>
+            </header>
+
+            <div class="onb-corpo">
+                <div class="onb-mapa-area">
+                    <div id="onb-mapa"></div>
+
+                    <div class="onb-map-overlay onb-map-tools">
+                        <button type="button" class="onb-mapbtn" id="onb-btn-localizar" title="Usar minha localização">
+                            <i class="bi bi-crosshair"></i>
+                        </button>
+                        <button type="button" class="onb-mapbtn onb-btn-primary-map" id="onb-btn-desenhar" title="Desenhar contorno">
+                            <i class="bi bi-vector-pen"></i> Desenhar
+                        </button>
+                        <button type="button" class="onb-mapbtn" id="onb-btn-apagar" title="Apagar desenho" disabled>
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+
+                    <div class="onb-map-overlay onb-map-rodape">
+                        <div class="onb-mapstat">
+                            <span>Área desenhada</span>
+                            <b id="onb-area-calculada">—</b>
+                        </div>
+                        <div class="onb-mapstat">
+                            <span>Cidade / UF</span>
+                            <b id="onb-cidade-detectada">—</b>
+                        </div>
+                        <span class="onb-localizando" id="onb-localizando"></span>
+                        <span class="onb-aviso-local" id="onb-aviso-local" hidden></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ COLUNA DA DIREITA: OS DADOS ══ -->
+        <div class="onb-shell">
+        <div class="onb-card" id="onbCard">
+
+            <div class="onb-topnav">
+                <button type="button" onclick="alternarCoresOnboarding()" class="onb-iconbtn" title="Modo Claro/Escuro">
+                    <i class="bi bi-moon-stars-fill"></i>
+                </button>
+            </div>
+
+            <div class="onb-dots">
+                <div class="step-dot active" data-step="1"></div>
+                <div class="step-dot" data-step="2"></div>
+                <div class="step-dot" data-step="3"></div>
+            </div>
+
+            <!-- STEP 1 -->
+            <div class="step-panel active" id="step1">
+                <div class="onb-welcome">
+                    <h2 class="onb-panel-title">Bem-vindo ao Ampliagro!</h2>
+                    <p class="onb-panel-sub">
+                        {% if user_name %}Olá, {{ user_name }}. {% endif %}
+                        Desenhe o contorno da fazenda no mapa ao lado. A gente preenche
+                        cidade, estado e a área — você confere e corrige se precisar.
+                    </p>
+                </div>
+                <button onclick="goStep(2)" class="onb-btn onb-btn-primary">Começar <i class="bi bi-arrow-right ml-1"></i></button>
+            </div>
+
+            <!-- STEP 2 -->
+            <div class="step-panel" id="step2">
+                <h3 class="onb-panel-title">Sua propriedade</h3>
+                <p class="onb-panel-sub">
+                    Use <b>Desenhar</b> no mapa. Depois preencha ou corrija os dados aqui.
+                </p>
+
+                <div class="onb-field">
+                    <label class="onb-label" for="onb-nome">Nome da propriedade *</label>
+                    <input type="text" id="onb-nome" class="onb-input" placeholder="Ex: Fazenda São José" autocomplete="off">
+                </div>
+                <div class="onb-field">
+                    <label class="onb-label" for="onb-area">Área total (hectares) * <span class="onb-preenchido" id="onb-area-tag" hidden>do mapa</span></label>
+                    <input type="number" id="onb-area" step="0.1" min="0" class="onb-input" placeholder="Ex: 150.5">
+                    <small class="onb-hint">Preenchida pelo desenho. Se o seu dato real for outro, sobrescreva — o que vale é o que você digitar.</small>
+                </div>
+                <div class="onb-field">
+                    <label class="onb-label" for="onb-cidade">Cidade <span class="onb-optional">detectada</span></label>
+                    <input type="text" id="onb-cidade" class="onb-input" placeholder="Detectada pelo mapa">
+                </div>
+                <div class="onb-field">
+                    <label class="onb-label" for="onb-uf">Estado / UF <span class="onb-optional">detectado</span></label>
+                    <input type="text" id="onb-uf" class="onb-input" placeholder="Detectado pelo mapa" maxlength="2">
+                </div>
+                <div class="onb-field">
+                    <label class="onb-label" for="onb-documento">CPF ou CNPJ <span class="onb-optional">opcional</span></label>
+                    <input type="text" id="onb-documento" class="onb-input" placeholder="000.000.000-00" inputmode="numeric">
+                    <small class="onb-hint">Necessário só para emitir o LCDPR.</small>
+                </div>
+
+                <div class="onb-actions">
+                    <button onclick="goStep(1)" class="onb-btn onb-btn-ghost">Voltar</button>
+                    <button onclick="goStep(3)" class="onb-btn onb-btn-primary">Próximo <i class="bi bi-arrow-right ml-1"></i></button>
+                </div>
+            </div>
+
+            <!-- STEP 3 -->
+            <div class="step-panel" id="step3">
+                <h3 class="onb-panel-title">Confirmar</h3>
+                <p class="onb-panel-sub">Confira antes de finalizar.</p>
+                <div class="onb-review" id="onb-review"></div>
+                <div class="onb-actions">
+                    <button onclick="goStep(2)" class="onb-btn onb-btn-ghost">Voltar</button>
+                    <button onclick="finalizar()" class="onb-btn onb-btn-primary"><i class="bi bi-check-lg mr-1"></i> Finalizar</button>
+                </div>
+            </div>
+
+            <div id="onb-loading" class="onb-loading hidden">
+                <div class="onb-spinner"></div>
+                <p>Configurando seu painel...</p>
+            </div>
+        </div>
+        </div>
+    </main>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+<script>
+    var currentStep = 1;
+    var _geo = { lat: null, lon: null, geom: null, cidade: '', uf: '', areaPreenchida: false };
+
+    function _aplicarTemaSalvo() {
+        try {
+            var p = JSON.parse(localStorage.getItem('ampliagro-preferences') || '{}');
+            var t = p.theme && p.theme.mode ? p.theme.mode : localStorage.getItem('theme');
+            t = String(t || '').toLowerCase();
+            var escuro = (t === 'escuro' || t === 'noite' || t === 'dark') ||
+                         (t === 'custom' && p.theme.custom && p.theme.custom.dark);
+            if (escuro) document.documentElement.classList.add('dark');
+        } catch(e) {}
+    }
+    _aplicarTemaSalvo();
+
+    function alternarCoresOnboarding() {
+        var h = document.documentElement;
+        if (h.classList.contains('dark')) {
+            h.classList.remove('dark');
+            localStorage.setItem('theme', 'light');
+        } else {
+            h.classList.add('dark');
+            localStorage.setItem('theme', 'dark');
+        }
+        if (window._onbMap) setTimeout(function () { window._onbMap.invalidateSize(); }, 80);
+    }
+
+    // ══ MAPA ══
+    var _map = null, _drawn = null, _pin = null;
+
+    function _initMapa() {
+        if (_map) return;
+        _map = L.map('onb-mapa', { zoomControl: true, attributionControl: true }).setView([-14.2, -51.9], 4);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19, attribution: '&copy; OpenStreetMap'
+        }).addTo(_map);
+        _drawn = new L.FeatureGroup().addTo(_map);
+
+        _map.on(L.Draw.Event.CREATED, function (e) {
+            _drawn.clearLayers();
+            _drawn.addLayer(e.layer);
+            _onbPoligonoMudou(e.layer);
+        });
+        _map.on(L.Draw.Event.EDITED, function () {
+            var ls = _drawn.getLayers();
+            if (ls.length) _onbPoligonoMudou(ls[ls.length - 1]);
+        });
+        _map.on(L.Draw.Event.DELETED, _onbDesenhoLimpo);
+
+        document.getElementById('onb-btn-desenhar').addEventListener('click', function () {
+            new L.Draw.Polygon(_map, { allowIntersection: false, showArea: true }).enable();
+        });
+        document.getElementById('onb-btn-apagar').addEventListener('click', function () {
+            _drawn.clearLayers();
+            _onbDesenhoLimpo();
+        });
+        document.getElementById('onb-btn-localizar').addEventListener('click', function () { _onbLocalizar(false); });
+
+        window._onbMap = _map;
+    }
+
+    // L.GeometryUtil.geodesicArea vem no bundle do leaflet-draw: devolve m².
+    // Se nao existir (bundle mudado), caimos para null e o produtor digita a area.
+    function _onbAreaM2(latlngs) {
+        try {
+            if (window.L && L.GeometryUtil && typeof L.GeometryUtil.geodesicArea === 'function') {
+                return L.GeometryUtil.geodesicArea(latlngs);
+            }
+        } catch (e) {}
+        return null;
+    }
+
+    function _onbPoligonoMudou(layer) {
+        _geo.geom = layer.toGeoJSON();
+        document.getElementById('onb-btn-apagar').disabled = false;
+
+        // Área: só preenche se o produtor ainda não digitou nada. Depois de
+        // editar o campo a mão, redesenhar NÃO sobrescreve o que ele escreveu.
+        var campoArea = document.getElementById('onb-area');
+        if (campoArea.value.trim() === '') {
+            var m2 = _onbAreaM2(layer.getLatLngs()[0]);
+            if (m2 != null && isFinite(m2)) {
+                campoArea.value = (m2 / 10000).toFixed(2);
+                _geo.areaPreenchida = true;
+                document.getElementById('onb-area-tag').hidden = false;
+            }
+        }
+        var areaTxt = document.getElementById('onb-area-calculada');
+        areaTxt.textContent = campoArea.value.trim() ? campoArea.value + ' ha' : '—';
+
+        var c = _drawn.getBounds().getCenter();
+        _geo.lat = c.lat; _geo.lon = c.lng;
+        _onbGeocodificar(c.lat, c.lng);
+    }
+
+    function _onbDesenhoLimpo() {
+        _geo.geom = null;
+        document.getElementById('onb-btn-apagar').disabled = true;
+        document.getElementById('onb-area-calculada').textContent = '—';
+    }
+
+    // Geocodificacao REVERSA: coordenada -> cidade/UF.
+    // Usa o Nominatim (OpenStreetMap). A API de busca do Open-Meteo NAO faz
+    // reversa — testado: /search?name=LAT,LON responde 200 sem `results`, e a
+    // tela ficava "não identificada" mesmo com o GPS certo.
+    function _onbGeocodificar(lat, lon) {
+        var aviso = document.getElementById('onb-cidade-detectada');
+        aviso.textContent = 'buscando…';
+        var url = 'https://nominatim.openstreetmap.org/reverse?format=jsonv2&addressdetails=1'
+                + '&accept-language=pt-BR&zoom=10&lat=' + lat + '&lon=' + lon;
+        fetch(url, { headers: { 'Accept': 'application/json' } })
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+                var a = (d && d.address) ? d.address : {};
+                // town/city/village/municipality: cada municipio brasileiro vem
+                // com uma chave diferente dependendo do porte.
+                var nome = a.city || a.town || a.village || a.municipality || a.county || '';
+                // A UF vem do codigo ISO (BR-SP), NAO dos 2 ultimos
+                // caracteres do nome do estado: "São Paulo".slice(-2) = "lo",
+                // que e o bug que o teste pegou. state_code tambem serve.
+                var uf = '';
+                var iso = a['ISO3166-2-lvl4'] || '';
+                if (iso.indexOf('-') >= 0) { uf = iso.split('-').pop().toUpperCase(); }
+                else if (a.state_code) { uf = String(a.state_code).toUpperCase(); }
+                else if (a.state && a.state.length > 2) { uf = a.state.slice(-2).toUpperCase(); }
+                _geo.cidade = nome; _geo.uf = uf;
+                aviso.textContent = nome ? nome + (uf ? ' / ' + uf : '') : 'não identificada';
+                var ci = document.getElementById('onb-cidade'), ufI = document.getElementById('onb-uf');
+                if (nome && ci.value.trim() === '') ci.value = nome;
+                if (uf && ufI.value.trim() === '') ufI.value = uf;
+            })
+            .catch(function () {
+                _geo.cidade = ''; _geo.uf = '';
+                aviso.textContent = 'sem conexão — informe ao lado';
+            });
+    }
+
+    // Localização: usada por clique no botao E automaticamente ao entrar.
+    // `silencioso` = true não abre modal. No automatico o produtor pode estar so
+    // olhando a tela de boas-vindas; um Swal na cara dele é interrupção. Se a
+    // permissão for negada, o mapa fica no centro do Brasil e o aviso vai para
+    // o rodapé, onde ele lê quando quiser.
+    function _onbLocalizar(silencioso) {
+        var btn = document.getElementById('onb-btn-localizar');
+        if (!navigator.geolocation) {
+            if (!silencioso) {
+                Swal.fire({ title: 'Sem GPS', text: 'Este navegador não oferece localização.', icon: 'info',
+                            background: 'var(--lc-panel-bg)', color: 'var(--lc-text-color)' });
+            }
+            return;
+        }
+        if (btn) btn.disabled = true;
+        var estado = document.getElementById('onb-localizando');
+        if (estado) estado.textContent = 'localizando…';
+        navigator.geolocation.getCurrentPosition(
+            function (pos) {
+                if (btn) btn.disabled = false;
+                if (estado) estado.textContent = '';
+                var lat = pos.coords.latitude, lon = pos.coords.longitude;
+                _map.setView([lat, lon], 14);
+                _geo.lat = lat; _geo.lon = lon;
+                if (_pin) { _map.removeLayer(_pin); }
+                _pin = L.marker([lat, lon]).addTo(_map);
+                _onbGeocodificar(lat, lon);
+            },
+            function () {
+                if (btn) btn.disabled = false;
+                if (estado) estado.textContent = '';
+                var aviso = document.getElementById('onb-aviso-local');
+                if (aviso) {
+                    aviso.textContent = 'localização indisponível — buscando no mapa à mão';
+                    aviso.hidden = false;
+                    setTimeout(function () { aviso.hidden = true; }, 7000);
+                }
+                if (!silencioso) {
+                    Swal.fire({ title: 'Localização negada', text: 'Liber o acesso à localização no navegador.',
+                                icon: 'warning', background: 'var(--lc-panel-bg)', color: 'var(--lc-text-color)' });
+                }
+            },
+            { enableHighAccuracy: false, timeout: 8000, maximumAge: 60000 }
+        );
+    }
+
+    function goStep(n) {
+        document.querySelectorAll('.step-panel').forEach(function (p) { p.classList.remove('active'); });
+        document.getElementById('step' + n).classList.add('active');
+        document.querySelectorAll('.step-dot').forEach(function (d) {
+            var s = parseInt(d.dataset.step);
+            d.classList.remove('active', 'done');
+            if (s === n) d.classList.add('active');
+            else if (s < n) d.classList.add('done');
+        });
+        document.querySelectorAll('#onb-checklist li').forEach(function (li) {
+            var s = parseInt(li.dataset.step);
+            li.classList.remove('current', 'done');
+            if (s === n) li.classList.add('current');
+            else if (s < n) li.classList.add('done');
+        });
+        currentStep = n;
+        if (n >= 2 && _map) setTimeout(function () { _map.invalidateSize(); }, 90);
+        if (n === 3) _renderReview();
+    }
+
+    function _renderReview() {
+        var g = function (id) { var v = document.getElementById(id).value.trim(); return v || '—'; };
+        var linhas = [
+            ['Propriedade', g('onb-nome')],
+            ['Área', g('onb-area') + ' ha'],
+            ['Cidade / UF', g('onb-cidade') + ' / ' + g('onb-uf')],
+            ['Contorno', _geo.geom ? 'desenhado' : 'não desenhado'],
+            ['CPF / CNPJ', g('onb-documento')]
+        ];
+        document.getElementById('onb-review').innerHTML = linhas.map(function (l) {
+            return '<div class="onb-resumo-linha"><span>' + l[0] + '</span><b>' + l[1] + '</b></div>';
+        }).join('');
+    }
+
+    function finalizar() {
+        var nome = document.getElementById('onb-nome').value.trim();
+        var area = document.getElementById('onb-area').value.trim();
+        var faltando = [];
+        if (!nome) faltando.push('o nome da propriedade');
+        if (!area || parseFloat(area) <= 0) faltando.push('a área total (desenhe no mapa ou digite)');
+        if (faltando.length) {
+            Swal.fire({
+                title: 'Falta ' + (faltando.length > 1 ? 'alguns dados' : 'um dado'),
+                html: 'Preencha ' + faltando.join(', ') + ' para continuar.',
+                icon: 'warning', background: 'var(--lc-panel-bg)', color: 'var(--lc-text-color)',
+                confirmButtonColor: 'var(--auth-accent)'
+            });
+            return;
+        }
+        var payload = {
+            nome_fazenda: nome,
+            documento: document.getElementById('onb-documento').value.trim(),
+            area: area,
+            cidade: document.getElementById('onb-cidade').value.trim(),
+            estado: document.getElementById('onb-uf').value.trim().toUpperCase().slice(0, 2),
+            lat: _geo.lat, lon: _geo.lon,
+            geometria: _geo.geom,
+        };
+        window.__onbFinalizando = true;
+        document.getElementById('onb-loading').classList.remove('hidden');
+        fetch('/api/onboarding/save/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
+            body: JSON.stringify(payload),
+        })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+            if (data.ok) { window.location.href = (data.redirect || '/dashboard/') + '?onboarded=1'; }
+            else { Swal.fire({title:'Erro', text:data.erro||'Erro ao salvar', icon:'error', background:'var(--lc-panel-bg)', color:'var(--lc-text-color)'}); document.getElementById('onb-loading').classList.add('hidden'); window.__onbFinalizando=false; }
+        })
+        .catch(function () { Swal.fire({title:'Erro de conexão', text:'Não foi possível falar com o servidor.', icon:'error', background:'var(--lc-panel-bg)', color:'var(--lc-text-color)'}); document.getElementById('onb-loading').classList.add('hidden'); window.__onbFinalizando=false; });
+    }
+
+    function getCookie(name) {
+        var v = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+        return v ? v.pop() : '';
+    }
+    // Receber mensagens do Service Worker para reinicializar o mapa
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.addEventListener('message', function(event) {
+            if (event.data && event.data.type === 'RESET_MAP') {
+                // Reinicializa o mapa do onboarding
+                window._onbMap?.invalidateSize();
+                _map?.invalidateSize();
+            }
+        });
+    }
+
+    // O mapa e a tela de boas-vindas: ele ja aparece na etapa 1, entao e
+    // inicializado no load, nao quando o produtor avanca. Sem isso ficava um
+    // retangulo vazio ate a etapa 2.
+    _initMapa();
+    setTimeout(function () { if (_map) _map.invalidateSize(); }, 120);
+    window.addEventListener('resize', function () { if (_map) _map.invalidateSize(); });
+
+    // Ao entrar, ja centraliza no produtor. Antes ele tinha que clicar no botao
+    // e depois procurar a fazenda no mapa inteiro — o tempo que o GPS evita.
+    //maximumAge de 60s reaproveita a posicao recente em vez de pedir o GPS de novo.
+    setTimeout(function () { _onbLocalizar(true); }, 350);
+</script>
+</body>
+</html>

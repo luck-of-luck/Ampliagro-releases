@@ -1,0 +1,1015 @@
+/* ==========================================================================
+   LIQUID GLASS — PRESET MODAL
+   Design Variables + Full Component Styles (self-contained)
+   ========================================================================== */
+
+/* ==========================================================================
+   1. VARIÁVEIS DO LIQUID GLASS (escoped ao modal)
+   ========================================================================== */
+
+/* Light mode */
+.preset-modal-box,
+.widget-modal-box {
+  --lg-item-bg: rgba(255, 255, 255, 0.12);
+  --lg-item-hover: rgba(255, 255, 255, 0.22);
+  --lg-glass-bg: rgba(255, 255, 255, 0.15);
+  --lg-primary: #0f9d6e;
+  --lg-primary-glow: rgba(15, 157, 110, 0.35);
+  --lg-input-bg: rgba(255, 255, 255, 0.08);
+  --lc-subtext: rgba(24, 34, 30, 0.75);
+  --lg-text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+  --lg-icon-shadow: drop-shadow(0 1px 1px rgba(255, 255, 255, 0.5));
+}
+
+/* Dark mode */
+html.dark .preset-modal-box,
+body.dark-mode .preset-modal-box,
+html.dark .widget-modal-box,
+body.dark-mode .widget-modal-box {
+  --lg-item-bg: rgba(255, 255, 255, 0.06);
+  --lg-item-hover: rgba(255, 255, 255, 0.12);
+  --lg-glass-bg: rgba(255, 255, 255, 0.08);
+  --lg-primary: #14d49a;
+  --lg-primary-glow: rgba(20, 212, 154, 0.3);
+  --lg-input-bg: rgba(255, 255, 255, 0.04);
+  --lc-subtext: rgba(255, 255, 255, 0.7);
+  --lg-text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  --lg-icon-shadow: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+}
+
+/* ==========================================================================
+   2. RESET — Neutraliza .lc-panel global (mantém pseudo-elements controlados)
+   ========================================================================== */
+
+/* Overlay e container wrapper — totalmente transparentes */
+#ia-panel-overlay,
+#preset-modal-overlay,
+#preset-modal {
+  background-color: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Reset do .lc-panel global — NÃO matar filter/pseudo-elements,
+   apenas redirecionar para o efeito liquid glass real */
+.preset-modal-box.lc-panel,
+.widget-modal-box.lc-panel {
+  background-image: none !important;
+  mask: none !important;
+  -webkit-mask: none !important;
+  animation: none !important;
+}
+
+/* ==========================================================================
+   3. PAINEL MODAL — GRADIENTE OPACO COM BORDAS VERDES
+   Design limpo e prático: gradiente opaco (light/dark), borda verde,
+   sem efeitos de vidro/liquid glass.
+   ========================================================================== */
+.preset-modal-box.lc-panel,
+.widget-modal-box.lc-panel {
+  /* Estrutura */
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  isolation: auto !important;
+  overflow: hidden !important;
+
+  /* Gradiente opaco — Light mode */
+  background: linear-gradient(
+    135deg,
+    rgba(15, 157, 110, 0.04) 0%,
+    rgba(15, 157, 110, 0.08) 50%,
+    rgba(15, 157, 110, 0.02) 100%
+  ) !important;
+  /* Overlay branco semi-transparente para legibilidade */
+  background-blend-mode: overlay, normal !important;
+
+  /* Borda verde do sistema */
+  border: 1.5px solid var(--pal-accent, #0f9d6e) !important;
+  border-radius: 16px !important;
+
+  /* Sombra suave com tom verde */
+  box-shadow:
+    0 4px 24px rgba(15, 157, 110, 0.12),
+    0 1px 3px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6) !important;
+
+  /* Sem backdrop-filter/glass */
+  background-color: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  filter: none !important;
+
+  transition:
+    box-shadow 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.15s ease;
+
+  /* Dimensões */
+  width: 100%;
+  padding: 1.5rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+  color: var(--lc-text-color);
+}
+
+/* Dark mode — gradiente mais profundo com verde */
+html.dark .preset-modal-box.lc-panel,
+html.dark .widget-modal-box.lc-panel,
+body.dark-mode .preset-modal-box.lc-panel,
+body.dark-mode .widget-modal-box.lc-panel {
+  background: linear-gradient(
+    135deg,
+    rgba(62, 196, 143, 0.12) 0%,
+    rgba(62, 196, 143, 0.18) 50%,
+    rgba(62, 196, 143, 0.08) 100%
+  ) !important;
+  background-blend-mode: overlay, normal !important;
+
+  border-color: var(--pal-accent, #3ec48f) !important;
+
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.35),
+    0 1px 3px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+.preset-modal-box.lc-panel {
+  max-width: 480px;
+}
+
+/* ── REMOVER CAMADAS DE VIDRO (::after, ::before) ──
+   O liquid glass SVG displacementMap e specular edge são removidos
+   para dar lugar ao design opaco limpo. */
+.preset-modal-box.lc-panel::after,
+.widget-modal-box.lc-panel::after,
+.preset-modal-box.lc-panel::before,
+.widget-modal-box.lc-panel::before {
+  display: none !important;
+  content: none !important;
+}
+
+/* Focus ring verde ao focar inputs dentro do modal */
+.preset-modal-box.lc-panel:focus-within,
+.widget-modal-box.lc-panel:focus-within {
+  box-shadow:
+    0 4px 24px rgba(15, 157, 110, 0.12),
+    0 1px 3px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    0 0 0 3px var(--pal-accent, #0f9d6e) !important;
+}
+
+html.dark .preset-modal-box.lc-panel:focus-within,
+html.dark .widget-modal-box.lc-panel:focus-within,
+body.dark-mode .preset-modal-box.lc-panel:focus-within,
+body.dark-mode .widget-modal-box.lc-panel:focus-within {
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.35),
+    0 1px 3px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 0 0 3px var(--pal-accent, #3ec48f) !important;
+}
+
+/* Linha sutil no topo do painel para profundidade */
+.preset-modal-box.lc-panel::before,
+.widget-modal-box.lc-panel::before {
+  content: '' !important;
+  display: block !important;
+  position: absolute !important;
+  top: -1.5px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: 90% !important;
+  height: 2px !important;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--pal-accent, #0f9d6e) 50%,
+    transparent 100%
+  ) !important;
+  opacity: 0.6 !important;
+  border-radius: 16px 16px 0 0 !important;
+  pointer-events: none !important;
+  z-index: 10 !important;
+}
+
+html.dark .preset-modal-box.lc-panel::before,
+html.dark .widget-modal-box.lc-panel::before,
+body.dark-mode .preset-modal-box.lc-panel::before,
+body.dark-mode .widget-modal-box.lc-panel::before {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--pal-accent, #3ec48f) 50%,
+    transparent 100%
+  ) !important;
+}
+
+/* Inputs internos — glass sutil */
+.preset-modal-box .lc-input,
+.widget-modal-box .lc-input {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(4px);
+  color: inherit;
+}
+
+/* ==========================================================================
+   4. HEADER
+   ========================================================================== */
+.preset-modal-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--pal-accent, #0f9d6e);
+  opacity: 0.3;
+}
+
+html.dark .preset-modal-header,
+body.dark-mode .preset-modal-header {
+  border-bottom-color: var(--pal-accent, #3ec48f);
+}
+
+/* Título Centralizado */
+.preset-modal-title-center,
+.widget-modal-title-center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: var(--lc-text-color);
+  text-shadow: var(--lg-text-shadow);
+  letter-spacing: -0.01em;
+  pointer-events: none;
+}
+
+.preset-modal-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--lc-subtext);
+  border: 1px solid var(--pal-accent, #0f9d6e);
+  transition: all 0.2s ease;
+  z-index: 2;
+  cursor: pointer;
+}
+
+html.dark .preset-modal-close,
+body.dark-mode .preset-modal-close {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--pal-accent, #3ec48f);
+}
+
+.preset-modal-close:hover {
+  background: rgba(15, 157, 110, 0.15);
+  color: var(--lc-text-color);
+  border-color: var(--pal-accent, #0f9d6e);
+  transform: scale(1.05);
+}
+
+html.dark .preset-modal-close:hover,
+body.dark-mode .preset-modal-close:hover {
+  background: rgba(62, 196, 143, 0.2);
+  border-color: var(--pal-accent, #3ec48f);
+}
+
+/* ==========================================================================
+   5. SCROLLBAR SUTIL
+   ========================================================================== */
+.hide-scrollbar::-webkit-scrollbar {
+  height: 2px;
+  width: 2px;
+}
+.hide-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.hide-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(150, 150, 150, 0.3);
+  border-radius: 10px;
+}
+
+/* ==========================================================================
+   6. CARROSSEL DE PRESETS — Gradiente opaco com borda verde
+   ========================================================================== */
+.preset-carousel-section {
+  background: linear-gradient(
+    135deg,
+    rgba(15, 157, 110, 0.04) 0%,
+    rgba(15, 157, 110, 0.08) 50%,
+    rgba(15, 157, 110, 0.02) 100%
+  ) !important;
+  background-blend-mode: overlay, normal !important;
+  border-radius: 16px !important;
+  padding: 1rem;
+  border: 1.5px solid var(--pal-accent, #0f9d6e) !important;
+  margin-bottom: 1.5rem;
+  box-shadow:
+    0 2px 8px rgba(15, 157, 110, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+  position: relative;
+}
+
+html.dark .preset-carousel-section,
+body.dark-mode .preset-carousel-section {
+  background: linear-gradient(
+    135deg,
+    rgba(62, 196, 143, 0.12) 0%,
+    rgba(62, 196, 143, 0.18) 50%,
+    rgba(62, 196, 143, 0.08) 100%
+  ) !important;
+  background-blend-mode: overlay, normal !important;
+  border-color: var(--pal-accent, #3ec48f) !important;
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Linha sutil no topo */
+.preset-carousel-section::before {
+  content: '' !important;
+  position: absolute !important;
+  top: -1.5px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: 90% !important;
+  height: 2px !important;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--pal-accent, #0f9d6e) 50%,
+    transparent 100%
+  ) !important;
+  opacity: 0.6 !important;
+  border-radius: 16px 16px 0 0 !important;
+  pointer-events: none !important;
+}
+
+html.dark .preset-carousel-section::before,
+body.dark-mode .preset-carousel-section::before {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--pal-accent, #3ec48f) 50%,
+    transparent 100%
+  ) !important;
+}
+
+.modal-preset-carousel {
+  display: flex;
+  gap: 0.8rem;
+  overflow-x: auto;
+  align-items: center;
+  padding-top: 3.5rem;
+  margin-top: -3.5rem;
+  padding-bottom: 0.5rem;
+}
+
+/* Modal Preset Card — Gradiente opaco com borda verde */
+.modal-preset-card {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(
+    135deg,
+    rgba(15, 157, 110, 0.06) 0%,
+    rgba(15, 157, 110, 0.1) 50%,
+    rgba(15, 157, 110, 0.04) 100%
+  ) !important;
+  background-blend-mode: overlay, normal !important;
+  border: 1.5px solid var(--pal-accent, #0f9d6e) !important;
+  box-shadow:
+    0 2px 8px rgba(15, 157, 110, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--lc-text-color);
+  flex-shrink: 0;
+  position: relative;
+}
+
+html.dark .modal-preset-card,
+body.dark-mode .modal-preset-card {
+  background: linear-gradient(
+    135deg,
+    rgba(62, 196, 143, 0.1) 0%,
+    rgba(62, 196, 143, 0.15) 50%,
+    rgba(62, 196, 143, 0.06) 100%
+  ) !important;
+  background-blend-mode: overlay, normal !important;
+  border-color: var(--pal-accent, #3ec48f) !important;
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Linha sutil no topo do card */
+.modal-preset-card::before {
+  content: '' !important;
+  position: absolute !important;
+  top: -1px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: 80% !important;
+  height: 1px !important;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--pal-accent, #0f9d6e) 50%,
+    transparent 100%
+  ) !important;
+  opacity: 0.5 !important;
+  border-radius: 12px 12px 0 0 !important;
+  pointer-events: none !important;
+}
+
+html.dark .modal-preset-card::before,
+body.dark-mode .modal-preset-card::before {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--pal-accent, #3ec48f) 50%,
+    transparent 100%
+  ) !important;
+}
+
+.modal-preset-card:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(15, 157, 110, 0.1) 0%,
+    rgba(15, 157, 110, 0.15) 50%,
+    rgba(15, 157, 110, 0.06) 100%
+  ) !important;
+  background-blend-mode: overlay, normal !important;
+  border-color: var(--pal-accent, #0f9d6e) !important;
+  transform: translateY(-1px);
+  box-shadow:
+    0 4px 12px rgba(15, 157, 110, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
+}
+
+html.dark .modal-preset-card:hover,
+body.dark-mode .modal-preset-card:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(62, 196, 143, 0.18) 0%,
+    rgba(62, 196, 143, 0.22) 50%,
+    rgba(62, 196, 143, 0.1) 100%
+  ) !important;
+  background-blend-mode: overlay, normal !important;
+  border-color: var(--pal-accent, #3ec48f) !important;
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+.modal-preset-card.active-preset {
+  background: linear-gradient(
+    135deg,
+    rgba(15, 157, 110, 0.12) 0%,
+    rgba(15, 157, 110, 0.18) 50%,
+    rgba(15, 157, 110, 0.08) 100%
+  ) !important;
+  background-blend-mode: overlay, normal !important;
+  color: var(--lc-text-color);
+  border: 2px solid var(--pal-accent, #0f9d6e) !important;
+  box-shadow:
+    0 4px 16px var(--lg-primary-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
+}
+
+html.dark .modal-preset-card.active-preset,
+body.dark-mode .modal-preset-card.active-preset {
+  background: linear-gradient(
+    135deg,
+    rgba(62, 196, 143, 0.2) 0%,
+    rgba(62, 196, 143, 0.28) 50%,
+    rgba(62, 196, 143, 0.14) 100%
+  ) !important;
+  background-blend-mode: overlay, normal !important;
+  border-color: var(--pal-accent, #3ec48f) !important;
+  box-shadow:
+    0 4px 16px var(--lg-primary-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+/* ==========================================================================
+   WIDGET CARDS — Gradiente opaco com borda verde
+   ========================================================================== */
+#add-widget-modal-panel .widget-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-radius: 12px;
+  background: linear-gradient(
+    135deg,
+    rgba(15, 157, 110, 0.06) 0%,
+    rgba(15, 157, 110, 0.1) 50%,
+    rgba(15, 157, 110, 0.04) 100%
+  ) !important;
+  background-blend-mode: overlay, normal !important;
+  border: 1.5px solid var(--pal-accent, #0f9d6e) !important;
+  box-shadow:
+    0 2px 8px rgba(15, 157, 110, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--lc-text-color);
+  position: relative;
+}
+
+/* Linha sutil no topo do card */
+#add-widget-modal-panel .widget-card::before {
+  content: '' !important;
+  position: absolute !important;
+  top: -1px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: 80% !important;
+  height: 1px !important;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--pal-accent, #0f9d6e) 50%,
+    transparent 100%
+  ) !important;
+  opacity: 0.5 !important;
+  border-radius: 12px 12px 0 0 !important;
+  pointer-events: none !important;
+}
+
+html.dark #add-widget-modal-panel .widget-card,
+body.dark-mode #add-widget-modal-panel .widget-card {
+  background: linear-gradient(
+    135deg,
+    rgba(62, 196, 143, 0.1) 0%,
+    rgba(62, 196, 143, 0.15) 50%,
+    rgba(62, 196, 143, 0.06) 100%
+  ) !important;
+  background-blend-mode: overlay, normal !important;
+  border-color: var(--pal-accent, #3ec48f) !important;
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+#add-widget-modal-panel .widget-card:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(15, 157, 110, 0.1) 0%,
+    rgba(15, 157, 110, 0.15) 50%,
+    rgba(15, 157, 110, 0.06) 100%
+  ) !important;
+  background-blend-mode: overlay, normal !important;
+  border-color: var(--pal-accent, #0f9d6e) !important;
+  transform: translateY(-1px);
+  box-shadow:
+    0 4px 12px rgba(15, 157, 110, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
+}
+
+html.dark #add-widget-modal-panel .widget-card:hover,
+body.dark-mode #add-widget-modal-panel .widget-card:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(62, 196, 143, 0.18) 0%,
+    rgba(62, 196, 143, 0.22) 50%,
+    rgba(62, 196, 143, 0.1) 100%
+  ) !important;
+  background-blend-mode: overlay, normal !important;
+  border-color: var(--pal-accent, #3ec48f) !important;
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+#add-widget-modal-panel .widget-card.widget-added {
+  background: linear-gradient(
+    135deg,
+    rgba(15, 157, 110, 0.12) 0%,
+    rgba(15, 157, 110, 0.18) 50%,
+    rgba(15, 157, 110, 0.08) 100%
+  ) !important;
+  background-blend-mode: overlay, normal !important;
+  color: var(--lc-text-color);
+  border: 2px solid var(--pal-accent, #0f9d6e) !important;
+  box-shadow:
+    0 4px 16px var(--lg-primary-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
+}
+
+html.dark #add-widget-modal-panel .widget-card.widget-added,
+body.dark-mode #add-widget-modal-panel .widget-card.widget-added {
+  background: linear-gradient(
+    135deg,
+    rgba(62, 196, 143, 0.2) 0%,
+    rgba(62, 196, 143, 0.28) 50%,
+    rgba(62, 196, 143, 0.14) 100%
+  ) !important;
+  background-blend-mode: overlay, normal !important;
+  border-color: var(--pal-accent, #3ec48f) !important;
+  box-shadow:
+    0 4px 16px var(--lg-primary-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+#add-widget-modal-panel .widget-card-icon {
+  background: transparent !important;
+  filter: var(--lg-icon-shadow);
+  font-size: 1.5rem;
+  margin: 0;
+  padding: 0;
+}
+
+#add-widget-modal-panel .widget-card-label {
+  font-size: 0.65rem;
+  font-weight: 500;
+  text-align: center;
+  color: var(--lc-subtext);
+  text-shadow: var(--lg-text-shadow);
+}
+#add-widget-modal-panel .widget-card:hover .widget-card-label {
+  color: var(--lc-text-color);
+}
+
+/* Tooltip do nome do preset */
+.preset-tooltip {
+  position: absolute;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%) translateY(5px);
+  background: rgba(0, 0, 0, 0.85);
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  z-index: 50;
+}
+.modal-preset-card:hover .preset-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+.modal-preset-add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--lg-item-bg);
+  border: none;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  color: var(--lc-subtext);
+  transition: all 0.3s;
+  cursor: pointer;
+}
+.modal-preset-add:hover {
+  background: var(--lg-item-hover);
+  color: var(--lc-text-color);
+  transform: scale(1.05);
+}
+
+.preset-trash-zone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.05);
+  color: #ef4444;
+  border: 1px dashed rgba(239, 68, 68, 0.3);
+  box-shadow: inset 0 1px 2px rgba(239, 68, 68, 0.1);
+  transition: all 0.3s;
+}
+.preset-trash-zone span {
+  display: none;
+}
+.preset-trash-zone:hover,
+.preset-trash-zone.drag-over {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  transform: scale(1.1);
+  border: 2px solid #ef4444;
+  box-shadow:
+    0 0 15px rgba(239, 68, 68, 0.4),
+    inset 0 0 10px rgba(239, 68, 68, 0.2);
+}
+
+/* ==========================================================================
+   7. FORMULÁRIO LIQUID
+   ========================================================================== */
+.preset-form-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  margin: 1.25rem 0;
+}
+html.dark .preset-form-divider,
+body.dark-mode .preset-form-divider {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.03), transparent);
+}
+
+.preset-form-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  color: var(--lc-subtext);
+  margin-bottom: 0.5rem;
+  text-shadow: var(--lg-text-shadow);
+}
+
+/* Glass Well Input — scoped ao modal para não vazar para o resto */
+.preset-modal-box .lc-input,
+.widget-modal-box .lc-input {
+  background: var(--lg-input-bg) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  border-radius: 14px !important;
+  color: var(--lc-text-color) !important;
+  box-shadow:
+    inset 0 2px 6px rgba(0, 0, 0, 0.1),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.02) !important;
+  transition: all 0.3s !important;
+}
+html.dark .preset-modal-box .lc-input,
+body.dark-mode .preset-modal-box .lc-input,
+html.dark .widget-modal-box .lc-input,
+body.dark-mode .widget-modal-box .lc-input {
+  box-shadow:
+    inset 0 2px 6px rgba(0, 0, 0, 0.3),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+}
+.preset-modal-box .lc-input::placeholder,
+.widget-modal-box .lc-input::placeholder {
+  color: var(--lc-subtext) !important;
+  opacity: 0.6;
+}
+.preset-modal-box .lc-input:focus,
+.widget-modal-box .lc-input:focus {
+  outline: none !important;
+  background: var(--lg-item-bg) !important;
+  box-shadow:
+    inset 0 2px 8px rgba(0, 0, 0, 0.2),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+    0 0 0 3px var(--lg-primary-glow) !important;
+}
+
+/* Guias de Categoria de Ícone (Tabs) */
+.preset-tab-btn {
+  padding: 0.5rem 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--lc-subtext);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+.preset-tab-btn:hover {
+  color: var(--lc-text-color);
+  background: transparent !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+.preset-tab-btn.active {
+  color: var(--lg-primary);
+  border-bottom: 2px solid var(--lg-primary);
+  text-shadow: 0 0 10px var(--lg-primary-glow);
+}
+
+/* Grid de Ícones Compacto */
+.icon-category-wrapper {
+  margin-bottom: 0.75rem;
+}
+.icon-category-wrapper label {
+  font-size: 0.65rem;
+  color: var(--lc-subtext);
+  font-weight: 500;
+  text-transform: none;
+  text-shadow: var(--lg-text-shadow);
+}
+
+.preset-icon-option {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--lc-text-color);
+  filter: var(--lg-icon-shadow);
+  cursor: pointer;
+  transition: all 0.3s;
+  flex-shrink: 0;
+  border: none;
+}
+.preset-icon-option:hover {
+  background: var(--lg-item-bg);
+  transform: scale(1.05);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+.preset-icon-option.selected {
+  background: rgba(255, 255, 255, 0.15);
+  color: var(--lc-text-color);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.05),
+    inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  filter: drop-shadow(0 2px 5px var(--lg-primary-glow));
+}
+
+/* Gotas de Cor */
+.preset-color-grid {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+
+.preset-color-option {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.15),
+    inset 0 2px 3px rgba(255, 255, 255, 0.4);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  flex-shrink: 0;
+}
+.preset-color-option:hover {
+  transform: scale(1.15);
+}
+.preset-color-option.selected {
+  transform: scale(1.2);
+  box-shadow:
+    0 4px 10px rgba(0, 0, 0, 0.2),
+    inset 0 2px 3px rgba(255, 255, 255, 0.5),
+    0 0 0 2px var(--lg-primary);
+}
+
+/* ==========================================================================
+   8. BOTÕES DE AÇÃO
+   ========================================================================== */
+.preset-modal-box .lc-btn {
+  background: var(--lg-item-bg);
+  color: var(--lc-text-color);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.6rem 1.4rem;
+  border-radius: 14px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.05),
+    inset 0 1px 1px rgba(255, 255, 255, 0.2);
+  transition: all 0.3s;
+}
+.preset-modal-box .lc-btn:hover {
+  background: var(--lg-item-hover);
+  transform: translateY(-2px);
+  box-shadow:
+    0 6px 16px rgba(0, 0, 0, 0.1),
+    inset 0 1px 1px rgba(255, 255, 255, 0.3);
+}
+
+/* Botão principal com cor primária */
+#preset-save-btn {
+  background: var(--lg-primary) !important;
+  color: white !important;
+  border: none !important;
+  box-shadow:
+    0 4px 12px var(--lg-primary-glow),
+    inset 0 1px 1px rgba(255, 255, 255, 0.4) !important;
+}
+#preset-save-btn:hover {
+  background: var(--lg-primary) !important;
+  filter: brightness(1.1);
+  box-shadow:
+    0 6px 16px var(--lg-primary-glow),
+    inset 0 1px 1px rgba(255, 255, 255, 0.5) !important;
+}
+
+.preset-modal-box .lc-btn-secondary {
+  background: transparent;
+  color: var(--lc-subtext);
+  box-shadow: none;
+  border: none;
+}
+.preset-modal-box .lc-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--lc-text-color);
+  box-shadow: none;
+}
+.preset-modal-box .lc-btn-danger {
+  background: transparent;
+  color: #ef4444;
+  border: none;
+  box-shadow: none;
+}
+.preset-modal-box .lc-btn-danger:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
+}
+
+.preset-modal-box select.lc-input {
+  appearance: none;
+  font-size: 0.85rem;
+}
+.preset-modal-box select.lc-input option {
+  background: #1e293b;
+  color: white;
+}
+
+/* ==========================================================================
+   LIQUID GLASS BUTTONS (.lc-btn)
+   ========================================================================== */
+.lc-btn {
+  background: var(--lg-primary) !important;
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.3),
+    0 4px 12px var(--lg-primary-glow) !important;
+  border-radius: 8px !important;
+  transition: all 0.3s ease !important;
+  cursor: pointer;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+.lc-btn:hover {
+  background: color-mix(in srgb, var(--lg-primary) 85%, white) !important;
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.4),
+    0 6px 16px var(--lg-primary-glow) !important;
+}
+
+.lc-btn-secondary {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: var(--lc-text-color) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.1),
+    0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  border-radius: 8px !important;
+  transition: all 0.3s ease !important;
+  cursor: pointer;
+}
+.lc-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+  transform: translateY(-1px);
+}
+html.dark .lc-btn-secondary,
+body.dark-mode .lc-btn-secondary {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+html.dark .lc-btn-secondary:hover,
+body.dark-mode .lc-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.lc-btn-danger {
+  background: rgba(239, 68, 68, 0.8) !important;
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.3),
+    0 4px 12px rgba(239, 68, 68, 0.3) !important;
+  border-radius: 8px !important;
+  transition: all 0.3s ease !important;
+  cursor: pointer;
+}
+.lc-btn-danger:hover {
+  background: rgba(239, 68, 68, 1) !important;
+  transform: translateY(-1px);
+}

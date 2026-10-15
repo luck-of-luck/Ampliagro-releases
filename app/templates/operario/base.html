@@ -1,0 +1,80 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    {% include "partials/brand-head.html" %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Ampliagro - Operário{% endblock %}</title>
+    <link href="{% static 'vendor/bootstrap-5.3.2.min.css' %}" rel="stylesheet">
+    <link href="{% static 'vendor/bootstrap-icons-1.11.3.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/operario.css' %}" rel="stylesheet">
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="operario-layout">
+    <header class="operario-header">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-auto">
+                    <a href="{% url 'operario-kanban' %}" class="navbar-brand d-flex align-items-center text-white text-decoration-none">
+                        <i class="bi bi-tractor me-2" style="font-size: 1.5rem;"></i>
+                        <span class="fw-bold">Ampliagro Operário</span>
+                    </a>
+                </div>
+                <div class="col">
+                    <nav class="operario-nav">
+                        <a href="{% url 'operario-kanban' %}" class="{% block nav_kanban %}{% endblock %}">
+                            <i class="bi bi-kanban"></i> Minhas Tarefas
+                        </a>
+                        <a href="{% url 'operario-perfil' %}" class="{% block nav_perfil %}{% endblock %}">
+                            <i class="bi bi-person"></i> Meu Perfil
+                        </a>
+                    </nav>
+                </div>
+                <div class="col-auto">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-light dropdown-toggle d-flex align-items-center" type="button" data-bs-toggle="dropdown">
+                            {% if funcionario %}
+                                <span class="operario-avatar rounded-circle me-2 d-flex align-items-center justify-content-center" 
+                                      style="width: 32px; height: 32px; background: #28a745; color: #fff; font-size: 0.875rem; font-weight: 600;">
+                                    {{ funcionario.nome|make_list|first|upper }}
+                                </span>
+                                {{ funcionario.nome|truncatewords:1 }}
+                            {% else %}
+                                <i class="bi bi-person-circle me-2"></i>
+                                {{ user.username }}
+                            {% endif %}
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><h6 class="dropdown-header">{{ user.username }}</h6></li>
+                            <li><span class="dropdown-item-text text-muted small">
+                                {% if funcionario %}{{ funcionario.get_cargo_display }}{% else %}Operário{% endif %}
+                            </span></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'operario-perfil' %}"><i class="bi bi-person me-2"></i>Meu Perfil</a></li>
+                            <li><form action="{% url 'logout' %}" method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="dropdown-item text-danger"><i class="bi bi-box-arrow-right me-2"></i>Sair</button>
+                            </form></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% if propriedade %}
+        <div class="operario-fazenda-badge">
+            <i class="bi bi-geo-alt"></i> {{ propriedade.nome }} {% if propriedade.cidade %}- {{ propriedade.cidade }}/{{ propriedade.uf }}{% endif %}
+        </div>
+        {% endif %}
+    </header>
+
+    <main class="operario-main">
+        <div class="container-fluid">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <script src="{% static 'vendor/bootstrap-5.3.2.bundle.min.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,130 @@
+{% extends base_template %}
+{% load static %}
+
+{% block title %}Ampliagro - Agenda Agrícola{% endblock %}
+
+{% block extra_css %}
+
+{% endblock %}
+
+{% block dashboard_appbar %}{% endblock %}
+
+{% block content %}
+<div class="section-container">
+    <div class="section-header">
+        <h1 class="section-title"><i class="bi bi-calendar-event"></i> Agenda Agrícola</h1>
+        <a href="{% url 'index_spa' %}" class="btn-secondary btn-sm"><i class="bi bi-arrow-left"></i> Voltar ao Dashboard</a>
+    </div>
+
+    <div class="content-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+            <h2 style="font-size:1rem;font-weight:600;color:var(--ncs-green-dark);">Julho 2026</h2>
+            <div style="display:flex;gap:0.5rem;">
+                <button class="btn-secondary btn-sm"><i class="bi bi-chevron-left"></i></button>
+                <button class="btn-secondary btn-sm"><i class="bi bi-chevron-right"></i></button>
+            </div>
+        </div>
+        <div class="calendar-grid">
+            <div class="calendar-header">Dom</div>
+            <div class="calendar-header">Seg</div>
+            <div class="calendar-header">Ter</div>
+            <div class="calendar-header">Qua</div>
+            <div class="calendar-header">Qui</div>
+            <div class="calendar-header">Sex</div>
+            <div class="calendar-header">Sáb</div>
+            <div class="calendar-day other-month"><div class="day-num">29</div></div>
+            <div class="calendar-day other-month"><div class="day-num">30</div></div>
+            <div class="calendar-day"><div class="day-num">1</div></div>
+            <div class="calendar-day"><div class="day-num">2</div></div>
+            <div class="calendar-day"><div class="day-num">3</div></div>
+            <div class="calendar-day"><div class="day-num">4</div></div>
+            <div class="calendar-day"><div class="day-num">5</div></div>
+            <div class="calendar-day"><div class="day-num">6</div><div class="cal-event cal-event-plantio">Plantio - Soja</div></div>
+            <div class="calendar-day"><div class="day-num">7</div><div class="cal-event cal-event-plantio">Plantio - Milho</div></div>
+            <div class="calendar-day"><div class="day-num">8</div></div>
+            <div class="calendar-day"><div class="day-num">9</div></div>
+            <div class="calendar-day"><div class="day-num">10</div><div class="cal-event cal-event-aplicacao">Aplicação - Talhão 3</div></div>
+            <div class="calendar-day"><div class="day-num">11</div></div>
+            <div class="calendar-day"><div class="day-num">12</div></div>
+            <div class="calendar-day"><div class="day-num">13</div></div>
+            <div class="calendar-day"><div class="day-num">14</div><div class="cal-event cal-event-manutencao">Manutenção - Trator</div></div>
+            <div class="calendar-day"><div class="day-num">15</div></div>
+            <div class="calendar-day"><div class="day-num">16</div></div>
+            <div class="calendar-day"><div class="day-num">17</div></div>
+            <div class="calendar-day"><div class="day-num">18</div></div>
+            <div class="calendar-day"><div class="day-num">19</div></div>
+            <div class="calendar-day"><div class="day-num">20</div><div class="cal-event cal-event-colheita">Colheita - Safra 1</div></div>
+            <div class="calendar-day"><div class="day-num">21</div></div>
+            <div class="calendar-day"><div class="day-num">22</div></div>
+            <div class="calendar-day"><div class="day-num">23</div></div>
+            <div class="calendar-day"><div class="day-num">24</div></div>
+            <div class="calendar-day"><div class="day-num">25</div></div>
+            <div class="calendar-day"><div class="day-num">26</div></div>
+            <div class="calendar-day"><div class="day-num">27</div><div class="cal-event cal-event-aplicacao">Aplicação - Talhão 5</div></div>
+            <div class="calendar-day"><div class="day-num">28</div></div>
+            <div class="calendar-day"><div class="day-num">29</div></div>
+            <div class="calendar-day"><div class="day-num">30</div></div>
+            <div class="calendar-day"><div class="day-num">31</div></div>
+            <div class="calendar-day other-month"><div class="day-num">1</div></div>
+        </div>
+        <div class="legend">
+            <div class="legend-item"><span class="legend-color" style="background:#dcfce7;"></span> Plantio</div>
+            <div class="legend-item"><span class="legend-color" style="background:#fef3c7;"></span> Colheita</div>
+            <div class="legend-item"><span class="legend-color" style="background:#dbeafe;"></span> Aplicação</div>
+            <div class="legend-item"><span class="legend-color" style="background:#f3e8ff;"></span> Manutenção</div>
+        </div>
+    </div>
+
+    <div class="content-card">
+        <h2 style="font-size:1rem;font-weight:600;margin-bottom:1rem;color:var(--ncs-green-dark);">Próximos Eventos</h2>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Tipo</th>
+                        <th>Descrição</th>
+                        <th>Talhão</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>06/07/2026</td>
+                        <td><span class="badge badge-plant">Plantio</span></td>
+                        <td>Plantio de Soja</td>
+                        <td>Talhão 01</td>
+                    </tr>
+                    <tr>
+                        <td>07/07/2026</td>
+                        <td><span class="badge badge-plant">Plantio</span></td>
+                        <td>Plantio de Milho</td>
+                        <td>Talhão 02</td>
+                    </tr>
+                    <tr>
+                        <td>10/07/2026</td>
+                        <td><span class="badge badge-plan">Aplicação</span></td>
+                        <td>Aplicação de defensivo</td>
+                        <td>Talhão 03</td>
+                    </tr>
+                    <tr>
+                        <td>14/07/2026</td>
+                        <td><span class="badge badge-colh">Manutenção</span></td>
+                        <td>Manutenção preventiva</td>
+                        <td>Trator JD 5075</td>
+                    </tr>
+                    <tr>
+                        <td>20/07/2026</td>
+                        <td><span class="badge badge-colh">Colheita</span></td>
+                        <td>Colheita de Soja</td>
+                        <td>Talhão 01</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+{% endblock %}

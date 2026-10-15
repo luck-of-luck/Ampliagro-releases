@@ -1,0 +1,77 @@
+{% extends base_template %}
+{% load static %}
+
+{% block title %}Ampliagro - Previsao de Safra{% endblock %}
+
+{% block extra_css %}
+
+{% endblock %}
+
+{% block dashboard_appbar %}{% endblock %}
+
+{% block content %}
+<div class="section-container">
+    <div class="section-header">
+        <h1 class="section-title">Previsao de Safra</h1>
+            <a href="{% url 'cadastro-safra' %}" class="btn-secondary btn-sm"><i class="bi bi-plus-lg"></i> Nova Safra</a>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon" style="color:#15803d;"><i class="bi bi-flower1"></i></div>
+            <div class="stat-value" style="color:#15803d;">{{ safras_andamento|default:"0" }}</div>
+            <div class="stat-label">Safras em Andamento</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="color:#b45309;"><i class="bi bi-calendar-check"></i></div>
+            <div class="stat-value" style="color:#b45309;">{{ previsao_colheita|default:"0" }}</div>
+            <div class="stat-label">Previsao Colheita (dias)</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="color:#1d4ed8;"><i class="bi bi-graph-up"></i></div>
+            <div class="stat-value" style="color:#1d4ed8;">{{ produtividade_esperada|default:"0" }} sc/ha</div>
+            <div class="stat-label">Produtividade Esperada</div>
+        </div>
+    </div>
+
+    <div class="content-card">
+        <h2 style="font-size:1rem;font-weight:600;margin-bottom:1rem;color:var(--ncs-green-dark);">Safras em Andamento</h2>
+        {% if safras %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cultura</th>
+                        <th>Area (ha)</th>
+                        <th>Data Plantio</th>
+                        <th>Previsao Colheita</th>
+                        <th>Status Fenologico</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in safras %}
+                    <tr>
+                        <td><strong>{{ s.cultura.nome }}</strong></td>
+                        <td>{{ s.area_plantada|floatformat:2 }}</td>
+                        <td>{{ s.data_plantio|date:"d/m/Y"|default:"-" }}</td>
+                        <td>{{ s.data_colheita|date:"d/m/Y"|default:"-" }}</td>
+                        <td><span class="badge badge-{{ s.status_fenologico|default:'vegetativo' }}">{{ s.get_status_fenologico_display|default:"Vegetativo" }}</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state"><i class="bi bi-inbox" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>Nenhuma safra cadastrada.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+function getCSRFToken() { return document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''; }
+function showToast(msg, type) { const t = document.getElementById('toast'); t.textContent = msg; t.className = 'toast toast-' + type + ' show'; setTimeout(() => t.classList.remove('show'), 3000); }
+</script>
+{% endblock %}

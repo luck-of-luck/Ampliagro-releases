@@ -1,0 +1,739 @@
+/* ===== Guia Vegetal — Premium (esmeralda / branco / preto) — CSS inline mantido por exigência ===== */
+.guide-container {
+  width: min(100% - 24px, 1320px);
+  max-width: 1320px;
+  margin: clamp(18px, 3vw, 28px) auto;
+  padding: 0;
+}
+.guide-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 18px;
+  padding: 0 2px 14px;
+  border-bottom: 1px solid var(--cor-borda);
+}
+.guide-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Sora', 'IBM Plex Sans', sans-serif;
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--cor-texto) !important;
+  margin: 0;
+}
+.guide-title i {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--cor-primaria), var(--cor-primaria-forte));
+  color: #fff;
+  font-size: 14px;
+  box-shadow: 0 6px 14px var(--cor-primaria-suave);
+}
+.guide-title::before {
+  display: none !important;
+}
+html.dark .guide-title {
+  color: var(--cor-texto) !important;
+}
+
+/* Sub-tabs — pílulas dentro de container (padrão soft-ui refinado) — !important para vencer soft-ui */
+.sub-tabs {
+  display: flex !important;
+  gap: 6px !important;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 8px !important;
+  border: 1px solid var(--cor-borda) !important;
+  border-radius: 12px !important;
+  background: color-mix(in srgb, var(--cor-fundo-card) 78%, transparent) !important;
+  backdrop-filter: blur(8px);
+}
+html.dark .sub-tabs {
+  border-color: var(--cor-borda) !important;
+  background: color-mix(in srgb, var(--cor-fundo-card-aninhado) 86%, transparent) !important;
+  backdrop-filter: blur(12px) saturate(1.2) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(1.2) !important;
+}
+.sub-tab {
+  padding: 7px 14px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  border-radius: 8px !important;
+  cursor: pointer;
+  transition: all 0.16s var(--cor-ease-2);
+  color: var(--cor-texto-medio) !important;
+  border: 1px solid transparent !important;
+  background: transparent !important;
+  line-height: 1;
+}
+.sub-tab:hover {
+  color: var(--cor-primaria) !important;
+  background: var(--cor-primaria-suave) !important;
+  border-color: color-mix(in srgb, var(--cor-primaria) 14%, transparent) !important;
+}
+.sub-tab.active {
+  color: #fff !important;
+  background: var(--cor-primaria) !important;
+  border-color: var(--cor-primaria) !important;
+  box-shadow: 0 6px 14px var(--cor-primaria-suave) !important;
+}
+/* Dark mode sub-tab states */
+html.dark .sub-tab:hover {
+  color: #fff !important;
+  background: color-mix(
+    in srgb,
+    var(--cor-primaria) 20%,
+    var(--cor-fundo-card-aninhado)
+  ) !important;
+  border-color: color-mix(in srgb, var(--cor-primaria) 30%, var(--cor-borda)) !important;
+}
+html.dark .sub-tab.active {
+  background: var(--cor-primaria) !important;
+  color: #fff !important;
+  border-color: var(--cor-primaria) !important;
+  box-shadow: 0 6px 16px var(--cor-primaria-suave) !important;
+}
+
+/* Stats — cartões esmeralda suave — vence soft-ui !important */
+.stats-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 12px !important;
+  margin-bottom: 22px;
+}
+@media (max-width: 980px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+@media (max-width: 560px) {
+  .stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+.stat-card {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(
+    180deg,
+    var(--cor-fundo-card),
+    var(--cor-fundo-card-aninhado)
+  ) !important;
+  border: 1px solid var(--cor-borda) !important;
+  border-radius: 12px !important;
+  padding: 16px 16px 14px !important;
+  box-shadow:
+    0 1px 0 var(--cor-sombra-clara),
+    0 8px 20px var(--cor-sombra) !important;
+}
+/* Dark mode stat-card: gradiente 3 cores + glassmorphism */
+html.dark .stat-card {
+  background: linear-gradient(
+    180deg,
+    var(--cor-fundo-card),
+    var(--cor-fundo-card-aninhado),
+    var(--cor-fundo-card-profundo)
+  ) !important;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--cor-fundo-card) 85%, transparent),
+    color-mix(in srgb, var(--cor-fundo-card-aninhado) 70%, transparent),
+    color-mix(in srgb, var(--cor-fundo-card-profundo) 60%, transparent)
+  ) !important;
+  backdrop-filter: blur(16px) saturate(1.2) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(1.2) !important;
+  border-color: var(--cor-borda) !important;
+  box-shadow:
+    0 1px 0 var(--cor-sombra-clara),
+    0 12px 28px var(--cor-sombra),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+}
+.stat-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, var(--cor-primaria), var(--cor-primaria-forte));
+  opacity: 0.9;
+}
+.stat-label {
+  font-size: 0.66rem !important;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--cor-texto-fraco) !important;
+}
+.stat-value {
+  font-family: 'JetBrains Mono', 'IBM Plex Sans', monospace;
+  font-size: 1.28rem !important;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--cor-texto) !important;
+  margin-top: 6px;
+  line-height: 1;
+}
+html.dark .stat-value {
+  color: var(--cor-texto) !important;
+}
+
+/* Tab content título */
+.tab-content {
+  display: none;
+}
+.tab-content.active {
+  display: block;
+  animation: gvFade 0.28s var(--cor-ease);
+}
+@keyframes gvFade {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.tab-content > h2 {
+  font-family: 'Sora', sans-serif !important;
+  font-size: 0.95rem !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.01em;
+  color: var(--cor-texto) !important;
+  margin: 0 0 14px !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tab-content > h2 i {
+  color: var(--cor-primaria);
+}
+
+/* Cultura grid — cards premium esmeralda — !important para vencer soft-ui */
+.cultura-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
+  gap: 14px !important;
+}
+.cultura-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 132px;
+  padding: 18px 14px 16px;
+  background: linear-gradient(
+    180deg,
+    var(--cor-fundo-card),
+    var(--cor-fundo-card-aninhado)
+  ) !important;
+  border: 1px solid var(--cor-borda) !important;
+  border-radius: 12px !important;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    transform 0.16s var(--cor-ease-2),
+    border-color 0.16s,
+    box-shadow 0.16s;
+  box-shadow:
+    0 1px 0 var(--cor-sombra-clara),
+    0 8px 18px var(--cor-sombra) !important;
+}
+.cultura-card:hover {
+  transform: translateY(-2px) !important;
+  border-color: color-mix(in srgb, var(--cor-primaria) 28%, var(--cor-borda)) !important;
+  box-shadow: 0 10px 24px var(--cor-sombra) !important;
+}
+.cultura-card:active {
+  transform: translateY(0) scale(0.988) !important;
+}
+/* Dark mode hover/active states */
+html.dark .cultura-card:hover {
+  transform: translateY(-2px) !important;
+  border-color: color-mix(in srgb, var(--cor-primaria) 40%, var(--cor-borda)) !important;
+  box-shadow:
+    0 14px 32px var(--cor-sombra),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+html.dark .cultura-card:active {
+  transform: translateY(0) scale(0.988) !important;
+  box-shadow:
+    0 4px 12px var(--cor-sombra),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+}
+/* Dark mode: gradiente mais pronunciado (3 cores) + glassmorphism/blur */
+html.dark .cultura-card {
+  background: linear-gradient(
+    180deg,
+    var(--cor-fundo-card),
+    var(--cor-fundo-card-aninhado),
+    var(--cor-fundo-card-profundo)
+  ) !important;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--cor-fundo-card) 85%, transparent),
+    color-mix(in srgb, var(--cor-fundo-card-aninhado) 70%, transparent),
+    color-mix(in srgb, var(--cor-fundo-card-profundo) 60%, transparent)
+  ) !important;
+  backdrop-filter: blur(16px) saturate(1.2) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(1.2) !important;
+  border-color: var(--cor-borda) !important;
+  box-shadow:
+    0 1px 0 var(--cor-sombra-clara),
+    0 12px 28px var(--cor-sombra),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+}
+.cultura-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 11px;
+  background: var(--cor-primaria) !important;
+  color: #fff !important;
+  font-size: 10px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  z-index: 2;
+  box-shadow: 0 2px 8px var(--cor-primaria-suave);
+}
+.cultura-badge:empty {
+  display: none !important;
+}
+.cultura-quick-add {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--cor-primaria) !important;
+  color: #fff !important;
+  border: 1px solid color-mix(in srgb, var(--cor-primaria) 60%, transparent) !important;
+  cursor: pointer;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition:
+    opacity 0.16s,
+    transform 0.16s;
+  z-index: 2;
+  padding: 0;
+  line-height: 1;
+  box-shadow: 0 6px 14px var(--cor-primaria-suave);
+}
+.cultura-card:hover .cultura-quick-add {
+  opacity: 1 !important;
+  transform: scale(1) !important;
+}
+.cultura-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--cor-primaria-suave) !important;
+  color: var(--cor-primaria) !important;
+  font-size: 1.35rem;
+  border: 1px solid color-mix(in srgb, var(--cor-primaria) 12%, transparent) !important;
+}
+.cultura-icon svg {
+  width: 22px;
+  height: 22px;
+}
+.cultura-card:hover .cultura-icon {
+  background: var(--cor-primaria) !important;
+  color: #fff !important;
+  border-color: var(--cor-primaria) !important;
+  box-shadow: 0 8px 18px var(--cor-primaria-suave) !important;
+}
+/* Dark mode icon hover */
+html.dark .cultura-icon {
+  background: color-mix(
+    in srgb,
+    var(--cor-primaria) 18%,
+    var(--cor-fundo-card-aninhado)
+  ) !important;
+  color: var(--cor-primaria) !important;
+  border-color: color-mix(in srgb, var(--cor-primaria) 30%, var(--cor-borda)) !important;
+}
+html.dark .cultura-card:hover .cultura-icon {
+  background: var(--cor-primaria) !important;
+  color: #fff !important;
+  border-color: var(--cor-primaria) !important;
+  box-shadow:
+    0 8px 20px var(--cor-primaria-suave),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+.cultura-name {
+  font-family: 'Sora', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--cor-texto) !important;
+  line-height: 1.2;
+}
+html.dark .cultura-name {
+  color: var(--cor-texto) !important;
+}
+.empty-state {
+  text-align: center;
+  padding: 28px 16px;
+  color: var(--cor-texto-medio);
+  font-size: 0.875rem;
+  border: 1px dashed var(--cor-borda-forte);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--cor-fundo-card) 70%, transparent);
+}
+.empty-state i {
+  color: var(--cor-texto-fraco);
+}
+.table-wrap {
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid var(--cor-borda);
+  box-shadow: 0 8px 20px var(--cor-sombra);
+}
+html.dark .table-wrap {
+  border-color: var(--cor-borda);
+}
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.813rem;
+}
+th {
+  background: color-mix(in srgb, var(--cor-fundo-card-profundo) 72%, transparent);
+  padding: 0.6rem 0.75rem;
+  text-align: left;
+  font-weight: 700;
+  color: var(--cor-texto-medio);
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-bottom: 1px solid var(--cor-borda);
+}
+html.dark th {
+  background: var(--cor-fundo-card-profundo);
+  color: var(--cor-texto-medio);
+  border-color: var(--cor-borda);
+}
+td {
+  padding: 0.55rem 0.75rem;
+  border-bottom: 1px solid var(--cor-borda);
+  color: var(--cor-texto);
+}
+
+/* Modal — overlay + panel centralizado premium — compatível com gc-editor-panel */
+.detail-overlay {
+  position: fixed;
+  inset: 0;
+  background: color-mix(in srgb, var(--cor-texto) 38%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.24s var(--cor-ease);
+}
+.detail-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+.detail-panel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.97);
+  width: min(1180px, 95vw);
+  max-height: min(90vh, 920px);
+  background: color-mix(in srgb, var(--cor-fundo-card) 90%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--cor-borda);
+  border-radius: 16px;
+  box-shadow:
+    0 24px 64px var(--cor-sombra),
+    0 8px 24px rgba(0, 0, 0, 0.12);
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.24s var(--cor-ease);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.detail-panel.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, -50%) scale(1);
+}
+/* Quando gc-editor-panel está ativo, mantém o glassmorphism */
+.detail-panel.gc-editor-panel {
+  background: color-mix(in srgb, var(--cor-fundo-card) 92%, transparent) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1px solid var(--cor-borda) !important;
+}
+html.dark .detail-panel {
+  background: color-mix(in srgb, var(--cor-fundo-card) 85%, transparent);
+  border-color: var(--cor-borda);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+}
+html.dark .detail-panel.gc-editor-panel {
+  background: color-mix(in srgb, var(--cor-fundo-card) 85%, transparent) !important;
+  border-color: var(--cor-borda) !important;
+}
+.detail-header {
+  display: none;
+}
+.detail-nome {
+  font-size: 1.125rem;
+  font-weight: 800;
+  color: var(--cor-primaria);
+}
+.detail-close {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 8px;
+  border: 1px solid var(--cor-borda);
+  background: color-mix(in srgb, var(--cor-fundo-card-aninhado) 80%, transparent);
+  backdrop-filter: blur(4px);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  color: var(--cor-texto-medio);
+  transition: all 0.15s;
+}
+.detail-close:hover {
+  background: var(--cor-erro-suave);
+  color: var(--cor-erro);
+  border-color: color-mix(in srgb, var(--cor-erro) 24%, transparent);
+}
+html.dark .detail-close {
+  background: color-mix(in srgb, var(--cor-fundo-card-aninhado) 80%, transparent);
+  color: var(--cor-texto-medio);
+  border-color: var(--cor-borda);
+}
+.detail-body {
+  padding: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  flex: 1;
+  min-height: 0;
+}
+.detail-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.75rem;
+}
+.detail-stat {
+  background: var(--cor-fundo-card-aninhado);
+  border: 1px solid var(--cor-borda);
+  border-radius: 10px;
+  padding: 0.85rem;
+  text-align: center;
+}
+html.dark .detail-stat {
+  background: var(--cor-fundo-card-profundo);
+  border-color: var(--cor-borda);
+}
+.detail-stat .stat-label {
+  font-size: 0.625rem;
+}
+.detail-stat .stat-value {
+  font-size: 1rem;
+  margin-top: 0.2rem;
+}
+
+/* Botão Dashboard no header */
+.guide-header .btn-secondary {
+  border-radius: 8px !important;
+  font-weight: 700 !important;
+  font-size: 0.78rem !important;
+  padding: 7px 14px !important;
+  background: var(--cor-fundo-card-aninhado) !important;
+  border: 1px solid var(--cor-borda) !important;
+  color: var(--cor-texto) !important;
+  box-shadow: none !important;
+}
+.guide-header .btn-secondary:hover {
+  border-color: var(--cor-primaria) !important;
+  color: var(--cor-primaria) !important;
+  transform: translateY(-1px);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.animate-spin {
+  animation: spin 1s linear infinite;
+  display: inline-block;
+}
+html.dark .detail-panel input,
+html.dark .detail-panel select,
+html.dark .detail-panel textarea {
+  background: var(--cor-fundo-card-profundo) !important;
+  border-color: var(--cor-borda) !important;
+  color: var(--cor-texto) !important;
+}
+html.dark .detail-panel hr {
+  border-color: var(--cor-borda) !important;
+}
+@media (max-width: 760px) {
+  .guide-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .sub-tabs {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    scrollbar-width: none;
+  }
+  .sub-tabs::-webkit-scrollbar {
+    display: none;
+  }
+  .cultura-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  /* Fullscreen panel no mobile */
+  .detail-panel {
+    width: 100vw;
+    height: 100vh;
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 0;
+    border: none;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  .detail-panel.active {
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+@media (max-width: 420px) {
+  .cultura-grid {
+    grid-template-columns: 1fr;
+  }
+}
+/* ─────────────────────────────────────────────────────────────────────
+   HISTORICO OBSERVADO POR CULTURA (2026-10-05)
+   ─────────────────────────────────────────────────────────────────────
+   O cartao mostrava so o nome. A tabela `Cultura` tem a agronomia vazia
+   (janela de plantio 0/709, ciclo 0,3%), por isso nao havia o que
+   mostrar. Agora entra o que o produtor registou nas safras.
+
+   Duas regras de desenho que nao sao esteticas:
+
+   * a linha de "registar safra" e' a unica que aparece quando NAO ha
+     ciclo. As 703 culturas sem safra mostram o convite; as 6 com safra
+     mostram o numero. Um cartao com os dois seria um cartao que nao
+     sabe o que e'.
+
+   * `hist-alerta` nao e' uma cor de aviso posta ao lado de um numero:
+     quando ha alerta, o ciclo **nao e' escrito** (o servico devolve
+     `ciclo_medio: None`). O aviso e' a informacao toda.
+   ───────────────────────────────────────────────────────────────────── */
+.cultura-hist {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin: 6px 0 2px;
+  padding-top: 6px;
+  border-top: 1px solid var(--cor-borda, var(--cor-borda));
+}
+
+/* Sem historico, o cartao nao ganha altura. Os dois estados — com e sem
+   safra — tem de ter a mesma forma, ou a grelha treme a cada safra que o
+   produtor regista. */
+.cultura-card:not(:has(.cultura-hist-linha)) .cultura-hist {
+  padding-top: 0;
+  margin-top: 0;
+  border-top: none;
+  min-height: 0;
+}
+
+.cultura-hist-linha {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.68rem;
+  line-height: 1.35;
+  color: var(--cor-texto-fraco);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cultura-hist-linha i {
+  font-size: 0.62rem;
+  flex: 0 0 auto;
+  opacity: 0.75;
+}
+
+/* A amostra: uma safra nao e' um ciclo, e' uma observacao. O numero
+   sozinho ("128 dias") le-se como regra; com a amostra le-se como o que
+   aconteceu aquele ano — que e' o que o produtor sabe. */
+.hist-sample {
+  font-size: 0.92em;
+  opacity: 0.7;
+}
+
+.hist-anos {
+  opacity: 0.8;
+}
+
+/* Ausencia de dado com explicacao. Aparece enquanto a cultura nao tem
+   safra; some sozinha quando passa a ter. */
+.hist-vazio {
+  opacity: 0.62;
+  font-style: italic;
+}
+
+/* Datas a rever. O ciclo nao esta escrito: este e' o aviso inteiro. */
+.hist-alerta {
+  color: var(--cor-alerta);
+  font-weight: var(--peso-alerta, 600);
+  opacity: 1;
+}
+
+.hist-alerta i {
+  opacity: 1;
+}
+
+/* Sem navegador com `:has()`, a linha de "registar safra" aparece sem a
+   moldura que a separa. Fica aceitavel, e melhor do que nada aparecer. */
+@supports not selector(:has(*)) {
+  .cultura-hist {
+    padding-top: 6px;
+    margin-top: 6px;
+    border-top: 1px solid var(--cor-borda, var(--cor-borda));
+  }
+}

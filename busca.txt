@@ -1,0 +1,64 @@
+=== esperaOverlay ===
+promessa de
+   * gente, não de máquina. Por isso não se pode `await` antes de mexer no
+   * overlay; o `await` vai no fim, quando o print já existe. */
+  describe('o print da tela', () => {
+    const esperaOverlay = async () => {
+      for (let i = 0; i < 60 && !document.getElementById('ia-print-overlay'); i++) {
+        await new Promise((r) => setTimeout(r, 1));
+      }
+      return document.getElementById('ia-print-overlay');
+    };
+
+    const ev = (alvo, tipo, x, y) =>
+      alvo.dispatchEvent(
+        new window.MouseEvent(tipo, {
+          clientX: x,
+          clientY: y,
+          bubbles: true,
+          button: 0,
+        })
+      );
+
+    function arrasta(de, para) {
+      const ov = document.getElementById('ia-print-overlay');
+      ev(ov, 'mousedown', de.x, de.y);
+      ev(window, 'mousemove', para.x, para.y);
+      ev(window, 'mouseup', para.x, para.y);
+      return ov;
+    }
+
+    /* Abre o editor e deixa uma seleção feita.
+     *
+     * Devolve `{p}` e NÃO a promessa: um `async` que devolve uma promessa
+     * adota-a, e `await editorComSelecao()` ficava à espera de um 
+
+=== selecionar ===
+ids).toEqual([
+      /* O expandir/guardar da propria barra e o PRIMEIRO: e' o topo da rail,
+       * com o icone `bi-layout-sidebar`, e vai junto quando ela guarda. */
+      'alternar-barra',
+      'selecionar-area',
+      'importar-documento',
+      'nova-conversa',
+      'historico',
+      'criar-no-chat',
+      'criar-no-painel',
+      /* `usar-nuvem` e a chave do agente da nuvem — ligada, usa a API do
+       * Gemini em vez do motor local. Esta lista dizia NOVE botões e a
+       * barra passou a desenhar ONZE: os dois que faltavam eram exactamente
+       * estes, mais a engrenagem. MEDIDO: o teste falhava com
+       * `expected [ 'alternar-barra', …(10) ] to deeply equal [ 'alternar-barra', …(8) ]`
+       * — e o defeito não era da barra, era desta lista a ter ficado para
+       * trás. Escrever a lista à mão é o que permite isto; o remédio é
+       * acrescentá-los, e é o que está feito. */
+      'usar-nuvem',
+      'exportar',
+      'bug',
+      /* A ENGRENAGEM, NO FUNDO — configuração, não ferramenta de trabalho. */
+      'config-ia',
+    ]);
+  });
+
+  /* A razao de ser do íco
+

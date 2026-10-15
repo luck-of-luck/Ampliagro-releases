@@ -1,0 +1,69 @@
+Toda fazenda emite gases de efeito estufa. O trator queima diesel, o rebanho digere capim e libera metano, o a dubo nitrogenado devolve óxido nitroso ao ar. A pergunta que a ciência do clima faz não é se uma propriedade emite – é se, no fim das contas, ela devolve mais carbono à atmosfera do que retira dela.
+
+Na Fazenda São Pedro da Mantiqueira, em Pindamonhangaba (SP), a resposta contraria a intuição: a conta fecha no negativo. A propriedade sequestra mais do que emite.
+
+Este artigo é organizado em três partes. Primeiro, o inventário oficial – o que a fazenda emite e remove, calculado pela pesquisadora Susian Christian Martins, mestre em ciência do solo e nutrição vegetal e doutora em ciências, e auditado pela KPMG. Depois, o carbono efêmero: o que é e como ele entra na leitura do fluxo de gases da propriedade. Por fim, uma reflexão sobre a regra dos 30 centímetros de profundidade – de onde ela vem e o que encontramos quando pesquisamos mais detalhadamente.
+
+Parte 1 O inventário verificado O que a fazenda emite e o que ela remove
+
+Imagine uma balança. De um lado, tudo o que a fazenda emite: combustível, fermentação do gado , fertilizantes, energia elétrica. De outro, tudo o que ela retira do ar e guarda – sobretudo o carbono que as raízes das plantas empurram para dentro do solo, onde pode ficar estocado por décadas. O balanço de GEE é a diferença entre os dois pratos.
+
+Quando a emissão supera a remoção, o número é positivo: a fazenda é uma fonte. Quando a remoção supera a emissão, o número é negativo – e a propriedade funciona como um sumidouro, um dreno que ajuda a limpar a atmosfera. Este balanço foi calculado por SusianMartins segundo o GHG ProtocolAgropecuário e verificado de forma independente pela KPMG.
+
+Medir emissão é relativamente simples – conta-se o diesel, o rebanho, o adubo. Medir remoção de carbono no solo é mais difícil, e é aí que entram os chamados tiers (níveis) do IPCC, o painel científico do clima da ONU. Cada tier é uma régua com precisão crescente:
+
+Tier 2 — Fatores Nacionais. Usa fatores de remoção padronizados, ajustados para o bioma e as condições do Brasil. É a abordagem mais conservadora: aplica valores de tabela, sem medir o solo daquela fazenda específica.
+
+Tier 3 — Fatores Locais. Substitui a tabela por parâmetros calibrados para a região e a propriedade, com modelagem detalhada do estoque de carbono. Captura melhor o efeito real do manejo do solo.
+
+Tier 3 Métrico — Medição Direta. O padrão ouro: em vez de qualquer fator estimado, mede-se fisicamente o carbono em amostras de solo coletadas no campo, por análise laboratorial (CHN). É o retrato mais fiel do que de fato está no chão.
+
+O padrão se repete: quanto mais os dados vêm de medição própria da fazenda, e menos de fatores genéricos, maior o sequestro reconhecido. Os parâmetros das tabelas tipo padrão são conservadores e não conseguem considerar como referência o Sistema Regenerativo Integrado Roncador – que, por ter impacto positivo sobre o ecossistema, acaba capturando mais carbono no solo do que o esperado por um manejo convencional.
+
+Parte 2 O fluxo dos gases Carbono efêmero: contando o que entra e o que sai
+
+Até aqui olhamos o estoque que fica. Mas há um segundo olhar, complementar: o fluxo de carbono que atravessa a fazenda ao longo de um ano – o carbono que as plantas fixam e que, em boa parte, volta relativamente rápido à atmosfera. É o chamado carbono efêmero.
+
+Ele não é estoque permanente; é uma fotografia de quanto carbono a propriedade movimenta e retém temporariamente a cada safra.
+
+Por ser temporário, esse carbono precisa ser contabilizado com rigor: conta-se apenas o que de fato se torna estoque temporário real, e desconta-se o resto – o que é respirado de volta pelos microrganismos, pelo próprio animal, ou que já aparece em outro lugar do balanço (como o metano). São duas fontes:
+
+Na pecuária, o raciocínio é o seguinte: de cada porção de carbono que o animal ingere, a maior parte é respirada de volta ou vira metano (já contabilizado à parte). Só uma fração – o que vira tecido no animal, a biomassa dos microrganismos do solo e a parcela do esterco que efetivamente se estabiliza – permanece como carbono guardado. É essa fração, e apenas ela, que entra na conta.
+
+O tamanho desse fluxo fica claro quando o colocamos lado a lado com as emissões da fazenda. O carbono efêmero fixado em um único ano – só em grão e biomassa – está na mesma ordem de grandeza das emissões diretas e de energia do mesmo período:
+
+Vale a distinção: o carbono efêmero é um fluxo anual de carbono temporário – não faz parte do balanço de GEE verificado da Parte 1, e não deve ser lido como sequestro permanente. Ele é apresentado à parte justamente para deixar claro o que é medição de estoque e o que é leitura de fluxo.
+
+Uma observação sobre o alcance dessa conta – e ela reforça o caráter conservador do número. Entraram no carbono efêmero apenas duas coisas: o que vira produto e deixa a fazenda (o grão de soja e a massa corporal do boi ) e o que se humifica no solo, tendendo a se tornar carbono de duração muito longa.
+
+Ficou de fora todo o carbono retido nas reservas de alimento estocadas na própria fazenda – grão de milho , silagem, s orgo e snaplage –, que podem permanecer armazenadas por até dois anos como estratégia de segurança alimentar do rebanho, independentemente do clima. Ou seja: o fluxo de carbono temporário efetivamente manejado na propriedade é maior do que o contabilizado aqui.
+
+O que segue nesta parte é uma reflexão do autor, baseada em observação de campo e numa leitura pessoal do balanço de carbono. Não faz parte do inventário verificado das partes 1 e 2 – é apresentada como hipótese e convite à investigação, não como dado auditado.
+
+O GHG Protocol – e praticamente todos os inventários de carbono do mundo – contabiliza o carbono do solo até apenas 30 centímetros de profundidade. Essa régua não é arbitrária: nasceu da ciência de solos de clima temperado, onde a matéria orgânica se concentra numa camada superficial rasa e pouco carbono desce além disso. Para aqueles solos, 30 centímetros capturam quase toda a história.
+
+Solos tropicais profundos, como os do Brasil, não seguem necessariamente esse padrão. Por isso, na Fazenda São Pedro da Mantiqueira, o solo foi medido até 2 metros. Apresentamos os números abaixo sem conclusões fechadas – o leitor pode tirar as suas.
+
+Falo também da experiência de quem cava. Todo ano eu entro em trincheiras na fazenda e vejo, com meus próprios olhos, raízes vivas passando de 2 metros de profundidade. Vejo a terra escurecer de cima para baixo, gradualmente – o que me parece matéria orgânica se acumulando e carbono descendo pelo perfil. Medir é rotina para mim desde os 14 anos, e o que a trincheira mostra é difícil de ignorar: há vida e carbono muito abaixo da linha onde costumamos parar de contar.
+
+Nesse talhão, a camada entre 30 centímetros e 2 metros guarda 330,67 tCO2eq/ha – mais do que os 267,08 dos primeiros 30 centímetros. Ou seja: a régua padrão enxergaria pouco menos da metade do carbono presente no perfil medido.
+
+O que os números levantam é uma pergunta legítima: se há tanto carbono abaixo da linha que costumamos medir, quanto do papel do solo no clima pode estar ficando fora da conta? Confirmar se esse carbono profundo também está aumentando sob bom manejo é o próximo passo da investigação.
+
+A régua dos 30 centímetros foi feita para outro tipo de solo. Em terra tropical funda, talvez esteja na hora de cavar mais fundo antes de fechar a conta.
+
+Duas leituras saem deste trabalho. A primeira é sobre a Fazenda São Pedro da Mantiqueira: mesmo pela régua mais conservadora e padronizada do mundo, e sem contar o carbono profundo, a fazenda já é carbono-negativa. Ela faz parte da solução, não do problema.
+
+A segunda é um convite à investigação. A forma como medimos carbono no solo – parando aos 30 centímetros – foi uma convenção herdada de solos rasos de clima temperado. Os dados da Mantiqueira sugerem que, em solos tropicais profundos, essa convenção pode estar deixando parte relevante da história fora do enquadramento. Não afirmamos ter a resposta final; apresentamos a medição e a pergunta.
+
+Há ainda uma terceira leitura, mais pessoal. Se olharmos mos uma fazenda como uma estufa – um espaço geográfico fechado –, tudo o que ela retira da atmosfera deveria entrar na conta, mesmo que temporariamente. Nesse sentido, limitar a ocupação de uma propriedade pelas suas emissões, sobretudo as do gado, é olhar só um lado da balança: quanto mais uma fazenda produz alimento, mais carbono ela puxou do ar para produzi-lo.
+
+Contabilizar toda a produção – e todo o carbono que desce e se acumula no perfil do solo – talvez seja o caminho mais honesto para medir o papel real do campo no clima.
+
+*Reflexão de Pelerson Penido Dalla Vecchia. Os trabalhos técnicos (retirada das amostras e compilação dos resultados das análises CHN) foram conduzidos pela pesquisadora Susian Christian Martins, e a verificação do balanço, pela KPMG.
+
+O inventário de gases de efeito estufa da Agropecuária São Pedro da Mantiqueira Ltda. (Grupo Roncador), safra 2023/2024, elaborado segundo o GHG Protocol Agropecuário, considerando os gases CO₂, CH₄ e N₂O convertidos em CO₂-equivalente pelos potenciais de aquecimento global do IPCC (AR5). O carbono do solo foi calculado por três abordagens (Tier 2, Tier 3 e Tier 3 Métrico), essa última por análise laboratorial CHN de amostras de campo.
+
+A análise técnica foi conduzida pela pesquisadora Susian Christian Martins; e a verificação independente do balanço, pela KPMG. O balanço de GEE é expresso em tCO₂e (fluxo anual); os estoques de carbono, por profundidade (tCO₂eq/ha). O carbono efêmero representa fluxo anual de carbono temporário, e não estoque permanente.
+
+A fração de carbono efêmero retida na pecuária foi estimada a partir de um balanço de massa de carbono do rebanho (carbono ingerido particionado entre respiração, metano, fezes, urina e tecido corporal). Esse balanço apoiase em NASEM – Nutrient Requirements of Beef Cattle (2016) e Dairy Cattle (2021); IPCC (2006) para metano entérico; sistema CNCPS (Tedeschi, Fox Tylutki) para partição de nutrientes; Johnson Johnson (1995) para emissão de metano; e trabalhos de Ungerfeld sobre fermentação ruminal.

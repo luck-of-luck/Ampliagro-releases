@@ -1,0 +1,192 @@
+{% load static %}
+{# Preset modal styles agora consolidados em panels-premium.css (tokens --pnl-* / --preset-*) #}
+{# <link rel="stylesheet" href="{% static 'css/paginas/preset-modal-liquid.css' %}?v=7"> #}
+
+<!-- O background é totalmente transparente para não escurecer a tela -->
+<div id="preset-modal-overlay" onclick="closePresetModal()" class="fixed inset-0 bg-transparent z-[2147483646] hidden items-center justify-center transition-all" style="pointer-events: auto;"></div>
+
+<div id="preset-modal" class="fixed inset-0 z-[2147483647] hidden items-center justify-center p-3" style="pointer-events: none;">
+  <!-- ==========================================================================
+       PAINEL DE PRESETS (LIQUID GLASS MODAL)
+       ========================================================================== -->
+  <div id="preset-modal-box" class="preset-modal-box lc-panel" style="pointer-events: auto;">
+
+    <!-- Cabeçalho Liquid Glass -->
+    <div class="preset-modal-header" style="position: relative; z-index: 1;">
+      <!-- Elemento invisível na esquerda só para equilibrar espaço (opcional, já que o close flutua à direita) -->
+      <div class="w-8 h-8 opacity-0 pointer-events-none"></div>
+
+      <!-- Título Centralizado Absoluto -->
+      <div class="preset-modal-title-center flex items-center gap-2">
+        <div class="w-7 h-7 rounded-lg flex items-center justify-center" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); box-shadow: inset 0 1px 1px rgba(255,255,255,0.4);">
+          <i class="bi bi-layout-three-columns" style="color:var(--lc-text-color); font-size:13px"></i>
+        </div>
+        <span>Presets</span>
+      </div>
+
+      <!-- Botão Fechar na Direita -->
+      <button onclick="closePresetModal()" class="preset-modal-close" title="Fechar">
+        <i class="bi bi-x text-base"></i>
+      </button>
+    </div>
+
+    <!-- Carrossel de Presets & Ações -->
+    <div class="preset-carousel-section" style="position: relative; z-index: 1;">
+      <div class="flex items-center gap-2">
+        <div id="modal-preset-carousel" class="modal-preset-carousel flex-grow hide-scrollbar">
+          <!-- Populated by JS -->
+        </div>
+
+        <!-- Botão Novo Preset (+) -->
+        <button onclick="addNewPresetForm()" class="modal-preset-add shrink-0" title="Novo preset">
+          <i class="bi bi-plus-lg text-xs"></i>
+        </button>
+
+        <!-- Zona de Lixeira para Arraste -->
+        <div id="preset-trash-zone" class="preset-trash-zone shrink-0 cursor-pointer" title="Arraste um preset aqui para excluir">
+          <i class="bi bi-trash3 text-xs"></i>
+          <span>Arraste para excluir</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formulário de Edição Líquido -->
+    <div id="preset-edit-form" class="preset-edit-form" style="display: none; position: relative; z-index: 1;">
+      <div class="preset-form-divider"></div>
+
+      <!-- Seleção de Ícone em Carrosséis por Categoria -->
+      <div class="preset-form-group mb-3">
+        <label class="preset-form-label block mb-1.5">Categoria do Ícone</label>
+
+        <!-- Guias (Tabs) das Categorias -->
+        <div class="preset-tabs-container flex gap-4 mb-3 border-b border-white/10 overflow-x-auto hide-scrollbar">
+          <button type="button" class="preset-tab-btn category-btn active" onclick="toggleIconCategory('vegetal', this)">Vegetal</button>
+          <button type="button" class="preset-tab-btn category-btn" onclick="toggleIconCategory('animal', this)">Animal</button>
+          <button type="button" class="preset-tab-btn category-btn" onclick="toggleIconCategory('aquatico', this)">Aquático</button>
+          <button type="button" class="preset-tab-btn category-btn" onclick="toggleIconCategory('logistico', this)">Logístico</button>
+        </div>
+
+        <!-- Vegetal -->
+        <div id="cat-content-vegetal" class="icon-category-wrapper block">
+          <div class="preset-icon-carousel flex overflow-x-auto gap-1 pb-1 hide-scrollbar" id="preset-icon-carousel-vegetal"></div>
+        </div>
+
+        <!-- Animal -->
+        <div id="cat-content-animal" class="icon-category-wrapper hidden">
+          <div class="preset-icon-carousel flex overflow-x-auto gap-1 pb-1 hide-scrollbar" id="preset-icon-carousel-animal"></div>
+        </div>
+
+        <!-- Aquático -->
+        <div id="cat-content-aquatico" class="icon-category-wrapper hidden">
+          <div class="preset-icon-carousel flex overflow-x-auto gap-1 pb-1 hide-scrollbar" id="preset-icon-carousel-aquatico"></div>
+        </div>
+
+        <!-- Logístico / Outros -->
+        <div id="cat-content-logistico" class="icon-category-wrapper hidden">
+          <div class="preset-icon-carousel flex overflow-x-auto gap-1 pb-1 hide-scrollbar" id="preset-icon-carousel-logistico"></div>
+        </div>
+      </div>
+
+      <!-- Nome do Preset -->
+      <div class="preset-form-group mb-3 mt-1">
+        <label class="preset-form-label block mb-1.5">Nome do Preset</label>
+        <input type="text" id="preset-name-input" class="lc-input w-full px-3 py-2 text-sm" placeholder="Ex: Minha Visão" maxlength="30" data-edit-key="">
+      </div>
+
+      <!-- Gotas de Cor (Liquid Gemstones) -->
+      <div class="preset-form-group mb-3">
+        <label class="preset-form-label block mb-1.5">Cor</label>
+        <div class="preset-color-grid flex overflow-x-auto gap-2 pb-2 pt-1 hide-scrollbar" id="preset-color-grid"></div>
+      </div>
+
+      <!-- Clonar Widgets -->
+      <div class="preset-form-group" id="preset-clone-group" style="display: block;">
+        <label class="preset-form-label block mb-1.5">Clonar widgets de...</label>
+        <select id="preset-clone-select" class="lc-input w-full px-3 py-2 h-[38px] cursor-pointer" style="padding-right: 30px; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23ffffff%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 10px center; background-size: 10px auto;">
+          <!-- Options populated dynamically -->
+        </select>
+      </div>
+
+      <!-- Barra de Ações (Botões Liquid Glass) -->
+      <div class="preset-form-actions pt-4 mt-3 border-t border-white/10 flex items-center">
+        <button onclick="deletePresetForm()" id="preset-delete-btn" class="lc-btn-danger" style="display:none; padding: 0.4rem 0.8rem; font-size: 0.75rem; border-radius: 8px;">Excluir</button>
+        <div class="flex-grow"></div>
+        <button onclick="closePresetModal()" class="lc-btn-secondary mr-2" style="padding: 0.4rem 0.8rem; font-size: 0.75rem; border-radius: 8px;">Cancelar</button>
+        <button onclick="savePresetForm()" id="preset-save-btn" class="lc-btn" style="padding: 0.4rem 1rem; font-size: 0.75rem;">Finalizar e adicionar presets</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const modalBox = document.querySelector('.preset-modal-box');
+
+
+    // Lixeira com suporte a Drag & Drop (Enhanced)
+    const trashZone = document.getElementById('preset-trash-zone');
+
+    // We bind dynamically because cards are generated by JS
+    document.addEventListener('dragstart', (e) => {
+      if (e.target.classList && e.target.classList.contains('modal-preset-card')) {
+        window._draggedPresetCard = e.target;
+        e.target.style.opacity = '0.5';
+        e.dataTransfer.effectAllowed = 'move';
+      }
+    });
+
+    document.addEventListener('dragend', (e) => {
+      if (e.target.classList && e.target.classList.contains('modal-preset-card')) {
+        window._draggedPresetCard = null;
+        e.target.style.opacity = '1';
+        if (trashZone) trashZone.classList.remove('drag-over');
+      }
+    });
+
+    if (trashZone) {
+      trashZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        trashZone.classList.add('drag-over');
+      });
+
+      trashZone.addEventListener('dragleave', () => {
+        trashZone.classList.remove('drag-over');
+      });
+
+      trashZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        trashZone.classList.remove('drag-over');
+        if (window._draggedPresetCard) {
+          const cardKey = window._draggedPresetCard.dataset.presetKey;
+          const cardName = window._draggedPresetCard.querySelector('span')?.innerText || 'o preset';
+          if (confirm(`Deseja realmente excluir "${cardName}"?`)) {
+            // Call system delete
+            if (typeof deletePresetByKey === 'function') {
+                deletePresetByKey(cardKey);
+            }
+          }
+        }
+      });
+    }
+  });
+
+  // Função para alternar as guias (tabs) de categorias de ícones
+  window.toggleIconCategory = function(cat, btn) {
+    document.querySelectorAll('.icon-category-wrapper').forEach(function(el) {
+      el.classList.add('hidden');
+      el.classList.remove('block');
+    });
+    document.querySelectorAll('.category-btn').forEach(function(el) {
+      el.classList.remove('active');
+    });
+
+    var target = document.getElementById('cat-content-' + cat);
+    if (target) {
+      target.classList.remove('hidden');
+      target.classList.add('block');
+    }
+    if (btn) {
+      btn.classList.add('active');
+    }
+  };
+</script>

@@ -1,0 +1,17 @@
+A Usina Coruripe, uma das maiores produtoras sucroenergéticas do país, e a Algar, empresa de tecnologia e telecom do Grupo Algar, vão implantar infraestrutura 4G em 69,8 mil hectares na região de Iturama, no Triângulo Mineiro. O projeto, que conta com investimento conjunto de R$ 3,7 milhões, vai beneficiar a operação da usina e de 120 mil pessoas que vivem em comunidades rurais da região.
+
+O projeto inclui a modernização de sete estações rádio base (ERBs) para a tecnologia 4G na faixa de 700 MHz, que oferece maior alcance e qualidade de sinal. Também serão construídas cinco torres para ampliar a cobertura da rede.
+
+Controlada pelo grupo Tércio Wanderley, a Usina Coruripe conta com quatro unidades em Minas Gerais (em Iturama, Campo Florido, Carneirinho e Limeira do Oeste), uma em Alagoas (Coruripe) e um terminal ferroviário em Iturama. A usina tem capacidade de moagem de 17 milhões de toneladas de cana-de-açúcar, produz 1,6 milhão de toneladas de açúcar e cerca de 500 milhões de litros de etanol.
+
+Ledir Malaquias, gerente de tecnologia da Usina Coruripe, disse que com o reforço da conectividade 4G foi possível agilizar em até cinco dias a análise de dados. “Isso nos permite tomar decisões em tempo real e impulsionar nossa produtividade. A viabilidade do projeto, sem impacto no caixa, foi um fator decisivo”, afirmou Malaquias.
+
+A usina também implementou 20 estações meteorológicas conectadas por internet das coisas (IoT), permitindo o uso de dados agroclimáticos mais precisos na tomada de decisão.
+
+Para Ivan Mendes, diretor de inovação da Algar e presidente do Brain, a iniciativa reforça o posicionamento da companhia no agronegócio. “Este projeto demonstra nossa capacidade de entregar ecossistemas completos, unindo infraestrutura robusta, IoT e parcerias estratégicas para gerar eficiência e impulsionar a competitividade do campo. Estamos construindo as bases para o futuro da agricultura digital”, afirmou Mendes.
+
+O projeto foi viabilizado por meio do Programa Alô Minas - Fase III, que autoriza empresas a direcionar parte dos créditos de ICMS para projetos de expansão da infraestrutura de telecomunicações. O programa foi criado em 2020 para acelerar a implantação da cobertura de telefonia móvel e internet 4G em áreas rurais.
+
+Para a terceira fase, o governo espera atender 36 distritos e comunidades de diferentes regiões mineiras. Nas duas primeiras fases, a expansão da cobertura atingiu 153 locais, beneficiando 138 mil habitantes.
+
+Estão previstos investimentos de aproximadamente R$ 100 milhões na terceira fase, sendo R$ 77,3 milhões da TIM com a CNH, R$ 19,6 milhões da Vivo e o restante da Algar.

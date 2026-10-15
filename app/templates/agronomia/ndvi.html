@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Ampliagro - Sanidade NDVI{% endblock %}
+
+{% block extra_css %}
+
+{% endblock %}
+
+{% block content %}
+<div class="section-container">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h1 class="section-title">Análise de Sanidade (NDVI)</h1>
+        <a href="{% url 'index_spa' %}" class="btn-primary" style="padding:0.5rem 1rem; border-radius:0.5rem; text-decoration:none;">Voltar ao Dashboard</a>
+    </div>
+
+    <div class="content-card">
+        <label for="talhaoSelect" style="display:block; font-weight:600; margin-bottom:0.5rem;">Selecione o Talhão</label>
+        <select id="talhaoSelect" class="form-select">
+            <option value="">Carregando talhões...</option>
+        </select>
+
+        <div id="loadingState" style="text-align:center; padding: 2rem; display:none;">
+            <i class="bi bi-hourglass-split" style="font-size:2rem; color:var(--cor-primaria);"></i>
+            <p style="margin-top:1rem; color:var(--cor-texto-secundario);">Processando imagens de satélite...</p>
+        </div>
+
+        <div id="ndviContent" style="display:none;">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Índice Médio (NDVI)</div>
+                    <div class="stat-value" id="valNdvi">0.00</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Estado</div>
+                    <div class="stat-value" id="valEstado">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Nuvens (%)</div>
+                    <div class="stat-value warning" id="valNuvens">0%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Data de Captura</div>
+                    <div class="stat-value" id="valData" style="font-size:1.25rem; line-height:2rem;">-</div>
+                </div>
+            </div>
+
+            <h3 style="margin-bottom:1rem; font-weight:600;">Mapa de Calor de Vigor</h3>
+            <div class="heatmap-placeholder">
+                <i class="bi bi-map"></i>
+                <span>Visualização Geoespacial do Talhão</span>
+                <span style="font-size:0.75rem; margin-top:0.5rem;">Dados reais via Sentinel-2 L2A (Copernicus)</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+async function loadTalhoes() {
+    try {
+        // Aproveitando endpoint existente (ou usando um mock se não houver)
+        const res = await fetch('/api/talhoes-por-propriedade/');
+        const data = await res.json();
+        const sel = document.getElementById('talhaoSelect');
+        sel.innerHTML = '<option value="">-- Selecione --</option>';
+        if (data.talhoes && data.talhoes.length > 0) {
+            data.talhoes.forEach(t => {
+                sel.innerHTML += '<option value="' + t.id + '">' + t.nome + '</option>';
+            });
+        } else {
+            // Mock de fallback caso não tenha endpoint ou esteja vazio
+            sel.innerHTML += '<option value="1">Talhão 01 - Soja (Demonstração)</option>';
+        }
+    } catch(e) {
+        document.getElementById('talhaoSelect').innerHTML = '<option value="1">Talhão Demonstração (Erro API)</option>';
+    }
+}
+
+document.getElementById('talhaoSelect').addEventListener('change', async function() {
+    const tid = this.value;
+    if(!tid) {
+        document.getElementById('ndviContent').style.display = 'none';
+        return;
+    }
+
+    document.getElementById('ndviContent').style.display = 'none';
+    document.getElementById('loadingState').style.display = 'block';
+
+    try {
+        const res = await fetch('/api/agronomia/ndvi/?talhao_id=' + tid);
+        const data = await res.json();
+
+        if (data.error) throw new Error(data.error);
+
+        document.getElementById('valNdvi').textContent = data.ndvi_medio;
+        document.getElementById('valEstado').textContent = data.sanidade;
+        document.getElementById('valNuvens').textContent = data.cobertura_nuvens + '%';
+
+        const dataObj = new Date(data.data_captura);
+        document.getElementById('valData').textContent = dataObj.toLocaleDateString('pt-BR');
+
+        // Color coding
+        const ndvi = parseFloat(data.ndvi_medio);
+        const valElem = document.getElementById('valNdvi');
+        valElem.className = 'stat-value';
+        if (ndvi >= 0.65) valElem.classList.add('excellent');
+        else if (ndvi < 0.5) valElem.classList.add('warning');
+
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('ndviContent').style.display = 'block';
+    } catch (e) {
+        alert("Erro ao processar NDVI: " + e.message);
+        document.getElementById('loadingState').style.display = 'none';
+    }
+});
+
+document.addEventListener('DOMContentLoaded', loadTalhoes);
+</script>
+{% endblock %}

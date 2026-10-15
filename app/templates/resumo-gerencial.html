@@ -1,0 +1,142 @@
+{% extends base_template %}
+{% load static %}
+
+{% block title %}Ampliagro - Resumo Gerencial{% endblock %}
+
+{% block extra_css %}
+
+{% endblock %}
+
+{% block dashboard_appbar %}{% endblock %}
+
+{% block content %}
+<div class="section-container">
+    <div class="section-header">
+        <h1 class="section-title">Resumo Gerencial</h1>
+        <a href="{% url 'cadastro-financeiro' %}" class="btn-secondary btn-sm"><i class="bi bi-currency-dollar"></i> Lancamentos</a>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon" style="color:#15803d;"><i class="bi bi-arrow-up-circle"></i></div>
+            <div class="stat-value" style="color:#15803d;">R$ {{ receita_total|default:"0,00" }}</div>
+            <div class="stat-label">Receita Total</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="color:#dc2626;"><i class="bi bi-arrow-down-circle"></i></div>
+            <div class="stat-value" style="color:#dc2626;">R$ {{ despesa_total|default:"0,00" }}</div>
+            <div class="stat-label">Despesas</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="color:#1d4ed8;"><i class="bi bi-graph-up-arrow"></i></div>
+            <div class="stat-value" style="color:#1d4ed8;">R$ {{ lucro_liquido|default:"0,00" }}</div>
+            <div class="stat-label">Lucro Liquido</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="color:#b45309;"><i class="bi bi-pie-chart"></i></div>
+            <div class="stat-value" style="color:#b45309;">{% if roi is not None %}{{ roi }}%{% else %}<span title="Sem receita no periodo — ROI indefinido">&mdash;</span>{% endif %}</div>
+            <div class="stat-label">ROI</div>
+        </div>
+    </div>
+
+    <div class="charts-grid">
+        <div class="chart-box">
+            <h3 style="font-size:0.875rem;font-weight:600;margin-bottom:0.75rem;color:var(--ncs-green-dark);">Receitas vs Despesas <span style="font-weight:400;opacity:.7">(ultimos {{ periodo_meses }} meses)</span></h3>
+            <canvas id="chartReceitasDespesas"></canvas>
+            {% if not tem_serie %}<div class="empty-state" style="margin-top:0.5rem"><i class="bi bi-inbox" style="display:block;margin-bottom:0.25rem"></i>Sem lancamentos nos ultimos {{ periodo_meses }} meses.</div>{% endif %}
+        </div>
+        <div class="chart-box">
+            <h3 style="font-size:0.875rem;font-weight:600;margin-bottom:0.75rem;color:var(--ncs-green-dark);">Distribuicao de Custos <span style="font-weight:400;opacity:.7">(ultimos {{ periodo_meses }} meses)</span></h3>
+            <canvas id="chartCustos"></canvas>
+            {% if not tem_custos %}<div class="empty-state" style="margin-top:0.5rem"><i class="bi bi-inbox" style="display:block;margin-bottom:0.25rem"></i>Nenhuma despesa registrada no periodo.</div>{% endif %}
+        </div>
+        <div class="chart-box">
+            <h3 style="font-size:0.875rem;font-weight:600;margin-bottom:0.75rem;color:var(--ncs-green-dark);">Evolucao Financeira</h3>
+            <canvas id="chartEvolucao"></canvas>
+            {% if not tem_serie %}<div class="empty-state" style="margin-top:0.5rem"><i class="bi bi-inbox" style="display:block;margin-bottom:0.25rem"></i>Sem dados para a evolucao.</div>{% endif %}
+        </div>
+    </div>
+
+    <div class="content-card">
+        <h2 style="font-size:1rem;font-weight:600;margin-bottom:1rem;color:var(--ncs-green-dark);">Ultimos Lancamentos Financeiros</h2>
+        {% if ultimos_lancamentos %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Tipo</th>
+                        <th>Categoria</th>
+                        <th>Descricao</th>
+                        <th>Valor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for l in ultimos_lancamentos %}
+                    <tr>
+                        <td>{{ l.data|date:"d/m/Y" }}</td>
+                        <td>{% if l.tipo == "RECEITA" %}<span class="badge badge-receita">Receita</span>{% else %}<span class="badge badge-despesa">Despesa</span>{% endif %}</td>
+                        <td>{{ l.get_categoria_display }}</td>
+                        <td>{{ l.descricao|default:"-" }}</td>
+                        <td class="{% if l.tipo == 'RECEITA' %}valor-positivo{% else %}valor-negativo{% endif %}">R$ {{ l.valor|floatformat:2 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state"><i class="bi bi-inbox" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>Nenhum lancamento financeiro encontrado.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="{% static 'vendor/chart.umd-4.4.7.min.js' %}"></script>
+<!-- Dados dos graficos como JSON seguro (nunca |safe dentro de <script>).
+     A view entrega listas reais de 12 meses; antes elas nem existiam no
+     contexto e o doughnut usava [30,25,15,10,20] fixo — grafico de mentira. -->
+{{ receitas_meses|json_script:"g-receitas" }}
+{{ despesas_meses|json_script:"g-despesas" }}
+{{ meses_labels|json_script:"g-labels" }}
+{{ custos_labels|json_script:"g-custos-labels" }}
+{{ custos_valores|json_script:"g-custos-valores" }}
+<script>
+function _json(id, fallback) {
+    var el = document.getElementById(id);
+    if (!el) return fallback;
+    try { return JSON.parse(el.textContent); } catch (e) { return fallback; }
+}
+function initCharts() {
+    const receitas  = _json('g-receitas', []);
+    const despesas = _json('g-despesas', []);
+    const labels   = _json('g-labels', []);
+    const cLabels  = _json('g-custos-labels', []);
+    const cValores = _json('g-custos-valores', []);
+
+    // Sem dado: nao desenha um grafico vazio que parece "zero real".
+    if (labels.length && (receitas.some(function(v){return v;}) || despesas.some(function(v){return v;}))) {
+        const ctx1 = document.getElementById('chartReceitasDespesas');
+        if (ctx1) new Chart(ctx1, { type:'bar', data:{ labels: labels, datasets:[
+            { label:'Receitas', data:receitas, backgroundColor:'#15803d40', borderColor:'#15803d', borderWidth:2 },
+            { label:'Despesas', data:despesas, backgroundColor:'#dc262640', borderColor:'#dc2626', borderWidth:2 }
+        ]}, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom', labels:{ boxWidth:12, font:{size:11} } } } } });
+
+        const ctx3 = document.getElementById('chartEvolucao');
+        if (ctx3) new Chart(ctx3, { type:'line', data:{ labels: labels, datasets:[{ label:'Saldo', data:receitas.map(function(r,i){ return r - despesas[i]; }), borderColor:'#0f172a', backgroundColor:'#0f172a10', fill:true, tension:0.3 }]}, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } } } });
+    }
+
+    // Distribuicao de custos: valores REAIS por categoria. Antes era fixo.
+    if (cLabels.length && cValores.some(function(v){return v;})) {
+        const paleta = ['#15803d','#1d4ed8','#b45309','#dc2626','#64748b','#0f766e','#7c3aed','#be123c','#0891b2','#65a30d'];
+        const ctx2 = document.getElementById('chartCustos');
+        if (ctx2) new Chart(ctx2, { type:'doughnut', data:{
+            labels: cLabels,
+            datasets:[{ data: cValores, backgroundColor: cLabels.map(function(_,i){ return paleta[i % paleta.length]; }) }]
+        }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom', labels:{ boxWidth:12, font:{size:11} } } } } });
+    }
+}
+document.addEventListener('DOMContentLoaded', initCharts);
+</script>
+{% endblock %}

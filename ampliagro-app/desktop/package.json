@@ -1,0 +1,195 @@
+{
+  "name": "ampliagro-desktop",
+  "productName": "Ampliagro",
+  "version": "0.1.1",
+  "private": true,
+  "author": {
+    "name": "Ampliagro"
+  },
+  "description": "Ampliagro Desktop — casca Electron para o runtime Django embebido",
+  "license": "UNLICENSED",
+  "homepage": "https://luck-of-luck.github.io/Ampliagro-releases/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/luck-of-luck/Ampliagro.git"
+  },
+  "main": "electron/main.js",
+  "scripts": {
+    "start": "electron .",
+    "check:python": "python backend/bootstrap.py --check",
+    "build:assets": "python backend/bootstrap.py --preparar",
+    "build:runtime": "python backend/congelar.py --limpar",
+    "build:packs": "python ../../app/static/js/build-packs.py",
+    "build:all": "npm run build:assets && npm run build:packs && npm run build:runtime",
+    "dist": "npm run build:all && electron-builder",
+    "dist:win": "npm run build:all && electron-builder --win",
+    "dist:mac": "npm run build:all && electron-builder --mac",
+    "dist:linux": "npm run build:all && electron-builder --linux",
+    "vendor:download": "python backend/vendorizar.py",
+    "vendor:verificar": "python backend/vendorizar.py --verificar",
+    "vendor:relatorio": "python backend/vendorizar.py --relatorio",
+    "vendor:reescrever": "python backend/reescrever_cdn.py --dry-run",
+    "vendor:aplicar": "python backend/reescrever_cdn.py",
+    "vendor:restaurar": "python backend/reescrever_cdn.py --restaurar",
+    "inventario:cdn": "python backend/inventario_cdn.py",
+    "packs:gerar": "python ../../app/static/js/build-packs.py",
+    "packs:wizard": "node -e \"require('../../app/static/js/pack-wizard.js'); PackWizard.open();\"",
+    "packs:atualizar": "node -e \"require('../../app/static/js/pack-updater.js'); PackUpdater.checkAllUpdates().then(u=>console.log(u.length+' updates'));\";",
+    "prova:janela": "node testes/prova-janela.cjs",
+    "prova:encerramento": "python testes/prova_encerramento.py",
+    "prova:congelado": "python testes/prova_congelado.py",
+    "gate:offline": "node testes/gate-offline.cjs",
+    "dist:store": "node -e \"require('./build/store.js')\" && npm run build:all && electron-builder --win appx --config build/store.js --publish never",
+    "prova:instalador": "node testes/prova-instalador-windows.cjs"
+  },
+  "build": {
+    "appId": "com.ampliagro.desktop",
+    "productName": "Ampliagro",
+    "copyright": "Copyright © 2026 Ampliagro",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "icon": "build/icon.png",
+    "files": [
+      "electron/**/*",
+      "backend/**/*",
+      "staticfiles/**/*",
+      "node_modules/**/*",
+      "package.json",
+      "build/license.txt"
+    ],
+    "extraResources": [
+      {
+        "from": "../../staticfiles",
+        "to": "staticfiles",
+        "filter": [
+          "**/*"
+        ]
+      },
+      {
+        "from": "dist-runtime/ampliagro-runtime",
+        "to": "runtime/ampliagro-runtime",
+        "filter": [
+          "**/*"
+        ]
+      },
+      {
+        "from": "../..",
+        "to": "setup",
+        "filter": [
+          "installer.html",
+          "installer.css",
+          "installer.js",
+          "app/static/img/ampliagro-logo.svg",
+          "app/static/vendor/fontes.css",
+          "app/static/vendor/fonts/*.woff2"
+        ]
+      }
+    ],
+    "asar": true,
+    "asarUnpack": [
+      "backend/**/*"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "publisherName": "Ampliagro",
+      "signingHashAlgorithms": [
+        "sha256"
+      ]
+    },
+    "nsis": {
+      "oneClick": true,
+      "allowToChangeInstallationDirectory": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Ampliagro",
+      "uninstallDisplayName": "Ampliagro",
+      "license": null,
+      "artifactName": "${productName}-${arch}.${ext}",
+      "runAfterFinish": false,
+      "include": "build/installer.nsh"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        },
+        {
+          "target": "pkg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
+      "category": "public.app-category.productivity",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
+      "artifactName": "${productName}-${arch}.${ext}"
+    },
+    "dmg": {
+      "contents": [
+        {
+          "x": 130,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        },
+        {
+          "x": 410,
+          "y": 220,
+          "type": "file"
+        }
+      ],
+      "window": {
+        "width": 540,
+        "height": 380
+      }
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "deb",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "category": "Office",
+      "maintainer": "Ampliagro <suporte@ampliagro.com>",
+      "artifactName": "${productName}-${arch}.${ext}"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "luck-of-luck",
+      "repo": "Ampliagro-releases"
+    }
+  },
+  "devDependencies": {
+    "electron": "^44.7.0",
+    "electron-builder": "^24.13.3"
+  },
+  "dependencies": {
+    "electron-updater": "^6.8.9"
+  }
+}

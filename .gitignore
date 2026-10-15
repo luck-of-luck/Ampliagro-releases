@@ -1,0 +1,309 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django
+*.log
+local_settings.py
+# A base E' o dado do produtor. Qualquer variante — base, journal, WAL,
+# SHM, ou um backup escrito por um comando antes de mexer nos talhoes —
+# nao entra no git. Um unico `git add -A` apanha ficheiros nao
+# rastreados, e um backup de 4,8 MB com os dados da fazenda dentro do
+# historico e' permanente: da-se para apagar o ficheiro, nao o commit.
+# O `*.bak` de baixo nao chega: um ficheiro chamado
+# "db.sqlite3.bak antes-de-saneear-talhoes" tem ESPACO depois de .bak,
+# nao ponto, e por isso nao casa com `*.bak` nem com `*.bak.*`.
+db.sqlite3*
+db.sqlite3-journal
+media/
+staticfiles/
+
+# O estado do desktop tambem e' dado do produtor — e `db.sqlite3*` nao o
+# apanha, porque a base do desktop chama-se `ampliagro-desktop.sqlite3` e
+# vive em `.desktop-data/`. Foi EXACTAMENTE o que aconteceu: um `git add -A`
+# poe este directorio inteiro para dentro do historico.
+#
+# MEDIDO em 13/10/2026, antes de o repositorio ser publico: 3 ficheiros
+# rastreados sob `.desktop-data/`.
+#   `ampliagro-desktop.sqlite3`  16 KB, 3 tabelas de cache, ZERO linhas.
+#                               Nenhum dado de produtor — mas um `.sqlite`
+#                               no historico e um `.sqlite` no historico para
+#                               sempre, e o dia que uma sessao de
+#                               desenvolvimento correr ali dentro, fica
+#                               publicada com o repositorio.
+#   `secret.key`                a SECRET_KEY do desktop desta maquina.
+#   `cache-clima/clima.json`    e o cache de uma sessao de desenvolvimento.
+#
+# `config/settings/desktop.py:45` diz que o directorio de dados vem de
+# `AMPLIAGRO_DESKTOP_DATA_DIR` e, por omissao, e' `BASE_DIR/.desktop-data` —
+# dentro do repositorio. Dai a razao de o ignorar inteiro e nao o nome da
+# base: a proxima versao desta pasta nao tem `.sqlite3` no nome.
+.desktop-data/
+# MEDIDO 14/10/2026: a linha 36 deste ficheiro JA descrevia o
+# `cache-clima/clima.json` como "o cache de uma sessao de desenvolvimento" —
+# mas estava dentro de um comentario, e sem o ponto inicial. Nao havia
+# nenhuma regra. O `git status` mostrava `?? .cache-clima/clima.json` em cada
+# commit, e o ponto e' que o `git check-ignore` nao acusa: devolveu
+# `.gitignore:277:` com o PADRAO VAZIO, que e' a linha 277 estar em branco.
+# Um ficheiro com o comentario a descrever o que deve ser ignorado, e sem a
+# regra que o faz, e' o pior dos dois: le-se como se estivesse cuidado.
+.cache-clima/
+
+# `index.html` na raiz: ficheiro de 0 bytes. Nao e' a landing (que esta em
+# `landing.html` e no repo de releases) nem o catalogo (que vive inline em
+# `app/templates/index.html`, como diz o comentario da linha 272).
+/index.html
+
+# Environment
+.env
+.env.local
+.env.*.local
+CREDENCIAIS.txt
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Build outputs
+dist/
+build/
+*.egg-info/
+
+# Tailwind compiled output (generated)
+app/static/css/tailwind-compiled.css
+staticfiles/css/tailwind-compiled.css
+
+# Backup templates (old versions)
+app/templates/backup_telas/
+
+# Fix scripts (development garbage)
+fix_*.py
+fix_*.js
+fix_*.ps1
+apply_*.py
+add_*.py
+check_*.py
+cleanup_*.py
+copy_*.py
+debug_*.py
+do_fix.py
+dump_*.py
+final_*.py
+find_*.py
+inspect_*.py
+replace_*.py
+reformat_*.py
+rewrite_*.py
+step1.py
+temp_*.py
+temp_*.html
+temp_*.txt
+temp.b64
+unify_*.py
+update_*.py
+verify_*.py
+add_*.js
+widgetbar-*.js
+widgets-*.js
+navbar_*.txt
+index_bak.b64
+test.txt
+run_py.bat
+gerenciar_cofre.bat
+
+# Coverage
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+
+# Pytest
+.pytest_cache/
+.tox/
+
+# Mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyright
+.pyright_cache/
+
+# Ruff
+.ruff_cache/
+
+#Ignore vscode AI rules
+.github\instructions\codacy.instructions.md
+
+# AI / agent tooling
+.claude/
+.qoder/
+CLAUDE.md
+.clinerules
+
+# Virtual env
+.venv/
+venv/
+
+# Backup / temp directories
+_bmad/
+_bekups/
+cofre-bekups/
+_backups/
+
+# Dev / cleanup scripts
+_check.py
+_check2.py
+_find_unbalanced.py
+_fix_all.py
+
+# Database backups
+*.bak
+*.bak.*
+
+# OS convenience scripts
+runserver_dev.bat
+gerenciar_cofre.bat
+
+# Dev server logs
+server_log*.txt
+console
+implementation_plan.md
+
+# Data local do produto (inclui credenciais)
+product-data/
+
+# Capturas de tela / artefatos de teste na raiz
+/guia-*.png
+
+# AI / agent tooling local
+.hermes/
+.hurc-harness/
+.opencode/
+graphify-out/
+AGENTS.md
+
+# Codebase memory (large embedded DB, not for repo)
+grafos/
+codebase-memory-mcp/
+
+# Reorganiza��o 22/09/2026 � artefatos locais
+lighthouse.json
+console-lighthouse.json
+console
+*.mp4
+gerar_final.py
+SUPER-ESTUDO-*.md
+SUPER-ESTUDO-?M.md
+
+
+# Higiene repo 26/09/2026 - artefatos temporarios na raiz
+/test.js
+/test_0.js
+/test_*.js
+/temp_*.html
+/db.sqlite3-shm
+/db.sqlite3-wal
+/_backups/
+
+# ---------------------------------------------------------------------------
+# Residuo de sessao: onde se depura, nao onde se constroi.
+# ---------------------------------------------------------------------------
+# `scratch/` e' onde se deita um script para responder a uma pergunta. As
+# respostas que importam vao para `docs/` ou para um teste; o script fica.
+# Sem esta regra, um `git add -A` leva vinte ficheiros de debug para a
+# historia e esconde os tres que interessam.
+/scratch/
+
+# Saida de processo ao lado do log: `.err` e `.out` sao o mesmo ruido que
+# `*.log`, e `*.log` ja estava coberto.
+#
+# SEM o `/` inicial, como `*.log`. Com o `/`, a regra so pegava a ficheiros na
+# RAIZ do repositorio, e `logs/srv.err`, `logs/_b.err`, `logs/_iae_suite.err` e
+# `logs/_iae_suite.out` ficavam sem regra nenhuma — a um `git add -A` do
+# historico. O comentario ja dizia que deviam ser como `*.log`; a regra nao era.
+*.err
+*.out
+
+# Artefactos do browser usado para simular um produtor. Sao ficheiros
+# temporarios do teste, e o nome deles muda a cada execucao.
+/.playwright-mcp/
+/.playwright/
+
+# O dump de um navegador tem o nome da sessao dentro. Ignorar o padrao e'
+# mais honesto do que o caminho, porque ninguem escolhe essa pasta.
+/simulacao-*.png
+# Artefatos de teste do navegador que JA ESTAVAM versionados quando estas
+# regras foram escritas — .gitignore nao desversiona, entao sao Preciso
+# desversionar na mao (feito no commit "chore(repo): ..."). Mantidas aqui
+# para que um `git add -A` nao os traga de volta.
+playwright-report/
+/playwright/
+backups/
+
+# --- lacunas fechadas pela IA-C (2026-10-04) -----------------------------
+#
+# `catalog.json` e' JAVASCRIPT com extensao .json (`window.WIDGET_CATALOG =
+# {...}`), nao JSON. E' um duplicado morto: o WIDGET_CATALOG real vive em
+# `app/templates/index.html`, o teste le o de la, e nenhuma sessao o
+# referenceia. Nao esta em HEAD.
+#
+# Porque nao se apaga: e' trabalho de outra sessao (R6). Fica no disco,
+#(versionado nao), e so ganha uma regra para que um `git add -A` o traga
+# junto — o `check-json` reprova-o, e porque o indice e partilhado, isso
+# bloqueava o commit de todas as outras sessoes. Foi o que produziu o
+# varrimento de 158 ficheiros staged na sessao anterior.
+catalog.json
+
+# Logs de execucao. O README.md e' versionado de proposito; o resto nao.
+# A suite de testes escrevia no log de PRODUCAO (achado do bloco IA-H), e um
+# log em historico e' ruido que ninguem vai ler.
+logs/*
+!logs/README.md
+
+# Saida do Playwright quando corre sem CI. `playwright-report/` ja estava
+# tratado; esta e' a outra porta de saida dele.
+test-results/
+
+# Ficheiros orfaos, preservados em disco mas fora do git.
+#
+# `catalog.json` vivia na raiz: era JavaScript (`window.WIDGET_CATALOG = {...}`)
+# com extensao `.json`, nao era JSON valido, nao estava no HEAD, e o catalogo
+# real esta definido inline em `app/templates/index.html`. O pre-commit
+# `check-json` reprovava-o sempre — e por isso NENHUM commit do repositorio
+# passava. Movido para `docs/_orfaos/` com a extensao verdadeira.
+docs/_orfaos/
+
+# Comparativo 100x50 (docs/sistema/comparativo/)
+# Cache do verificador de evidencia: guarda o HTML de cada pagina buscada para
+# que a prova seja reexecutavel sem rede. ~24 MB de HTML de terceiros.
+# Nao entra no git: versionar uma fotografia de uma pagina que ja mudou
+# transformaria a prova numa mentira com data.
+docs/sistema/comparativo/.cache_fontes.json
+
+# Backups da reescrita de CDN (Fase 2). endorizar.py / 
+eescrever_cdn.py guardam o
+# original antes de mexer; 
+pm run vendor:restaurar desfaz. Não são produto.
+*.cdn-backup
+
+
+# Fixture do teste de render do clima: gerada pelo CI
+.clima-fixture/
+
+ampliagro-app/desktop/dist-validation/

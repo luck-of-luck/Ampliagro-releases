@@ -1,0 +1,25 @@
+A criação da Infraestrutura de Verificação Agrícola, Monitoramento e Conformidade de Grãos (VMG) já havia sido questionada pela Controladoria-Geral da União (CGU) em fevereiro deste ano. A partir de denúncias públicas, o órgão de controle pediu explicações ao Ministério da Agricultura sobre possíveis impropriedades e o suposto direcionamento do processo de seleção de empresas prestadoras de serviços. Criada em 2025, a VMG verifica se as propriedades estão fazendo a aplicação correta de recursos subsidiados, com apoio de inteligência artificial e imagens de satélites.
+
+Na época, a Pasta negou irregularidades e defendeu a ferramenta. O ministério ainda criticou o “descumprimento” da norma pelas instituições financeiras e disse que o comportamento “aprofunda o apagão de dados que se vive no crédito rural brasileiro” e impede a verificação adequada das condicionantes socioambientais das operações e a rastreabilidade da aplicação dos recursos públicos subvencionados.
+
+“A resistência à sua implementação (...) perpetua um modelo em que a falta de transparência prejudica o produtor rural, onera o erário e fragiliza a capacidade de fiscalização dos órgãos de controle”, disse o ministério na resposta à CGU no início deste ano, obtida pelo Valor .
+
+A Federação Brasileira de Bancos (Febraban) disse à reportagem, em março, que a implementação de eventuais exigências “depende da adequada regulamentação, da clareza dos critérios e da viabilidade de integração com os sistemas já existentes no âmbito do crédito rural e das políticas públicas associadas”. A entidade reforçou que o tema deve ser tratado pelo Conselho Monetário Nacional (CMN).
+
+Embora vigente desde setembro de 2025, apenas quatro atestados VMG haviam sido emitidos até fevereiro de 2026, correspondendo a uma área total de 487,61 hectares, com investimento total de R$ 1.815,46, o equivalente a R$ 3,72 por hectare analisado.
+
+Na manifestação à CGU em fevereiro, o Ministério da Agricultura defendeu que houve prazo razoável para divulgação e preparação das empresas para o credenciamento. A criação do padrão VMG foi em 21 de março de 2025 e os testes das metodologias foram agendados entre 22 de abril e 9 de maio. O ministério reforçou que apenas uma empresa realizou a prova de conceito e atendeu aos requisitos, mas que houve interesse de outras companhias.
+
+A Pasta explicou que o credenciamento de empresas será “contínuo”. Em 2026, houve nova rodada de testes das tecnologias entre abril e maio e a seleção de outra companhia para operar a emissão dos atestados VMG.
+
+Sobre os requisitos exigidos, como a experiência em mapeamento e monitoramento de 100 milhões de hectares via inteligência artificial, o ministério afirmou à CGU que a medida visa evitar o credenciamento de empresas sem “maturidade de processos, a infraestrutura computacional e a capacidade de orquestração necessárias para sustentar a operação em produção com desempenho e acurácia ao longo do tempo”.
+
+A Pasta esclareceu que o projeto de credenciamento da Infraestrutura VMG dispensou a elaboração de estudo de impacto econômico sobre as tarifas a serem cobradas dos produtores rurais porque o atestado “não representa um custo novo ou adicional ao produtor, mas sim um componente do projeto técnico do financiamento rural, tal como certidões negativas, laudos agronômicos e o próprio projeto de financiamento”.
+
+O Ministério da Agricultura também disse à CGU que foi uma “decisão estratégica” não desenvolver uma plataforma própria com recursos públicos, mas sim optar por um modelo via credenciamento, “o que preservou os recursos da União e transferiu o risco tecnológico para o setor privado”.
+
+Após análise feita nos últimos meses, o Tribunal de Contas da União (TCU) recomendou ao ministério que avalie a viabilidade de utilizar e integrar infraestruturas públicas já disponíveis para o monitoramento da conformidade agrícola. O material cita a plataforma federal “Meu Imóvel Rural”, do Ministério da Gestão e Inovação (MGI). “Essa solução evita que cada produtor pague a prestador privado para obter informações já detidas pelo Estado e reduz o risco de divergência entre cópias privadas e registros oficiais”, disse o órgão.
+
+Consultada, a CGU informou que como o Tribunal de Contas da União (TCU) estava à frente de uma avaliação mais aprofundada sobre o tema , o órgão optou por enviar os resultados preliminares das análises ao TCU para subsídio e suspendeu a avaliação para evitar a sobreposição de esforços e conferir eficiência à atuação dos órgãos de controle .
+
+Procurado pela reportagem, o Ministério da Agricultura não respondeu.

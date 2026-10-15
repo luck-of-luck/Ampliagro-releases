@@ -1,0 +1,147 @@
+{
+  "Soja": {
+    "grupo": "leguminosas",
+    "ibge": 2713,
+    "agrodoc": "soja"
+  },
+  "Milho": {
+    "grupo": "graos",
+    "ibge": 2712,
+    "agrodoc": "milho"
+  },
+  "Arroz": {
+    "grupo": "graos",
+    "ibge": 2691,
+    "agrodoc": "arroz"
+  },
+  "Trigo": {
+    "grupo": "graos",
+    "ibge": 2696,
+    "agrodoc": "trigo"
+  },
+  "Feijão": {
+    "grupo": "leguminosas",
+    "ibge": 2716,
+    "agrodoc": "feijao"
+  },
+  "Feijão-carioca": {
+    "grupo": "leguminosas",
+    "ibge": 2716,
+    "agrodoc": "feijao-carioca"
+  },
+  "Feijão-preto": {
+    "grupo": "leguminosas",
+    "ibge": 2716,
+    "agrodoc": "feijao-preto"
+  },
+  "Algodão": {
+    "grupo": "fibras",
+    "ibge": 2707,
+    "agrodoc": "algodao"
+  },
+  "Café": {
+    "grupo": "graos",
+    "ibge": 2700,
+    "agrodoc": "cafe"
+  },
+  "Cana-de-açúcar": {
+    "grupo": "cana",
+    "ibge": 2689,
+    "agrodoc": "acucar"
+  },
+  "Amendoim": {
+    "grupo": "leguminosas",
+    "ibge": 2693,
+    "agrodoc": "amendoim"
+  },
+  "Girassol": {
+    "grupo": "oleaginosas",
+    "ibge": 2720,
+    "agrodoc": "girassol"
+  },
+  "Sorgo": {
+    "grupo": "graos",
+    "ibge": 2714,
+    "agrodoc": "sorgo"
+  },
+  "Cevada": {
+    "grupo": "graos",
+    "ibge": 2710,
+    "agrodoc": "cevada"
+  },
+  "Aveia": {
+    "grupo": "graos",
+    "ibge": 2709,
+    "agrodoc": "aveia"
+  },
+  "Batata": {
+    "grupo": "tuberculos",
+    "ibge": 2698,
+    "agrodoc": "batata"
+  },
+  "Mandioca": {
+    "grupo": "tuberculos",
+    "ibge": 2694,
+    "agrodoc": "mandioca"
+  },
+  "Tomate": {
+    "grupo": "hortalicas",
+    "ibge": 2699,
+    "agrodoc": "tomate"
+  },
+  "Cebola": {
+    "grupo": "hortalicas",
+    "ibge": 2701,
+    "agrodoc": "cebola"
+  },
+  "Alho": {
+    "grupo": "hortalicas",
+    "ibge": 2702,
+    "agrodoc": "alho"
+  },
+  "Cenoura": {
+    "grupo": "hortalicas",
+    "ibge": 2703,
+    "agrodoc": "cenoura"
+  },
+  "Banana": {
+    "grupo": "frutas",
+    "ibge": 2006,
+    "agrodoc": "banana"
+  },
+  "Laranja": {
+    "grupo": "citricos",
+    "ibge": 2008,
+    "agrodoc": "laranja"
+  },
+  "Manga": {
+    "grupo": "frutas",
+    "ibge": 2010,
+    "agrodoc": "manga"
+  },
+  "Uva": {
+    "grupo": "trepadeiras",
+    "ibge": 2007,
+    "agrodoc": "uva"
+  },
+  "Maçã": {
+    "grupo": "frutas",
+    "ibge": 2009,
+    "agrodoc": "maca"
+  },
+  "Mamão": {
+    "grupo": "frutas",
+    "ibge": 2011,
+    "agrodoc": "mamao"
+  },
+  "Melancia": {
+    "grupo": "frutas",
+    "ibge": 2012,
+    "agrodoc": "melancia"
+  },
+  "Melão": {
+    "grupo": "frutas",
+    "ibge": 2013,
+    "agrodoc": "melao"
+  }
+}

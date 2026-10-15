@@ -1,0 +1,105 @@
+{% extends base_template %}
+{% load static %}
+
+{% block title %}Ampliagro - Setor Campo{% endblock %}
+
+{% block extra_css %}
+
+{% endblock %}
+
+{% block dashboard_appbar %}{% endblock %}
+
+{% block content %}
+<div class="section-container">
+    <div class="section-header">
+        <h1 class="section-title"><i class="bi bi-tree"></i> Setor de Campo</h1>
+        <a href="{% url 'index_spa' %}" class="btn-secondary btn-sm"><i class="bi bi-arrow-left"></i> Voltar ao Dashboard</a>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Total Talhões</div>
+            <div class="stat-value">12</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Área Total (ha)</div>
+            <div class="stat-value">485,50</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Culturas Ativas</div>
+            <div class="stat-value">4</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Safra Atual</div>
+            <div class="stat-value">2025/2026</div>
+        </div>
+    </div>
+
+    <div class="content-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+            <h2 style="font-size:1rem;font-weight:600;color:var(--ncs-green-dark);">Talhões</h2>
+            <a href="{% url 'cadastro-talhao' %}" class="btn-primary btn-sm"><i class="bi bi-plus-lg"></i> Novo Talhão</a>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Área (ha)</th>
+                        <th>Cultura</th>
+                        <th>Safra</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Talhão 01</strong></td>
+                        <td>45,00</td>
+                        <td>Soja</td>
+                        <td>2025/2026</td>
+                        <td><span class="badge badge-ativo">Ativo</span></td>
+                        <td><div class="action-cell"><a href="{% url 'cadastro-talhao' %}" class="btn-secondary btn-sm">Editar</a></div></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Talhão 02</strong></td>
+                        <td>38,50</td>
+                        <td>Milho</td>
+                        <td>2025/2026</td>
+                        <td><span class="badge badge-ativo">Ativo</span></td>
+                        <td><div class="action-cell"><a href="{% url 'cadastro-talhao' %}" class="btn-secondary btn-sm">Editar</a></div></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Talhão 03</strong></td>
+                        <td>52,00</td>
+                        <td>Algodão</td>
+                        <td>2025/2026</td>
+                        <td><span class="badge badge-preparo">Preparo</span></td>
+                        <td><div class="action-cell"><a href="{% url 'cadastro-talhao' %}" class="btn-secondary btn-sm">Editar</a></div></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Talhão 04</strong></td>
+                        <td>30,00</td>
+                        <td>Café</td>
+                        <td>2025/2026</td>
+                        <td><span class="badge badge-ativo">Ativo</span></td>
+                        <td><div class="action-cell"><a href="{% url 'cadastro-talhao' %}" class="btn-secondary btn-sm">Editar</a></div></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Talhão 05</strong></td>
+                        <td>42,00</td>
+                        <td>Soja</td>
+                        <td>2025/2026</td>
+                        <td><span class="badge badge-descanso">Descanso</span></td>
+                        <td><div class="action-cell"><a href="{% url 'cadastro-talhao' %}" class="btn-secondary btn-sm">Editar</a></div></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+{% endblock %}

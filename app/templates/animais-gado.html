@@ -1,0 +1,124 @@
+{% extends base_template %}
+{% load static %}
+
+{% block title %}Ampliagro - Animais / Gado{% endblock %}
+
+{% block extra_css %}
+
+{% endblock %}
+
+{% block dashboard_appbar %}{% endblock %}
+
+{% block content %}
+<div class="section-container">
+    <div class="section-header">
+        <h1 class="section-title"><i class="bi bi-signpost-2"></i> Animais / Gado</h1>
+        <a href="{% url 'index_spa' %}" class="btn-secondary btn-sm"><i class="bi bi-arrow-left"></i> Voltar ao Dashboard</a>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Lotação (UA/ha)</div>
+            <div class="stat-value">{{ lotacao_media|default:"0.0" }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">GMD Médio Rebanho</div>
+            <div class="stat-value">{{ gmd_medio|default:"0.0" }} kg/dia</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Animais Rastreáveis</div>
+            <div class="stat-value">{{ total_individuos|default:"0" }}</div>
+        </div>
+        <div class="stat-card" style="{% if alertas_qtd > 0 %}border-color: #fca5a5; background: #fef2f2;{% endif %}">
+            <div class="stat-label">Alertas Sanitários</div>
+            <div class="stat-value" style="{% if alertas_qtd > 0 %}color: #dc2626;{% endif %}">{{ alertas_qtd|default:"0" }}</div>
+        </div>
+    </div>
+
+    {% if alertas_qtd > 0 %}
+    <div class="content-card" style="border-left: 4px solid #dc2626; padding: 1.5rem;">
+        <h2 style="font-size:1rem;font-weight:600;color:#dc2626;margin-bottom:1rem;"><i class="bi bi-shield-exclamation"></i> Calendário Sanitário (Atenção)</h2>
+        <ul style="list-style: none; padding: 0; margin: 0;">
+            {% for alerta in alertas_sanitarios %}
+                <li style="margin-bottom: 0.5rem; font-size: 0.875rem;">
+                    <strong>Brinco {{ alerta.animal_brinco }}</strong>:
+                    {{ alerta.protocolo }}
+                    {% if alerta.status == 'vencido' %}
+                        <span style="color:#dc2626;font-weight:600;">(Vencido há {{ alerta.dias_restantes|stringformat:"d"|slice:"1:" }} dias)</span>
+                    {% else %}
+                        <span style="color:#b45309;font-weight:600;">(Vence em {{ alerta.dias_restantes }} dias)</span>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <div class="content-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+            <h2 style="font-size:1rem;font-weight:600;color:var(--ncs-green-dark);">Grupos de Animais</h2>
+            <a href="{% url 'cadastro-animal' %}" class="btn-primary btn-sm"><i class="bi bi-plus-lg"></i> Novo Animal</a>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Grupo</th>
+                        <th>Espécie</th>
+                        <th>Quantidade</th>
+                        <th>Peso Médio (kg)</th>
+                        <th>Tipo Produção</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Lote A - Corte</strong></td>
+                        <td>Bovino</td>
+                        <td>85</td>
+                        <td>420</td>
+                        <td><span class="badge badge-corte">Corte</span></td>
+                        <td><div class="action-cell"><a href="{% url 'cadastro-animal' %}" class="btn-secondary btn-sm">Editar</a></div></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Lote B - Leite</strong></td>
+                        <td>Bovino</td>
+                        <td>62</td>
+                        <td>510</td>
+                        <td><span class="badge badge-leite">Leite</span></td>
+                        <td><div class="action-cell"><a href="{% url 'cadastro-animal' %}" class="btn-secondary btn-sm">Editar</a></div></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Lote C - Recria</strong></td>
+                        <td>Bovino</td>
+                        <td>120</td>
+                        <td>280</td>
+                        <td><span class="badge badge-misto">Misto</span></td>
+                        <td><div class="action-cell"><a href="{% url 'cadastro-animal' %}" class="btn-secondary btn-sm">Editar</a></div></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Lote Ovinos</strong></td>
+                        <td>Ovino</td>
+                        <td>45</td>
+                        <td>45</td>
+                        <td><span class="badge badge-corte">Corte</span></td>
+                        <td><div class="action-cell"><a href="{% url 'cadastro-animal' %}" class="btn-secondary btn-sm">Editar</a></div></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Lote Equinos</strong></td>
+                        <td>Equino</td>
+                        <td>30</td>
+                        <td>380</td>
+                        <td><span class="badge badge-misto">Misto</span></td>
+                        <td><div class="action-cell"><a href="{% url 'cadastro-animal' %}" class="btn-secondary btn-sm">Editar</a></div></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+{% endblock %}

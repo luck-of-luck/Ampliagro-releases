@@ -1,0 +1,261 @@
+{% extends base_template %}
+{% load static %}
+{% block title %}Cadastrar Cultura — Ampliagro{% endblock %}
+{% block extra_css %}
+
+{% endblock %}
+{% block content %}
+<div class="cad-cultura-wrap">
+  <div class="cad-cultura-card">
+    <div class="cad-cultura-head">
+      <h1><i class="bi bi-flower1" style="color:var(--cor-primaria)"></i> Cadastrar Nova Cultura</h1>
+      <a href="{% url 'guia-vegetal' %}" class="btn-ghost" style="text-decoration:none;font-size:13px;">← Voltar</a>
+    </div>
+    <form id="cadCulturaForm" method="post" novalidate>
+      {% csrf_token %}
+      <div class="cad-cultura-body">
+        <div class="cad-field">
+          <label for="cultNome">Nome da Cultura <span class="req">*</span></label>
+          <input type="text" id="cultNome" name="nome" placeholder="Ex: Café Arábica, Soja, Milho" required autocomplete="off">
+          <div class="hint">Nome popular da cultura — obrigatório para sair.</div>
+        </div>
+        <div class="cad-field">
+          <label for="cultLocal">Local / Talhão <span class="req">*</span></label>
+          <select id="cultLocal" name="local" required>
+            <option value="">Selecione o local...</option>
+            {% for t in talhoes %}
+            <option value="{{ t.id }}">{{ t.nome }} — {{ t.propriedade.nome }} ({{ t.area_hectare }} ha)</option>
+            {% endfor %}
+            {% for p in propriedades %}
+            <option value="prop-{{ p.id }}">Propriedade: {{ p.nome }} ({{ p.uf }})</option>
+            {% endfor %}
+          </select>
+          <div class="hint">Onde será cultivado — obrigatório.</div>
+        </div>
+
+        <div class="cad-field">
+          <label for="cultGrupo">Grupo / Categoria <span class="req">*</span></label>
+          <select id="cultGrupo" name="grupo" required>
+            <option value="">Selecione...</option>
+            {% for val,label in grupos %}
+            <option value="{{ val }}">{{ label }}</option>
+            {% endfor %}
+          </select>
+          <div class="hint" id="grupoHint">Ex: Grãos, Frutas, Hortaliças. <span id="grupoLockHint" class="hint readonly" style="display:none;">🔒 Definido automaticamente (não alterável)</span></div>
+        </div>
+        <div class="cad-field">
+          <label for="cultUnidade">Unidade Comercial</label>
+          <select id="cultUnidade" name="unidade_comercial">
+            <option value="sacas">Sacas</option>
+            <option value="kg">Kg</option>
+            <option value="t">Toneladas</option>
+            <option value="caixas">Caixas</option>
+            <option value="unidades">Unidades</option>
+          </select>
+        </div>
+
+        <div class="cad-field">
+          <label for="cultVariedade">Variedade / Cultivar</label>
+          <input type="text" id="cultVariedade" name="variedade" placeholder="Ex: Catuaí, CD 105, IPR 100">
+          <div class="hint" id="variedadeHint">Se óbvio (Café = Arábica), ficará travado.</div>
+        </div>
+        <div class="cad-field">
+          <label for="cultCiclo">Ciclo (dias)</label>
+          <input type="number" id="cultCiclo" name="ciclo_dias" placeholder="Ex: 120" min="1">
+        </div>
+
+        <div class="cad-field">
+          <label for="cultIbge">Código IBGE</label>
+          <input type="number" id="cultIbge" name="ibge_codigo" placeholder="Auto" readonly>
+          <div class="hint readonly">🔒 Código IBGE — automático, não editável</div>
+        </div>
+        <div class="cad-field">
+          <label for="cultMercado">Chave Mercado</label>
+          <input type="text" id="cultMercado" name="chave_mercado" placeholder="Auto" readonly>
+          <div class="hint readonly">🔒 Chave mercado — automática</div>
+        </div>
+
+        <div class="cad-field">
+          <label for="cultJanelaInicio">Janela Início</label>
+          <select id="cultJanelaInicio" name="janela_plantio_inicio">
+            <option value="">Mês...</option>
+            {% for i in meses %}<option value="{{ i }}">{{ i }} — {{ meses_nomes|slice:i|last }}</option>{% endfor %}
+            {% for m in "123456789012"|make_list %}<option value="{{ forloop.counter }}">{{ forloop.counter }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="cad-field">
+          <label for="cultJanelaFim">Janela Fim</label>
+          <select id="cultJanelaFim" name="janela_plantio_fim">
+            <option value="">Mês...</option>
+            {% for m in "123456789012"|make_list %}<option value="{{ forloop.counter }}">{{ forloop.counter }}</option>{% endfor %}
+          </select>
+        </div>
+
+        <div class="cad-field full">
+          <label for="cultObs">Observações</label>
+          <textarea id="cultObs" name="observacoes" rows="3" placeholder="Detalhes, manejo, solo, clima..." style="padding:10px 12px;border:1px solid var(--cor-borda-forte);border-radius:8px;resize:vertical;"></textarea>
+        </div>
+      </div>
+      <div class="cad-actions">
+        <button type="button" class="btn-ghost" onclick="window.location.href='{% url 'guia-vegetal' %}'">Cancelar</button>
+        <button type="submit" class="btn-primary" id="btnSalvar" disabled>Salvar Cultura</button>
+      </div>
+    </form>
+  </div>
+</div>
+<script>
+(function(){
+  const form = document.getElementById('cadCulturaForm');
+  const nomeEl = document.getElementById('cultNome');
+  const localEl = document.getElementById('cultLocal');
+  const grupoEl = document.getElementById('cultGrupo');
+  const variedadeEl = document.getElementById('cultVariedade');
+  const ibgeEl = document.getElementById('cultIbge');
+  const mercadoEl = document.getElementById('cultMercado');
+  const btnSalvar = document.getElementById('btnSalvar');
+  const grupoLockHint = document.getElementById('grupoLockHint');
+  const variedadeHint = document.getElementById('variedadeHint');
+
+  // Conhecimento óbvio: variedade travada por cultura
+  const OBVIO_VARIEDADE = {
+    'cafe': 'Arábica',
+    'café': 'Arábica',
+    'soja': 'Convencional',
+    'milho': 'Híbrido',
+  };
+  // Mapa grupo óbvio
+  const GRUPO_OBVIO = {
+    'cafe': 'outro',
+    'café': 'outro',
+    'soja': 'graos',
+    'milho': 'graos',
+    'trigo': 'graos',
+    'arroz': 'graos',
+  };
+
+  let hasInteracted = false;
+
+  function validate(){
+    const nomeOk = nomeEl.value.trim().length >= 2;
+    const localOk = localEl.value !== '';
+    const grupoOk = grupoEl.value !== '';
+    btnSalvar.disabled = !(nomeOk && localOk && grupoOk);
+    return nomeOk && localOk && grupoOk;
+  }
+
+  // Ao digitar nome, tenta adivinhar grupo/variedade/ibge e travar se óbvio
+  nomeEl.addEventListener('input', () => {
+    hasInteracted = true;
+    const nome = nomeEl.value.trim().toLowerCase();
+    // Grupo óbvio
+    let g = GRUPO_OBVIO[nome];
+    if(!g){
+      // tenta por config
+      if(window.CulturesLoader){
+        const found = CulturesLoader.findByTitle(nomeEl.value.trim());
+        if(found && found.django_grupo) g = found.django_grupo;
+      }
+    }
+    if(g){
+      grupoEl.value = g;
+      grupoEl.disabled = true;
+      grupoLockHint.style.display = 'inline';
+    } else {
+      if(grupoEl.disabled && !GRUPO_OBVIO[nome]) {
+        // só destrava se não for mais óbvio
+        const stillObvio = GRUPO_OBVIO[nome];
+        if(!stillObvio) {
+          grupoEl.disabled = false;
+          grupoLockHint.style.display = 'none';
+        }
+      }
+    }
+    // Variedade óbvia
+    const varObvia = OBVIO_VARIEDADE[nome];
+    if(varObvia){
+      variedadeEl.value = varObvia;
+      variedadeEl.readOnly = true;
+      variedadeHint.textContent = '🔒 Variedade travada para ' + nomeEl.value.trim() + ' (' + varObvia + ')';
+      variedadeHint.classList.add('readonly');
+    } else {
+      if(variedadeEl.readOnly){
+        variedadeEl.readOnly = false;
+        variedadeEl.value = '';
+        variedadeHint.textContent = 'Se óbvio (Café = Arábica), ficará travado.';
+        variedadeHint.classList.remove('readonly');
+      }
+    }
+    // IBGE auto
+    if(window.CulturesLoader){
+      const found = CulturesLoader.findByTitle(nomeEl.value.trim());
+      if(found){
+        ibgeEl.value = found.ibge || '';
+        mercadoEl.value = found.id || '';
+      } else {
+        ibgeEl.value = '';
+        mercadoEl.value = '';
+      }
+    }
+    validate();
+  });
+  localEl.addEventListener('change', validate);
+  grupoEl.addEventListener('change', validate);
+
+  // Antes de sair, exige nome+local
+  window.addEventListener('beforeunload', (e)=>{
+    if(!hasInteracted) return;
+    if(!validate()){
+      e.preventDefault();
+      e.returnValue = 'Preencha Nome e Local antes de sair — são obrigatórios.';
+      return e.returnValue;
+    }
+  });
+  // Intercepta cliques em links de saída
+  document.addEventListener('click', (e)=>{
+    const a = e.target.closest('a');
+    if(!a || !hasInteracted) return;
+    if(!validate()){
+      e.preventDefault();
+      alert('Preencha Nome e Local (obrigatórios) antes de sair.');
+      nomeEl.focus();
+    }
+  });
+
+  form.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    if(!validate()){
+      alert('Preencha Nome, Local e Grupo.');
+      return;
+    }
+    const data = {
+      nome: nomeEl.value.trim(),
+      grupo: grupoEl.value,
+      unidade_comercial: document.getElementById('cultUnidade').value,
+      variedade: variedadeEl.value.trim(),
+      ciclo_dias: document.getElementById('cultCiclo').value ? parseInt(document.getElementById('cultCiclo').value) : null,
+      ibge_codigo: ibgeEl.value ? parseInt(ibgeEl.value) : null,
+      chave_mercado: mercadoEl.value.trim(),
+      janela_plantio_inicio: document.getElementById('cultJanelaInicio').value ? parseInt(document.getElementById('cultJanelaInicio').value) : null,
+      janela_plantio_fim: document.getElementById('cultJanelaFim').value ? parseInt(document.getElementById('cultJanelaFim').value) : null,
+    };
+    // Salva via API
+    try{
+      const res = await fetch('/api/culturas/', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json','X-CSRFToken': (typeof getCSRFToken==='function'?getCSRFToken():(document.cookie.match(/csrftoken=([^;]+)/)||[])[1]||'')},
+        body: JSON.stringify(data)
+      });
+      if(!res.ok) throw new Error('Falha ao salvar');
+      const saved = await res.json();
+      hasInteracted = false;
+      if(typeof showToast==='function') showToast('success','Cultura cadastrada!');
+      setTimeout(()=> window.location.href='/guias/vegetal/', 800);
+    }catch(err){
+      alert('Erro ao salvar: '+err.message);
+    }
+  });
+
+  validate();
+})();
+</script>
+{% endblock %}

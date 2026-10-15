@@ -1,0 +1,789 @@
+{% extends base_template %}
+{% load static %}
+
+{% block title %}Ampliagro · Café — Registro de Produção{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/paginas/registro-cafe.css' %}">
+
+<link href="{% static 'vendor/fontes.css' %}" rel="stylesheet">
+
+{% endblock %}
+
+{% block dashboard_appbar %}{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+<div class="pc-page-wrap">
+<div class="pc-panel">
+  <div class="pc-scroll" id="pcScroll">
+
+    <div class="pc-context">
+      <div class="pc-context-left">
+        <div class="pc-mark">A</div>
+        <b>Ampliagro</b><span class="sep">/</span><span>Guia Vegetal</span><span class="sep">/</span><span class="cur">Café</span>
+      </div>
+      <!-- modo noturno desabilitado neste painel conforme solicitado -->
+      <button class="pc-theme-toggle" id="pcThemeToggle" type="button" style="display:none" tabindex="-1" aria-hidden="true"><i class="bi bi-moon-stars-fill"></i><span>Escuro</span></button>
+    </div>
+
+    <div class="pc-hero">
+      <div class="pc-hero-top">
+        <div class="pc-hero-id">
+          <div class="pc-avatar"><i class="bi bi-tree-fill"></i></div>
+          <div>
+            <div class="pc-hero-name">{{ cultura.nome|default:"Café" }}</div>
+            <div class="pc-hero-sub">Registros de produção da cultura · {{ talhao_atual.nome|default:"Talhão Encosta Norte" }}</div>
+            <div class="pc-hero-badge"><i class="bi bi-pencil-fill"></i> Editando dados</div>
+          </div>
+        </div>
+        <a href="{% url 'guia-vegetal' %}" class="pc-close" title="Fechar" aria-label="Fechar"><i class="bi bi-x-lg"></i></a>
+      </div>
+      <div class="pc-chips">
+        <div class="pc-chip"><i class="bi bi-flower1"></i><span><span class="pc-chip-label">Categoria</span><span class="pc-chip-val">Vegetal</span></span></div>
+        <div class="pc-chip" id="pcChipStage"><i class="bi bi-fire"></i><span><span class="pc-chip-label">Estágio atual</span><span class="pc-chip-val">Maturação</span></span></div>
+        <div class="pc-chip"><i class="bi bi-rulers"></i><span><span class="pc-chip-label">Área plantada</span><span class="pc-chip-val" id="pcHeroArea">{{ area_total|default:"3,2 ha" }}</span></span></div>
+        <div class="pc-chip"><i class="bi bi-cash-stack"></i><span><span class="pc-chip-label">Investido na safra</span><span class="pc-chip-val" id="pcHeroInvest">R$ {{ custo_total|default:"18.400" }}</span></span></div>
+      </div>
+    </div>
+
+    <div class="pc-section-label">
+      <h3><i class="bi bi-grid-3x3-gap-fill"></i> Talhões da Cultura</h3>
+      <span>{{ talhoes|length|default:"2" }} talhões ativos</span>
+    </div>
+    <div class="pc-carousel" id="pcCarousel">
+      {% for t in talhoes %}
+      <div class="pc-plot {% if forloop.first %}is-selected{% endif %}" style="--plot-color:{% cycle '#f59e0b' '#16a34a' '#0ea5e9' '#8b5cf6' %};" data-talhao-id="{{ t.id }}">
+        <div class="pc-plot-head">
+          <div class="pc-plot-zone"><i class="bi bi-geo-alt-fill"></i> {{ t.nome }}</div>
+          <svg class="pc-plot-ring" viewBox="0 0 36 36"><circle class="pc-ring-track" cx="18" cy="18" r="15" fill="none" stroke="#e2e8f0" stroke-width="4"/><circle cx="18" cy="18" r="15" fill="none" stroke="{% cycle '#f59e0b' '#16a34a' '#0ea5e9' '#8b5cf6' %}" stroke-width="4" stroke-dasharray="94.2" stroke-dashoffset="{% if forloop.first %}18.8{% else %}51.8{% endif %}" stroke-linecap="round" transform="rotate(-90 18 18)"/></svg>
+        </div>
+        <div class="pc-plot-sub">{{ cultura.nome|default:"Café" }} · {{ t.area_hectare }} ha</div>
+        <div class="pc-plot-metrics">
+          <div><span>Plantio</span><span>{{ t.safra_atual.data_plantio|date:"d M Y"|default:"01 fev 2026" }}</span></div>
+          <div><span>Custo</span><span>R$ {{ t.custo|default:"11.200" }}</span></div>
+          <div><span>Produtiv. est.</span><span>{{ t.produtividade|default:"34" }} sc/ha</span></div>
+          <div><span>Progresso</span><span>{{ t.progresso|default:"80" }}%</span></div>
+        </div>
+        <div class="pc-plot-stage" style="color:{% cycle '#b45309' '#15803d' '#0369a1' '#7c3aed' %};">● {{ t.estagio|default:"Maturação" }}</div>
+      </div>
+      {% empty %}
+      <div class="pc-plot is-selected" style="--plot-color:#f59e0b;">
+        <div class="pc-plot-head">
+          <div class="pc-plot-zone"><i class="bi bi-geo-alt-fill"></i> Encosta Norte</div>
+          <svg class="pc-plot-ring" viewBox="0 0 36 36"><circle class="pc-ring-track" cx="18" cy="18" r="15" fill="none" stroke="#e2e8f0" stroke-width="4"/><circle cx="18" cy="18" r="15" fill="none" stroke="#f59e0b" stroke-width="4" stroke-dasharray="94.2" stroke-dashoffset="18.8" stroke-linecap="round" transform="rotate(-90 18 18)"/></svg>
+        </div>
+        <div class="pc-plot-sub">Café · 2,0 ha</div>
+        <div class="pc-plot-metrics">
+          <div><span>Plantio</span><span>01 fev 2026</span></div>
+          <div><span>Custo</span><span>R$ 11.200</span></div>
+          <div><span>Produtiv. est.</span><span>34 sc/ha</span></div>
+          <div><span>Progresso</span><span>80%</span></div>
+        </div>
+        <div class="pc-plot-stage" style="color:#b45309;">● Maturação</div>
+      </div>
+      <div class="pc-plot" style="--plot-color:#16a34a;">
+        <div class="pc-plot-head">
+          <div class="pc-plot-zone"><i class="bi bi-geo-alt-fill"></i> Fundos</div>
+          <svg class="pc-plot-ring" viewBox="0 0 36 36"><circle class="pc-ring-track" cx="18" cy="18" r="15" fill="none" stroke="#e2e8f0" stroke-width="4"/><circle cx="18" cy="18" r="15" fill="none" stroke="#16a34a" stroke-width="4" stroke-dasharray="94.2" stroke-dashoffset="51.8" stroke-linecap="round" transform="rotate(-90 18 18)"/></svg>
+        </div>
+        <div class="pc-plot-sub">Café · 1,2 ha</div>
+        <div class="pc-plot-metrics">
+          <div><span>Plantio</span><span>15 mar 2026</span></div>
+          <div><span>Custo</span><span>R$ 7.200</span></div>
+          <div><span>Produtiv. est.</span><span>30 sc/ha</span></div>
+          <div><span>Progresso</span><span>45%</span></div>
+        </div>
+        <div class="pc-plot-stage" style="color:#15803d;">● Granação</div>
+      </div>
+      {% endfor %}
+      <div class="pc-plot-new" tabindex="0" role="button" onclick="window.location.href='{% url 'cadastro-talhao' %}'"><i class="bi bi-plus-circle"></i>Novo Registro</div>
+    </div>
+
+    <div class="pc-workspace">
+      <div class="pc-rail">
+        <button class="pc-rail-btn" data-module="identidade"><i class="bi bi-fingerprint"></i>Identidade</button>
+        <button class="pc-rail-btn active" data-module="ciclo"><i class="bi bi-clock-history"></i>Ciclo &amp; Tempo</button>
+        <button class="pc-rail-btn" data-module="financeiro"><i class="bi bi-cash-stack"></i>Financeiro</button>
+        <button class="pc-rail-btn" data-module="tratamentos"><i class="bi bi-eyedropper"></i>Tratamentos</button>
+        <button class="pc-rail-btn" data-module="monitoramento"><i class="bi bi-cloud-sun-fill"></i>Monitoramento</button>
+      </div>
+
+      <div class="pc-content">
+
+        <!-- ================= CICLO & TEMPO ================= -->
+        <div class="pc-module active" data-module="ciclo">
+          <div class="pc-mod-head"><i class="bi bi-clock-history"></i><h2>Ciclo &amp; Tempo</h2></div>
+          <div class="pc-mod-sub">Da floração à colheita — acompanhe exatamente onde este talhão está hoje.</div>
+
+          <div class="pc-cycle-grid">
+            <div class="pc-donut-wrap">
+              <svg viewBox="0 0 300 300" width="280" height="280">
+                <g transform="rotate(-90 150 150)">
+                  <circle class="pc-donut-track" cx="150" cy="150" r="100" fill="none" stroke="#eef2f0" stroke-width="20"/>
+                  <circle class="pc-arc" data-i="0" cx="150" cy="150" r="100" fill="none" stroke="#94a3b8" stroke-width="20" stroke-linecap="round" stroke-dasharray="69.4 628.32" stroke-dashoffset="0"/>
+                  <circle class="pc-arc" data-i="1" cx="150" cy="150" r="100" fill="none" stroke="#a5b4fc" stroke-width="20" stroke-linecap="round" stroke-dasharray="44.3 628.32" stroke-dashoffset="-75.40"/>
+                  <circle class="pc-arc" data-i="2" cx="150" cy="150" r="100" fill="none" stroke="#86efac" stroke-width="20" stroke-linecap="round" stroke-dasharray="88.2 628.32" stroke-dashoffset="-125.66"/>
+                  <circle class="pc-arc" data-i="3" cx="150" cy="150" r="100" fill="none" stroke="#16a34a" stroke-width="20" stroke-linecap="round" stroke-dasharray="169.9 628.32" stroke-dashoffset="-219.91"/>
+                  <circle class="pc-arc" data-i="4" cx="150" cy="150" r="100" fill="none" stroke="#f59e0b" stroke-width="20" stroke-linecap="round" stroke-dasharray="151.1 628.32" stroke-dashoffset="-395.84"/>
+                  <circle class="pc-arc" data-i="5" cx="150" cy="150" r="100" fill="none" stroke="#dc2626" stroke-width="20" stroke-linecap="round" stroke-dasharray="69.4 628.32" stroke-dashoffset="-552.92"/>
+                </g>
+                <circle id="pcMarkerGlow" cx="150" cy="50" r="12" fill="#f59e0b" opacity=".2"/>
+                <circle id="pcMarker" cx="150" cy="50" r="7" fill="#fff" stroke="#f59e0b" stroke-width="4"/>
+                <circle class="pc-donut-center" cx="150" cy="150" r="58" fill="#fff"/>
+                <text x="150" y="140" text-anchor="middle" class="pc-cycle-stage-name" id="pcDonutStage">Maturação</text>
+                <text x="150" y="169" text-anchor="middle" class="pc-cycle-pct" id="pcDonutPct">80%</text>
+                <text x="150" y="187" text-anchor="middle" class="pc-cycle-of">DO CICLO</text>
+              </svg>
+            </div>
+
+            <div class="pc-cycle-info">
+              <h4 id="pcStatAtual">Estágio atual: Maturação</h4>
+              <div class="pc-legend" id="pcLegend"></div>
+              <div class="pc-stat-line"><span class="k">Janela de colheita</span><span class="v">Maio – Setembro</span></div>
+              <div class="pc-stat-line"><span class="k">Dias restantes</span><span class="v" id="pcDiasRestantes">—</span></div>
+              <div class="pc-stat-line"><span class="k">Dias decorridos</span><span class="v" id="pcDiasDecorridos">—</span></div>
+              <div class="pc-stat-line"><span class="k">Ciclo total</span><span class="v" id="pcCicloTotal">—</span></div>
+              <div class="pc-stat-line"><span class="k">Plantio</span><span class="v" id="pcPlantioTxt">—</span></div>
+              <div class="pc-stat-line"><span class="k">Colheita prevista</span><span class="v" id="pcColheitaTxt">—</span></div>
+              <div class="pc-stat-line"><span class="k">Próxima fase</span><span class="v" id="pcProximaFase">—</span></div>
+              <div class="pc-stat-line"><span class="k">Idade da lavoura</span><span class="v">4 anos</span></div>
+              <div class="pc-callout"><i class="bi bi-arrow-repeat"></i> As datas de plantio e colheita prevista definem o ciclo. Tarefas e insumos são posicionados proporcionalmente ao longo do tempo.</div>
+              <div class="pc-callout" id="pcWindowCallout"><i class="bi bi-calendar-check"></i> <span id="pcWindowText">—</span></div>
+            </div>
+          </div>
+
+          <div class="pc-timeline">
+            <div class="pc-tl-track">
+              <div class="pc-tl-seg" data-i="0" style="--seg-color:#94a3b8; flex-grow:12;"></div>
+              <div class="pc-tl-seg" data-i="1" style="--seg-color:#a5b4fc; flex-grow:8;"></div>
+              <div class="pc-tl-seg" data-i="2" style="--seg-color:#86efac; flex-grow:15;"></div>
+              <div class="pc-tl-seg" data-i="3" style="--seg-color:#16a34a; flex-grow:28;"></div>
+              <div class="pc-tl-seg" data-i="4" style="--seg-color:#f59e0b; flex-grow:25;"></div>
+              <div class="pc-tl-seg" data-i="5" style="--seg-color:#dc2626; flex-grow:12;"></div>
+              <div class="pc-tl-today" id="pcTlToday" style="left:80%;"><span class="pc-tl-today-label">Hoje</span><span class="pc-tl-today-dot"></span></div>
+            </div>
+            <div class="pc-tl-labels">
+              <span>Dormência</span><span>Floração</span><span>Chumbinho</span><span>Granação</span><span>Maturação</span><span>Colheita</span>
+            </div>
+            <div class="pc-tl-dates"><span>Plantio: <b id="pcTlPlantio">—</b></span><span>Colheita prevista: <b id="pcTlColheita">—</b></span></div>
+          </div>
+
+          <hr class="pc-divider">
+
+          <div class="pc-section-label" style="padding:0; margin-bottom:12px;"><h3><i class="bi bi-kanban-fill"></i> Estágios &amp; Tarefas</h3></div>
+          <div class="pc-stage-tabs" id="pcStageTabs"></div>
+
+          <div class="pc-stage-panel">
+            <div class="pc-stage-panel-head">
+              <div class="pc-stage-panel-title"><span class="dot" id="pcStagePanelDot"></span><i class="bi" id="pcStagePanelIcon"></i><span id="pcStagePanelTitle">Maturação</span></div>
+              <span id="pcStageProgress"></span>
+            </div>
+            <div class="pc-task-list" id="pcTaskList"></div>
+            <button class="pc-add-task-btn" id="pcAddTaskBtn"><i class="bi bi-plus-lg"></i> Nova tarefa</button>
+            <div class="pc-add-task-form" id="pcAddTaskForm">
+              <input type="text" id="pcNewTaskText" placeholder="Descreva a tarefa...">
+              <select id="pcNewTaskPerson">
+                <option value="">Responsável...</option>
+                {% for f in funcionarios %}
+                <option value="{{ f.nome }}">{{ f.nome }} — {{ f.get_cargo_display }}</option>
+                {% endfor %}
+                <option>Gerente</option><option>Técnico Agrícola</option><option>Eng. Agrônomo</option>
+                <option>Tratorista</option><option>Aplicador</option><option>Serviços Gerais</option>
+              </select>
+              <div class="pc-add-task-btns">
+                <button class="pc-btn-mini-ghost" id="pcAddTaskCancel" type="button">Cancelar</button>
+                <button class="pc-btn-mini-solid" id="pcAddTaskSave" type="button"><i class="bi bi-check-lg"></i>Salvar</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="pc-form-group">
+            <div class="pc-form-group-title"><i class="bi bi-calendar-range"></i> Datas do Ciclo</div>
+            <div class="pc-field-grid">
+              <div class="pc-field"><label for="pcPlantio">Data de Plantio</label><input type="date" id="pcPlantio" value="2026-02-01"></div>
+              <div class="pc-field"><label for="pcCicloDias">Ciclo Estimado (dias)</label><input type="number" id="pcCicloDias" value="256"></div>
+              <div class="pc-field is-computed"><label>Colheita Prevista <span class="pc-field-tag">calculado</span></label><input type="text" id="pcColheitaCalc" value="—" readonly></div>
+              <div class="pc-field"><label for="pcJanelaIni">Janela Início</label><select id="pcJanelaIni"><option>Mês...</option><option>Jan</option><option>Fev</option><option>Mar</option><option>Abr</option><option selected>Maio</option><option>Jun</option><option>Jul</option><option>Ago</option><option>Set</option><option>Out</option><option>Nov</option><option>Dez</option></select></div>
+              <div class="pc-field"><label for="pcJanelaFim">Janela Fim</label><select id="pcJanelaFim"><option>Mês...</option><option>Jan</option><option>Fev</option><option>Mar</option><option>Abr</option><option>Maio</option><option>Jun</option><option>Jul</option><option>Ago</option><option selected>Set</option><option>Out</option><option>Nov</option><option>Dez</option></select></div>
+            </div>
+          </div>
+
+          <div class="pc-form-group">
+            <div class="pc-form-group-title"><i class="bi bi-scissors"></i> Manejo</div>
+            <div class="pc-field-grid">
+              <div class="pc-field"><label for="pcPoda">Última Poda</label><input type="date" id="pcPoda" value="2025-07-15"></div>
+              <div class="pc-field"><label for="pcTipoPoda">Tipo de Poda</label><select id="pcTipoPoda"><option>Selecione...</option><option>Esqueletamento</option><option>Formação</option><option selected>Manutenção</option><option>Poda de colheita</option><option>Renovação</option></select></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= IDENTIDADE ================= -->
+        <div class="pc-module" data-module="identidade">
+          <div class="pc-mod-head"><i class="bi bi-fingerprint"></i><h2>Identidade</h2></div>
+          <div class="pc-mod-sub">Ficha técnica e características agronômicas desta variedade.</div>
+
+          <div class="pc-fact-grid">
+            <div class="pc-fact"><div class="pc-fact-label">Variedade</div><div class="pc-fact-val">{{ cultura_variedade|default:"Catuaí Vermelho IAC 144" }}</div></div>
+            <div class="pc-fact"><div class="pc-fact-label">Porte</div><div class="pc-fact-val">Médio (2,0–2,5 m)</div></div>
+            <div class="pc-fact"><div class="pc-fact-label">Espaçamento</div><div class="pc-fact-val">3,5 m × 0,8 m</div></div>
+            <div class="pc-fact"><div class="pc-fact-label">Densidade</div><div class="pc-fact-val">≈ 3.570 pés/ha</div></div>
+            <div class="pc-fact"><div class="pc-fact-label">Altitude ideal</div><div class="pc-fact-val">800 – 1.200 m</div></div>
+            <div class="pc-fact"><div class="pc-fact-label">Processamento</div><div class="pc-fact-val">Cereja descascado (CD)</div></div>
+          </div>
+
+          <div class="pc-tags">
+            <span class="pc-tag"><i class="bi bi-check-circle-fill"></i>Ciclo médio</span>
+            <span class="pc-tag"><i class="bi bi-check-circle-fill"></i>Boa tolerância a veranico</span>
+            <span class="pc-tag"><i class="bi bi-check-circle-fill"></i>Grão tipo 6 (peneira 16/17)</span>
+          </div>
+
+          <div class="pc-note">
+            <span class="pc-note-label">Observações</span>
+            <div class="pc-note-box">Lote implantado em espaçamento adensado para elevar produtividade por hectare. Bom desempenho em anos de veranico prolongado; atenção redobrada ao monitoramento de ferrugem em anos mais chuvosos.</div>
+          </div>
+        </div>
+
+        <!-- ================= FINANCEIRO ================= -->
+        <div class="pc-module" data-module="financeiro">
+          <div class="pc-mod-head"><i class="bi bi-cash-stack"></i><h2>Financeiro</h2></div>
+          <div class="pc-mod-sub">Investimento e retorno projetado para esta safra.</div>
+
+          <div class="pc-kpi-row">
+            <div class="pc-kpi"><div class="pc-kpi-label">Investido até agora</div><div class="pc-kpi-val" id="pcKpiCusto">R$ {{ custo_total|default:"18.400" }}</div></div>
+            <div class="pc-kpi"><div class="pc-kpi-label">Receita projetada</div><div class="pc-kpi-val ok" id="pcKpiReceita">R$ 42.500</div><div class="pc-kpi-delta up"><i class="bi bi-arrow-up-right"></i>34 sc/ha × R$ 1.250</div></div>
+            <div class="pc-kpi"><div class="pc-kpi-label">Margem estimada</div><div class="pc-kpi-val ok" id="pcKpiMargem">56,7%</div></div>
+            <div class="pc-kpi"><div class="pc-kpi-label">Custo por hectare</div><div class="pc-kpi-val">R$ 5.750</div></div>
+          </div>
+
+          <div class="pc-form-group-title"><i class="bi bi-pie-chart-fill"></i> Composição do custo</div>
+          <div class="pc-bar">
+            <div style="flex-grow:45; background:#0f9d6e;"></div>
+            <div style="flex-grow:35; background:#38bdf8;"></div>
+            <div style="flex-grow:11; background:#f59e0b;"></div>
+            <div style="flex-grow:9; background:#94a3b8;"></div>
+          </div>
+          <div class="pc-legend2">
+            <div class="li"><span class="sw" style="background:#0f9d6e;"></span>Insumos <b>R$ 8.280</b> (45%)</div>
+            <div class="li"><span class="sw" style="background:#38bdf8;"></span>Mão de obra <b>R$ 6.440</b> (35%)</div>
+            <div class="li"><span class="sw" style="background:#f59e0b;"></span>Maquinário <b>R$ 2.024</b> (11%)</div>
+            <div class="li"><span class="sw" style="background:#94a3b8;"></span>Outros <b>R$ 1.656</b> (9%)</div>
+          </div>
+
+          <div class="pc-form-group-title" style="margin-top:26px;"><i class="bi bi-receipt"></i> Últimos lançamentos</div>
+          <div class="pc-entry-list">
+            {% for lanc in lancamentos|slice:":3" %}
+            <div class="pc-entry"><span class="date">{{ lanc.data|date:"d M Y" }}</span><span class="desc">{{ lanc.descricao|default:lanc.get_categoria_display }}</span><span class="pc-badge" style="background:#ecfdf5; color:#0a7d56;">{{ lanc.get_categoria_display }}</span><span class="val">R$ {{ lanc.valor }}</span></div>
+            {% empty %}
+            <div class="pc-entry"><span class="date">15 fev 2026</span><span class="desc">Calcário dolomítico (2 t)</span><span class="pc-badge" style="background:#ecfdf5; color:#0a7d56;">Insumos</span><span class="val">R$ 1.380</span></div>
+            <div class="pc-entry"><span class="date">28 mar 2026</span><span class="desc">Diária de equipe — capina</span><span class="pc-badge" style="background:#eff6ff; color:#0369a1;">Mão de obra</span><span class="val">R$ 640</span></div>
+            <div class="pc-entry"><span class="date">10 mai 2026</span><span class="desc">Adubação de granação (KCl)</span><span class="pc-badge" style="background:#ecfdf5; color:#0a7d56;">Insumos</span><span class="val">R$ 2.150</span></div>
+            {% endfor %}
+          </div>
+          <button class="pc-add-task-btn" style="margin-top:14px;" onclick="window.location.href='{% url 'cadastro-financeiro' %}'"><i class="bi bi-plus-lg"></i> Novo lançamento</button>
+        </div>
+
+        <!-- ================= TRATAMENTOS ================= -->
+        <div class="pc-module" data-module="tratamentos">
+          <div class="pc-mod-head"><i class="bi bi-eyedropper"></i><h2>Tratamentos &amp; Insumos</h2></div>
+          <div class="pc-mod-sub">Histórico de aplicações registradas neste talhão.</div>
+
+          <div class="pc-vtimeline">
+            {% for trat in tratamentos %}
+            <div class="pc-vt-item"><div class="pc-vt-dot" style="--dot:{{ trat.cor|default:'#16a34a' }};"></div><div class="pc-vt-date">{{ trat.data|date:"d M Y" }}</div><div class="pc-vt-title">{{ trat.titulo }}</div><div class="pc-vt-desc">{{ trat.desc }}</div><div class="pc-vt-cost">R$ {{ trat.custo }}</div></div>
+            {% empty %}
+            <div class="pc-vt-item"><div class="pc-vt-dot" style="--dot:#16a34a;"></div><div class="pc-vt-date">20 jan 2026</div><div class="pc-vt-title">Adubação de arranque</div><div class="pc-vt-desc">NPK 20-05-20 · 320 kg/ha</div><div class="pc-vt-cost">R$ 1.180</div></div>
+            <div class="pc-vt-item"><div class="pc-vt-dot" style="--dot:#dc2626;"></div><div class="pc-vt-date">08 mar 2026</div><div class="pc-vt-title">Defensivo — controle de ferrugem</div><div class="pc-vt-desc">Fungicida sistêmico · 1,5 L/ha</div><div class="pc-vt-cost">R$ 590</div></div>
+            <div class="pc-vt-item"><div class="pc-vt-dot" style="--dot:#38bdf8;"></div><div class="pc-vt-date">22 abr 2026</div><div class="pc-vt-title">Irrigação suplementar</div><div class="pc-vt-desc">Aspersão · lâmina de 35 mm</div><div class="pc-vt-cost">R$ 210</div></div>
+            <div class="pc-vt-item"><div class="pc-vt-dot" style="--dot:#16a34a;"></div><div class="pc-vt-date">10 mai 2026</div><div class="pc-vt-title">Adubação de granação</div><div class="pc-vt-desc">Cloreto de potássio · 180 kg/ha</div><div class="pc-vt-cost">R$ 860</div></div>
+            {% endfor %}
+          </div>
+
+          <div class="pc-callout" style="margin-top:20px;"><i class="bi bi-lightbulb-fill"></i> Sugestão: monitorar broca-do-café antes do início da maturação para orientar a colheita.</div>
+          <button class="pc-add-task-btn" style="margin-top:14px;" onclick="window.location.href='{% url 'cadastro-insumo' %}'"><i class="bi bi-plus-lg"></i> Novo tratamento</button>
+        </div>
+
+        <!-- ================= MONITORAMENTO ================= -->
+        <div class="pc-module" data-module="monitoramento">
+          <div class="pc-mod-head"><i class="bi bi-cloud-sun-fill"></i><h2>Monitoramento</h2></div>
+          <div class="pc-mod-sub">Clima, saúde da lavoura e registros de campo.</div>
+
+          <div class="pc-mon-row">
+            <div class="pc-mon-card">
+              <h5><i class="bi bi-cloud-sun-fill"></i> Clima — últimas 24h</h5>
+              <div class="pc-weather"><i class="bi bi-cloud-sun-fill"></i><span class="t">24°C</span></div>
+              <div class="pc-weather-meta">
+                <span><i class="bi bi-droplet-fill"></i> Umidade do ar: 68%</span>
+                <span><i class="bi bi-cloud-rain-fill"></i> Chance de chuva amanhã: 40%</span>
+                <span><i class="bi bi-wind"></i> Vento: 9 km/h</span>
+              </div>
+            </div>
+            <div class="pc-mon-card">
+              <h5><i class="bi bi-heart-pulse-fill"></i> Saúde da lavoura</h5>
+              <div class="pc-gauge-wrap">
+                <svg width="60" height="60" viewBox="0 0 60 60"><circle class="pc-gauge-track" cx="30" cy="30" r="24" fill="none" stroke="#eef2f0" stroke-width="7"/><circle cx="30" cy="30" r="24" fill="none" stroke="#0f9d6e" stroke-width="7" stroke-linecap="round" stroke-dasharray="150.8" stroke-dashoffset="19.6" transform="rotate(-90 30 30)"/></svg>
+                <div><div class="pc-gauge-val">87</div><div class="pc-gauge-label">Excelente</div></div>
+              </div>
+            </div>
+            <div class="pc-mon-card">
+              <h5><i class="bi bi-cup-hot-fill"></i> Prova de xícara</h5>
+              <div class="pc-gauge-wrap">
+                <div class="pc-gauge-val" style="font-size:28px;">84,5</div>
+                <div><div class="pc-gauge-label">Muito Bom</div><div style="font-size:11px; color:var(--s500);">Última análise: 03 jun 2026</div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="pc-form-group-title" style="margin-top:22px;"><i class="bi bi-camera-fill"></i> Registros fotográficos</div>
+          <div class="pc-photo-grid">
+            <div class="pc-photo" style="background:linear-gradient(155deg,#166534,#4d7c0f);"><span>22 abr</span></div>
+            <div class="pc-photo" style="background:linear-gradient(155deg,#a16207,#ca8a04);"><span>10 mai</span></div>
+            <div class="pc-photo" style="background:linear-gradient(155deg,#0a7d56,#0f9d6e);"><span>02 jun</span></div>
+            <div class="pc-photo pc-photo-add" tabindex="0" role="button" onclick="document.getElementById('pcFotoInput')?.click()"><i class="bi bi-plus-lg"></i>Adicionar</div>
+            <input type="file" id="pcFotoInput" accept="image/*" hidden>
+          </div>
+
+          <div class="pc-note">
+            <span class="pc-note-label">Observação de campo</span>
+            <div class="pc-note-box" id="pcObsBox" contenteditable="true" data-placeholder="Folhas com leve amarelecimento nas bordas nas linhas mais altas do talhão — possível deficiência de magnésio. Análise foliar recomendada antes da próxima adubação.">Folhas com leve amarelecimento nas bordas nas linhas mais altas do talhão — possível deficiência de magnésio. Análise foliar recomendada antes da próxima adubação.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="pc-action">
+      <a href="{% url 'guia-vegetal' %}" class="pc-btn pc-btn-ghost"><i class="bi bi-x-lg"></i> Cancelar</a>
+      <button class="pc-btn pc-btn-outline" id="pcSaveAdd" type="button"><i class="bi bi-plus-lg"></i> Salvar e Adicionar Outro</button>
+      <button class="pc-btn pc-btn-solid" id="pcSaveClose" type="button"><i class="bi bi-check2-circle"></i> Concluir Cadastro</button>
+    </div>
+
+  </div>
+</div>
+</div>
+<div class="pc-toast" id="pcToast"><i class="bi bi-check-circle-fill"></i><span>Registro salvo com sucesso</span></div>
+{{ cultura_json|json_script:"pcCulturaData" }}
+{{ talhoes_json|json_script:"pcTalhoesData" }}
+{{ registro_json|json_script:"pcRegistroData" }}
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+// Proporções aproximadas de cada fase dentro do ciclo produtivo do cafeeiro (soma = 1)
+const STAGES = [
+  {key:'dormencia', name:'Dormência', hex:'#94a3b8', ink:'#64748b', bg:'rgba(148,163,184,.16)', icon:'bi-moon-fill', share:.12},
+  {key:'floracao', name:'Floração', hex:'#a5b4fc', ink:'#6366f1', bg:'rgba(165,180,252,.20)', icon:'bi-flower1', share:.08},
+  {key:'chumbinho', name:'Chumbinho', hex:'#86efac', ink:'#16a34a', bg:'rgba(134,239,172,.22)', icon:'bi-circle-fill', share:.15},
+  {key:'granacao', name:'Granação', hex:'#16a34a', ink:'#15803d', bg:'rgba(22,163,74,.14)', icon:'bi-capsule', share:.28},
+  {key:'maturacao', name:'Maturação', hex:'#f59e0b', ink:'#b45309', bg:'rgba(245,158,11,.16)', icon:'bi-fire', share:.25},
+  {key:'colheita', name:'Colheita', hex:'#dc2626', ink:'#dc2626', bg:'rgba(220,38,38,.12)', icon:'bi-scissors', share:.12}
+];
+
+const stageTasks = {
+  dormencia: [
+    {text:'Avaliar vigor da lavoura pós-colheita', person:'Eng. Agrônomo', done:true},
+    {text:'Planejar poda de produção do talhão', person:'Técnico Agrícola', done:true}
+  ],
+  floracao: [
+    {text:'Monitorar florada após chuva de florada', person:'Técnico Agrícola', done:true},
+    {text:'Aplicar boro na pré-floração', person:'Técnico Agrícola', done:true}
+  ],
+  chumbinho: [
+    {text:'Monitorar pegamento dos frutos', person:'Técnico Agrícola', done:true},
+    {text:'Controle preventivo de broca-do-café', person:'Aplicador', done:true}
+  ],
+  granacao: [
+    {text:'Adubação de granação (potássio)', person:'Tratorista', done:true},
+    {text:'Monitorar enchimento de grãos', person:'Técnico Agrícola', done:true}
+  ],
+  maturacao: [
+    {text:'Teste de flutuação para ponto de colheita', person:'Técnico Agrícola', done:false},
+    {text:'Escalar equipe de colheita', person:'Gerente', done:false},
+    {text:'Revisar terreiros de secagem', person:'Serviços Gerais', done:true}
+  ],
+  colheita: [
+    {text:'Colheita seletiva (derriça no pano)', person:'Gerente', done:false},
+    {text:'Transporte até o terreiro', person:'Tratorista', done:false},
+    {text:'Início da secagem (via seca)', person:'Técnico Agrícola', done:false}
+  ]
+};
+
+let currentStageIdx = 4;
+let activeTasksStage = 4;
+
+function fmtDate(d){
+  return d.toLocaleDateString('pt-BR', {day:'2-digit', month:'short', year:'numeric'}).replace('.', '');
+}
+
+const MONTH_NAMES = ['Jan','Fev','Mar','Abr','Maio','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+
+function stageIndexForPct(p){
+  let acc = 0;
+  for(let i=0;i<STAGES.length;i++){
+    acc += STAGES[i].share;
+    if(p < acc) return i;
+  }
+  return STAGES.length-1;
+}
+
+function checkWindow(colheita){
+  const iniSel = document.getElementById('pcJanelaIni').value;
+  const fimSel = document.getElementById('pcJanelaFim').value;
+  const iniIdx = MONTH_NAMES.indexOf(iniSel);
+  const fimIdx = MONTH_NAMES.indexOf(fimSel);
+  const box = document.getElementById('pcWindowCallout');
+  const txt = document.getElementById('pcWindowText');
+  if(iniIdx<0 || fimIdx<0){ box.style.display='none'; return; }
+  const m = colheita.getMonth();
+  const inside = iniIdx<=fimIdx ? (m>=iniIdx && m<=fimIdx) : (m>=iniIdx || m<=fimIdx);
+  box.style.display='flex';
+  box.classList.toggle('is-warn', !inside);
+  box.querySelector('i').className = 'bi ' + (inside ? 'bi-calendar-check' : 'bi-exclamation-triangle-fill');
+  txt.textContent = inside
+    ? 'Colheita prevista (' + fmtDate(colheita) + ') cai dentro da janela ideal informada (' + iniSel + '–' + fimSel + ').'
+    : 'Atenção: colheita prevista (' + fmtDate(colheita) + ') cai fora da janela ideal informada (' + iniSel + '–' + fimSel + '). Vale reavaliar o Ciclo Estimado.';
+}
+
+function recompute(){
+  const plantioEl = document.getElementById('pcPlantio');
+  const cicloEl = document.getElementById('pcCicloDias');
+  if(!plantioEl.value || !cicloEl.value) return;
+
+  const plantio = new Date(plantioEl.value + 'T00:00:00');
+  const cicloDias = parseInt(cicloEl.value, 10) || 0;
+  const colheita = new Date(plantio.getTime() + cicloDias*86400000);
+  const today = new Date();
+
+  let pct = cicloDias > 0 ? (today - plantio) / (colheita - plantio) : 0;
+  pct = Math.max(0, Math.min(1, pct));
+  const stageIdx = stageIndexForPct(pct);
+  const stage = STAGES[stageIdx];
+  currentStageIdx = stageIdx;
+
+  const elapsedDays = Math.max(0, Math.round((today-plantio)/86400000));
+  const remainingDays = Math.max(0, Math.round((colheita-today)/86400000));
+
+  let cumBefore = 0;
+  for(let i=0;i<stageIdx;i++) cumBefore += STAGES[i].share;
+  const proxEl = document.getElementById('pcProximaFase');
+  if(stageIdx < STAGES.length-1){
+    const daysToNext = Math.max(0, Math.round((cumBefore+stage.share)*cicloDias - elapsedDays));
+    proxEl.textContent = STAGES[stageIdx+1].name + ' em ' + daysToNext + ' dias';
+  } else {
+    proxEl.textContent = 'Ciclo concluído';
+  }
+  checkWindow(colheita);
+
+  document.getElementById('pcColheitaCalc').value = fmtDate(colheita);
+  document.getElementById('pcDonutStage').textContent = stage.name;
+  document.getElementById('pcDonutPct').textContent = Math.round(pct*100) + '%';
+  document.getElementById('pcStatAtual').textContent = 'Estágio atual: ' + stage.name;
+  document.getElementById('pcDiasDecorridos').textContent = elapsedDays + ' dias';
+  document.getElementById('pcDiasRestantes').textContent = remainingDays + ' dias';
+  document.getElementById('pcCicloTotal').textContent = cicloDias + ' dias';
+  document.getElementById('pcPlantioTxt').textContent = fmtDate(plantio);
+  document.getElementById('pcColheitaTxt').textContent = fmtDate(colheita);
+  document.getElementById('pcTlPlantio').textContent = fmtDate(plantio);
+  document.getElementById('pcTlColheita').textContent = fmtDate(colheita);
+
+  const chip = document.getElementById('pcChipStage');
+  chip.style.setProperty('--chip-bg', stage.bg);
+  chip.style.setProperty('--chip-ink', stage.ink);
+  chip.querySelector('.pc-chip-val').textContent = stage.name;
+  chip.querySelector('i').className = 'bi ' + stage.icon;
+
+  document.querySelectorAll('.pc-arc').forEach(el=>{
+    const i = +el.dataset.i;
+    el.classList.remove('is-past','is-current','is-future');
+    if(i < stageIdx){ el.classList.add('is-past'); el.style.filter=''; }
+    else if(i === stageIdx){ el.classList.add('is-current'); el.style.filter = 'drop-shadow(0 0 7px ' + stage.hex + ')'; }
+    else { el.classList.add('is-future'); el.style.filter=''; }
+  });
+
+  const angle = (pct*360 - 90) * Math.PI/180;
+  const mx = 150 + 100*Math.cos(angle), my = 150 + 100*Math.sin(angle);
+  ['pcMarker','pcMarkerGlow'].forEach(id=>{
+    const el = document.getElementById(id);
+    el.setAttribute('cx', mx); el.setAttribute('cy', my);
+    if(id==='pcMarker') el.setAttribute('stroke', stage.hex);
+    else el.setAttribute('fill', stage.hex);
+  });
+
+  document.querySelectorAll('.pc-tl-seg').forEach(el=>{
+    el.classList.toggle('is-dim', +el.dataset.i > stageIdx);
+  });
+  document.getElementById('pcTlToday').style.left = (pct*100) + '%';
+
+  document.querySelectorAll('.pc-legend-chip').forEach((el,i)=>{
+    const s = STAGES[i];
+    const isActive = i===stageIdx;
+    el.classList.toggle('active', isActive);
+    el.style.background = isActive ? s.bg : 'transparent';
+    el.style.borderColor = isActive ? s.hex : '#cbd5e1';
+    el.style.color = isActive ? s.ink : '#94a3b8';
+  });
+}
+
+function buildLegendAndTabs(){
+  const legend = document.getElementById('pcLegend');
+  const tabs = document.getElementById('pcStageTabs');
+  if(!legend || !tabs) return;
+  legend.innerHTML=''; tabs.innerHTML='';
+  STAGES.forEach((s,i)=>{
+    const chip = document.createElement('span');
+    chip.className = 'pc-legend-chip';
+    chip.innerHTML = '<i class="bi bi-circle-fill" style="color:'+s.hex+'"></i>' + s.name;
+    legend.appendChild(chip);
+
+    const tab = document.createElement('button');
+    tab.type = 'button';
+    tab.className = 'pc-stage-tab';
+    tab.style.setProperty('--dot-color', s.hex);
+    tab.innerHTML = '<span class="dot"></span>' + s.name;
+    tab.addEventListener('click', ()=>{
+      activeTasksStage = i;
+      tabs.querySelectorAll('.pc-stage-tab').forEach(b=>b.classList.remove('active'));
+      tab.classList.add('active');
+      renderTaskPanel();
+    });
+    tabs.appendChild(tab);
+  });
+}
+
+function renderTaskPanel(){
+  const s = STAGES[activeTasksStage];
+  document.getElementById('pcStagePanelDot').style.background = s.hex;
+  document.getElementById('pcStagePanelIcon').className = 'bi ' + s.icon;
+  document.getElementById('pcStagePanelIcon').style.color = s.hex;
+  document.getElementById('pcStagePanelTitle').textContent = s.name;
+
+  const list = document.getElementById('pcTaskList');
+  list.textContent = '';
+  const tasks = stageTasks[s.key] || [];
+  if(tasks.length === 0){
+    const empty = document.createElement('div');
+    empty.className = 'pc-task-empty';
+    empty.textContent = 'Nenhuma tarefa registrada nesta fase ainda.';
+    list.appendChild(empty);
+  }
+  tasks.forEach(t=>{
+    const row = document.createElement('div');
+    row.className = 'pc-task' + (t.done ? ' is-done' : '');
+    const check = document.createElement('button');
+    check.type = 'button';
+    check.className = 'pc-task-check';
+    check.setAttribute('aria-label', t.done ? 'Marcar como pendente' : 'Concluir tarefa');
+    check.innerHTML = '<i class="bi ' + (t.done ? 'bi-check-circle-fill' : 'bi-circle') + '"></i>';
+    check.addEventListener('click', ()=>{ t.done = !t.done; renderTaskPanel(); persistTasks(); });
+    const text = document.createElement('span');
+    text.className = 'pc-task-text';
+    text.textContent = t.text;
+    const person = document.createElement('span');
+    person.className = 'pc-task-person';
+    person.textContent = t.person;
+    row.append(check, text, person);
+    list.appendChild(row);
+  });
+  const done = tasks.filter(t=>t.done).length;
+  document.getElementById('pcStageProgress').textContent = tasks.length ? (done + '/' + tasks.length + ' concluídas') : '';
+}
+
+function persistTasks(){
+  try{ localStorage.setItem('pc-cafe-tasks', JSON.stringify(stageTasks)); }catch(e){}
+}
+function loadTasks(){
+  try{
+    const raw = localStorage.getItem('pc-cafe-tasks');
+    if(raw){ const parsed=JSON.parse(raw); Object.keys(parsed).forEach(k=>{ if(stageTasks[k]) stageTasks[k]=parsed[k]; }); }
+  }catch(e){}
+}
+
+function initAddTask(){
+  const btn = document.getElementById('pcAddTaskBtn');
+  const form = document.getElementById('pcAddTaskForm');
+  if(!btn || !form) return;
+  btn.addEventListener('click', ()=> form.classList.toggle('open'));
+  document.getElementById('pcAddTaskCancel').addEventListener('click', ()=> form.classList.remove('open'));
+  document.getElementById('pcAddTaskSave').addEventListener('click', ()=>{
+    const textEl = document.getElementById('pcNewTaskText');
+    const personEl = document.getElementById('pcNewTaskPerson');
+    if(!textEl.value.trim()){ textEl.focus(); return; }
+    const s = STAGES[activeTasksStage];
+    stageTasks[s.key].push({text:textEl.value.trim(), person: personEl.value || 'A definir', done:false});
+    textEl.value=''; personEl.value='';
+    form.classList.remove('open');
+    renderTaskPanel(); persistTasks();
+  });
+}
+
+function initTheme(){
+  const btn = document.getElementById('pcThemeToggle');
+  if(!btn) return;
+  const icon = btn.querySelector('i');
+  const label = btn.querySelector('span');
+  function syncFromSystem(){
+    const isDark = document.documentElement.classList.contains('dark');
+    icon.className = 'bi ' + (isDark ? 'bi-sun-fill' : 'bi-moon-stars-fill');
+    label.textContent = isDark ? 'Claro' : 'Escuro';
+  }
+  syncFromSystem();
+  try{ if(btn._pcObserver) btn._pcObserver.disconnect(); }catch(e){}
+  const obs = new MutationObserver(syncFromSystem);
+  btn._pcObserver = obs;
+  obs.observe(document.documentElement, {attributes:true, attributeFilter:['class','data-tema']});
+  if(btn._pcClickHandler) btn.removeEventListener('click', btn._pcClickHandler);
+  const handler = ()=>{
+    if(window.aplicarTema){
+      const cur = document.documentElement.classList.contains('dark') ? 'escuro' : 'claro';
+      window.aplicarTema(cur === 'escuro' ? 'claro' : 'escuro');
+    } else if(window.alternarTema){
+      window.alternarTema();
+    } else if(window.applyThemeVars){
+      const dark = !document.documentElement.classList.contains('dark');
+      document.documentElement.classList.toggle('dark', dark);
+      window.applyThemeVars();
+    } else {
+      const dark = !document.documentElement.classList.contains('dark');
+      document.documentElement.classList.toggle('dark', dark);
+    }
+  };
+  btn._pcClickHandler = handler;
+  btn.addEventListener('click', handler);
+}
+
+function initRail(){
+  document.querySelectorAll('.pc-rail-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.pc-rail-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      const mod = btn.dataset.module;
+      document.querySelectorAll('.pc-module').forEach(m=> m.classList.toggle('active', m.dataset.module===mod));
+    });
+  });
+}
+
+function showToast(msg){
+  const t = document.getElementById('pcToast');
+  if(!t) return;
+  t.querySelector('span').textContent = msg;
+  t.classList.add('show');
+  clearTimeout(window._pcToastTimer);
+  window._pcToastTimer = setTimeout(()=> t.classList.remove('show'), 2600);
+}
+
+function collectPayload(){
+  const getVal = id => document.getElementById(id)?.value || '';
+  return {
+    cultura: document.querySelector('.pc-hero-name')?.textContent?.trim() || 'Café',
+    plantio: getVal('pcPlantio'),
+    cicloDias: getVal('pcCicloDias'),
+    colheitaCalc: getVal('pcColheitaCalc'),
+    janelaIni: getVal('pcJanelaIni'),
+    janelaFim: getVal('pcJanelaFim'),
+    podaData: getVal('pcPoda'),
+    podaTipo: getVal('pcTipoPoda'),
+    stageTasks: stageTasks,
+    obs: document.getElementById('pcObsBox')?.innerText || ''
+  };
+}
+
+async function saveRegistro(payload, keepOpen){
+  const csrf = document.querySelector('[name=csrfmiddlewaretoken]')?.value || (document.cookie.match(/csrftoken=([^;]+)/)?.[1] || '');
+  // tenta salvar via API Django — usa chaves esperadas pelo RegistroProducaoViewSet (name/cultureId/groupId/fields)
+  try{
+    const culturaData = JSON.parse(document.getElementById('pcCulturaData')?.textContent || 'null');
+    const registroData = JSON.parse(document.getElementById('pcRegistroData')?.textContent || 'null');
+    const body = {
+      name: (payload.cultura || 'Café') + ' · ' + (payload.plantio || new Date().toISOString().slice(0,10)),
+      cultureId: culturaData?.id ? String(culturaData.id) : 'cafe',
+      groupId: 'vegetal',
+      status: 'ativo',
+      location: document.querySelector('.pc-hero-sub')?.textContent || '',
+      date: payload.plantio || null,
+      observations: payload.obs || '',
+      fields: payload,
+      treatments: []
+    };
+    // se já existe registro, tenta atualizar via PATCH
+    const url = registroData?.id ? '/api/registros-producao/' + registroData.id + '/' : '/api/registros-producao/';
+    const method = registroData?.id ? 'PATCH' : 'POST';
+    const res = await fetch(url, {
+      method: method,
+      headers: {'Content-Type':'application/json', 'X-CSRFToken': csrf},
+      body: JSON.stringify(body)
+    });
+    if(res.ok){
+      const data = await res.json();
+      if(window.ProductionRegistry){
+        ProductionRegistry.save({id: data.id ? String(data.id) : undefined, cultureId: body.cultureId, name: body.name, fields: payload, createdAt: new Date().toISOString()});
+      }
+      showToast(keepOpen ? 'Registro salvo — pronto para adicionar outro talhão' : 'Cadastro concluído com sucesso');
+      if(!keepOpen){
+        setTimeout(()=> window.location.href = "{% url 'guia-vegetal' %}", 900);
+      } else {
+        document.getElementById('pcNewTaskText').value='';
+      }
+      return;
+    } else {
+      const err = await res.json().catch(()=> ({}));
+      console.warn('saveRegistro api error', res.status, err);
+    }
+  }catch(e){ console.warn('saveRegistro fallback', e); }
+  // fallback local
+  try{
+    if(window.ProductionRegistry){
+      const culturaData = JSON.parse(document.getElementById('pcCulturaData')?.textContent || '{}');
+      ProductionRegistry.save({cultureId: culturaData?.id ? String(culturaData.id) : 'cafe', name: payload.cultura, fields: payload});
+    }
+  }catch(e){}
+  showToast(keepOpen ? 'Registro salvo localmente — pronto para adicionar outro talhão' : 'Cadastro concluído (local)');
+  if(!keepOpen) setTimeout(()=> window.location.href = "{% url 'guia-vegetal' %}", 900);
+}
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  loadTasks();
+  buildLegendAndTabs();
+  recompute();
+  activeTasksStage = currentStageIdx;
+  document.querySelectorAll('.pc-stage-tab').forEach((b,i)=> b.classList.toggle('active', i===activeTasksStage));
+  renderTaskPanel();
+  initAddTask();
+  initRail();
+  initTheme();
+
+  document.getElementById('pcPlantio')?.addEventListener('change', recompute);
+  document.getElementById('pcCicloDias')?.addEventListener('input', recompute);
+  document.getElementById('pcJanelaIni')?.addEventListener('change', recompute);
+  document.getElementById('pcJanelaFim')?.addEventListener('change', recompute);
+
+  // seleção de talhão
+  document.querySelectorAll('.pc-plot').forEach(el=>{
+    if(el.classList.contains('pc-plot-new')) return;
+    el.addEventListener('click', ()=>{
+      document.querySelectorAll('.pc-plot').forEach(p=>p.classList.remove('is-selected'));
+      el.classList.add('is-selected');
+    });
+  });
+
+  document.getElementById('pcSaveAdd')?.addEventListener('click', ()=> saveRegistro(collectPayload(), true));
+  document.getElementById('pcSaveClose')?.addEventListener('click', ()=> saveRegistro(collectPayload(), false));
+
+  // foto upload preview
+  document.getElementById('pcFotoInput')?.addEventListener('change', (e)=>{
+    const file = e.target.files?.[0];
+    if(!file) return;
+    const grid = document.querySelector('.pc-photo-grid');
+    const div = document.createElement('div');
+    div.className='pc-photo';
+    div.style.background='linear-gradient(155deg,#0a7d56,#0f9d6e)';
+    const url = URL.createObjectURL(file);
+    div.style.backgroundImage='url('+url+')';
+    div.style.backgroundSize='cover';
+    div.innerHTML='<span>'+ new Date().toLocaleDateString('pt-BR',{day:'2-digit', month:'short'}) +'</span>';
+    grid.insertBefore(div, grid.querySelector('.pc-photo-add'));
+    showToast('Foto adicionada');
+  });
+});
+</script>
+{% endblock %}

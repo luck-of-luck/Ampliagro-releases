@@ -1,0 +1,1032 @@
+/* ONBOARDING — mesma linguagem visual da tela de login.
+ *
+ * Usa os MESMOS tokens e os mesmos valores de login.css (--auth-* e --lc-*),
+ * de propósito: as duas páginas passam a ser a mesma coisa por construção, e
+ * não por semelhança. Se um dia a paleta do login mudar, o onboarding muda junto.
+ *
+ * Saíram daqui: a grade de 56px no body, o clip-path com os
+ * repeating-linear-gradient (as "curvas" verdes e douradas), o
+ * backdrop-filter sobre um fundo que não é opaco, e o `letter-spacing: 0
+ * !important` global.
+ */
+
+:root {
+  --auth-bg-a: #f4f7f2;
+  --auth-ink: #18221e;
+  --auth-muted: #48524d;
+  --auth-line: rgba(24, 34, 30, 0.13);
+  --auth-accent: #137a59;
+  --auth-accent-hover: #13b57f;
+  --auth-water: #1e6f82;
+  --auth-gold: #b98523;
+
+  --lc-shell-bg: #e6ede8;
+  --lc-shell-grid: rgba(19, 122, 89, 0.1);
+  --lc-shell-shadow: rgba(0, 0, 0, 0.1);
+  --lc-panel-bg: rgba(255, 255, 255, 0.65);
+  --lc-panel-solid: #f7faf7;
+  --lc-panel-border: rgba(19, 122, 89, 0.2);
+  --lc-panel-border-top: rgba(19, 122, 89, 0.4);
+  --lc-input-bg: rgba(255, 255, 255, 0.5);
+  --lc-text-color: #18221e;
+  --lc-placeholder: rgba(24, 34, 30, 0.5);
+  --lc-btn-gradient-a: rgba(19, 122, 89, 0.1);
+  --lc-btn-gradient-b: rgba(19, 122, 89, 0.3);
+}
+
+.dark {
+  --auth-bg-a: #08100d;
+  --auth-ink: #edf3ef;
+  --auth-muted: #a1aaa5;
+  --auth-line: rgba(237, 243, 239, 0.14);
+  --auth-accent: #54c996;
+  --auth-water: #6bb7c4;
+  --auth-gold: #e0b45a;
+
+  --lc-shell-bg: #030605;
+  --lc-shell-grid: rgba(84, 201, 150, 0.04);
+  --lc-shell-shadow: rgba(0, 0, 0, 0.9);
+  --lc-panel-bg: rgba(15, 20, 18, 0.6);
+  --lc-panel-solid: #101614;
+  --lc-panel-border: rgba(84, 201, 150, 0.15);
+  --lc-panel-border-top: rgba(84, 201, 150, 0.4);
+  --lc-input-bg: rgba(255, 255, 255, 0.03);
+  --lc-text-color: #fff;
+  --lc-placeholder: rgba(255, 255, 255, 0.4);
+  --lc-btn-gradient-a: rgba(84, 201, 150, 0.2);
+  --lc-btn-gradient-b: rgba(15, 157, 110, 0.4);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  font-family: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+  color: var(--auth-ink);
+  background-color: var(--auth-bg-a);
+  background-image:
+    radial-gradient(circle at 20% 45%, rgba(19, 122, 89, 0.15), transparent 30%),
+    radial-gradient(circle at 82% 20%, rgba(30, 111, 130, 0.14), transparent 28%);
+  transition: background-color 0.2s ease;
+}
+
+/* ── Layout: mesma divisão do login (showcase à esquerda, shell à direita) ── */
+
+.onb-layout {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+}
+
+.onb-showcase {
+  flex: 1;
+  position: relative;
+  min-width: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--lc-shell-bg);
+}
+
+/* Cabecalho: marca a esquerda, etapas a direita, na mesma faixa. */
+.onb-topo {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  padding: 0.9rem 1.25rem;
+  border-bottom: 1px solid var(--lc-panel-border);
+  background: var(--lc-shell-bg);
+}
+
+.onb-marca {
+  min-width: 0;
+}
+.onb-marca h1 {
+  font-family: 'Sora', sans-serif;
+  font-weight: 800;
+  font-size: 1.65rem;
+  letter-spacing: -0.5px;
+  line-height: 1.15;
+  margin: 0 0 0.1rem 0;
+  color: var(--auth-ink);
+}
+.onb-marca p {
+  font-size: 0.82rem;
+  margin: 0;
+  color: var(--auth-muted);
+}
+
+/* Etapas na horizontal, dentro do cabecalho. */
+.onb-topo .onb-checklist {
+  flex-direction: row;
+  flex: none;
+  margin: 0;
+  padding: 0.3rem;
+  gap: 0.3rem;
+  border-radius: 12px;
+  border: 1px solid var(--lc-panel-border);
+  background: var(--lc-panel-solid);
+}
+.onb-topo .onb-checklist li {
+  white-space: nowrap;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.78rem;
+}
+
+/* A lista saiu da coluna lateral: agora vive no cabecalho (acima). O mapa fica
+   com a largura INTEIRA da coluna esquerda — antes sobrava um rail de 315px. */
+.onb-corpo {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  padding: 0.75rem;
+}
+
+.onb-mapa-area {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--lc-panel-border);
+}
+
+#onb-mapa {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+/* ── Lista de etapas ──
+   Base da lista. Precisa existir explicitamente: quando ela sobrepunha o mapa
+   eu tinha posto estas regras aqui, e a substituicao seguinte as levou junto —
+   os bullets `•` apareceram no lugar dos numeros. Nao remover. */
+.onb-checklist {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+}
+.onb-checklist li {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 0.9rem;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  font-size: 0.9rem;
+  color: var(--auth-muted);
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    color 0.25s ease;
+}
+
+.onb-map-overlay {
+  position: absolute;
+  z-index: 500;
+  background: var(--lc-panel-solid);
+  border: 1px solid var(--lc-panel-border);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
+}
+
+.onb-map-tools {
+  top: 0.75rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.4rem;
+  padding: 0.35rem;
+}
+
+.onb-btn-primary-map {
+  background: var(--auth-accent);
+  border-color: var(--auth-accent);
+  color: #fff;
+}
+.onb-btn-primary-map:hover {
+  color: #fff;
+  filter: brightness(1.1);
+}
+
+/* bottom: 1.9rem, nao 1rem — o Leaflet põe a atribuicao "© OpenStreetMap"
+   no rodape do mapa e a barra de status ficava por cima dela. */
+.onb-map-rodape {
+  left: 1rem;
+  bottom: 1.9rem;
+  right: 1rem;
+  display: flex;
+  gap: 1.5rem;
+  padding: 0.6rem 0.9rem;
+}
+
+.onb-mapstat {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  color: var(--auth-muted);
+}
+.onb-mapstat b {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--lc-text-color);
+}
+
+.onb-localizando,
+.onb-aviso-local {
+  font-size: 0.75rem;
+  color: var(--auth-muted);
+  align-self: center;
+  margin-left: auto;
+}
+.onb-aviso-local {
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  color: var(--auth-accent);
+  background: var(--lc-btn-gradient-a);
+}
+
+/* Rotulo discreto ao lado de um campo preenchido pelo mapa */
+.onb-preenchido {
+  display: inline-block;
+  margin-left: 0.35rem;
+  padding: 0.05rem 0.35rem;
+  border-radius: 5px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--auth-accent);
+  background: var(--lc-btn-gradient-a);
+}
+
+.onb-checklist li .onb-mark {
+  flex: none;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  border: 1px solid var(--lc-panel-border);
+  color: var(--auth-muted);
+  background: var(--lc-input-bg);
+}
+
+.onb-checklist li.done {
+  color: var(--auth-ink);
+}
+.onb-checklist li.done .onb-mark {
+  background: var(--auth-accent);
+  border-color: var(--auth-accent);
+  color: #fff;
+}
+
+.onb-checklist li.current {
+  background: var(--lc-panel-bg);
+  border-color: var(--lc-panel-border);
+  color: var(--auth-ink);
+  font-weight: 600;
+}
+.onb-checklist li.current .onb-mark {
+  background: var(--auth-accent);
+  border-color: var(--auth-accent);
+  color: #fff;
+}
+
+.onb-shell {
+  width: 480px;
+  flex: none;
+  padding: 3rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  /* justify-content:center + overflow sem barra = o conteudo alto e CORTADO em
+     cima e embaixo, sem rolagem. O CPF/CNPJ ficava inalcancavel. Trocado por
+     align-items no eixo vertical, que nao empurra o topo para fora. */
+  justify-content: flex-start;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  position: relative;
+  background: var(--lc-shell-bg);
+  background-image:
+    radial-gradient(120% 80% at 100% 0%, var(--lc-btn-gradient-a), transparent 60%),
+    radial-gradient(90% 60% at 0% 100%, var(--lc-btn-gradient-a), transparent 55%);
+  border-left: 1px solid var(--lc-shell-grid);
+  box-shadow:
+    -30px 0 80px var(--lc-shell-shadow),
+    inset 30px 0 60px rgba(0, 0, 0, 0.1);
+  color: var(--lc-text-color);
+  transition:
+    color 0.3s ease,
+    background-color 0.3s ease;
+}
+
+/* ── Cartão: o mesmo painel do login, com a mesma borda de acento ── */
+
+.onb-card {
+  position: relative;
+  /* margin:auto centraliza na vertical QUANDO ha sobra; quando o conteudo e
+     maior que a coluna ele cresce para cima e para baixo sem corte, e o
+     overflow do .onb-shell rola. Com justify-content:center isso nao
+     acontecia e a metade de baixo do formulario sumia. */
+  margin: auto 0;
+  flex: none;
+  border-radius: 20px;
+  border: 1px solid var(--lc-panel-border);
+  border-top: 1px solid var(--lc-panel-border-top);
+  box-shadow:
+    0 25px 50px var(--lc-shell-shadow),
+    inset 0 0 30px var(--lc-panel-border);
+  background: var(--lc-panel-bg);
+  padding: 2.2rem 2rem;
+  overflow: hidden;
+}
+
+/* Barra de acento no topo — sinaliza progresso, como o wizard merece. */
+.onb-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--auth-accent), var(--auth-water) 56%, var(--auth-gold));
+}
+
+@property --angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+@keyframes borderRotate {
+  to {
+    --angle: 360deg;
+  }
+}
+.onb-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  padding: 1.5px;
+  background: conic-gradient(
+    from var(--angle),
+    transparent 0deg,
+    transparent 90deg,
+    var(--auth-water) 180deg,
+    var(--auth-accent) 270deg,
+    transparent 360deg
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  z-index: 5;
+  opacity: 0.8;
+  pointer-events: none;
+  animation: borderRotate 3s linear infinite;
+  animation-play-state: paused;
+}
+.onb-card:hover::after {
+  animation-play-state: running;
+}
+
+/* ── Barra superior (mesma do login) ── */
+
+.onb-topnav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.onb-iconbtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid var(--lc-panel-border);
+  background: var(--lc-input-bg);
+  color: var(--lc-text-color);
+  opacity: 0.8;
+  cursor: pointer;
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    color 0.25s ease,
+    opacity 0.25s ease;
+}
+.onb-iconbtn:hover {
+  background: var(--lc-btn-gradient-a);
+  border-color: var(--lc-panel-border-top);
+  opacity: 1;
+  box-shadow: 0 0 10px var(--lc-panel-border);
+}
+
+/* ── Pontos de progresso (agora nos mesmos verdes dos tokens) ── */
+
+.onb-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1.75rem;
+}
+
+.step-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--lc-panel-border);
+  transition:
+    width 0.3s ease,
+    background-color 0.3s ease;
+}
+.step-dot.active {
+  width: 26px;
+  border-radius: 5px;
+  background: var(--auth-accent);
+}
+.step-dot.done {
+  background: var(--lc-btn-gradient-b);
+}
+
+/* ── Painéis de etapa ── */
+
+.step-panel {
+  display: none;
+}
+.step-panel.active {
+  display: block;
+}
+
+.onb-panel-title {
+  font-family: 'Sora', sans-serif;
+  font-weight: 700;
+  font-size: 1.25rem;
+  letter-spacing: -0.2px;
+  color: var(--lc-text-color);
+  margin: 0 0 0.35rem 0;
+}
+
+.onb-panel-sub {
+  font-size: 0.85rem;
+  color: var(--auth-muted);
+  margin: 0 0 1.5rem 0;
+  line-height: 1.5;
+}
+
+.onb-welcome {
+  text-align: center;
+}
+.onb-welcome .onb-panel-title {
+  font-size: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+.onb-welcome .onb-panel-sub {
+  margin-bottom: 1.75rem;
+}
+
+/* ── Campos ── */
+
+.onb-field {
+  margin-bottom: 1rem;
+}
+
+.onb-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--lc-text-color);
+  opacity: 0.85;
+  margin-bottom: 0.5rem;
+}
+
+/* "opcional" ao lado do rótulo: some com a interrogação, mas fica visível que
+   o campo não é exigido. */
+.onb-optional {
+  font-weight: 400;
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  color: var(--auth-muted);
+  opacity: 0.8;
+  text-transform: uppercase;
+}
+
+.onb-input,
+.onb-select {
+  width: 100%;
+  padding: 0.85rem 1.2rem;
+  border-radius: 12px;
+  border: 1px solid var(--lc-panel-border);
+  border-top: 1px solid var(--lc-panel-border-top);
+  background: var(--lc-input-bg);
+  /* Sem isto o texto do valor saia PRETO nos dois temas: no escuro, preto sobre
+     quase-preto = invisivel. Foi a regra base que sumiu numa limpeza e deixou
+     so o `:focus` valendo. */
+  color: var(--lc-text-color);
+  font-size: 1rem;
+  font-family: inherit;
+  letter-spacing: 0.3px;
+  box-shadow: inset 0 3px 6px var(--lc-shell-shadow);
+  transition:
+    border-color 0.25s ease,
+    background-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+/* Foco: anel de acento, sem deslocar o layout. */
+.onb-input:focus,
+.onb-select:focus {
+  outline: none;
+  border-color: var(--auth-accent);
+  background: var(--lc-panel-bg);
+  box-shadow:
+    0 0 0 3px var(--lc-btn-gradient-b),
+    inset 0 3px 6px var(--lc-shell-shadow);
+}
+
+/* O select nativo desenha a seta com a cor do texto; no escuro ela sumia. */
+.onb-select option {
+  background: var(--lc-panel-solid);
+  color: var(--lc-text-color);
+}
+
+.onb-input::placeholder {
+  color: var(--lc-placeholder);
+}
+
+/* Campo somente-leitura (cidade): parece campo, mas abre lista. */
+.onb-input[readonly] {
+  cursor: pointer;
+}
+
+.onb-hint {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--auth-muted);
+  margin-top: 0.4rem;
+}
+
+/* ── Botões ── */
+
+.onb-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.onb-btn {
+  flex: 1;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.25s ease;
+}
+
+.onb-btn:active {
+  transform: translateY(0);
+}
+
+.onb-btn-primary {
+  border: 1px solid var(--lc-panel-border-top);
+  color: #fff;
+  background: linear-gradient(135deg, var(--auth-accent), var(--auth-water));
+  box-shadow:
+    0 0 15px var(--lc-panel-border),
+    inset 0 2px 5px rgba(255, 255, 255, 0.2);
+}
+.onb-btn-primary:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, var(--auth-accent-hover), var(--auth-water));
+  border-color: var(--auth-accent);
+  box-shadow:
+    0 0 25px var(--auth-accent),
+    inset 0 2px 5px rgba(255, 255, 255, 0.4);
+}
+
+.onb-btn-ghost {
+  background: none;
+  border: 1px solid var(--lc-panel-border);
+  color: var(--auth-muted);
+}
+.onb-btn-ghost:hover {
+  border-color: var(--lc-panel-border-top);
+  color: var(--lc-text-color);
+  background: var(--lc-btn-gradient-a);
+}
+
+/* ── Busca de culturas ── */
+
+.onb-searchwrap i {
+  position: absolute;
+  left: 0.9rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--lc-placeholder);
+  font-size: 0.85rem;
+  pointer-events: none;
+}
+
+.cultura-chip:hover {
+  border-color: var(--auth-accent);
+}
+.cultura-chip.selected {
+  background: var(--auth-accent);
+  border-color: var(--auth-accent);
+  color: #fff;
+}
+
+/* ── Mapa ──
+   O tamanho do mapa vive na regra #onb-mapa do topo do arquivo
+   (position:absolute; inset:0), que o enche dentro de .onb-showcase.
+
+   Aqui NAO se repete #onb-mapa: quando o mapa morava dentro do formulario havia
+   um `height: 280px` aqui, e essa regra vem depois no arquivo — ela vencia o
+   `inset: 0` e o mapa ficava com 280px de altura no topo de uma coluna de tela
+   cheia, com o resto abaixo em branco. */
+
+/* Leaflet precisa de contraste próprio; sem isso os tiles somem no tema escuro
+   e os controles ficam brancos sobre o cartão. */
+.leaflet-container {
+  font-family: inherit;
+  background: #e8eee9;
+}
+
+/* No escuro, os tiles do OSM continu claros e o mapa virava um buraco branco
+   no meio de um painel escuro. Inverter+girar o matiz devolve o mapa em tom
+   escuro sem trocar de servidor de tiles (nada novo no CSP). */
+.dark .leaflet-tile-pane,
+.dark .leaflet-overlay-pane,
+.dark .leaflet-shadow-pane,
+.dark .leaflet-marker-pane {
+  filter: invert(1) hue-rotate(180deg) brightness(0.92) contrast(0.88) saturate(0.7);
+}
+/* O pino do produtor e o poligono nao devem ser invertidos junto com o mapa. */
+.dark .leaflet-marker-icon,
+.dark .leaflet-interactive,
+.dark .leaflet-control-container {
+  filter: none;
+}
+.leaflet-control-zoom a,
+.leaflet-draw-toolbar a {
+  background-color: var(--lc-panel-solid);
+  color: var(--lc-text-color);
+  border-color: var(--lc-panel-border);
+}
+.leaflet-bar,
+.leaflet-draw-toolbar {
+  border: 1px solid var(--lc-panel-border) !important;
+  box-shadow: none;
+}
+
+.onb-mapbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.7rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  color: var(--lc-text-color);
+  background: var(--lc-panel-solid);
+  border: 1px solid var(--lc-panel-border);
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    opacity 0.2s ease;
+}
+.onb-mapbtn:hover {
+  border-color: var(--auth-accent);
+  color: var(--auth-accent);
+}
+.onb-mapbtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ── Resumo / revisão ── */
+
+.onb-resumo-linha {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.3rem 0;
+  font-size: 0.85rem;
+  color: var(--auth-muted);
+}
+.onb-resumo-linha b {
+  font-weight: 600;
+  color: var(--lc-text-color);
+  text-align: right;
+  word-break: break-word;
+}
+
+/* ── Dropdown de cidades ── */
+
+.dropdown-city .city-item {
+  padding: 0.6rem 0.9rem;
+  font-size: 0.88rem;
+  cursor: pointer;
+  color: var(--lc-text-color);
+  transition: background-color 0.12s ease;
+}
+.dropdown-city .city-item:hover {
+  background: var(--lc-btn-gradient-a);
+  color: var(--auth-accent);
+}
+
+/* ── Overlay de carregamento ── */
+
+.onb-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9rem;
+  background: var(--lc-panel-bg);
+  backdrop-filter: blur(6px);
+  border-radius: 20px;
+}
+
+.onb-spinner {
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 3px solid var(--lc-btn-gradient-b);
+  border-top-color: var(--auth-accent);
+  border-radius: 50%;
+  animation: onb-spin 0.8s linear infinite;
+}
+
+@keyframes onb-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.onb-loading p {
+  font-size: 0.9rem;
+  color: var(--auth-muted);
+  margin: 0;
+}
+
+/* ── Utilitário (o JS usa .hidden) ── */
+
+.hidden {
+  display: none !important;
+}
+
+/* ── Passo 3: multi-seleção de culturas ──
+ *
+ * 21 grupos, ~700 culturas. A lista inteira nao cabe: cada grupo e' um
+ * <details> fechado, e a busca abre o que bate. Sem virtualização porque
+ * <details> fechado nao custa layout — 21 caixas de 700 linhas é o que
+ * custaria.
+ */
+
+.onb-culturas {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  margin-top: 0.4rem;
+}
+
+.onb-culturas-resumo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  font-size: 0.78rem;
+  color: var(--auth-muted);
+}
+
+.onb-btn-mini {
+  padding: 0.25rem 0.6rem;
+  font-size: 0.72rem;
+}
+
+.onb-culturas-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  max-height: 44vh;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.onb-grupo {
+  border: 1px solid var(--lc-panel-border);
+  border-radius: 10px;
+  background: var(--lc-panel-bg);
+}
+
+.onb-grupo-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.55rem 0.75rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  list-style: none;
+}
+
+/* Safari e Chrome mostram o marcador nativo do <summary>; o desenho aqui e'
+   seta à direita, que é o que o produtor espera de um grupo dobrável. */
+.onb-grupo-topo::-webkit-details-marker {
+  display: none;
+}
+
+.onb-grupo-topo::before {
+  content: '▸';
+  margin-right: 0.45rem;
+  color: var(--auth-muted);
+  transition: transform 0.15s ease;
+}
+
+.onb-grupo[open] > .onb-grupo-topo::before {
+  transform: rotate(90deg);
+}
+
+.onb-grupo-nome {
+  flex: 1;
+  min-width: 0;
+}
+
+.onb-grupo-contador {
+  font-size: 0.72rem;
+  font-weight: 400;
+  color: var(--auth-muted);
+  background: var(--lc-panel-border);
+  border-radius: 999px;
+  padding: 0.1rem 0.5rem;
+}
+
+.onb-grupo-grade {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 0.15rem 0.5rem;
+  padding: 0.35rem 0.75rem 0.7rem;
+}
+
+.onb-cultura {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.25rem 0.3rem;
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 0.82rem;
+}
+
+.onb-cultura:hover {
+  background: var(--lc-panel-border);
+}
+
+/* O nome pode ser longo e é dado de outra pessoa (Cultura.nome é gravável
+   por qualquer autenticado): corta, não expande a linha. */
+.onb-cultura-nome {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.onb-cultura input[type='checkbox'] {
+  flex: none;
+  accent-color: var(--auth-accent);
+  cursor: pointer;
+}
+
+/* ── Passo 4: resumo ── */
+
+.onb-review {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin: 0.4rem 0 0.2rem;
+}
+
+.onb-resumo-linha {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 8px;
+  background: var(--lc-panel-bg);
+  border: 1px solid var(--lc-panel-border);
+  font-size: 0.85rem;
+}
+
+.onb-resumo-linha span {
+  color: var(--auth-muted);
+  flex: none;
+}
+
+/* Culturas pode ser uma lista de 40 nomes numa linha só. `min-width: 0` +
+   quebra é o que impede o <b> de empurrar o rótulo para fora da caixa. */
+.onb-resumo-linha b {
+  text-align: right;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* ── Telas estreitas: o mapa encolhe, o shell vai embaixo ── */
+
+/* No celular: marca em cima, mapa embaixo. */
+@media (max-width: 900px) {
+  .onb-layout {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+  }
+  .onb-showcase {
+    display: flex;
+    flex: none;
+    width: 100%;
+    height: auto;
+  }
+  /* A marca e as etapas ficam lado a lado; se nao couberem, a marca encolhe. */
+  .onb-topo {
+    gap: 0.6rem;
+    padding: 0.65rem 0.8rem;
+  }
+  .onb-marca h1 {
+    font-size: 1.15rem;
+  }
+  .onb-marca p {
+    display: none;
+  }
+  /* So os numeros + rotulo curto: os 3 cabem sem cortar. */
+  .onb-topo .onb-checklist {
+    padding: 0.2rem;
+    gap: 0.2rem;
+  }
+  .onb-topo .onb-checklist li {
+    padding: 0.3rem 0.35rem;
+    font-size: 0.66rem;
+    gap: 0.3rem;
+  }
+  .onb-topo .onb-checklist li .onb-mark {
+    width: 1.15rem;
+    height: 1.15rem;
+    font-size: 0.6rem;
+  }
+  .onb-corpo {
+    padding: 0.6rem;
+  }
+  .onb-mapa-area {
+    height: 42vh;
+    min-height: 240px;
+  }
+  .onb-map-rodape {
+    left: 0.5rem;
+    right: 0.5rem;
+    bottom: 1.7rem;
+    gap: 0.9rem;
+    padding: 0.45rem 0.7rem;
+  }
+  .onb-shell {
+    width: 100%;
+    padding: 2rem 1.5rem;
+    border-left: none;
+    overflow-y: visible;
+  }
+  .onb-card {
+    margin: 0;
+  }
+}

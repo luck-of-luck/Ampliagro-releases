@@ -1,0 +1,122 @@
+{% extends base_template %}
+{% load static %}
+
+{% block title %}Ampliagro - Configurações do Sistema{% endblock %}
+
+{% block extra_css %}
+
+{% endblock %}
+
+{% block dashboard_appbar %}{% endblock %}
+
+{% block content %}
+<div class="section-container">
+    <div class="section-header">
+        <h1 class="section-title"><i class="bi bi-gear-wide me-2"></i>Configurações do Sistema</h1>
+    </div>
+
+    <div class="content-card">
+        <h2 class="section-subtitle"><i class="bi bi-toggles me-2"></i>Preferências Globais</h2>
+        <form id="config-sistema-form">
+            {% csrf_token %}
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="id_moeda">Moeda Padrão</label>
+                    <select id="id_moeda" name="moeda" data-key="moeda_padrao">
+                        <option value="BRL">BRL (R$)</option>
+                        <option value="USD">USD ($)</option>
+                        <option value="EUR">EUR (€)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="id_unidade_area">Unidade de Área</label>
+                    <select id="id_unidade_area" name="unidade_area" data-key="unidade_area">
+                        <option value="ha">Hectare (ha)</option>
+                        <option value="alqueire">Alqueire</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="id_formato_data">Formato de Data</label>
+                    <select id="id_formato_data" name="formato_data" data-key="formato_data">
+                        <option value="DD/MM/AAAA">DD/MM/AAAA</option>
+                        <option value="MM/DD/AAAA">MM/DD/AAAA</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="id_fuso">Fuso Horário</label>
+                    <select id="id_fuso" name="fuso" data-key="fuso_horario">
+                        <option value="-3">UTC -3 (Brasília)</option>
+                        <option value="-4">UTC -4 (Manaus)</option>
+                        <option value="-5">UTC -5 (Acre)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="id_idioma_sistema">Idioma do Sistema</label>
+                    <select id="id_idioma_sistema" name="idioma_sistema" data-key="idioma_sistema">
+                        <option value="pt-br">Português (Brasil)</option>
+                        <option value="en">English</option>
+                        <option value="es">Español</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="id_autosave">Auto-save Interval</label>
+                    <select id="id_autosave" name="autosave" data-key="autosave_interval">
+                        <option value="1">1 minuto</option>
+                        <option value="5">5 minutos</option>
+                        <option value="15">15 minutos</option>
+                    </select>
+                </div>
+            </div>
+            <div style="margin-top:0.5rem;display:flex;gap:0.75rem;flex-wrap:wrap;">
+                <button type="submit" class="btn-primary"><i class="bi bi-check-lg"></i> Salvar Configurações</button>
+                <button type="button" class="btn-danger" onclick="limparCache()"><i class="bi bi-trash"></i> Limpar Cache</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="toast" class="toast"></div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+    const STORAGE_KEY = 'ampliagro_config_sistema';
+
+    function carregarConfig() {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (!saved) return;
+        const config = JSON.parse(saved);
+        document.querySelectorAll('[data-key]').forEach(el => {
+            const key = el.dataset.key;
+            if (config[key] !== undefined) el.value = config[key];
+        });
+    }
+
+    function salvarConfig(e) {
+        e.preventDefault();
+        const config = {};
+        document.querySelectorAll('[data-key]').forEach(el => {
+            config[el.dataset.key] = el.value;
+        });
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+        const t = document.getElementById('toast');
+        t.textContent = 'Configurações salvas com sucesso!';
+        t.className = 'toast toast-success show';
+        setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    function limparCache() {
+        if (!confirm('Limpar todo o cache local do sistema?')) return;
+        localStorage.clear();
+        const t = document.getElementById('toast');
+        t.textContent = 'Cache limpo com sucesso!';
+        t.className = 'toast toast-warning show';
+        setTimeout(() => t.classList.remove('show'), 3000);
+        carregarConfig();
+    }
+
+    document.getElementById('config-sistema-form').addEventListener('submit', salvarConfig);
+    document.addEventListener('DOMContentLoaded', carregarConfig);
+</script>
+{% endblock %}

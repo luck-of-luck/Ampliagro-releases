@@ -1,0 +1,32 @@
+{
+  "0001-abertura.md": {
+    "bytes": 3480,
+    "quando": "2026-10-04T10:40:29",
+    "sha256": "f0adff2d902c6523ef22b320e07f74e7ad37e8dc5b934ea0ba223c1787d291c5"
+  },
+  "0002-s7-ocupado-e-corrupcao-de-encoding.md": {
+    "bytes": 4633,
+    "quando": "2026-10-04T10:40:29",
+    "sha256": "a1d6c25e25b0183a839b5d61b238bf615dc3fe3e351c65d6c7299da7d155b8b7"
+  },
+  "0003-manifesto-implementado-e-mojibake-ja-corrigido.md": {
+    "bytes": 9586,
+    "quando": "2026-10-04T10:40:29",
+    "sha256": "5fdcdda8254101fcfb1821a3ade4c4a7c613c9b826f2362447b3706b4861a49c"
+  },
+  "0003-scanners-coreram.md": {
+    "bytes": 5416,
+    "quando": "2026-10-04T10:40:29",
+    "sha256": "fa5b81a50f6bf054b73f10f0042b42b6e746580290000434986b52438184c2e1"
+  },
+  "0004-guard-acusa-r2-a-hook-nao-a-pessoa.md": {
+    "bytes": 7580,
+    "quando": "2026-10-04T10:40:29",
+    "sha256": "af49c49504fa60d2f72df2e5fa02b5c4f165f36918307d6f8a2901c3d6977316"
+  },
+  "0005-merge-feito-e-catalog-json-orfao.md": {
+    "bytes": 6341,
+    "quando": "2026-10-04T10:50:49",
+    "sha256": "18f10090bb5d981097f6fb9896eb435bfee040d65a3e3f3a99d2c21a41485b6b"
+  }
+}

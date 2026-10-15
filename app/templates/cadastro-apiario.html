@@ -1,0 +1,261 @@
+{% extends "partials/_premium_cadastro_base.html" %}
+{% load static agro_icons %}
+
+{% block title %}Ampliagro - Apiário / Colmeias{% endblock %}
+
+{% block cadastro_icon %}bi bi-flower1{% endblock %}
+{% block cadastro_title %}Apiário / Colmeias{% endblock %}
+{% block cadastro_novo_title %}Nova Colmeia{% endblock %}
+{% block cadastro_lista_title %}Colmeias Cadastradas{% endblock %}
+
+{% block cadastro_subtabs %}
+<div class="pcrud-subtabs" id="cadastroSubTabs">
+    <button class="pcrud-subtab active" data-tab="novo">Nova Colmeia</button>
+    <button class="pcrud-subtab" data-tab="lista">Colmeias</button>
+    <button class="pcrud-subtab" data-tab="producao">Produção de Mel</button>
+</div>
+{% endblock %}
+
+{% block cadastro_stats %}
+<div class="pcrud-stats" id="cadastroStats">
+    <div class="pcrud-stat"><div class="pcrud-stat-label">Total Colmeias</div><div class="pcrud-stat-value" id="statTotalColmeias">{{ colmeias|length }}</div></div>
+    <div class="pcrud-stat"><div class="pcrud-stat-label">Ativas</div><div class="pcrud-stat-value" id="statAtivas">{{ colmeias_ativas }}</div></div>
+    <div class="pcrud-stat"><div class="pcrud-stat-label">Mel Mês (kg)</div><div class="pcrud-stat-value" id="statMelMes">{{ mel_mes|floatformat:2 }}</div></div>
+    <div class="pcrud-stat"><div class="pcrud-stat-label">Valor Estimado</div><div class="pcrud-stat-value" id="statValorMel">R$ {{ valor_mel|floatformat:2 }}</div></div>
+</div>
+{% endblock %}
+
+{% block cadastro_form_novo %}
+<form id="colmeia-form" onsubmit="return submitColmeia(event)">
+    {% csrf_token %}
+    <div class="pcrud-form-grid">
+        <div class="pcrud-form-group">
+            <label>Propriedade</label>
+            <select name="propriedade" required onblur="validateField(this)">
+                <option value="">Selecione...</option>
+                {% for p in propriedades %}
+                <option value="{{ p.id }}">{{ p.nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="pcrud-form-group">
+            <label>Identificação</label>
+            <input type="text" name="identificacao" placeholder="Ex: Apiário 01 - Caixa A" required onblur="validateField(this)">
+        </div>
+        <div class="pcrud-form-group">
+            <label>Tipo de Abelha</label>
+            <input type="text" name="tipo_abelha" value="Apis mellifera" placeholder="Apis mellifera, Jataí, etc.">
+        </div>
+        <div class="pcrud-form-group">
+            <label>Data de Instalação</label>
+            <input type="date" name="data_instalacao" value="{{ today|date:'Y-m-d' }}" required onblur="validateField(this)">
+        </div>
+        <div class="pcrud-form-group">
+            <label>Localização</label>
+            <input type="text" name="localizacao" placeholder="Ex: Próximo ao talhão A3, coordenadas GPS">
+        </div>
+        <div class="pcrud-form-group">
+            <label>Ativa</label>
+            <div style="display:flex;align-items:center;gap:8px;">
+                <input type="checkbox" name="ativa" id="id_ativa" checked style="width:auto;height:auto;">
+                <label for="id_ativa" style="margin:0;font-weight:500;font-size:.813rem;text-transform:none;letter-spacing:0;cursor:pointer;">Colmeia ativa</label>
+            </div>
+        </div>
+        <div class="pcrud-form-group" style="grid-column:span 2;">
+            <label>Observação</label>
+            <textarea name="observacao" rows="2" placeholder="Observações sobre a colmeia (opcional)"></textarea>
+        </div>
+    </div>
+    <div class="pcrud-form-actions">
+        <button type="submit" class="pcrud-btn pcrud-btn-primary"><i class="bi bi-check-lg"></i> Salvar Colmeia</button>
+        <button type="reset" class="pcrud-btn pcrud-btn-secondary">Limpar</button>
+    </div>
+</form>
+{% endblock %}
+
+{% block cadastro_tab_lista %}
+{% if colmeias %}
+<div class="pcrud-table-wrap">
+    <table class="pcrud-table">
+        <thead>
+            <tr>
+                <th>Identificação</th>
+                <th>Tipo Abelha</th>
+                <th>Data Instalação</th>
+                <th>Localização</th>
+                <th>Ativa</th>
+                <th>Produção Mês (kg)</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in colmeias %}
+            <tr>
+                <td><strong>{{ c.identificacao }}</strong></td>
+                <td>{{ c.tipo_abelha|default:"Apis mellifera" }}</td>
+                <td>{{ c.data_instalacao|date:"d/m/Y"|default:"—" }}</td>
+                <td>{{ c.localizacao|default:"—" }}</td>
+                <td>{% if c.ativa %}<span style="color:var(--cor-sucesso);">● Ativa</span>{% else %}<span style="color:var(--cor-erro);">● Inativa</span>{% endif %}</td>
+                <td>{{ c.producao_mes|floatformat:2|default:"0,00" }}</td>
+                <td>
+                    <div class="action-cell">
+                        <button class="pcrud-btn pcrud-btn-secondary pcrud-btn-sm" onclick="editarColmeia({{ c.id }})"><i class="bi bi-pencil"></i> Editar</button>
+                        <button class="pcrud-btn pcrud-btn-danger pcrud-btn-sm" onclick="excluirColmeia({{ c.id }})"><i class="bi bi-trash"></i> Excluir</button>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+{% include "partials/_empty_state_cta.html" with empty_icone="bi bi-hexagon" empty_titulo="Nenhuma colmeia cadastrada" empty_descricao="Cadastre a primeira colmeia para ligar sensores e comparar produtividade por apiário." empty_acao="Cadastrar colmeia" empty_aba="novo" %}
+{% endif %}
+{% endblock %}
+
+{% block cadastro_extra_tabs %}
+<!-- Tab: Produção de Mel -->
+<div class="pcrud-tab" id="tab-producao">
+    <h2><i class="bi bi-droplet-fill"></i> Produção de Mel & Cera</h2>
+    <div class="pcrud-form-card">
+        <form id="producao-form" onsubmit="return submitProducao(event)">
+            {% csrf_token %}
+            <div class="pcrud-form-grid">
+                <div class="pcrud-form-group">
+                    <label>Colmeia</label>
+                    <select name="colmeia" required onblur="validateField(this)">
+                        <option value="">Selecione...</option>
+                        {% for c in colmeias %}
+                        <option value="{{ c.id }}">{{ c.identificacao }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="pcrud-form-group">
+                    <label>Data da Extração</label>
+                    <input type="date" name="data_extracao" value="{{ today|date:'Y-m-d' }}" required onblur="validateField(this)">
+                </div>
+                <div class="pcrud-form-group">
+                    <label>Produção de Mel (kg)</label>
+                    <input type="number" step="0.01" name="producao_mel_kg" required placeholder="0,00" min="0" onblur="validateField(this)">
+                </div>
+                <div class="pcrud-form-group">
+                    <label>Produção de Cera (kg)</label>
+                    <input type="number" step="0.01" name="producao_cera_kg" placeholder="0,00" min="0">
+                </div>
+                <div class="pcrud-form-group">
+                    <label>Valor de Venda (R$)</label>
+                    <input type="number" step="0.01" name="valor_venda" placeholder="0,00" min="0">
+                </div>
+                <div class="pcrud-form-group" style="grid-column:span 2;">
+                    <label>Observação</label>
+                    <textarea name="observacao" rows="2" placeholder="Observações..."></textarea>
+                </div>
+            </div>
+            <div class="pcrud-form-actions">
+                <button type="submit" class="pcrud-btn pcrud-btn-primary"><i class="bi bi-check-lg"></i> Registrar Produção</button>
+                <button type="reset" class="pcrud-btn pcrud-btn-secondary">Limpar</button>
+            </div>
+        </form>
+    </div>
+
+    {% if producoes %}
+    <h2 style="margin-top:28px;"><i class="bi bi-clock-history"></i> Histórico de Produção</h2>
+    <div class="pcrud-form-card" style="padding:0;">
+        <div class="pcrud-table-wrap">
+            <table class="pcrud-table">
+                <thead>
+                    <tr>
+                        <th>Colmeia</th>
+                        <th>Data</th>
+                        <th>Mel (kg)</th>
+                        <th>Cera (kg)</th>
+                        <th>Valor Venda</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in producoes %}
+                    <tr>
+                        <td>{{ p.colmeia.identificacao }}</td>
+                        <td>{{ p.data_extracao|date:"d/m/Y" }}</td>
+                        <td>{{ p.producao_mel_kg|floatformat:2 }}</td>
+                        <td>{{ p.producao_cera_kg|floatformat:2|default:"—" }}</td>
+                        <td>R$ {{ p.valor_venda|floatformat:2|default:"—" }}</td>
+                        <td><button class="pcrud-btn pcrud-btn-danger pcrud-btn-sm" onclick="excluirProducao({{ p.id }})"><i class="bi bi-trash"></i></button></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+(function() {
+    window.submitColmeia = async function(event) {
+        event.preventDefault();
+        if (!validateForm('colmeia-form')) { showToast('Corrija os campos em destaque', 'error'); return false; }
+        const f = document.getElementById('colmeia-form');
+        const data = {
+            propriedade: parseInt(f.propriedade.value),
+            identificacao: f.identificacao.value,
+            tipo_abelha: f.tipo_abelha.value || 'Apis mellifera',
+            data_instalacao: f.data_instalacao.value || null,
+            localizacao: f.localizacao.value || '',
+            ativa: f.ativa?.checked ?? true,
+            observacao: f.observacao.value || '',
+        };
+        const btn = f.querySelector('.pcrud-btn-primary'); showLoading(btn);
+        try {
+            const resp = await fetch('/api/colmeias/', { method:'POST', headers:{'Content-Type':'application/json','X-CSRFToken':getCSRFToken()}, body: JSON.stringify(data) });
+            if (resp.ok) { showToast('Colmeia cadastrada!','success'); setTimeout(() => location.reload(), 800); }
+            else { const err = await resp.json(); showToast('Erro: '+JSON.stringify(err),'error'); }
+        } catch(e) { showToast('Erro: '+e.message,'error'); } finally { hideLoading(btn); }
+        return false;
+    };
+
+    window.excluirColmeia = function(id) {
+        if (!confirm('Excluir esta colmeia?')) return;
+        fetch('/api/colmeias/'+id+'/', { method:'DELETE', headers:{'X-CSRFToken':getCSRFToken()} })
+            .then(r => { if(r.ok){ showToast('Excluído','success'); setTimeout(() => location.reload(), 500); } else showToast('Erro','error'); });
+    };
+
+    // Esta função INTEIRA tinha desaparecido: o formulário continua a chamar
+    // `submitProducao(event)`, e o que ficou no ficheiro era a cauda órfã do
+    // corpo dela — linhas soltas com `await` no topo de um `<script>` clássico.
+    // Isso é um SyntaxError em qualquer browser moderno, e o parse erro leva o
+    // BLOCO INTEIRO: não era só o registo de produção que estava morto, eram
+    // também o cadastro e a exclusão de colmeias, no mesmo `<script>`.
+    window.submitProducao = async function(event) {
+        event.preventDefault();
+        if (!validateForm('producao-form')) { showToast('Corrija os campos em destaque', 'error'); return false; }
+        const f = document.getElementById('producao-form');
+        const data = {
+            colmeia: parseInt(f.colmeia.value),
+            data_extracao: f.data_extracao.value || null,
+            producao_mel_kg: parseFloat(f.producao_mel_kg.value) || 0,
+            producao_cera_kg: f.producao_cera_kg.value ? parseFloat(f.producao_cera_kg.value) : null,
+            valor_venda: f.valor_venda.value ? parseFloat(f.valor_venda.value) : null,
+            observacao: f.observacao.value || '',
+        };
+        const btn = f.querySelector('.pcrud-btn-primary'); showLoading(btn);
+        try {
+            const r = await fetch('/api/producao-apiario/', { method:'POST', headers:{'Content-Type':'application/json','X-CSRFToken':getCSRFToken()}, body: JSON.stringify(data) });
+            if (r.ok) { showToast('Produção registrada!','success'); setTimeout(() => location.reload(), 800); }
+            else { const err = await r.json(); showToast('Erro: '+JSON.stringify(err),'error'); }
+        } catch(e) { showToast('Erro: '+e.message,'error'); } finally { hideLoading(btn); }
+        return false;
+    };
+
+    window.excluirProducao = function(id) {
+        if (!confirm('Excluir este registro de produção?')) return;
+        fetch('/api/producao-apiario/'+id+'/', { method:'DELETE', headers:{'X-CSRFToken':getCSRFToken()} })
+            .then(r => { if(r.ok){ showToast('Excluído','success'); setTimeout(() => location.reload(), 500); } else showToast('Erro','error'); });
+    };
+})();
+</script>
+{% endblock %}

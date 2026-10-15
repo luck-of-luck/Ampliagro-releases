@@ -1,0 +1,108 @@
+{
+  "version": "1.0.0",
+  "profiles": {
+    "METEO": {
+      "label": "Estação Meteorológica Completa",
+      "vendor_examples": [" Davis Vantage Pro2", "Agromet", "Pessl iMetos"],
+      "metrics": [
+        {"key": "temperatura", "label": "Temperatura Ar", "unit": "°C", "precision": 1, "range": [-20, 60]},
+        {"key": "umidade_ar", "label": "Umidade Ar", "unit": "%", "precision": 1, "range": [0, 100]},
+        {"key": "pressao", "label": "Pressão", "unit": "hPa", "precision": 1, "range": [800, 1100]},
+        {"key": "chuva", "label": "Chuva 15min", "unit": "mm", "precision": 1, "range": [0, 200]},
+        {"key": "chuva_acum", "label": "Chuva Acumulada Dia", "unit": "mm", "precision": 1},
+        {"key": "vento_vel", "label": "Vento Vel", "unit": "m/s", "precision": 1, "range": [0, 50]},
+        {"key": "vento_dir", "label": "Vento Dir", "unit": "°", "precision": 0, "range": [0, 360]},
+        {"key": "vento_rajada", "label": "Rajada", "unit": "m/s", "precision": 1},
+        {"key": "radiacao", "label": "Radiação", "unit": "W/m²", "precision": 0, "range": [0, 1400]},
+        {"key": "uv", "label": "Índice UV", "unit": "", "precision": 1, "range": [0, 15]},
+        {"key": "ponto_orvalho", "label": "Ponto Orvalho", "unit": "°C", "precision": 1},
+        {"key": "bateria", "label": "Bateria", "unit": "%", "precision": 0}
+      ],
+      "push": {"protocol": "MQTT", "interval_s": 900, "payload": "json", "topic_template": "ampliagro/{propriedade_id}/{gateway_eui}/{device_eui}/telemetry"},
+      "alert_defaults": [
+        {"metric": "temperatura", "tipo": "threshold_max", "valor_ref": 40, "severidade": "warning"},
+        {"metric": "chuva_acum", "tipo": "threshold_max", "valor_ref": 80, "severidade": "critical"},
+        {"metric": "vento_rajada", "tipo": "threshold_max", "valor_ref": 20, "severidade": "warning"}
+      ]
+    },
+    "SOLO": {
+      "label": "Sensor de Solo (LoRaWAN)",
+      "vendor_examples": ["Dragino LSE01", "Decentlab DL-SM", "Teros 12"],
+      "metrics": [
+        {"key": "umidade_solo", "label": "Umidade Solo", "unit": "%", "precision": 1, "range": [0, 100], "depths": ["10cm","30cm","60cm"]},
+        {"key": "temp_solo", "label": "Temp Solo", "unit": "°C", "precision": 1},
+        {"key": "condutividade", "label": "EC", "unit": "dS/m", "precision": 2},
+        {"key": "ph_solo", "label": "pH", "unit": "", "precision": 1, "range": [3, 10]},
+        {"key": "npk_n", "label": "Nitrogênio", "unit": "mg/kg", "precision": 0},
+        {"key": "npk_p", "label": "Fósforo", "unit": "mg/kg", "precision": 0},
+        {"key": "npk_k", "label": "Potássio", "unit": "mg/kg", "precision": 0},
+        {"key": "bateria", "label": "Bateria", "unit": "%", "precision": 0}
+      ],
+      "push": {"protocol": "LORAWAN", "interval_s": 3600, "payload": "cayenne_lpp", "fport": 2},
+      "alert_defaults": [
+        {"metric": "umidade_solo", "tipo": "threshold_min", "valor_ref": 25, "severidade": "warning", "mensagem": "Solo seco — avaliar irrigação"},
+        {"metric": "ph_solo", "tipo": "threshold_min", "valor_ref": 5.2, "severidade": "info"}
+      ]
+    },
+    "NIVEL": {
+      "label": "Nível / Vazão",
+      "metrics": [
+        {"key": "nivel", "label": "Nível", "unit": "m", "precision": 2},
+        {"key": "vazao", "label": "Vazão", "unit": "L/s", "precision": 1},
+        {"key": "ph_agua", "label": "pH Água", "unit": "", "precision": 1},
+        {"key": "turbidez", "label": "Turbidez", "unit": "NTU", "precision": 1},
+        {"key": "bateria", "label": "Bateria", "unit": "%", "precision": 0}
+      ],
+      "push": {"protocol": "MQTT", "interval_s": 900, "payload": "json"}
+    },
+    "MAQUINARIO": {
+      "label": "Rastreador Maquinário (GPS/CAN)",
+      "metrics": [
+        {"key": "gps_lat", "label": "Latitude", "unit": "°", "precision": 6},
+        {"key": "gps_lon", "label": "Longitude", "unit": "°", "precision": 6},
+        {"key": "gps_alt", "label": "Altitude", "unit": "m", "precision": 0},
+        {"key": "velocidade", "label": "Velocidade", "unit": "km/h", "precision": 1},
+        {"key": "rpm", "label": "RPM", "unit": "rpm", "precision": 0},
+        {"key": "combustivel", "label": "Combustível", "unit": "%", "precision": 0},
+        {"key": "horimetro", "label": "Horímetro", "unit": "h", "precision": 1},
+        {"key": "temp_motor", "label": "Temp Motor", "unit": "°C", "precision": 0}
+      ],
+      "push": {"protocol": "MQTT", "interval_s": 30, "payload": "json"},
+      "alert_defaults": [
+        {"metric": "temp_motor", "tipo": "threshold_max", "valor_ref": 105, "severidade": "critical"},
+        {"metric": "combustivel", "tipo": "threshold_min", "valor_ref": 15, "severidade": "warning"}
+      ]
+    },
+    "ANIMAL": {
+      "label": "Colar Animal (gado)",
+      "metrics": [
+        {"key": "gps_lat", "label": "Latitude", "unit": "°", "precision": 6},
+        {"key": "gps_lon", "label": "Longitude", "unit": "°", "precision": 6},
+        {"key": "temp_corporal", "label": "Temp Corporal", "unit": "°C", "precision": 1},
+        {"key": "passos", "label": "Passos", "unit": "", "precision": 0},
+        {"key": "ruminação", "label": "Ruminação", "unit": "min", "precision": 0},
+        {"key": "bateria", "label": "Bateria", "unit": "%", "precision": 0}
+      ],
+      "push": {"protocol": "LORAWAN", "interval_s": 1800, "payload": "json"}
+    },
+    "ENERGIA": {
+      "label": "Medidor Energia Solar/Rede",
+      "metrics": [
+        {"key": "potencia", "label": "Potência", "unit": "W", "precision": 0},
+        {"key": "energia_dia", "label": "Energia Dia", "unit": "kWh", "precision": 2},
+        {"key": "tensao", "label": "Tensão", "unit": "V", "precision": 1},
+        {"key": "corrente", "label": "Corrente", "unit": "A", "precision": 1},
+        {"key": "radiacao", "label": "Irradiância", "unit": "W/m²", "precision": 0}
+      ],
+      "push": {"protocol": "HTTP", "interval_s": 300, "payload": "json"}
+    },
+    "GENERIC": {
+      "label": "Genérico",
+      "metrics": [
+        {"key": "outro", "label": "Valor", "unit": "", "precision": 2},
+        {"key": "bateria", "label": "Bateria", "unit": "%", "precision": 0}
+      ],
+      "push": {"protocol": "MQTT", "interval_s": 900, "payload": "json"}
+    }
+  }
+}

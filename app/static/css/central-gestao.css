@@ -1,0 +1,31 @@
+.central-agro{max-width:1160px;margin:auto;padding:32px 20px 80px;color:var(--cor-texto,#18221e)}
+.central-agro header{border-bottom:3px solid var(--cor-primaria,#137a59);padding-bottom:24px;margin-bottom:24px}
+.central-agro h1{font-size:clamp(2rem,5vw,3.4rem);letter-spacing:-.04em;margin:8px 0}
+.central-eyebrow{font-size:.75rem;letter-spacing:.16em;font-weight:700}
+.central-agro h2{font-size:1.5rem;margin:0 0 16px}.central-agro h3{margin:24px 0 12px}
+.central-agro p{line-height:1.65;margin:12px 0}.central-agro section{padding:32px 0;border-bottom:1px solid var(--cor-borda,#cbd5ce);scroll-margin-top:100px}
+.central-agro form,.central-filtros,.central-atalhos{display:flex;flex-wrap:wrap;align-items:end;gap:16px}
+.central-agro label{display:flex;flex-direction:column;gap:6px;font-weight:600;max-width:100%}
+.central-agro input,.central-agro select{padding:10px;border:1px solid var(--cor-borda,#abb9b0);border-radius:6px;background:var(--cor-fundo-card,#fff);color:inherit;max-width:100%;min-height:44px}
+.central-agro button,.central-botao{background:var(--cor-primaria,#137a59);color:var(--cor-texto-botao,#fff);padding:12px 18px;border:0;border-radius:6px;cursor:pointer;font-weight:600}
+.central-agro button:disabled{opacity:.6;cursor:wait}.central-agro :focus-visible{outline:3px solid var(--cor-primaria,#137a59);outline-offset:4px}
+.central-agro a{text-decoration:underline;text-underline-offset:4px}.central-atalhos{margin:24px 0}.central-agro details{padding:16px 0;border-bottom:1px solid var(--cor-borda,#cbd5ce)}
+.central-agro summary{cursor:pointer;font-weight:600;min-height:28px}.central-agro li{margin:10px 0;line-height:1.5}.central-agro ul{padding-left:24px}
+.central-tabela{overflow:auto;margin:20px 0}.central-agro table{width:100%;border-collapse:collapse;text-align:left}.central-agro th,.central-agro td{padding:12px;border-bottom:1px solid var(--cor-borda,#cbd5ce);vertical-align:top}.central-agro caption{text-align:left;margin-bottom:12px}.central-agro small{display:block;margin-top:4px}
+.central-resumo{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin:24px 0}.central-resumo dd{margin:8px 0;font-size:1.6rem;font-weight:600;font-variant-numeric:tabular-nums}
+.central-agro [role=status]{flex-basis:100%}.central-agro [data-error=true]{font-weight:700}
+.central-agro fieldset{display:flex;flex-wrap:wrap;gap:16px;padding:20px 0;border:0;border-bottom:1px solid var(--cor-borda,#cbd5ce)}
+.central-agro legend{font-weight:600}.central-agro [data-contrapartes-lista]{width:100%}
+.central-agro input[type=checkbox]{min-height:24px;width:24px}.central-agro .errorlist{font-size:.9rem;font-weight:600}
+@media(max-width:600px){.central-agro{padding:24px 16px}.central-resumo{grid-template-columns:1fr}.central-agro form>label{width:100%}.central-agro button{width:100%}}
+
+.central-campo{display:flex;flex-direction:column;gap:6px;max-width:100%;min-width:0}
+.central-confirmacao{padding:12px 16px;border-left:4px solid var(--cor-primaria,#137a59);background:var(--cor-fundo-card,#fff)}
+.central-agro [hidden]{display:none!important}
+.central-agro textarea{padding:10px;border:1px solid var(--cor-borda,#abb9b0);border-radius:6px;background:var(--cor-fundo-card,#fff);color:inherit;max-width:100%;font:inherit}
+.central-ocr-texto,.central-ocr-lista,.central-agro [data-ocr-itens]{width:100%;min-width:0}
+.central-agro .central-ocr-item{display:grid;grid-template-columns:2fr 1fr 1fr auto;align-items:end;width:100%;box-sizing:border-box}
+.central-ocr-item input{width:100%;min-width:0;box-sizing:border-box}
+.central-ocr-item label{min-width:0}
+@media(max-width:700px){.central-agro .central-ocr-item{grid-template-columns:1fr}.central-agro [data-ocr-entrada]>label{width:100%}}
+@media(max-width:600px){.central-campo{width:100%}}

@@ -1,0 +1,130 @@
+{% extends base_template %}
+{% load static %}
+
+{% block title %}Ampliagro - Modo Noturno{% endblock %}
+
+{% block extra_css %}
+
+{% endblock %}
+
+{% block dashboard_appbar %}{% endblock %}
+
+{% block content %}
+<div class="section-container">
+    <div class="section-header">
+        <h1 class="section-title"><i class="bi bi-moon-stars me-2"></i>Modo Noturno</h1>
+    </div>
+
+    <div class="content-card">
+        <h2 class="section-subtitle"><i class="bi bi-sliders me-2"></i>Preferências do Modo Noturno</h2>
+
+        <div class="toggle-row">
+            <div>
+                <div class="toggle-label">Modo Escuro Automático</div>
+                <div class="toggle-desc">Ativar modo escuro com base no horário configurado</div>
+            </div>
+            <label class="toggle-switch">
+                <input type="checkbox" id="modo-escuro-auto" data-key="modo_escuro_auto">
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+
+        <div class="toggle-row">
+            <div>
+                <div class="toggle-label">Início</div>
+                <div class="toggle-desc">Horário para ativar automaticamente o modo escuro</div>
+            </div>
+            <input type="time" class="form-time" id="inicio-noturno" data-key="inicio" value="18:00">
+        </div>
+
+        <div class="toggle-row">
+            <div>
+                <div class="toggle-label">Fim</div>
+                <div class="toggle-desc">Horário para desativar automaticamente o modo escuro</div>
+            </div>
+            <input type="time" class="form-time" id="fim-noturno" data-key="fim" value="06:00">
+        </div>
+
+        <div class="toggle-row">
+            <div>
+                <div class="toggle-label">Reduzir Brilho de Fundo</div>
+                <div class="toggle-desc">Atenuar elementos de fundo para reduzir cansaço visual</div>
+            </div>
+            <label class="toggle-switch">
+                <input type="checkbox" id="reduzir-brilho" data-key="reduzir_brilho">
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+
+        <div class="toggle-row">
+            <div>
+                <div class="toggle-label">Contraste Elevado</div>
+                <div class="toggle-desc">Aumentar contraste de texto e elementos para melhor legibilidade</div>
+            </div>
+            <label class="toggle-switch">
+                <input type="checkbox" id="contraste-elevado" data-key="contraste_elevado">
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+
+        <div class="toggle-row" style="border-bottom:none;">
+            <div>
+                <div class="toggle-label">Reduzir Animações</div>
+                <div class="toggle-desc">Diminuir ou desabilitar animações da interface</div>
+            </div>
+            <label class="toggle-switch">
+                <input type="checkbox" id="reduzir-animacoes" data-key="reduzir_animacoes">
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+
+        <div style="margin-top:1.5rem;">
+            <button class="btn-primary" onclick="salvarPreferencias()"><i class="bi bi-check-lg"></i> Salvar Preferências</button>
+        </div>
+    </div>
+</div>
+
+<div id="toast" class="toast"></div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+    const STORAGE_KEY = 'ampliagro_config_noturno';
+
+    function carregarPreferencias() {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (!saved) return;
+        const prefs = JSON.parse(saved);
+        document.querySelectorAll('[data-key]').forEach(el => {
+            const key = el.dataset.key;
+            if (el.type === 'checkbox') {
+                el.checked = prefs[key] === true;
+            } else if (el.type === 'time') {
+                el.value = prefs[key] || el.value;
+            } else {
+                el.value = prefs[key] || el.options[0].value;
+            }
+        });
+    }
+
+    function salvarPreferencias() {
+        const prefs = {};
+        document.querySelectorAll('[data-key]').forEach(el => {
+            const key = el.dataset.key;
+            if (el.type === 'checkbox') {
+                prefs[key] = el.checked;
+            } else {
+                prefs[key] = el.value;
+            }
+        });
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs));
+        const t = document.getElementById('toast');
+        t.textContent = 'Preferências salvas com sucesso!';
+        t.className = 'toast toast-success show';
+        setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    document.addEventListener('DOMContentLoaded', carregarPreferencias);
+</script>
+{% endblock %}

@@ -1,0 +1,535 @@
+{% extends base_template %}
+{% load static agro_icons %}
+
+{% block title %}Ampliagro - Cadastro de Funcionários{% endblock %}
+
+{% block extra_css %}
+{% include "partials/_premium_cadastro_styles.html" %}
+{% endblock %}
+
+{% block dashboard_appbar %}{% endblock %}
+
+{% block content %}
+<div class="pcrud-container">
+    <div class="pcrud-header">
+        <h1 class="pcrud-title"><i class="bi bi-people"></i> Cadastro de Funcionários</h1>
+        <a href="{% url 'index_spa' %}" class="pcrud-btn pcrud-btn-secondary pcrud-btn-sm"><i class="bi bi-speedometer2"></i> Dashboard</a>
+    </div>
+
+    <div class="pcrud-subtabs" id="cadastroSubTabs">
+        <button class="pcrud-subtab active" data-tab="novo">Novo Funcionário</button>
+        <button class="pcrud-subtab" data-tab="lista">Funcionários Cadastrados</button>
+        <button class="pcrud-subtab" data-tab="operarios">Operários com Login</button>
+    </div>
+
+    <!-- Stats -->
+    <div class="pcrud-stats" id="cadastroStats">
+        <div class="pcrud-stat"><div class="pcrud-stat-label">Total Funcionários</div><div class="pcrud-stat-value" id="statTotalFunc">{{ funcionarios|length }}</div></div>
+        <div class="pcrud-stat"><div class="pcrud-stat-label">Ativos</div><div class="pcrud-stat-value" id="statAtivos">{{ funcionarios_ativos }}</div></div>
+        <div class="pcrud-stat"><div class="pcrud-stat-label">Folha Mensal (R$)</div><div class="pcrud-stat-value" id="statFolha">R$ {{ folha_mensal|floatformat:2 }}</div></div>
+        <div class="pcrud-stat"><div class="pcrud-stat-label">Com Login</div><div class="pcrud-stat-value" id="statComLogin">{{ funcionarios_com_login|length }}</div></div>
+    </div>
+
+    <!-- Tab: Novo Funcionário -->
+    <div class="pcrud-tab active" id="tab-novo">
+        <h2><i class="bi bi-plus-circle"></i> Novo Funcionário</h2>
+        <div class="pcrud-form-card">
+            <form id="func-form" onsubmit="return submitFuncionario(event)">
+                {% csrf_token %}
+                <div class="pcrud-form-grid">
+                    <div class="pcrud-form-group">
+                        <label>Propriedade</label>
+                        <select name="propriedade" required onblur="validateField(this)">
+                            <option value="">Selecione...</option>
+                            {% for p in propriedades %}
+                            <option value="{{ p.id }}">{{ p.nome }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="pcrud-form-group">
+                        <label>Nome Completo</label>
+                        <input type="text" name="nome" required placeholder="Nome do funcionário" onblur="validateField(this)">
+                    </div>
+                    <div class="pcrud-form-group">
+                        <label>Cargo / Profissão <span style="font-size:.68rem;color:var(--cor-texto-medio);font-weight:500">— 105 opções • digite para filtrar</span></label>
+                        <input type="text" name="cargo" id="cargoInput" list="cargosList" placeholder="Digite: Mecânico, Tratorista, Veterinário..." autocomplete="off" oninput="filtrarCargos(this)" onblur="validateField(this)" required>
+                        <datalist id="cargosList">
+                            <option value="GERENTE">Gerente de Fazenda</option>
+                            <option value="CAPATAZ">Capataz / Encarregado</option>
+                            <option value="SUPERVISOR_AGRICOLA">Supervisor Agrícola</option>
+                            <option value="SUPERVISOR_PECUARIA">Supervisor de Pecuária</option>
+                            <option value="ADMIN">Administrativo</option>
+                            <option value="AUX_ADMIN">Auxiliar Administrativo</option>
+                            <option value="CONTADOR_RURAL">Contador Rural</option>
+                            <option value="COMPRADOR_RURAL">Comprador Rural</option>
+                            <option value="VENDEDOR_INSUMOS">Vendedor de Insumos</option>
+                            <option value="TRATORISTA">Tratorista</option>
+                            <option value="OPERADOR_COLHEITADEIRA">Operador de Colheitadeira</option>
+                            <option value="OPERADOR_PULVERIZADOR">Operador de Pulverizador</option>
+                            <option value="OPERADOR_PLANTADEIRA">Operador de Plantadeira</option>
+                            <option value="OPERADOR_ROCADEIRA">Operador de Roçadeira</option>
+                            <option value="OPERADOR_MOTOSSERRA">Operador de Motosserra</option>
+                            <option value="OPERADOR_IRRIGACAO">Operador de Irrigação</option>
+                            <option value="TEC_IRRIGACAO">Técnico em Irrigação</option>
+                            <option value="AUX_CAMPO">Auxiliar de Campo</option>
+                            <option value="RURICOLA">Rurícola</option>
+                            <option value="DIARISTA">Diarista Rural</option>
+                            <option value="JARDINEIRO">Jardineiro</option>
+                            <option value="VIVEIRISTA">Viveirista</option>
+                            <option value="MECANICO_AGRICOLA">Mecânico Agrícola</option>
+                            <option value="MECANICO_PESADOS">Mecânico de Máquinas Pesadas</option>
+                            <option value="MECANICO_CAMINHAO">Mecânico de Caminhão</option>
+                            <option value="ELETRICISTA_RURAL">Eletricista Rural</option>
+                            <option value="SOLDADOR">Soldador</option>
+                            <option value="BORRACHEIRO">Borracheiro</option>
+                            <option value="LUBRIFICADOR">Lubrificador</option>
+                            <option value="LAVADOR_MAQUINAS">Lavador de Máquinas</option>
+                            <option value="CHEFE_OFICINA">Chefe de Oficina</option>
+                            <option value="AUX_OFICINA">Auxiliar de Oficina</option>
+                            <option value="CALDEIREIRO">Caldeireiro</option>
+                            <option value="MOTORISTA">Motorista</option>
+                            <option value="MOTORISTA_CAMINHAO">Motorista de Caminhão</option>
+                            <option value="OPERADOR_MUNCK">Operador de Caminhão Munck</option>
+                            <option value="OPERADOR_EMPILHADEIRA">Operador de Empilhadeira</option>
+                            <option value="CONFERENTE">Conferente</option>
+                            <option value="AUX_LOGISTICA">Auxiliar de Logística</option>
+                            <option value="OPERADOR_ARMAZEM">Operador de Armazém</option>
+                            <option value="CLASSIFICADOR_GRAOS">Classificador de Grãos</option>
+                            <option value="OPERADOR_SECADOR">Operador de Secador</option>
+                            <option value="OPERADOR_BENEFICIAMENTO">Operador de Beneficiamento</option>
+                            <option value="OPERADOR_SILO">Operador de Silo</option>
+                            <option value="VAQUEIRO">Vaqueiro</option>
+                            <option value="PEAO">Peão</option>
+                            <option value="ORDENHADOR">Ordenhador</option>
+                            <option value="INSEMINADOR">Inseminador</option>
+                            <option value="AUX_PECUARIA">Auxiliar de Pecuária</option>
+                            <option value="TRATADOR">Tratador de Animais</option>
+                            <option value="TOSQUIADOR">Tosquiador</option>
+                            <option value="CASQUEADOR">Casqueador</option>
+                            <option value="QUEIJEIRO">Queijeiro</option>
+                            <option value="VETERINARIO">Veterinário</option>
+                            <option value="ZOOTECNISTA">Zootecnista</option>
+                            <option value="TEC_NUTRICAO">Técnico em Nutrição Animal</option>
+                            <option value="TEC_PASTAGEM">Técnico em Pastagem</option>
+                            <option value="AUX_CONFINAMENTO">Auxiliar de Confinamento</option>
+                            <option value="OPERADOR_CONFINAMENTO">Operador de Confinamento</option>
+                            <option value="AUX_FABRICA_RACAO">Auxiliar de Fábrica de Ração</option>
+                            <option value="OPERADOR_FABRICA_RACAO">Operador de Fábrica de Ração</option>
+                            <option value="DOMADOR">Domador</option>
+                            <option value="FERRADOR">Ferreiro / Casqueamento</option>
+                            <option value="APICULTOR">Apicultor</option>
+                            <option value="AUX_APICULTURA">Auxiliar de Apicultura</option>
+                            <option value="OPERADOR_DRONE">Operador de Drone Agrícola</option>
+                            <option value="PILOTO_AGRICOLA">Piloto Agrícola</option>
+                            <option value="OPERADOR_GPS">Operador de GPS Agrícola</option>
+                            <option value="AGRIMENSOR">Agrimensor</option>
+                            <option value="TOPOGRAFO">Topógrafo</option>
+                            <option value="TEC_SEGURANCA">Técnico em Segurança do Trabalho</option>
+                            <option value="TEC_MEIO_AMBIENTE">Técnico em Meio Ambiente</option>
+                            <option value="ENG_AMBIENTAL">Engenheiro Ambiental</option>
+                            <option value="ENG_FLORESTAL">Engenheiro Florestal</option>
+                            <option value="TEC_FLORESTAL">Técnico Florestal</option>
+                            <option value="BIOLOGO">Biólogo</option>
+                            <option value="CARPINTEIRO_RURAL">Carpinteiro Rural</option>
+                            <option value="PEDREIRO_RURAL">Pedreiro Rural</option>
+                            <option value="PINTOR">Pintor</option>
+                            <option value="ENCANADOR_RURAL">Encanador Rural</option>
+                            <option value="OPERADOR_ESTEIRA">Operador de Trator de Esteira</option>
+                            <option value="OPERADOR_ESCAVADEIRA">Operador de Escavadeira</option>
+                            <option value="OPERADOR_PA_CARREGADEIRA">Operador de Pá Carregadeira</option>
+                            <option value="OPERADOR_RETRO">Operador de Retroescavadeira</option>
+                            <option value="TECNICO">Técnico Agrícola</option>
+                            <option value="TECNICO_AGROPECUARIA">Técnico em Agropecuária</option>
+                            <option value="ENGENHEIRO">Engenheiro Agrônomo</option>
+                            <option value="GERENTE_FAZENDA">Gerente de Fazenda (Sênior)</option>
+                            <option value="FISCAL_CAMPO">Fiscal de Campo</option>
+                            <option value="ENCARREGADO_TURMA">Encarregado de Turma</option>
+                            <option value="AUX_SERVICOS_GERAIS">Auxiliar de Serviços Gerais</option>
+                            <option value="SERVICO">Serviços Gerais</option>
+                            <option value="CASEIRO">Caseiro</option>
+                            <option value="COZINHEIRO_RURAL">Cozinheiro Rural</option>
+                            <option value="SEGURANCA_RURAL">Segurança Rural</option>
+                            <option value="VIGIA">Vigia</option>
+                            <option value="AUX_LIMPEZA">Auxiliar de Limpeza Rural</option>
+                            <option value="ALMOXARIFE">Almoxarife</option>
+                            <option value="ESTOQUISTA">Estoquista</option>
+                            <option value="ESTOQUISTA_PECAS">Estoquista de Peças</option>
+                            <option value="AUX_ARMAZEM">Auxiliar de Armazém</option>
+                            <option value="AUX_SILAGEM">Auxiliar de Silagem</option>
+                            <option value="OPERADOR_SILAGEM">Operador de Silagem</option>
+                            <option value="COLETOR_SEMENTES">Coletor de Sementes</option>
+                            <option value="OPERADOR_VIVEIRO">Operador de Viveiro</option>
+                            <option value="OUTRO">Outro</option>
+                        </datalist>
+                        <small style="color:var(--cor-texto-medio);font-size:.72rem">Ex: digite “Mecânico” para ver todas as opções de mecânica • <span id="cargoAreaHint" style="color:#0f9d6e;font-weight:600"></span></small>
+                    </div>
+                    <div class="pcrud-form-group">
+                        <label>Salário (R$)</label>
+                        <input type="number" step="0.01" name="salario" required placeholder="0,00" onblur="validateField(this)">
+                    </div>
+                    <div class="pcrud-form-group">
+                        <label>Telefone</label>
+                        <input type="text" name="telefone" placeholder="(XX) XXXXX-XXXX">
+                    </div>
+                    <div class="pcrud-form-group">
+                        <label>E-mail</label>
+                        <input type="email" name="email" placeholder="email@exemplo.com">
+                    </div>
+                    <div class="pcrud-form-group">
+                        <label>Data de Admissão</label>
+                        <input type="date" name="data_admissao" value="{{ today|date:'Y-m-d' }}" required onblur="validateField(this)">
+                    </div>
+                    <div class="pcrud-form-group">
+                        <label>Ativo</label>
+                        <select name="ativo">
+                            <option value="true" selected>Sim</option>
+                            <option value="false">Não</option>
+                        </select>
+                    </div>
+                    <div class="pcrud-form-group">
+                        <label>Criar Login de Acesso</label>
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <input type="checkbox" name="criar_login" id="id_criar_login" style="width:auto;">
+                            <label for="id_criar_login" style="margin:0;font-weight:500;font-size:.813rem;text-transform:none;letter-spacing:0;">Gerar usuário/senha para operário</label>
+                        </div>
+                    </div>
+                    <div class="pcrud-form-group" id="login-fields" style="display:none;">
+                        <label>Usuário (Login)</label>
+                        <input type="text" name="username" placeholder="Ex: joao.silva">
+                    </div>
+                    <div class="pcrud-form-group" id="senha-fields" style="display:none;">
+                        <label>Senha</label>
+                        <input type="password" name="senha" placeholder="Mín. 8 caracteres">
+                    </div>
+                </div>
+                <div class="pcrud-form-actions">
+                    <button type="submit" class="pcrud-btn pcrud-btn-primary"><i class="bi bi-check-lg"></i> Salvar Funcionário</button>
+                    <button type="reset" class="pcrud-btn pcrud-btn-secondary">Limpar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tab: Lista de Funcionários -->
+    <div class="pcrud-tab" id="tab-lista">
+        <h2><i class="bi bi-list-ul"></i> Funcionários Cadastrados</h2>
+        <div class="pcrud-form-card" style="padding:0;">
+            {% if funcionarios %}
+            <div class="pcrud-table-wrap">
+                <table class="pcrud-table">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Cargo</th>
+                            <th>Salário</th>
+                            <th>Telefone</th>
+                            <th>Admissão</th>
+                            <th>Ativo</th>
+                            <th>Login</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for f in funcionarios %}
+                        <tr>
+                            <td><strong>{{ f.nome }}</strong></td>
+                            <td>{{ f.get_cargo_display }}</td>
+                            <td>R$ {{ f.salario|floatformat:2 }}</td>
+                            <td>{{ f.telefone|default:"-" }}</td>
+                            <td>{{ f.data_admissao|date:"d/m/Y" }}</td>
+                            <td>{% if f.ativo %}<span style="color:var(--cor-sucesso);">● Ativo</span>{% else %}<span style="color:var(--cor-erro);">● Inativo</span>{% endif %}</td>
+                            <td>{% if f.user %}<span style="color:var(--cor-primaria);"><i class="bi bi-check-circle"></i> {{ f.user.username }}</span>{% else %}<span style="color:var(--cor-texto-fraco);">—</span>{% endif %}</td>
+                            <td>
+                                <div class="action-cell">
+                                    <button class="pcrud-btn pcrud-btn-secondary pcrud-btn-sm" onclick="editarFuncionario({{ f.id }})"><i class="bi bi-pencil"></i> Editar</button>
+                                    <button class="pcrud-btn pcrud-btn-danger pcrud-btn-sm" onclick="excluirFunc({{ f.id }})"><i class="bi bi-trash"></i> Excluir</button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            {% include "partials/_empty_state_cta.html" with empty_icone="bi bi-people" empty_titulo="Nenhum funcionário cadastrado" empty_descricao="Cadastre o primeiro funcionário para vincular máquinas, tarefas e login de campo." empty_acao="Cadastrar funcionário" empty_aba="novo" %}
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Tab: Operários com Login -->
+    <div class="pcrud-tab" id="tab-operarios">
+        <h2><i class="bi bi-shield-lock"></i> Operários com Login de Acesso</h2>
+        <div class="pcrud-form-card">
+            <form id="operario-form" onsubmit="return submitOperario(event)">
+                {% csrf_token %}
+                <div class="pcrud-form-grid">
+                    <div class="pcrud-form-group">
+                        <label>Funcionário (sem login)</label>
+                        <select name="funcionario" required onblur="validateField(this)">
+                            <option value="">Selecione...</option>
+                            {% for f in funcionarios_sem_login %}
+                            <option value="{{ f.id }}">{{ f.nome }} ({{ f.get_cargo_display }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="pcrud-form-group">
+                        <label>Usuário</label>
+                        <input type="text" name="username" required placeholder="Ex: joao.silva" onblur="validateField(this)">
+                    </div>
+                    <div class="pcrud-form-group">
+                        <label>Senha</label>
+                        <input type="password" name="senha" required placeholder="Mín. 8 caracteres" onblur="validateField(this)">
+                    </div>
+                    <div class="pcrud-form-group">
+                        <label>E-mail (opcional)</label>
+                        <input type="email" name="email" placeholder="email@exemplo.com">
+                    </div>
+                    <div class="pcrud-form-group">
+                        <label>Área do Servidor *</label>
+                        <select name="area_servidor" required onblur="validateField(this)">
+                            <option value="GERAL">Geral — tarefas e agenda</option>
+                            <option value="MECANICA" selected>Mecânica — estoque peças, agenda revisão, maquinário</option>
+                            <option value="CAMPO">Campo — talhões, safras, aplicações</option>
+                            <option value="PECUARIA">Pecuária — rebanho, manejo</option>
+                            <option value="ESTOQUE">Estoque — insumos, movimentações</option>
+                            <option value="AGRONOMIA">Agronomia — culturas, solo</option>
+                            <option value="ADMIN">Administrativo — funcionários, relatórios</option>
+                            <option value="FINANCEIRO">Financeiro — lançamentos</option>
+                        </select>
+                    </div>
+                    <div class="pcrud-form-group" style="grid-column:span 2;">
+                        <label>Permissões (gerenciadas pelo produtor)</label>
+                        <div style="display:flex;gap:12px;flex-wrap:wrap;font-size:.85rem">
+                            <label style="display:flex;align-items:center;gap:6px;text-transform:none;letter-spacing:0;font-weight:500"><input type="checkbox" name="pode_criar" checked> Pode criar</label>
+                            <label style="display:flex;align-items:center;gap:6px;text-transform:none;letter-spacing:0;font-weight:500"><input type="checkbox" name="pode_editar" checked> Pode editar</label>
+                            <label style="display:flex;align-items:center;gap:6px;text-transform:none;letter-spacing:0;font-weight:500"><input type="checkbox" name="pode_ver_financeiro"> Ver financeiro</label>
+                        </div>
+                        <small style="color:var(--cor-texto-medio)">O dashboard do servidor é estático e filtrado — o script <code>servidor.js</code> mostra só as seções da área escolhida</small>
+                    </div>
+                </div>
+                <div class="pcrud-form-actions">
+                    <button type="submit" class="pcrud-btn pcrud-btn-primary"><i class="bi bi-check-lg"></i> Criar Login Servidor</button>
+                    <button type="reset" class="pcrud-btn pcrud-btn-secondary">Limpar</button>
+                </div>
+            </form>
+        </div>
+
+        {% if funcionarios_com_login %}
+        <h2 style="margin-top:28px;"><i class="bi bi-people-fill"></i> Operários com Acesso</h2>
+        <div class="pcrud-form-card" style="padding:0;">
+            <div class="pcrud-table-wrap">
+                <table class="pcrud-table">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Cargo</th>
+                            <th>Área Servidor</th>
+                            <th>Usuário</th>
+                            <th>Fazenda Login</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for f in funcionarios_com_login %}
+                        <tr>
+                            <td><strong>{{ f.nome }}</strong></td>
+                            <td>{{ f.get_cargo_display }}</td>
+                            <td>{% if f.user.perfil.area_servidor %}<span style="font-size:.75rem;background:#dcfce7;color:#166534;padding:2px 6px;border-radius:999px">{{ f.user.perfil.get_area_servidor_display }}</span>{% else %}<span style="font-size:.75rem;color:var(--cor-texto-medio)">—</span>{% endif %}</td>
+                            <td>{{ f.user.username }}<br><small style="color:var(--cor-texto-medio)">{{ f.user.perfil.get_tipo_usuario_display }}</small></td>
+                            <td>{{ f.nome_fazenda_login|default:f.propriedade.nome }}</td>
+                            <td><button class="pcrud-btn pcrud-btn-danger pcrud-btn-sm" onclick="removerLogin({{ f.id }})"><i class="bi bi-shield-x"></i> Remover Login</button></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div id="toast" class="pcrud-toast"></div>
+{% include "partials/_confirm_modal.html" %}
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="{% static 'js/cadastro.js' %}"></script>
+<script>
+(function() {
+    // Sub-tabs
+    const tabs = document.querySelectorAll('.pcrud-subtab');
+    const tabContents = document.querySelectorAll('.pcrud-tab');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => t.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
+            tab.classList.add('active');
+            document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+        });
+    });
+
+    // Toggle login fields
+    const criarLogin = document.getElementById('id_criar_login');
+    if (criarLogin) {
+        criarLogin.addEventListener('change', (e) => {
+            const show = e.target.checked;
+            document.getElementById('login-fields').style.display = show ? 'block' : 'none';
+            document.getElementById('senha-fields').style.display = show ? 'block' : 'none';
+        });
+    }
+
+    // Validation
+    window.validateField = function(el) {
+        const val = (el.value || '').trim();
+        if (el.hasAttribute('required') && !val) {
+            el.classList.add('error');
+            return false;
+        }
+        el.classList.remove('error');
+        return true;
+    };
+    window.validateForm = function(formId) {
+        const form = document.getElementById(formId);
+        let ok = true;
+        form.querySelectorAll('[required]').forEach(el => { if (!validateField(el)) ok = false; });
+        return ok;
+    };
+    window.showToast = function(msg, type='success') {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.className = 'pcrud-toast show pcrud-toast-' + type;
+        clearTimeout(t._hide);
+        t._hide = setTimeout(() => t.classList.remove('show'), 3500);
+    };
+    window.showLoading = function(btn) {
+        btn.disabled = true;
+        btn.dataset.txt = btn.innerHTML;
+        btn.innerHTML = '<span class="pcrud-spinner"></span> Salvando...';
+    };
+    window.hideLoading = function(btn) {
+        btn.disabled = false;
+        btn.innerHTML = btn.dataset.txt || 'Salvar';
+    };
+    window.getCSRFToken = function() {
+        return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+    };
+
+    // Funcionário CRUD
+    window.submitFuncionario = async function(event) {
+        event.preventDefault();
+        if (!validateForm('func-form')) { showToast('Corrija os campos em destaque', 'error'); return false; }
+        const f = document.getElementById('func-form');
+        const data = {
+            propriedade: parseInt(f.propriedade.value),
+            nome: f.nome.value,
+            cargo: f.cargo.value,
+            salario: parseFloat(f.salario.value),
+            telefone: f.telefone.value || '',
+            email: f.email.value || '',
+            data_admissao: f.data_admissao.value,
+            ativo: f.ativo.value === 'true',
+        };
+        const btn = f.querySelector('.pcrud-btn-primary'); showLoading(btn);
+        try {
+            const r = await fetch('/api/funcionarios/', { method:'POST', headers:{'Content-Type':'application/json','X-CSRFToken':getCSRFToken()}, body: JSON.stringify(data) });
+            if (r.ok) { showToast('Funcionário cadastrado!','success'); setTimeout(() => location.reload(), 800); }
+            else { const e=await r.json(); showToast('Erro: '+JSON.stringify(e),'error'); }
+        } catch(e) { showToast('Erro: '+e.message,'error'); } finally { hideLoading(btn); }
+        return false;
+    };
+
+
+    window.excluirFunc = function(id) {
+        if (!confirm('Excluir este funcionário?')) return;
+        fetch('/api/funcionarios/'+id+'/', { method:'DELETE', headers:{'X-CSRFToken':getCSRFToken()} })
+            .then(r => { if(r.ok){ showToast('Excluído','success'); setTimeout(() => location.reload(), 500); } else showToast('Erro ao excluir','error'); });
+    };
+
+    // Servidor / Operário Login CRUD (gerenciado pelo produtor)
+    window.submitOperario = async function(event) {
+        event.preventDefault();
+        if (!validateForm('operario-form')) { showToast('Corrija os campos em destaque', 'error'); return false; }
+        const f = document.getElementById('operario-form');
+        const data = {
+            funcionario_id: parseInt(f.funcionario.value),
+            username: f.username.value,
+            senha: f.senha.value,
+            email: f.email.value || '',
+            area_servidor: f.area_servidor.value,
+            permissoes: {
+                pode_criar: f.pode_criar.checked,
+                pode_editar: f.pode_editar.checked,
+                pode_ver_financeiro: f.pode_ver_financeiro.checked,
+                paginas: [] // usa padrão da área; script servidor.js mostra só essas
+            }
+        };
+        const btn = f.querySelector('.pcrud-btn-primary'); showLoading(btn);
+        try {
+            const r = await fetch('/operario/api/criar-login/', { method:'POST', headers:{'Content-Type':'application/json','X-CSRFToken':getCSRFToken()}, body: JSON.stringify(data) });
+            const j = await r.json();
+            if (r.ok && j.ok) { showToast('Login Servidor criado: '+j.area_servidor+' — instruções: Servidor seleciona "Servidor" no login e informa fazenda "'+(j.nome_fazenda_login||'Fazenda')+'"','success'); setTimeout(() => location.reload(), 1200); }
+            else { showToast('Erro: '+(j.erro||JSON.stringify(j)),'error'); }
+        } catch(e) { showToast('Erro: '+e.message,'error'); } finally { hideLoading(btn); }
+        return false;
+    };
+
+    window.removerLogin = function(id) {
+        if (!confirm('Remover login deste operário? O usuário será excluído.')) return;
+        fetch('/api/operarios/'+id+'/remover_login/', { method:'POST', headers:{'X-CSRFToken':getCSRFToken()} })
+            .then(r => { if(r.ok){ showToast('Login removido','success'); setTimeout(() => location.reload(), 500); } else showToast('Erro ao remover','error'); });
+    };
+
+    // 105 profissões -> área + partes do sistema visíveis
+    const CARGO_MAP = {
+      "GERENTE":"ADMIN","CAPATAZ":"ADMIN","SUPERVISOR_AGRICOLA":"CAMPO","SUPERVISOR_PECUARIA":"PECUARIA","ADMIN":"ADMIN","AUX_ADMIN":"ADMIN","CONTADOR_RURAL":"FINANCEIRO","COMPRADOR_RURAL":"FINANCEIRO","VENDEDOR_INSUMOS":"FINANCEIRO",
+      "TRATORISTA":"CAMPO","OPERADOR_COLHEITADEIRA":"CAMPO","OPERADOR_PULVERIZADOR":"CAMPO","OPERADOR_PLANTADEIRA":"CAMPO","OPERADOR_ROCADEIRA":"CAMPO","OPERADOR_MOTOSSERRA":"CAMPO","OPERADOR_IRRIGACAO":"CAMPO","TEC_IRRIGACAO":"CAMPO","AUX_CAMPO":"CAMPO","RURICOLA":"CAMPO","DIARISTA":"CAMPO","JARDINEIRO":"CAMPO","VIVEIRISTA":"CAMPO",
+      "MECANICO_AGRICOLA":"MECANICA","MECANICO_PESADOS":"MECANICA","MECANICO_CAMINHAO":"MECANICA","ELETRICISTA_RURAL":"MECANICA","SOLDADOR":"MECANICA","BORRACHEIRO":"MECANICA","LUBRIFICADOR":"MECANICA","LAVADOR_MAQUINAS":"MECANICA","CHEFE_OFICINA":"MECANICA","AUX_OFICINA":"MECANICA","CALDEIREIRO":"MECANICA",
+      "MOTORISTA":"MECANICA","MOTORISTA_CAMINHAO":"MECANICA","OPERADOR_MUNCK":"MECANICA","OPERADOR_EMPILHADEIRA":"ESTOQUE","CONFERENTE":"ESTOQUE","AUX_LOGISTICA":"ESTOQUE","OPERADOR_ARMAZEM":"ESTOQUE","CLASSIFICADOR_GRAOS":"ESTOQUE","OPERADOR_SECADOR":"ESTOQUE","OPERADOR_BENEFICIAMENTO":"ESTOQUE","OPERADOR_SILO":"ESTOQUE",
+      "VAQUEIRO":"PECUARIA","PEAO":"PECUARIA","ORDENHADOR":"PECUARIA","INSEMINADOR":"PECUARIA","AUX_PECUARIA":"PECUARIA","TRATADOR":"PECUARIA","TOSQUIADOR":"PECUARIA","CASQUEADOR":"PECUARIA","QUEIJEIRO":"PECUARIA","VETERINARIO":"PECUARIA","ZOOTECNISTA":"PECUARIA","TEC_NUTRICAO":"PECUARIA","TEC_PASTAGEM":"PECUARIA","AUX_CONFINAMENTO":"PECUARIA","OPERADOR_CONFINAMENTO":"PECUARIA","AUX_FABRICA_RACAO":"PECUARIA","OPERADOR_FABRICA_RACAO":"PECUARIA","DOMADOR":"PECUARIA","FERRADOR":"PECUARIA",
+      "APICULTOR":"PECUARIA","AUX_APICULTURA":"PECUARIA",
+      "OPERADOR_DRONE":"AGRONOMIA","PILOTO_AGRICOLA":"AGRONOMIA","OPERADOR_GPS":"AGRONOMIA","AGRIMENSOR":"AGRONOMIA","TOPOGRAFO":"AGRONOMIA","TEC_SEGURANCA":"ADMIN","TEC_MEIO_AMBIENTE":"AGRONOMIA","ENG_AMBIENTAL":"AGRONOMIA","ENG_FLORESTAL":"AGRONOMIA","TEC_FLORESTAL":"AGRONOMIA","BIOLOGO":"AGRONOMIA",
+      "CARPINTEIRO_RURAL":"MECANICA","PEDREIRO_RURAL":"MECANICA","PINTOR":"MECANICA","ENCANADOR_RURAL":"MECANICA",
+      "OPERADOR_ESTEIRA":"MECANICA","OPERADOR_ESCAVADEIRA":"MECANICA","OPERADOR_PA_CARREGADEIRA":"MECANICA","OPERADOR_RETRO":"MECANICA",
+      "TECNICO":"AGRONOMIA","TECNICO_AGROPECUARIA":"AGRONOMIA","ENGENHEIRO":"AGRONOMIA","GERENTE_FAZENDA":"ADMIN","FISCAL_CAMPO":"CAMPO","ENCARREGADO_TURMA":"CAMPO",
+      "AUX_SERVICOS_GERAIS":"GERAL","SERVICO":"GERAL","CASEIRO":"GERAL","COZINHEIRO_RURAL":"GERAL","SEGURANCA_RURAL":"GERAL","VIGIA":"GERAL","AUX_LIMPEZA":"GERAL","ALMOXARIFE":"ESTOQUE","ESTOQUISTA":"ESTOQUE","ESTOQUISTA_PECAS":"MECANICA","AUX_ARMAZEM":"ESTOQUE","AUX_SILAGEM":"PECUARIA","OPERADOR_SILAGEM":"PECUARIA","COLETOR_SEMENTES":"CAMPO","OPERADOR_VIVEIRO":"CAMPO","OUTRO":"GERAL"
+    };
+    const AREA_PARTES = {
+      "MECANICA":["Estoque de peças","Agenda de revisão","Quadro de Tarefas — Mecânica","Máquinas","Telemetria"],
+      "CAMPO":["Talhões","Safras","Quadro de Tarefas — Campo","Clima","Telemetria"],
+      "PECUARIA":["Rebanho","Quadro de Tarefas — Pecuária","Produção","Telemetria"],
+      "ESTOQUE":["Estoque geral","Insumos","Movimentações"],
+      "AGRONOMIA":["Culturas","Talhões","Análise de solo","Quadro de Tarefas"],
+      "ADMIN":["Funcionários","Financeiro (resumo)","Relatórios"],
+      "FINANCEIRO":["Lançamentos","Relatório financeiro"],
+      "GERAL":["Quadro de Tarefas","Agenda"]
+    };
+    window.filtrarCargos = function(el){ /* datalist já filtra nativo */ updateCargoHint(el.value); };
+    window.updateCargoHint = function(val){
+      const code = (val||'').toUpperCase().trim();
+      // tenta achar pelo value exato do datalist
+      const opt = document.querySelector(`#cargosList option[value="${code}"]`);
+      const label = opt ? opt.textContent : '';
+      const area = CARGO_MAP[code] || '';
+      const hint = document.getElementById('cargoAreaHint');
+      if(hint){
+        if(area){
+          const partes = (AREA_PARTES[area]||[]).join(', ');
+          hint.textContent = `→ Área: ${area} • Verá: ${partes}`;
+          // auto-seleciona área no form de servidor se estiver visível
+          const selArea = document.querySelector('select[name="area_servidor"]');
+          if(selArea && selArea.value !== area){
+            // não força, só sugere via borda
+            selArea.style.borderColor = '#0f9d6e';
+            setTimeout(()=> selArea.style.borderColor='', 2000);
+          }
+        } else {
+          hint.textContent = label ? `→ ${label}` : '';
+        }
+      }
+    };
+    document.getElementById('cargoInput')?.addEventListener('change', e=> updateCargoHint(e.target.value));
+    document.getElementById('cargoInput')?.addEventListener('input', e=> updateCargoHint(e.target.value));
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,368 @@
+{% extends base_template %}
+{% load static agro_icons %}
+
+{% block title %}Ampliagro - Guia Vegetal{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/paginas/painel-cadastro.css' %}?v=20261008a">
+<link rel="stylesheet" href="{% static 'css/paginas/guia-vegetal.css' %}">
+
+
+{% endblock %}
+
+{% block dashboard_appbar %}{% endblock %}
+
+{% block content %}
+<div class="guide-container">
+    <div class="guide-header" style="display:flex; flex-wrap:wrap; gap:14px; align-items:center;">
+        <h1 class="guide-title" style="margin:0;"><i class="bi bi-tree"></i> Guia Vegetal</h1>
+        <div style="flex:1; min-width:200px; position:relative;">
+            <i class="bi bi-search" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--s400);"></i>
+            <input type="text" class="guide-search-input" placeholder="Buscar cultura..." style="width:100%; padding:8px 12px 8px 36px; border-radius:8px; border:1px solid var(--s200); font-size:14px; outline:none; transition:border-color 0.2s;">
+        </div>
+        <a href="{% url 'index_spa' %}" class="btn-secondary btn-sm" style="white-space:nowrap;">Dashboard</a>
+    </div>
+<div class="sub-tabs" id="subTabs">
+        <button class="sub-tab active" data-tab="graos">Grãos</button>
+        <button class="sub-tab" data-tab="frutas">Frutas</button>
+        <button class="sub-tab" data-tab="citricos">Cítricos</button>
+        <button class="sub-tab" data-tab="hortalicas">Hortaliças</button>
+        <button class="sub-tab" data-tab="tuberculos">Tubérculos e Raízes</button>
+        <button class="sub-tab" data-tab="ervas">Ervas e Aromáticas</button>
+        <button class="sub-tab" data-tab="leguminosas">Leguminosas</button>
+        <button class="sub-tab" data-tab="oleaginosas">Oleaginosas</button>
+        <button class="sub-tab" data-tab="frutas_bosque">Frutas de Bosque</button>
+        <button class="sub-tab" data-tab="especiarias">Especiarias</button>
+        <button class="sub-tab" data-tab="medicinais">Plantas Medicinais</button>
+        <button class="sub-tab" data-tab="panc">PANC</button>
+        <button class="sub-tab" data-tab="trepadeiras">Trepadeiras e Videiras</button>
+        <button class="sub-tab" data-tab="cana">Cana-de-açúcar</button>
+        <button class="sub-tab" data-tab="fibras">Fibras</button>
+        <button class="sub-tab" data-tab="nativas">Árvores Nativas</button>
+        {% if grupos.outras %}<button class="sub-tab" data-tab="outras">Outras Culturas</button>{% endif %}
+    </div>
+
+<div class="stats-grid" id="statsGrid">
+        <div class="stat-card"><div class="stat-label">Culturas na Propriedade</div><div class="stat-value" id="totalCulturas">—</div></div>
+        <div class="stat-card"><div class="stat-label">Safras Ativas</div><div class="stat-value" id="totalSafras">—</div></div>
+        <div class="stat-card"><div class="stat-label">Área Plantada (ha)</div><div class="stat-value" id="totalArea">—</div></div>
+        <div class="stat-card"><div class="stat-label">Produção Total</div><div class="stat-value" id="totalProducao">—</div></div>
+    </div>
+     {{ props_stats|json_script:"propsStatsData" }}
+    {{ guide_stats|json_script:"guideStatsData" }}
+
+    {% for grupo, culturas in grupos_com_hist.items %}
+    <div class="tab-content {% if forloop.first %}active{% endif %}" id="tab-{{ grupo }}" data-tab="{{ grupo }}">
+        <h2 style="font-family:'Sora',sans-serif; font-size:.95rem; font-weight:800; letter-spacing:-.01em; margin:0 0 14px; color:var(--cor-texto); display:flex; align-items:center; gap:8px;">
+            <i class="bi bi-grid" style="color:var(--cor-primaria);"></i> {{ grupo|grupo_label }}
+        </h2>
+        {% if culturas %}
+        <div class="cultura-grid">
+            {% for item in culturas %}
+            {% with c=item.c hist=item.hist %}
+            {# HISTORICO OBSERVADO. Vem das safras do produtor, nao de um catalogo. #}
+            {# `Cultura.ciclo_dias` esta vazio em 707 das 709 linhas (MEDIDO 2026-10-05). #}
+            {# O que sai daqui sao as datas que o proprio produtor postou. #}
+            {# `hist` chega empacotado com a cultura pela view (`{"c": <Cultura>, "hist": {...}}`). #}
+            {# Django nao aceita funcoes em templates nem tem `.get()`, por isso a resolucao #}
+            {# acontece na view — a alternativa seriam 709 chaves escritas a mao. #}
+            {# O QUE ISTO NAO FAZ, E' O QUE IMPORTA: nao escreve um ciclo medio quando a #}
+            {# amplitude e' absurda (o cafe da base tem safras de 60 a 461 dias: e' data mal #}
+            {# posta, e a media seria um numero que nunca existiu). Nao escreve "0 safras" — #}
+            {# escreve "ainda nao registou", porque zero safras e' uma affirmacao sobre o #}
+            {# produtor e "nao registou" e' uma affirmacao sobre o registo. #}
+            {# As 703 culturas sem safra recebem `sem_dado`. Um cartao sem numero e sem #}
+            {# explicacao parece bug da pagina; um cartao que explica a ausencia nao. #}
+            {# MEDIDO 2026-10-05: reescrito de multi-linha para linhas unicas. O lexer #}
+            {# de template do Django nao aplica DOTALL, e um comentario que usa o exato #}
+            {# teclado para abrir/fechar vaza como texto na pagina. #}
+            {# como texto na pagina. Ver `app/tests_templates.py`. #}
+            {# MEDIDO 2026-10-06: este card era `cultura-card premium-card fluido` e #}
+            {# trazia um `<span class="cultura-quick-add">` proprio. Animal e #}
+            {# aquatica trazem `cultura-card` seco e NAO trazem botao — e' o #}
+            {# `guide.js` que injecta um `<button class="cultura-quick-add">` #}
+            {# igual nas tres guias. #}
+            {# #}
+            {# Como o span ocupava o lugar, o #}
+            {# `if (!card.querySelector('.cultura-quick-add'))` do `guide.js` #}
+            {# nao corria aqui: o vegetal ficava com um `bi-plus-lg` num #}
+            {# `span` e as outras com um `bi-plus-circle-fill` num `button`. #}
+            {# Dois estilos de card na mesma aplicacao. #}
+            {# #}
+            {# SEM `onclick`, ao contrario de animal e aquatica: esta pagina #}
+            {# tem delegacao propria em fase CAPTURE (ver `handleCardClick`, #}
+            {# mais abaixo) que chama `e.stopPropagation()` antes do alvo. #}
+            {# Um `onclick` aqui nunca correria — ficava a parecer vivo sem #}
+            {# estar. #}
+            <div class="cultura-card" data-cultura-id="{{ c.id }}" data-cultura-nome="{{ c.nome }}" data-grupo="{{ grupo }}" title="Abrir painel de {{ c.nome }}" style="cursor:pointer; position: relative;">
+                <div class="cultura-icon">{{ grupo|grupo_icon }}</div>
+                <div class="cultura-name">{{ c.nome }}</div>
+
+                <div class="cultura-hist">
+                    {# MESMO markup e MESMO sitio que as guias animal e aquatica: #}
+                    {# a contagem vive na linha do historico, nao num badge no #}
+                    {# canto do cartao. Um "0" no canto ao lado de "registar #}
+                    {# safra" dizia ao mesmo tempo que ele nao registou e que #}
+                    {# nao havia nada a registar. So' entra quando ha registo. #}
+                    {% if hist.registos %}
+                        <span class="cultura-hist-linha"><i class="bi bi-journal-check"></i> {{ hist.registos }} registo{{ hist.registos|pluralize:"s" }}</span>
+                    {% endif %}
+                    {% if hist.alerta %}
+                        <span class="cultura-hist-linha hist-alerta" title="{{ hist.alerta }}"><i class="bi bi-exclamation-triangle"></i> datas a rever</span>
+                    {% elif hist.ciclo_medio %}
+                        <span class="cultura-hist-linha"><i class="bi bi-calendar3"></i> {{ hist.ciclo_medio }} dias{% if hist.ciclo_amostras == 1 %} <span class="hist-sample">(1 safra)</span>{% endif %}</span>
+                    {% endif %}
+                    {% if hist.produtividade_media %}
+                        <span class="cultura-hist-linha"><i class="bi bi-graph-up"></i> {{ hist.produtividade_media }} {{ c.unidade_comercial|default:"sc/ha" }}</span>
+                    {% endif %}
+                    {% if hist.anos %}
+                        <span class="cultura-hist-linha hist-anos"><i class="bi bi-clock-history"></i> {{ hist.anos|join:", " }}</span>
+                    {% elif hist.fonte == "sem_dado" %}
+                        <span class="cultura-hist-linha hist-vazio" title="{{ hist.motivo }}"><i class="bi bi-plus-circle"></i> registar safra</span>
+                    {% endif %}
+                </div>
+
+                {# Sem botao aqui: e' o `guide.js` que o injecta, igual como #}
+                {# nas guias animal e aquatica. Ver a nota no `class` do card. #}
+            </div>
+            {% endwith %}
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state"><i class="bi bi-inbox" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>Nenhuma cultura neste grupo.</div>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+
+<div class="detail-overlay" id="culturaOverlay" onclick="closeCulturaDetail()"></div>
+<div class="detail-panel" id="culturaDetail">
+    <div class="detail-header">
+        <span class="detail-nome"></span>
+        <button class="detail-close" id="culturaDetailClose"><i class="bi bi-x"></i></button>
+    </div>
+    <div class="detail-body"></div>
+</div>
+<script>
+// O painel de detalhe NAO e' movido para fora de #content, e nao ha
+// MutationObserver. MEDIDO 2026-10-06, depois de varias navegacoes:
+//
+//  1) cada visita criava um `MutationObserver` novo sobre #content,
+//     ligado e nunca desligado. So a observacao ja custava: 456 cards
+//     entravam no DOM e o observer acordava para cada um.
+//  2) os paineis eram movidos para `document.body`, onde o SPA nao
+//     limpa. Cada ida-e-volta deixava um par a mais em `body`.
+//     MEDIDO: 3 pares de #culturaDetail em `body` apos 3 navegacoes,
+//     e `#culturaDetail` e' procurado por `getElementById` — tres
+//     elementos com o mesmo id, e o `getElementById` devolvia o
+//     antigo, que ja nao pertencia a pagina visivel.
+//
+// O SPA escreve em `content.innerHTML`, o que substitui a subarvore
+// INTEIRA. Logo, ficar dentro de #content e' o que mantem o painel
+// vivo enquanto a pagina esta aberta e o remove sozinho quando ela sai.
+// A unica excepcao e' o `window.safeShowCulturaDetail`, que cria o
+// painel se faltar; esse caminho trata-se la.
+console.log('[guia] painel fica em #content; observer removido');
+</script>
+<!-- guia-vegetal SPA: garante guide.js mesmo quando carregado via innerHTML (contentScripts) -->
+<script src="{% static 'js/guide.js' %}?v=20261007n" data-spa-guide></script>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="{% static 'js/guide.js' %}?v=20261007n"></script>
+<script>
+(function () {
+    const el = document.getElementById('propsStatsData');
+    if (!el) return;
+    const props = JSON.parse(el.textContent || '[]');
+    const lastId = localStorage.getItem('ampliagro_last_propriedade');
+    let prop = props.find(p => String(p.id) === String(lastId)) || props[0];
+    if (!prop) return;
+    const fmt = (v, casas) => Number(v || 0).toLocaleString('pt-BR', { maximumFractionDigits: casas });
+    document.getElementById('totalCulturas').textContent = prop.total_culturas;
+    document.getElementById('totalSafras').textContent = prop.safras_ativas;
+    document.getElementById('totalArea').textContent = fmt(prop.area_plantada, 1);
+    document.getElementById('totalProducao').textContent = fmt(prop.producao_total, 0);
+})();
+(function(){
+    const el2 = document.getElementById('guideStatsData');
+    if(el2){
+        try{ window._guideStats = JSON.parse(el2.textContent||'{}'); }catch(e){ window._guideStats={}; }
+    }
+    // Os badges tem de ser RECONTADOS agora.
+    //
+    // MEDIDO 2026-10-06: este script inline corre no bloco de scripts, e o
+    // `guide.js` (que desenha os badges) pode ter corrido ANTES — o
+    // `data-spa-guide`, dentro do bloco de conteudo, carrega primeiro.
+    // Quando isso acontecia, os badges ficavam todos em "0" mesmo com o
+    // `_guideStats` cheio: Alpiste tem 4 registros e mostrava 0.
+    //
+    // A segunda passagem nao e' um remendo. E' a ordem: os DADOS chegam
+    // aqui, e so' depois se pode contar. Por isso este bloco publica o
+    // `_guideStats` e DEPOIS manda recontar.
+    if (typeof window.decorateGuideCards === 'function') window.decorateGuideCards();
+})();
+// Safe wrapper: garante guide.js carregado mesmo via SPA (evita loading infinito no 1º clique após dashboard)
+window.safeShowCulturaDetail = function(id, nome, grupo){
+    console.log('safeShow called', id, nome, grupo, 'hasShow', typeof window.showCulturaDetail);
+    function call(){ console.log('safeShow call', id); try{ window.showCulturaDetail(id, nome, grupo); console.log('showCulturaDetail done', id); }catch(e){ console.error('safeShow error',e); var b=document.querySelector('#culturaDetail .detail-body'); if(b) b.innerHTML='<div class="p-4 text-center text-sm text-red-600">Erro ao abrir painel. <button onclick="location.reload()" style="text-decoration:underline;">Recarregar</button> <button onclick="safeShowCulturaDetail(\''+id+'\',\''+nome.replace(/'/g,"\\'")+'\',\''+grupo+'\')" style="margin-left:8px;padding:4px 8px;border:1px solid #ccc;border-radius:6px;">Tentar novamente</button></div>'; } }
+    if(typeof window.showCulturaDetail === 'function'){
+        call();
+        setTimeout(function(){
+            var body=document.querySelector('#culturaDetail .detail-body');
+            if(body && body.textContent.indexOf('Carregando')>=0){
+                console.warn('painel travado, tentando reabrir', id);
+                try{ window.showCulturaDetail(id, nome, grupo); }catch(e){}
+            }
+        }, 3000);
+        return;
+    }
+    var s=document.querySelector('script[data-spa-guide]');
+    var src=s ? s.src : '/static/js/guide.js';
+    var el=document.createElement('script');
+    el.src=src;
+    el.onload=function(){ setTimeout(call, 80); };
+    el.onerror=function(){ console.error('falha ao carregar guide.js'); call(); };
+    document.body.appendChild(el);
+};
+// Delegacao dos cards desta guia (funciona apos reload, SPA e F5)
+//
+// MEDIDO 2026-10-07: esta delegacao estava em `document` e NUNCA saia de la.
+// A SPA substitui o `#content`, mas o listener fica. Depois de passar da
+// guia vegetal para a animal, clicar em Angus abria o painel com os CAMPOS DO
+// VEGETAL — "Area do Talhao", "Irrigacao", "Tipo de Solo", "Certificacoes" —
+// em vez de "Cabecas (cab)", "Finalidade", "Origem".
+//
+// Porque: o `e.stopPropagation()` e' de fase CAPTURE, acontece antes do
+// alvo, e portanto ANTES do `onclick` que os cards de animal e aquatica
+// trazem no proprio HTML. A delegacao sequestrava o clique, chamava
+// `showCulturaDetail(id, nome, null)` — `grupo` e' `null` porque os cards
+// dessas guias nao tem `data-grupo` — e o painel caia no perfil vegetal.
+//
+// A guarda abaixo devolve a delegacao ao que e' dela. So' as cartas COM
+// `data-grupo` sao desta guia; as de animal e aquatica tratam-se com o
+// `onclick` que ja traziam, que manda o `groupId` certo.
+(function(){
+  function handleCardClick(e){
+    const card = e.target.closest('.cultura-card');
+    if(!card) return;
+    if(!card.hasAttribute('data-grupo')) return;   // nao e' desta guia
+    const target = e.target.closest('.cultura-quick-add') || card;
+    const id = target.getAttribute('data-cultura-id') || card.getAttribute('data-cultura-id');
+    const nome = target.getAttribute('data-cultura-nome') || card.getAttribute('data-cultura-nome');
+    const grupo = target.getAttribute('data-grupo') || card.getAttribute('data-grupo');
+    if(!id || !nome) return;
+    e.preventDefault();
+    e.stopPropagation();
+    (window.safeShowCulturaDetail||window.showCulturaDetail) && (window.safeShowCulturaDetail ? safeShowCulturaDetail(id, nome, grupo) : showCulturaDetail(id, nome, grupo));
+  }
+  document.addEventListener('click', handleCardClick, true);
+  // O listener de CAPTURE acima ja apanha os cliques no `cultura-quick-add`:
+  // `e.target.closest('.cultura-card')` encontra a carta a que o botao
+  // pertence. O segundo listener que aqui estava chamava `handleCardClick`
+  // uma segunda vez para o MESMO clique. MEDIDO 2026-10-07: saiu.
+})();
+
+// Guide Search Filter - debounce 150ms + highlight + per tab-content + ESC
+(function(){
+    const searchInput = document.querySelector('.guide-search-input');
+    if(!searchInput) return;
+    let debounce=null;
+    function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    function highlight(name, q){
+        if(!q) return escapeHtml(name);
+        const idx=name.toLowerCase().indexOf(q);
+        if(idx<0) return escapeHtml(name);
+        return escapeHtml(name.slice(0,idx)) + '<mark style="background:var(--cor-primaria-suave);color:var(--cor-primaria);padding:0 2px;border-radius:3px;">' + escapeHtml(name.slice(idx,idx+q.length)) + '</mark>' + escapeHtml(name.slice(idx+q.length));
+    }
+    searchInput.addEventListener('input', function(e){
+        clearTimeout(debounce);
+        debounce=setTimeout(function(){
+            const query = e.target.value.toLowerCase().trim();
+            document.querySelectorAll('.cultura-card').forEach(card => {
+                const name = card.getAttribute('data-cultura-nome')||'';
+                const match = name.toLowerCase().includes(query);
+                card.style.display = match ? 'flex' : 'none';
+                const nameEl=card.querySelector('.cultura-name');
+                if(nameEl){
+                    if(!nameEl.dataset.orig) nameEl.dataset.orig=nameEl.textContent;
+                    nameEl.innerHTML = query ? highlight(nameEl.dataset.orig, query) : escapeHtml(nameEl.dataset.orig);
+                }
+            });
+            document.querySelectorAll('.tab-content[data-tab]').forEach(pane => {
+                let hasVisible = false;
+                pane.querySelectorAll('.cultura-card').forEach(c => { if(c.style.display !== 'none') hasVisible = true; });
+                const emptyState = pane.querySelector('.empty-state');
+                if(!emptyState) return;
+                const total=pane.querySelectorAll('.cultura-card').length;
+                if(!hasVisible && total>0){
+                    emptyState.style.display='block';
+                    emptyState.innerHTML='<i class="bi bi-search" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>Nenhum resultado para &quot;'+escapeHtml(query)+'&quot;. <button onclick="document.querySelector(\'.guide-search-input\').value=\'\';document.querySelector(\'.guide-search-input\').dispatchEvent(new Event(\'input\'))" style="margin-top:8px;padding:6px 12px;border:1px solid var(--cor-borda);border-radius:8px;background:var(--cor-fundo-card);cursor:pointer;font-size:12px;">Limpar busca</button>';
+                } else if(!hasVisible && total===0){
+                    emptyState.style.display='block';
+                    emptyState.innerHTML='<i class="bi bi-inbox" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>Nenhuma cultura neste grupo.';
+                } else {
+                    emptyState.style.display='none';
+                }
+                const grid=pane.querySelector('.cultura-grid');
+                if(grid) grid.style.display = (!hasVisible && total>0) ? 'none' : 'grid';
+            });
+        },150);
+    });
+    searchInput.addEventListener('keydown', function(e){ if(e.key==='Escape'){ this.value=''; this.dispatchEvent(new Event('input')); }});
+});
+// Sub-tabs switching - persist localStorage + hash + keyboard + ARIA + smooth scroll
+(function(){
+    const tabs = document.querySelectorAll('.sub-tab[data-tab]');
+    const panes = document.querySelectorAll('.tab-content[data-tab]');
+    if(!tabs.length || !panes.length) return;
+    const STORAGE='ampliagro_guia_tab';
+    function activate(target, opts){
+        opts=opts||{};
+        const scroll=opts.scroll||false;
+        const pushHash=opts.pushHash!==false;
+        tabs.forEach(t=>{ const on=t.getAttribute('data-tab')===target; t.classList.toggle('active', on); t.setAttribute('aria-selected', on?'true':'false'); t.setAttribute('tabindex', on?'0':'-1'); });
+        panes.forEach(pane=>{
+            const on=pane.getAttribute('data-tab')===target;
+            pane.classList.toggle('active', on);
+            pane.style.display = on ? 'block' : 'none';
+        });
+        try{ localStorage.setItem(STORAGE, target); }catch(e){}
+        if(pushHash) history.replaceState(null,'','#'+target);
+        if(scroll){
+            const el=document.querySelector('.sub-tabs');
+            const active=document.querySelector('.sub-tab.active');
+            if(el && active) el.scrollTo({left: active.offsetLeft - el.clientWidth/2 + active.clientWidth/2, behavior:'smooth'});
+        }
+    }
+    tabs.forEach((tab,i)=>{
+        tab.setAttribute('role','tab');
+        tab.setAttribute('aria-selected', tab.classList.contains('active')?'true':'false');
+        tab.setAttribute('tabindex', tab.classList.contains('active')?'0':'-1');
+        tab.addEventListener('click', function(e){
+            e.preventDefault();
+            activate(this.getAttribute('data-tab'), {scroll:true});
+        });
+        tab.addEventListener('keydown', function(e){
+            if(e.key==='ArrowRight' || e.key==='ArrowLeft'){
+                e.preventDefault();
+                const dir=e.key==='ArrowRight'?1:-1;
+                const next=(i+dir+tabs.length)%tabs.length;
+                tabs[next].focus();
+                tabs[next].click();
+            }
+            if(e.key==='Home'){ e.preventDefault(); tabs[0].focus(); tabs[0].click(); }
+            if(e.key==='End'){ e.preventDefault(); tabs[tabs.length-1].focus(); tabs[tabs.length-1].click(); }
+        });
+    });
+    const hash=window.location.hash.slice(1);
+    let target=null;
+    if(hash && document.querySelector('.sub-tab[data-tab="'+hash+'"]')) target=hash;
+    else try{ const s=localStorage.getItem(STORAGE); if(s && document.querySelector('.sub-tab[data-tab="'+s+'"]')) target=s; }catch(e){}
+    if(target) activate(target, {pushHash:!!hash});
+    const container=document.getElementById('subTabs');
+    if(container){ container.setAttribute('role','tablist'); container.setAttribute('aria-label','Grupos de culturas'); }
+})();
+</script>
+{% endblock %}

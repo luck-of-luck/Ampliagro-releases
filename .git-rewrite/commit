@@ -1,0 +1,6 @@
+tree 959044e20cb2fcb1d5fdc8789341fd4768f3f4c7
+parent e9d93939203af4f0b3f1acdb308cddbe1e046bea
+author LUCAS TOMAZ NUNES <lucastnunes2@gmail.com> 1789741463 -0300
+committer LUCAS TOMAZ NUNES <lucastnunes2@gmail.com> 1789741463 -0300
+
+fix(pwa): SW ignora chrome-extension + meta mobile-web-app-capable

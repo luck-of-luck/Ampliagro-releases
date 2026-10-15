@@ -1,0 +1,443 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Ampliagro - Sistema de gestão do agro 5.0 para a sua fazenda.">
+    <title>Ampliagro - Acesso ao sistema</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Sora:wght@500;600;700;800&display=swap">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+<link rel="stylesheet" href="{% static 'css/paginas/login.css' %}">
+</head>
+
+<body>
+    <main class="login-layout">
+        <!-- ═══ LADO ESQUERDO: SHOWCASE (ESTÉTICA ROG) ═══ -->
+        <div class="showcase-container">
+
+            <!-- SHOWCASE PRODUTOR -->
+            <div id="showcase-produtor" class="showcase-item active">
+
+
+                <div class="device-mockup">
+                    <h1>Ampliagro</h1>
+                    <p>Sistema de gestão do agro 5.0</p>
+                    <div class="devices-wrapper">
+                        <div class="mock-laptop">
+                            <!-- AQUI ENTRA A IMAGEM DO SISTEMA NO NOTEBOOK (PRODUTOR) -->
+                            <div class="mock-screen mock-screen-produtor-laptop"></div>
+                        </div>
+                        <div class="mock-mobile">
+                            <!-- AQUI ENTRA A IMAGEM DO SISTEMA NO CELULAR (PRODUTOR) -->
+                            <div class="mock-screen mock-screen-produtor-mobile"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SHOWCASE SERVIDOR -->
+            <div id="showcase-servidor" class="showcase-item">
+
+
+                <div class="device-mockup">
+                    <h1>Ampliagro</h1>
+                    <p>Sistema de gestão do agro 5.0</p>
+                    <div class="devices-wrapper">
+                        <div class="mock-laptop">
+                            <!-- AQUI ENTRA A IMAGEM DO SISTEMA NO NOTEBOOK (SERVIDOR) -->
+                            <div class="mock-screen mock-screen-servidor-laptop"></div>
+                        </div>
+                        <div class="mock-mobile">
+                            <!-- AQUI ENTRA A IMAGEM DO SISTEMA NO CELULAR (SERVIDOR) -->
+                            <div class="mock-screen mock-screen-servidor-mobile"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ═══ LADO DIREITO: AUTH SHELL ═══ -->
+        <div class="auth-shell">
+
+        <!-- ═══ PAINEL DE LOGIN ═══ -->
+        <div id="painelLogin">
+            <div class="mini-navbar">
+                <!-- Light/Dark Toggle -->
+                <button type="button" onclick="alternarCoresAcesso()" class="mini-btn icon-only" title="Modo Claro/Escuro">
+                    <i class="bi bi-moon-stars-fill"></i>
+                </button>
+
+                <div class="actions">
+                    <button type="button" onclick="abrirModalSenha()" class="mini-btn icon-only" title="Esqueci minha senha">
+                        <i class="bi bi-key-fill"></i>
+                    </button>
+                    <button type="button" onclick="exibirPainelOnboarding(true)" class="mini-btn accent icon-only" title="Cadastrar Nova Fazenda">
+                        <i class="bi bi-building-add"></i>
+                    </button>
+                </div>
+            </div>
+
+
+
+            {% if erro_login %}
+                <div class="auth-error">{{ erro_login }}</div>
+            {% endif %}
+
+            <form method="post" action="{% url 'login' %}" id="formLogin" style="display:flex;flex-direction:column;gap:1rem;">
+                {% csrf_token %}
+                <input type="hidden" name="acao" value="login">
+                {% if next %}
+                    <input type="hidden" name="next" value="{{ next }}">
+                {% endif %}
+                <input type="hidden" name="tipo_acesso" id="tipoAcesso" value="produtor">
+
+                <!-- Toggle Produtor / Servidor -->
+                <div style="display:flex;gap:6px;background:var(--lc-input-bg);border:1px solid var(--lc-panel-border);padding:4px;border-radius:12px;backdrop-filter:blur(5px);">
+                    <button type="button" id="btnProdutor" onclick="setTipoAcesso('produtor')" class="mini-btn accent" style="flex:1;justify-content:center">
+                        <i class="bi bi-person-fill"></i><span>Produtor</span>
+                    </button>
+                    <button type="button" id="btnServidor" onclick="setTipoAcesso('servidor')" class="mini-btn" style="flex:1;justify-content:center">
+                        <i class="bi bi-tools"></i><span>Servidor</span>
+                    </button>
+                </div>
+                <div id="hintAcesso" style="font-size:.78rem;color:var(--auth-muted);text-align:center">Acesso produtor — gestão completa da fazenda</div>
+
+                <!-- Campo Servidor -->
+                <div id="campoFazenda" class="login-hidden">
+                    <label class="auth-label">Nome da Fazenda *</label>
+                    <input type="text" name="nome_fazenda" id="inputFazenda" placeholder="Ex: Fazenda Modelo — Primavera do Leste">
+                    <small style="font-size:.72rem;color:var(--auth-muted)">Fazenda que cadastrou você como servidor</small>
+                </div>
+
+
+                <div>
+                    <label class="auth-label">Usuário:</label>
+                    <input type="text" name="usuario" placeholder="Digite seu usuário" required>
+                </div>
+
+                <div>
+                    <label class="auth-label">Senha de Acesso:</label>
+                    <input type="password" name="senha" placeholder="Digite sua senha" required>
+                </div>
+
+                <div style="text-align:right;">
+                    <button type="button" onclick="abrirModalSenha()" class="auth-forgot">Esqueci minha senha</button>
+                </div>
+
+                <button type="submit" class="auth-btn-submit" id="btnEntrar">Entrar no Sistema</button>
+            </form>
+        </div>
+
+        <!-- ═══ PAINEL DE CADASTRO ═══ -->
+        <div id="painelCadastro" class="login-hidden">
+            <div class="mini-navbar">
+                <!-- Light/Dark Toggle -->
+                <button type="button" onclick="alternarCoresAcesso()" class="mini-btn icon-only" title="Modo Claro/Escuro">
+                    <i class="bi bi-moon-stars-fill"></i>
+                </button>
+
+                <div class="actions">
+                    <button type="button" onclick="exibirPainelOnboarding(false)" class="mini-btn icon-only" title="Voltar ao Login">
+                        <i class="bi bi-arrow-left"></i>
+                    </button>
+                </div>
+            </div>
+
+            <h2 class="auth-title">Criar Conta</h2>
+            <p class="auth-subtitle">Após o cadastro, vamos configurar sua propriedade em poucos passos.</p>
+
+            <form method="post" action="{% url 'login' %}" style="display:flex;flex-direction:column;gap:1rem;">
+                {% csrf_token %}
+                <input type="hidden" name="acao" value="cadastro">
+                {% if next %}
+                    <input type="hidden" name="next" value="{{ next }}">
+                {% endif %}
+
+                {% if form_cadastro.errors %}
+                    <div class="auth-error" style="text-align:left;">
+                        {% for field in form_cadastro %}
+                            {% for error in field.errors %}
+                                <div>{{ error }}</div>
+                            {% endfor %}
+                        {% endfor %}
+                        {% for error in form_cadastro.non_field_errors %}
+                            <div>{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <div>
+                    <label class="auth-label">Usuário:</label>
+                    <input type="text" name="usuario" value="{{ form_cadastro.usuario.value|default:'' }}" placeholder="Escolha um usuário" required>
+                    {% if form_cadastro.usuario.errors %}
+                        <small class="auth-field-error">{{ form_cadastro.usuario.errors.0 }}</small>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label class="auth-label">Senha:</label>
+                    <input type="password" name="senha" placeholder="Crie uma senha" required>
+                    {% if form_cadastro.senha.errors %}
+                        <small class="auth-field-error">{{ form_cadastro.senha.errors.0 }}</small>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label class="auth-label">E-mail Corporativo:</label>
+                    <input type="email" name="email" value="{{ form_cadastro.email.value|default:'' }}" placeholder="seuemail@empresa.com" required>
+                    {% if form_cadastro.email.errors %}
+                        <small class="auth-field-error">{{ form_cadastro.email.errors.0 }}</small>
+                    {% endif %}
+                </div>
+
+                <button type="submit" class="auth-btn-submit">Criar Conta</button>
+            </form>
+        </div>
+    </div>
+    </main>
+
+    <!-- ═══ MODAL ESQUECI SENHA (2FA) ═══ -->
+    <div id="modalEsqueciSenha">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2>Recuperação de Credenciais</h2>
+                <button type="button" onclick="fecharModalSenha()" class="modal-close">&times;</button>
+            </div>
+
+            <!-- Etapa 1: Solicitar Dados -->
+            <form id="formRecuperacaoEtapa1" onsubmit="enviarRecuperacao(event)">
+                <div class="modal-body">
+                    <p>Informe seus dados para receber o código de verificação seguro.</p>
+                    <div style="margin-bottom: 1rem;">
+                        <label class="auth-label">Nome da Fazenda:</label>
+                        <input type="text" id="recFazenda" placeholder="Ex: Fazenda Modelo" required style="width: 100%; border-radius: 8px; border: 1px solid var(--lc-panel-border); background: var(--lc-input-bg); color: var(--lc-text-color); padding: 0.75rem; font-size: 0.95rem;">
+                    </div>
+                    <div style="margin-bottom: 1rem;">
+                        <label class="auth-label">Seu Nome (Usuário):</label>
+                        <input type="text" id="recUsuario" placeholder="Seu nome de usuário" required style="width: 100%; border-radius: 8px; border: 1px solid var(--lc-panel-border); background: var(--lc-input-bg); color: var(--lc-text-color); padding: 0.75rem; font-size: 0.95rem;">
+                    </div>
+                    <div style="margin-bottom: 1rem;">
+                        <label class="auth-label">E-mail Cadastrado:</label>
+                        <input type="email" id="recEmail" placeholder="seu@email.com" required style="width: 100%; border-radius: 8px; border: 1px solid var(--lc-panel-border); background: var(--lc-input-bg); color: var(--lc-text-color); padding: 0.75rem; font-size: 0.95rem;">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" onclick="fecharModalSenha()" class="modal-btn-cancel">Cancelar</button>
+                    <button type="submit" class="modal-btn-submit" id="btnEnviarRec">Gerar Código</button>
+                </div>
+            </form>
+
+            <!-- Etapa 2: Digitar Código -->
+            <form id="formRecuperacaoEtapa2" class="login-hidden" onsubmit="verificarCodigo(event)">
+                <div class="modal-body">
+                    <p>O código foi "enviado" para o seu e-mail. Digite-o abaixo para entrar no sistema.</p>
+                    <div style="margin-bottom: 1rem; text-align: center;">
+                        <label class="auth-label">Código de Confirmação (6 dígitos):</label>
+                        <input type="text" id="recCodigo" placeholder="EX: A-4592 ou 123456" required style="width: 80%; border-radius: 8px; border: 1px solid var(--lc-panel-border); background: var(--lc-input-bg); color: var(--auth-accent); padding: 1rem; font-size: 1.5rem; text-align: center; letter-spacing: 5px; text-transform: uppercase;">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" onclick="fecharModalSenha()" class="modal-btn-cancel">Cancelar</button>
+                    <button type="submit" class="modal-btn-submit" id="btnVerificarRec">Entrar</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+    <script>
+
+        /* ── Toggle Produtor / Servidor ── */
+        function alternarCoresAcesso(){
+            var h = document.documentElement;
+            if(h.classList.contains('dark')){
+                h.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                h.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+        (function(){
+            var saved = localStorage.getItem('theme');
+            if(saved === 'dark') document.documentElement.classList.add('dark');
+            else if(saved === 'light') document.documentElement.classList.remove('dark');
+        })();
+
+        function setTipoAcesso(tipo){
+
+            var isServidor = tipo === 'servidor';
+            document.getElementById('tipoAcesso').value = tipo;
+            var bP=document.getElementById('btnProdutor'), bS=document.getElementById('btnServidor');
+            var campo=document.getElementById('campoFazenda'), hint=document.getElementById('hintAcesso');
+            var btnEntrar=document.getElementById('btnEntrar');
+            var inputFaz=document.getElementById('inputFazenda');
+
+            // Controle da animação (Showcase)
+            var showProdutor = document.getElementById('showcase-produtor');
+            var showServidor = document.getElementById('showcase-servidor');
+
+            if(isServidor){
+                bS.classList.add('accent'); bP.classList.remove('accent');
+                campo.classList.remove('login-hidden');
+                inputFaz.required = true;
+                hint.textContent = 'Acesso servidor — informe a fazenda que te cadastrou';
+                btnEntrar.textContent = 'Entrar como Servidor';
+
+                if (showProdutor) showProdutor.classList.remove('active');
+                if (showServidor) showServidor.classList.add('active');
+            } else {
+                bP.classList.add('accent'); bS.classList.remove('accent');
+                campo.classList.add('login-hidden');
+                inputFaz.required = false;
+                hint.textContent = 'Acesso produtor — gestão completa da fazenda';
+                btnEntrar.textContent = 'Entrar no Sistema';
+
+                if (showServidor) showServidor.classList.remove('active');
+                if (showProdutor) showProdutor.classList.add('active');
+            }
+            // persiste escolha
+            try{ localStorage.setItem('ampliagro_tipo_acesso', tipo);}catch(e){}
+        }
+
+        (function(){
+            try{
+                var saved = localStorage.getItem('ampliagro_tipo_acesso');
+                if(saved==='servidor') setTipoAcesso('servidor');
+            }catch(e){}
+            // também suporta ?tipo=servidor na URL para demo.bat
+            var qs=new URLSearchParams(window.location.search);
+            if(qs.get('tipo')==='servidor') setTipoAcesso('servidor');
+        })();
+
+        /* ── Toggle between Login / Register panels ── */
+        function exibirPainelOnboarding(mostrar) {
+            var painelLogin = document.getElementById("painelLogin");
+            var painelCadastro = document.getElementById("painelCadastro");
+            if (mostrar) {
+                painelLogin.classList.add("login-hidden");
+                painelCadastro.classList.remove("login-hidden");
+            } else {
+                painelLogin.classList.remove("login-hidden");
+                painelCadastro.classList.add("login-hidden");
+            }
+        }
+
+        /* ── Open/close password recovery modal ── */
+        function abrirModalSenha() {
+            var modal = document.getElementById("modalEsqueciSenha");
+            document.getElementById('formRecuperacaoEtapa1').classList.remove('login-hidden');
+            document.getElementById('formRecuperacaoEtapa2').classList.add('login-hidden');
+            modal.classList.add("flex");
+        }
+        function fecharModalSenha() {
+            var modal = document.getElementById("modalEsqueciSenha");
+            modal.classList.remove("flex");
+            document.getElementById('formRecuperacaoEtapa1').reset();
+            document.getElementById('formRecuperacaoEtapa2').reset();
+        }
+
+        async function enviarRecuperacao(event) {
+            event.preventDefault();
+            const btn = document.getElementById('btnEnviarRec');
+            btn.textContent = 'Enviando...';
+            btn.disabled = true;
+
+            const fd = new FormData();
+            fd.append('acao', 'recuperar_senha');
+            fd.append('fazenda', document.getElementById('recFazenda').value);
+            fd.append('usuario', document.getElementById('recUsuario').value);
+            fd.append('email', document.getElementById('recEmail').value);
+            fd.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+
+            try {
+                const req = await fetch('{% url "login" %}', {
+                    method: 'POST',
+                    body: fd
+                });
+                const res = await req.json();
+
+                if(res.ok) {
+                    // O servidor só devolve `code` quando DEBUG está ligado
+                    // (app/views/auth.py). A versão anterior interpolava
+                    // ${res.code} sempre: em produção imprimia "undefined"
+                    // na tela, como se fosse o código.
+                    Swal.fire({
+                        title: res.code ? 'E-mail enviado!' : 'Se os dados conferem, enviamos o código',
+                        html: res.code
+                            ? `Ambiente de desenvolvimento — seu código:<br><br><b style="font-size:24px; letter-spacing:4px; color:var(--auth-accent)">${res.code}</b>`
+                            : 'Confira a caixa de entrada do e-mail cadastrado. O código expira em 10 minutos.',
+                        icon: 'success',
+                        background: 'var(--lc-panel-bg)',
+                        color: 'var(--lc-text-color)',
+                        confirmButtonColor: 'var(--auth-accent)'
+                    }).then(() => {
+                        document.getElementById('formRecuperacaoEtapa1').classList.add('login-hidden');
+                        document.getElementById('formRecuperacaoEtapa2').classList.remove('login-hidden');
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Erro',
+                        text: res.erro,
+                        icon: 'error',
+                        background: 'var(--lc-panel-bg)',
+                        color: 'var(--lc-text-color)'
+                    });
+                }
+            } catch(e) {
+                alert('Erro de conexão');
+            }
+            btn.textContent = 'Gerar Código';
+            btn.disabled = false;
+        }
+
+        async function verificarCodigo(event) {
+            event.preventDefault();
+            const btn = document.getElementById('btnVerificarRec');
+            btn.textContent = 'Verificando...';
+            btn.disabled = true;
+
+            const fd = new FormData();
+            fd.append('acao', 'verificar_codigo');
+            fd.append('codigo', document.getElementById('recCodigo').value);
+            fd.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+
+            try {
+                const req = await fetch('{% url "login" %}', {
+                    method: 'POST',
+                    body: fd
+                });
+                const res = await req.json();
+
+                if(res.ok) {
+                    window.location.href = res.redirect;
+                } else {
+                    Swal.fire({
+                        title: 'Código Inválido',
+                        text: res.erro,
+                        icon: 'error',
+                        background: 'var(--lc-panel-bg)',
+                        color: 'var(--lc-text-color)'
+                    });
+                }
+            } catch(e) {
+                alert('Erro de conexão');
+            }
+            btn.textContent = 'Entrar';
+            btn.disabled = false;
+        }
+
+        /* ── If registration had errors, show register panel ── */
+        {% if form_cadastro and form_cadastro.errors %}
+            exibirPainelOnboarding(true);
+        {% endif %}
+    </script>
+</body>
+</html>

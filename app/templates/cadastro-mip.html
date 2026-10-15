@@ -1,0 +1,33 @@
+{% extends "partials/_premium_cadastro_base.html" %}
+{% block title %}Ampliagro - MIP{% endblock %}
+{% block cadastro_icon %}bi bi-bug{% endblock %}
+{% block cadastro_title %}Monitoramento MIP{% endblock %}
+{% block cadastro_novo_title %}Novo Monitoramento{% endblock %}
+{% block cadastro_lista_title %}Histórico{% endblock %}
+{% block cadastro_subtabs %}<div class="pcrud-subtabs"><button class="pcrud-subtab active" data-tab="novo">Novo</button><button class="pcrud-subtab" data-tab="lista">Histórico</button></div>{% endblock %}
+{% block cadastro_stats %}<div class="pcrud-stats"><div class="pcrud-stat"><div class="pcrud-stat-label">Total</div><div class="pcrud-stat-value">{{ mips|length }}</div></div><div class="pcrud-stat"><div class="pcrud-stat-label">Acima Nível</div><div class="pcrud-stat-value" style="color:#dc2626;">{{ mips|length }}</div></div></div>{% endblock %}
+{% block cadastro_form_novo %}
+<form id="mip-form" onsubmit="return submitMIP(event)">
+{% csrf_token %}
+<div class="pcrud-form-grid">
+<div class="pcrud-form-group"><label>Talhão *</label><select name="talhao" required>{% for t in talhoes %}<option value="{{ t.id }}">{{ t.nome }}</option>{% endfor %}</select></div>
+<div class="pcrud-form-group"><label>Cultura</label><select name="cultura"><option value="">—</option>{% for c in culturas %}<option value="{{ c.id }}">{{ c.nome }}</option>{% endfor %}</select></div>
+<div class="pcrud-form-group"><label>Data *</label><input type="date" name="data" required value="{% now 'Y-m-d' %}"></div>
+<div class="pcrud-form-group"><label>Praga *</label><input type="text" name="praga" required placeholder="Ex: Percevejo"></div>
+<div class="pcrud-form-group"><label>Nível Infestação %/m² *</label><input type="number" step="0.01" name="nivel_infestacao" required></div>
+<div class="pcrud-form-group"><label>Nível Controle</label><input type="number" step="0.01" name="nivel_controle" placeholder="Ex: 2"></div>
+<div class="pcrud-form-group" style="grid-column:span 2;"><label>Ação Recomendada</label><textarea name="acao_recomendada" rows="2"></textarea></div>
+<div class="pcrud-form-group"><label>Foto</label><input type="file" name="foto" accept="image/*"></div>
+</div>
+<div class="pcrud-form-actions"><button type="submit" class="pcrud-btn pcrud-btn-primary"><i class="bi bi-check-lg"></i> Salvar MIP</button></div>
+</form>
+{% endblock %}
+{% block cadastro_tab_lista %}
+<div class="pcrud-table-wrap"><table class="pcrud-table"><thead><tr><th>Data</th><th>Talhão</th><th>Praga</th><th>Nível</th><th>Controle</th><th>Ação</th><th>Ações</th></tr></thead><tbody>
+{% for m in mips %}<tr style="background:{% if m.nivel_controle and m.nivel_infestacao > m.nivel_controle %}#fee2e2{% else %}transparent{% endif %};"><td>{{ m.data|date:"d/m/Y" }}</td><td>{{ m.talhao.nome }}</td><td>{{ m.praga }}</td><td>{{ m.nivel_infestacao }}</td><td>{{ m.nivel_controle|default:"—" }}</td><td style="font-size:.75rem;">{{ m.acao_recomendada|truncatechars:40 }}</td><td><button class="pcrud-btn pcrud-btn-secondary pcrud-btn-sm" onclick="editarMIP({{ m.id }})"><i class="bi bi-pencil"></i></button> <button class="pcrud-btn pcrud-btn-danger pcrud-btn-sm" onclick="excluirMIP({{ m.id }})"><i class="bi bi-trash"></i></button></td></tr>{% endfor %}
+</tbody></table></div>
+{% endblock %}
+{% block scripts %}{{ block.super }}<script>
+function submitMIP(e){ e.preventDefault(); var f=document.getElementById('mip-form'); var fd=new FormData(f); fetch('/api/monitoramentos-praga/',{method:'POST',headers:{'X-CSRFToken':getCSRFToken()},body:fd}).then(r=>{ if(r.ok){ showToast('MIP salvo','success'); setTimeout(()=>location.reload(),600);} else r.json().then(j=>showToast(JSON.stringify(j),'error'));}); return false;}
+function excluirMIP(id){ if(!confirm('Excluir?'))return; fetch('/api/monitoramentos-praga/'+id+'/',{method:'DELETE',headers:{'X-CSRFToken':getCSRFToken()}}).then(r=>{ if(r.ok) location.reload();});}
+</script>{% endblock %}

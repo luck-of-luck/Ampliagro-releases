@@ -1,0 +1,8 @@
+*.jar
+*.war
+*.class
+/gradle/wrapper/gradle-wrapper.jar
+
+# Keystore de release (não versionar)
+android/*.keystore
+android/*.jks

@@ -1,0 +1,15 @@
+Pétalas viçosas e coloridas, caule intacto, hastes proporcionais. Essas e outras características das flores, que sempre passaram pelo atento escrutínio humano, agora já começam a ser objeto de análise de inteligência artificial. A chinesa Focusight Technology, especializada em tecnologias de visão computacional para o agronegócio, desenvolveu uma máquina classificadora inteligente capaz de identificar características das flores em tempo real e separá-las automaticamente de acordo com padrões pré-estabelecidos de qualidade.
+
+A seleção automatizada funciona assim: o produtor alimenta um banco de dados com até 200 imagens de flores da variedade a ser trabalhada, para que a inteligência artificial entenda os padrões e defina as características das flores, o tamanho das hastes e o número de folhas. Depois, bastam quatro funcionários para inserir as flores na máquina para que o equipamento faça análises e empacotamento — são até 10 mil hastes por hora.
+
+O sistema funciona por meio de uma linha de processamento na qual operadores posicionam as flores em suportes específicos. Ao percorrerem a esteira, as hastes passam por um conjunto de câmeras de alta resolução e sensores ópticos, responsáveis por registrar imagens sob diferentes ângulos.
+
+Produtores inovam e transformam flores do café em matéria-prima para chás Flores fora de época? Plantas tropicais estão mudando o período de floração
+
+Algoritmos treinados para reconhecer padrões visuais e identificar características relevantes para o mercado analisam essas informações instantaneamente. Com base nos critérios definidos pelo produtor ou pela central de distribuição, a máquina direciona automaticamente cada flor para a categoria correspondente.
+
+“Essa tecnologia já desperta interesse em diferentes polos produtores ao redor do mundo. Existe uma tendência crescente de automação na floricultura comercial, especialmente em um cenário marcado pela busca por mais eficiência, escassez de mão de obra e exigências cada vez maiores dos compradores”, diz Maurício Torres, representante da Focusight Technology no Brasil. A companhia vai apresentar a novidade na 31 edição da Hortitec, a principal evento hortifrutícola do país, que começa amanhã em Holambra (SP).
+
+A empresa já vende o item em mercados tradicionais na floricultura, como Holanda, Colômbia, Equador e Quênia. “A análise via IA reduz a subjetividade inerente à classificação humana”, afirma Torres. “Em um mercado em que aparência e uniformidade determinam o valor do produto, a tecnologia pode redefinir o modo como as flores chegam aos consumidores, com uma operação guiada por algoritmos e precisão visual”.
+
+A floricultura brasileira faturou R$ 21,2 bilhões em 2024, segundo os dados mais recentes do Instituto Brasileiro de Floricultura (IBraflor). Para o executivo, a tecnologia pode ajudar a destravar um de seus principais gargalos do segmento, que é a falta de mão de obra qualificada. “É importante avançar em tecnologia, integração de cadeias e abrir espaço para nos produtos e modelos produtivos”, resume Torres.

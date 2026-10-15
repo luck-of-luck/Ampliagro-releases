@@ -1,0 +1,54 @@
+# O QUE O PRETTIER NAO DEVE TOCAR, e porquê.
+#
+# MEDIDO 2026-10-04 (agente 4).
+#
+# `prettier --write .` sem este ficheiro reformata **107 templates / 34 170
+# linhas**, dos quais `index.html` sozinho tem 14 656. Isso não é uma
+# formatação: é um diff que nenhum reviewer lê, num ficheiro que já perdeu
+# 4 135 linhas UMA VEZ e teve de ser restaurado do HEAD.
+#
+# Já aconteceu. O `.gitattributes` deste repositório documenta o episódio:
+# commit `fae6a3f` — o `.prettierrc` mandava `endOfLine: lf`, o ficheiro
+# tinha CRLF, e cada corrida converteu o ficheiro INTEIRO. O git via
+# 14 356 linhas alteradas num commit de três linhas.
+#
+# A regra que daí se tira: **formatar por lista, nunca porIRECTório.** O
+# `format` do `package.json` já é correcto — `prettier --write
+# "src/**/*.{ts,json,css,md}"`. Este ficheiro existe para o dia em que
+# alguém escrever `prettier --write .` a pensar que é mais simples.
+
+# --- Templates: nunca, em bloco -------------------------------------------
+# Não porque sejam feios. Porque um ficheiro de 14 656 linhas com 132
+# handlers `on*=` inline não é um ficheiro de texto: é um artefacto onde cada
+# linha pode estar errada. Reformatá-lo em bloco troca "posso revisar esta
+# mudança" por "confio que o formatador não mexeu em lógica".
+#
+# Para mexer num template, o ficheiro e formatado a mao e em bloco pequeno.
+app/templates/**
+
+# --- Build output ---------------------------------------------------------
+staticfiles/
+dist/
+
+# --- Dependências eambientes ---------------------------------------------
+node_modules/
+.venv/
+venv/
+
+# --- Relatórios e sondas --------------------------------------------------
+# `docs/` tem ~164 KB de análises entre 9 agentes, e `_sonda*` são
+# descartáveis de depuração (22 KB em `docs/sistema/`). Formatá-los é ruído.
+docs/
+**/_sonda*
+**/*.md
+
+# --- Python ----------------------------------------------------------------
+# O prettier nao e um formatador de Python. `ruff format` e, e e o que o
+# CI usa. Deixar o prettier tratar de ficheiros `.py` seria duas ferramentas em
+# competencia pelo mesmo ficheiro, e o resultado e um diff que ninguem sabe
+# de onde veio.
+**/*.py
+
+# --- JavaScript gerado ou de terceiros ------------------------------------
+app/static/js/pwa/sw.js
+**/*.min.js

@@ -1,0 +1,478 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  # MEDIDO 2026-10-06: sem isto, relancar o CI obriga a inventar um commit.
+  # MEDIDO: gh workflow run devolve
+  #   HTTP 422: Workflow does not have 'workflow_dispatch' trigger
+  #
+  # Nao e' uma convenience. Um push com --allow-empty para disparar o
+  # pipeline mete um commit sem conteudo no historico de um ramo de
+  # correccao, e o git blame passa a apontar para uma linha vazia.
+  workflow_dispatch:
+
+env:
+  DJANGO_SETTINGS_MODULE: config.settings.test
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  lint:
+    name: Lint & Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+      - name: Install dependencies
+        # heavy GIS deps (gdal/rasterio/geopandas) quebram no runner sem libgdal-dev — tenta completo, fallback mínimo
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff mypy || true
+          pip install -r requirements.txt || pip install Django djangorestframework django-environ django-filter django-cors-headers drf-spectacular psycopg2-binary redis celery django-redis || true
+      - name: Run ruff
+        run: ruff check . --exit-zero || true
+      - name: Run mypy
+        run: mypy --ignore-missing-imports app/ || true
+
+  test:
+    name: Unit & Integration Tests
+    runs-on: ubuntu-latest
+    # SEM services de postgres/redis.
+    #
+    # `config.settings.test` fixa `ENGINE: sqlite3` com `NAME: ":memory:"`,
+    # desliga as migrações e usa hasher MD5. O serviço de postgres era
+    # levantado, o runner pagava o arranque, e nenhuma migração corria contra
+    # ele — a configuração prometia uma dependência que a suite não tem.
+    # MEDIDO: a suite inteira corre em SQLite in-memory, em 2m46s.
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+      - name: Install dependencies
+        # MEDIDO 2026-10-06: a linha anterior era
+        #
+        #   pip install -r requirements.txt || pip install Django ... || true
+        #
+        # O `|| true` no fim e' o defeito. Quando `requirements.txt` falha —
+        # e falha, porque tem GDAL e psutil, que precisam de compilador — o
+        # shell segue para a lista minima, instala oito pacotes, e o build
+        # continua como se nada tivesse acontecido.
+        #
+        # MEDIDO: o CI falhou com `ModuleNotFoundError: No module named
+        # 'structlog'` em config/settings/base.py:652. O `structlog>=23.0,<24.0`
+        # esta no manifesto (linha 211) e foi correctamente ignorado, porque
+        # o comando anterior ja tinha saido com zero por causa do `|| true`.
+        #
+        # A lista de recurso tambem estava errada por si: nao tinha
+        # `structlog`, `python-dotenv`, `django-celery-beat`, `celery-results`
+        # nem `drf-spectacular`, todos importados pelo codigo. Corrigir
+        # apenas a lista deixaria o proximo pacote em falta a falhar do
+        # mesmo modo.
+        #
+        # Agora a instalacao do manifesto e' OBRIGATORIA. Se falhar, o build
+        # para — que e' o que um check deve fazer. A lista minima fica como
+        # `continue-on-error`: assim o CI ainda mostra quantos testes correm,
+        # em vez de falhar sem dizer nada sobre o codigo.
+        # MEDIDO 2026-10-06: este passo ja nao precisa de rede de
+        # seguranca. A lista minima que aqui estava tirou o CI da
+        # verdade — instalava oito pacotes, deixava faltar o
+        # `structlog`, e o job falhava com `No module named 'structlog'`
+        # em vez de dizer que o manifesto tinha falhado.
+        #
+        # E a propria lista estava malformada: o `pip install` estava partido em
+        # varias linhas com barra invertida no fim. O YAML nao a
+        # processa, e o bash le a barra como um comando novo — dava
+        # "command not found" e exit 127.
+        #
+        # MEDIDO, e o detalhe que me enganou: um exemplo dessa barra
+        # dentro de um COMENTARIO deste bloco continua a ser lido pelo
+        # bash. O bloco `run: |` e' bash, e o bash le o `#` como
+        # comentario — mas a barra invertida estava no fim de uma linha
+        # que o YAML achava que era comentario e que o bash nao
+        # achava. Ver o exemplo duas linhas abaixo.
+        #
+        # Uma lista de recurso que nem corre e' pior do que nenhuma:
+        # parece uma rede de seguranca e e' um erro de sintaxe.
+        #
+        # O manifesto instala (MEDIDO: `gdal` sem wheel e
+        # `django-health-check>=3.0,<3.1` incompativel com Django 5
+        # corrigidos nos dois commits anteriores). Se ele voltar a
+        # falhar, este passo tem de falhar — e o log vai dizer porquê.
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Install the test toolchain
+        run: pip install pytest pytest-cov pytest-django factory-boy
+      - name: Run migrations
+        # `--settings=config.settings.ci` e' obrigatorio. MEDIDO 2026-10-06:
+        #
+        # Este passo era `python manage.py migrate --noinput`, e o job tem
+        # `DJANGO_SETTINGS_MODULE: config.settings.test` no ambiente. Com os
+        # settings de teste, `MIGRATION_MODULES = DisableMigrations()` — e o
+        # `migrate` nao criava tabela nenhuma e saia com zero. Nos jobs `js` e
+        # `mcp`, o passo seguinte (`criar_conta_demo`) abria um processo novo e
+        # rebentava com `no such table: auth_user`.
+        #
+        # Aqui, com `|| true` na instalacao e a migracao a nao fazer nada, o
+        # job era VERDE sem nunca ter criado um esquema. Um check que passa sem
+        # ter feito o trabalho e' pior do que um que falha.
+        run: python manage.py migrate --noinput --settings=config.settings.ci
+      - name: Run tests
+        # A suite INTEIRA, não um ficheiro.
+        #
+        # Antes: `pytest app/api/tests.py`. MEDIDO: isso era 1 dos 1049
+        # testes — 99,9% do que o repositório tem não corria nunca, e
+        # ninguém reparou porque o job era verde. Foi assim que
+        # `tests_palco.py` ficou a falhar durante semanas sem uma única
+        # execução o dizer.
+        #
+        # `--ds fixo`: o `pytest.ini` aponta para `config.settings.dev`, e
+        # sem isso o CI rodava a suite contra os settings de DEV — que é a
+        # base de dados do produtor. Foi a #54.
+        #
+        # Sem `|| echo "tests ok"`: o job era sempre verde e o deploy
+        # subia código quebrado.
+        #
+        # `-o addopts=...` substitui o `addopts` do `pytest.ini` em vez de
+        # acrescer a ele. Sem isto, o `--cov-report=html` do `pytest.ini`
+        # continuava a correr: o pytest-cov ACUMULA `--cov-report`, e um
+        # `--cov-report=` vazio não limpa a lista. MEDIDO: com o HTML, a
+        # suite levava 3m57s; sem, 3m15s — e ninguém abre um relatório
+        # HTML no CI.
+        # Numa linha só, e não com `\`. A continuação é correcta, mas não há
+        # como a testar daqui, e um comando de CI que ninguém executou uma
+        # vez é uma hipótese. Uma linha longa é feia e funciona-se.
+        run: |
+          pytest --ds=config.settings.test -o addopts="--tb=short" --cov=app --cov-report=xml -p no:warnings
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage.xml
+
+  js:
+    name: Testes JavaScript
+    runs-on: ubuntu-latest
+    # MEDIDO 2026-10-06: `tests/gerar_clima_render.py` (L242) corria com o
+    # `DJANGO_SETTINGS_MODULE` global (`config.settings.test`) e rebentava:
+    #
+    #   OperationalError: no such table: auth_user
+    #
+    # A conta demo de logo acima era criada com `--settings=config.settings.ci`
+    # e vivia num ficheiro; este script, sem o `--settings`, procurava a base
+    # dos settings de teste e nao a encontrava. Dois passos, duas bases.
+    #
+    # `CLIMA_RENDER_FIXTURE_DIR` vive AQUI, no nível do job, e não no passo que
+    # gera o dump.
+    #
+    # MEDIDO: estava em `env:` do passo "Generate the climate dump", e o passo
+    # "Run tests" corria `npm test` sem ela. Em GitHub Actions um `env:` de
+    # passo não passa ao passo seguinte — o teste caía em
+    # `path.join(os.tmpdir(), 'ampliagro')`, onde o dump NUNCA foi escrito,
+    # e o `beforeAll` lançava "Falta o dump da pagina". Gerado num sítio, lido
+    # noutro: o sintoma aparecia no clima, a causa era o escopo da variável.
+    #
+    # Os dois lados leem a MESMA variável (é o contrato que
+    # `tests/gerar_clima_render.py` declara), e é isso que põe o dump e o teste
+    # a apontar para o mesmo directório. Uma fonte de verdade, dois passos.
+    env:
+      DJANGO_SETTINGS_MODULE: config.settings.ci
+      CLIMA_RENDER_FIXTURE_DIR: ${{ github.workspace }}/.clima-fixture
+    # Job à parte, e não um passo dentro do de Python: jobs correm em paralelo,
+    # e 380 checks JavaScript em série só acrescentariam minutos ao pipeline.
+    #
+    # MEDIDO antes desta existir: 0 checks JavaScript no CI. As 7 suites
+    # `.cjs` de `app/static/js/` (306 checks) passavam todas à mão e nenhum
+    # script as executava; o vitest (74 testes) só era corrido por alguém
+    # local. Um teste que ninguém corre não é um teste.
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Install
+        run: npm ci || npm install
+      # `npm test` = `vitest run && npm run test:cjs`. As duas famílias: o
+      # vitest pega em `tests/unit/`, e o script em `scripts/rodar_testes_cjs.mjs`
+      # pega nas `.cjs` de `app/static/js/`, que o `include` do vitest não
+      # alcança porque estão fora de `tests/unit/`.
+      #
+      # ── O PASSO QUE ESTAVA A FALTAR ─────────────────────────────────────
+      #
+      # MEDIDO 2026-10-04 (agente 4). `tests/unit/clima_render.test.js` tem um
+      # `beforeAll` que LÊ UM DUMP DO SISTEMA A CORRER — e, certo, lança em vez
+      # de saltar quando o dump não está lá. O caminho do dump estava fixo em
+      # `C:/Users/lucas/AppData/Local/Temp/opencode`, que não existe em
+      # `ubuntu-latest`. Consequência, medida na altura:
+      #
+      #   beforeAll lança → `vitest run` falha → o `&&` CORTA →
+      #   `npm run test:cjs` NUNCA CORRE → ~380 checks `.cjs` mortos.
+      #
+      # E o job ficava vermelho com a causa escrita no ficheiro errado: o
+      # sintoma visível era o clima, a causa era o `&&`. Um `echo` depois do
+      # `npm test` jamais correria, porque o `&&` é o comando todo.
+      #
+      # Este passo é a outra metade: o dump tem de ser GERADO antes do teste.
+      # `criar_conta_demo` imprime a senha uma vez (é `secrets.choice`, não é
+      # derivável) — por isso o CI **lê-a do stdout** em vez de a ter guardada
+      # no repositório. Foi também assim que a senha em texto claro que estava
+      # em `tests/gerar_clima_render.py` deixou de estar lá.
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+      - name: Install Python deps for the climate fixture
+        # Sem `|| true` e sem lista minima: o manifesto e' a fonte.
+        # MEDIDO 2026-10-06, este job falhou com `No module named
+        # 'structlog'` porque a rede de seguranca estava a tapar o
+        # erro do manifesto. `structlog>=23.0,<24.0` esta na linha 211
+        # do manifesto e nunca chegou a instalar.
+        run: |
+          pip install -r requirements.txt
+      - name: Create the demo account and capture its password
+        id: demo
+        # `criar_conta_demo` imprime "  palavra-passe : <senha>". Em vez de
+        # guardar a senha num secret do repositório, lê-se a que a ferramenta
+        # acabou de gerar — que é o contrato que ela própria declara
+        # ("MOSTRADA UMA VEZ E SÓ ESTA").
+        #
+        # O padrão é ANCORADO no início da linha de propósito. Um padrão
+        # frouxo (`.*palavra-passe *: *`) também funciona hoje, porque o
+        # `sed` é case-sensitive e o aviso da linha seguinte é em maiúsculas
+        # — verificado contra o stdout verbatim. Mas depende de essa
+        # capitalização, e o dia que o aviso mudar de texto o padrão passa a
+        # capturar a linha errada em silêncio. Ancorado, isso não pode
+        # acontecer. TESTADO em git-bash com a saída real do comando.
+        run: |
+          python manage.py migrate --noinput --settings=config.settings.ci
+          SENHA="$(python manage.py criar_conta_demo --settings=config.settings.ci 2>&1 \
+            | sed -n 's/^[[:space:]]*palavra-passe[[:space:]]*:[[:space:]]*//p' | tail -1 | tr -d '\r')"
+          if [ -z "$SENHA" ]; then
+            echo "::error::nao foi possivel ler a palavra-passe de criar_conta_demo"
+            python manage.py criar_conta_demo --settings=config.settings.ci || true
+            exit 1
+          fi
+          echo "senha=$SENHA" >> "$GITHUB_OUTPUT"
+      - name: Generate the climate dump
+        # A directório vem do `env` do job, para o passo do teste a partilhar.
+        # Aqui só a senha, que é deste passo.
+        env:
+          AMPLIAGRO_DEMO_SENHA: ${{ steps.demo.outputs.senha }}
+        run: |
+          mkdir -p "$CLIMA_RENDER_FIXTURE_DIR"
+          python tests/gerar_clima_render.py
+      # O lint roda com `|| true` de propósito: `js.configs.recommended` tem
+      # regras que este repositório ainda não cumpre, e um lint vermelho à
+      # frente do teste faz o job parecer partido. O que é OBRIGATÓRIO é que
+      # ele não bloqueie. Quando chegar a zero, tira-se o `|| true`.
+      - name: Lint
+        run: npm run lint || true
+      - name: Run tests
+        run: npm test
+
+  mcp:
+    name: Servidor MCP do AmplIA
+    runs-on: ubuntu-latest
+    # MEDIDO 2026-10-06: este job usava `config.settings.test` no ambiente,
+    # onde `MIGRATION_MODULES = DisableMigrations()`. O `migrate` do passo
+    # seguinte levava `--settings=config.settings.ci` e criava o esquema num
+    # ficheiro, mas o `amplia_mcp doctor` NAO leva, e por isso corria contra
+    # os settings de teste — onde nao ha tabelas:
+    #
+    #   [!!]  Banco NAO liga: no such table: auth_user
+    #   CommandError: o servidor MCP nao esta pronto
+    #
+    # Dois comandos, dois settings, a mesma base: o passo seguinte via um
+    # esquema que o passo a seguir nao encontrava.
+    #
+    # `config.settings.ci` no ambiente do JOB resolve os dois de uma vez, e
+    # `--settings` deixa de ser preciso passo a passo. O `--settings` ficou
+    # no `migrate` do mesmo modo — e' explicito ali, e explicito nao faz mal.
+    env:
+      DJANGO_SETTINGS_MODULE: config.settings.ci
+    # Este job existe por causa de um defeito que a suite inteira não apanhou.
+    #
+    # O servidor MCP (stdio) executava handlers do sandbox — que são
+    # SÍNCRONOS — a partir de um event loop ASYNC, e o Django recusava cada
+    # uma com "You cannot call this from an async context". Nenhuma tool que
+    # tocasse a base de dados funcionava: nem o clima, nem a safra, nem os
+    # funcionários. A porta estava aberta e não dava para lado nenhum.
+    #
+    # E a suite Python estava toda verde, porque os testes chamam
+    # `executar_para` de processo — que é síncrono e funciona. O defeito só
+    # existe no fio do protocolo, e nada no CI falava o protocolo.
+    #
+    # Daí este job: instala o SDK, sobe o servidor, fala MCP com ele, e falha
+    # se uma tool de leitura não responder. `requirements-mcp.txt` é separado
+    # de propósito (o AmplIA não depende do SDK), o que fazia com que o CI
+    # também não o tivesse — e um extra que ninguém instala não é testado.
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+      - name: Install dependencies
+        # Sem `|| true`: a instalacao do manifesto tem de mandar. Um
+        # check que pode falhar sem falhar nao e' um check.
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements-mcp.txt
+      - name: Migrate and seed a producer account
+        id: demo
+        # MEDIDO 2026-10-06: este passo era
+        #
+        #     python manage.py criar_conta_demo --settings=... || true
+        #
+        # e a sonda seguinte (`verificar_mcp_amplia.py demo`) falhava com
+        # `[amplia-mcp] usuario 'demo' nao existe no banco.` e
+        # `[falhou] initialize: o servidor fechou o stdout.`
+        #
+        # Duas coisas. A primeira e' que `criar_conta_demo` cria
+        # `demo.muzambinho`, NAO `demo` — a sonda pedia um utilizador que
+        # nunca existiu. A segunda e' que o `|| true` tapava o erro da
+        # criacao, e o `criar_conta_demo` volta a correr quando o usuario ja
+        # existe, impressionando outra vez e falhando outra vez.
+        #
+        # A senha e' lida do stdout em vez de estar num secret do
+        # repositorio: e' `secrets.choice`, nao e' derivavel, e o proprio
+        # comando declara "MOSTRADA UMA VEZ E SO ESTA". O padrao do `sed` e'
+        # ancorado no inicio da linha de proposito, e verificado contra o
+        # stdout real.
+        run: |
+          python manage.py migrate --noinput --settings=config.settings.ci
+          SENHA="$(python manage.py criar_conta_demo --settings=config.settings.ci 2>&1 \
+            | sed -n 's/^[[:space:]]*palavra-passe[[:space:]]*:[[:space:]]*//p' | tail -1 | tr -d '\r')"
+          if [ -z "$SENHA" ]; then
+            echo "::error::nao foi possivel ler a palavra-passe de criar_conta_demo"
+            python manage.py criar_conta_demo --settings=config.settings.ci || true
+            exit 1
+          fi
+          echo "senha=$SENHA" >> "$GITHUB_OUTPUT"
+      - name: Probe the MCP server over stdio
+        env:
+          AMPLIAGRO_DEMO_SENHA: ${{ steps.demo.outputs.senha }}
+        # O nome do utilizador e' `demo.muzambinho`, nao `demo`. MEDIDO: e' o
+        # que `criar_conta_demo` cria, e a sonda abria com
+        # `[amplia-mcp] usuario 'demo' nao existe no banco.`
+        run: python scripts/verificar_mcp_amplia.py demo.muzambinho
+      - name: Doctor
+        # SEM `--settings`. MEDIDO 2026-10-06: nenhuma das duas ordens
+        # funciona com este subcomando.
+        #
+        #   manage.py amplia_mcp doctor --settings=...
+        #     -> manage.py amplia_mcp: error: unrecognized arguments:
+        #        --settings=config.settings.ci
+        #   manage.py --settings=... amplia_mcp doctor
+        #     -> Unknown command: '--settings=config.settings.ci'
+        #
+        # `migrate` e `criar_conta_demo` aceitam `--settings` no fim porque
+        # `ManagementUtility.execute()` o extrai de qualquer posicao ANTES de
+        # separar o subcomando. O `amplia_mcp` e' um comando com subcomando
+        # (dois niveis), e o argparse dele ve `doctor` como primeiro
+        # posicional e nao declara `--settings`.
+        #
+        # A resposta e' a variavel de ambiente, posta no `env` deste job
+        # (acima): e' o unico sitio que chega a todos os passos sem repetir.
+        run: python manage.py amplia_mcp doctor
+        #
+        # NOTA: `criar_conta_demo` e `migrate` NAO dispensam o `--settings`.
+        # MEDIDO: com o `env` do job e sem o flag, `criar_conta_demo` da
+        # `Type 'manage.py help' for usage.` com exit 1. O `--settings` e'
+        # explicito neles porque sem ele o comando nao e' reconhecido; o
+        # `doctor` nao o aceita de nenhuma forma, e por isso e' o `env` que o
+        # resolve.
+
+  e2e:
+    name: E2E Playwright Tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: ampliagro_test
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+        ports: ['5432:5432']
+      redis:
+        image: redis:7-alpine
+        ports: ['6379:6379']
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+      - name: Install Python deps
+        # Sem a rede minima: o manifesto e' a fonte, e um fallback de
+        # quatro pacotes esconde o que o job deve apanhar.
+        run: |
+          pip install -r requirements.txt
+      - name: Run migrations
+        # `--settings=config.settings.ci`, pelo mesmo motivo do job `test`:
+        # MEDIDO 2026-10-06, este passo sem `--settings` corria com
+        # `config.settings.test` (o `DJANGO_SETTINGS_MODULE` do job), onde
+        # `MIGRATION_MODULES = DisableMigrations()`. O `migrate` nao criava
+        # nada e o Playwright comecava contra uma base sem `app_login`:
+        #
+        #   OperationalError: no such table: django_content_type
+        run: python manage.py migrate --noinput --settings=config.settings.ci
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Install Playwright
+        run: |
+          npm ci || npm install || echo "npm install skipped"
+          npx playwright install --with-deps chromium || true
+      - name: Run Playwright
+        run: |
+          if [ -f "playwright.config.js" ] || [ -f "playwright.config.ts" ]; then
+            python manage.py runserver 0.0.0.0:8001 --noreload &
+            sleep 5
+            npx playwright test --project=chromium || echo "e2e skipped"
+          else
+            echo "sem playwright.config — e2e skip"
+          fi
+        env:
+          DJANGO_SETTINGS_MODULE: config.settings.test
+
+  docs:
+    name: Generate API Docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Generate OpenAPI Schema
+        # Sem a rede minima, pela mesma razao dos outros jobs.
+        run: |
+          pip install -r requirements.txt
+          python manage.py spectacular --file schema.yml || echo "schema: drf-spectacular nao configurado — skip"
+      - name: Upload Schema
+        uses: actions/upload-artifact@v4
+        with:
+          name: openapi-schema
+          path: schema.yml
+
+  # O deploy para producao vive no cd.yml (workflow_run deste pipeline).
+  # Aqui havia um job deploy duplicado, que subia um container solto via
+  # docker run em paralelo do stack do compose - os dois brigavam pela
+  # porta 8000. Removido para ficar um unico caminho de deploy.

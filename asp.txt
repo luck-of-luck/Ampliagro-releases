@@ -1,0 +1,133 @@
+function abrirSeletorPagina() {
+    return new Promise(function (resolve) {
+      var camada = document.createElement('div');
+      camada.id = 'ia-print-overlay';
+      camada.className = 'ia-print-seletor';
+      camada.innerHTML =
+        '<div class="ia-print-seletor-rect" hidden></div>' +
+        '<div class="ia-print-seletor-dica">Arraste sobre a área que quer mostrar à IA · Esc cancela</div>' +
+        '<button type="button" class="ia-print-seletor-x" aria-label="Cancelar seleção" title="Cancelar (Esc)">×</button>';
+      document.body.appendChild(camada);
+
+      /* A barra inferior (`#dashboard-appbar`) vive em z-index máximo, ACIMA
+       * desta camada: sem isto, arrastar na faixa de baixo clicava a barra,
+       * não o retângulo — e no dashboard parecia que "não funciona". Tira-se
+       * o clique dela DURANTE a seleção e devolve-se a seguir: invisível, e
+       * só enquanto dura. */
+      var appbar = document.getElementById('dashboard-appbar');
+      var appbarToque = appbar ? appbar.style.pointerEvents : '';
+      if (appbar) {
+        try {
+          appbar.style.pointerEvents = 'none';
+        } catch (e) {}
+      }
+
+      var rectEl = camada.querySelector('.ia-print-seletor-rect');
+      var inicio = null;
+      var sel = null;
+
+      /* Rato e dedo falam o mesmo idioma aqui: um ponto {x, y}. O
+       * `changedTouches` do `touchend` não é preciso — o `largar` confirma
+       * com o `sel` que o `touchmove` já calculou. */
+      function pontoDe(e) {
+        try {
+          if (e.touches && e.touches.length) {
+            return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+          }
+        } catch (err) {}
+        return { x: e.clientX, y: e.clientY };
+      }
+
+      function eNoBotao(e) {
+        try {
+          return Boolean(e.target && e.target.closest && e.target.closest('.ia-print-seletor-x'));
+        } catch (err) {
+          return false;
+        }
+      }
+
+      function comecar(p) {
+        inicio = p;
+        sel = { left: inicio.x, top: inicio.y, width: 0, height: 0 };
+        desenha();
+      }
+
+      camada.addEventListener('mousedown', function (e) {
+        if (e.button !== 0 || eNoBotao(e)) return;
+        e.preventDefault();
+        comecar({ x: e.clientX, y: e.clientY });
+      });
+
+      /* `passive:false` de propósito: sem ele o `preventDefault` do `mover`
+       * é ignorado e a página rola por baixo do dedo no meio do gesto. */
+      camada.addEventListener(
+        'touchstart',
+        function (e) {
+          if (eNoBotao(e)) return;
+          e.preventDefault();
+          comecar(pontoDe(e));
+        },
+        { passive: false }
+      );
+
+      camada.querySelector('.ia-print-seletor-x').addEventListener('click', function () {
+        encerra();
+        camada.remove();
+        resolve({ ok: false, motivo: 'cancelado' });
+      });
+
+      window.addEventListener('mousemove', mover);
+      window.addEventListener('mouseup', largar);
+      window.addEventListener('touchmove', moverToque, { passive: false });
+      window.addEventListener('touchend', largar);
+      window.addEventListener('touchcancel', cancelaToque);
+      document.addEventListener('keydown', aoTeclar);
+
+      function mover(e) {
+        if (!inicio) return;
+        e.preventDefault();
+        sel = rectDe(inicio, { x: e.clientX, y: e.clientY });
+        desenha();
+      }
+
+      function moverToque(e) {
+        if (!inicio) return;
+        e.preventDefault();
+        sel = rectDe(inicio, pontoDe(e));
+        desenha();
+      }
+
+      function cancelaToque() {
+        encerra();
+        camada.remove();
+        resolve({ ok: false, motivo: 'cancelado' });
+      }
+
+      function desenha() {
+        if (!sel) {
+          rectEl.hidden = true;
+          return;
+        }
+        rectEl.hidden = false;
+        rectEl.style.left = sel.left + 'px';
+        rectEl.style.top = sel.top + 'px';
+        rectEl.style.width = Math.max(0, sel.width) + 'px';
+        rectEl.style.height = Math.max(0, sel.height) + 'px';
+      }
+
+      function largar() {
+        encerra();
+        if (!sel || sel.width < AREA_MENOR || sel.height < AREA_MENOR) {
+          camada.remove();
+          resolve({ ok: false, motivo: sel ? 'area_pequena' : 'cancelado' });
+          return;
+        }
+        camada.remove();
+        resolve({ ok: true, rect: sel });
+      }
+
+      function aoTeclar(e) {
+        if (e.key === 'Escape') {
+          encerra();
+          camada.remove();
+          resolve({ ok: false, motivo: 'cancelado

@@ -1,0 +1,169 @@
+{% extends base_template %}
+{% load static %}
+
+{% block title %}Ampliagro - Estoque de Insumos{% endblock %}
+
+{% block extra_css %}
+
+{% endblock %}
+
+{% block dashboard_appbar %}{% endblock %}
+
+{% block content %}
+<div class="section-container">
+    <div class="section-header">
+        <h1 class="section-title"><i class="bi bi-droplet me-2"></i>Estoque de Insumos</h1>
+        <a href="{% url 'cadastro-insumo' %}" class="btn-primary"><i class="bi bi-plus-lg"></i> Novo Insumo</a>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Total Insumos</div>
+            <div class="stat-value" id="total-insumos">--</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Fornecedores</div>
+            <div class="stat-value" id="total-fornecedores">--</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Valor Total</div>
+            <div class="stat-value" id="valor-total">--</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Lotes Ativos</div>
+            <div class="stat-value" id="lotes-ativos">--</div>
+        </div>
+    </div>
+
+    <div class="content-card">
+        <div class="search-bar">
+            <input type="text" class="search-input" id="search-input" placeholder="Buscar insumo, fornecedor, lote..." oninput="filtrarTabela()">
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Quantidade</th>
+                        <th>Unidade</th>
+                        <th>Local</th>
+                        <th>Fornecedor</th>
+                        <th>Lote</th>
+                        <th>Data Compra</th>
+                        <th>Validade</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tabela-insumos">
+                    <tr>
+                        <td colspan="9" class="empty-state">
+                            <i class="bi bi-droplet" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>
+                            Nenhum insumo encontrado.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+    const API_URL = '/api/estoque/';
+
+    async function carregarInsumos() {
+        try {
+            const resp = await fetch(API_URL);
+            if (!resp.ok) throw new Error('Falha ao carregar');
+            const itens = await resp.json();
+            const insumos = itens.filter(i => i.categoria === 'INSUMO');
+            const tbody = document.getElementById('tabela-insumos');
+            const fornecedores = new Set();
+            const lotes = new Set();
+
+            if (!insumos.length) {
+                tbody.innerHTML = '<tr><td colspan="9" class="empty-state"><i class="bi bi-droplet" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>Nenhum insumo encontrado.</td></tr>';
+                document.getElementById('total-insumos').textContent = '0';
+                document.getElementById('total-fornecedores').textContent = '0';
+                document.getElementById('valor-total').textContent = 'R$ 0,00';
+                document.getElementById('lotes-ativos').textContent = '0';
+                return;
+            }
+
+            let html = '';
+            let valorTotal = 0;
+            insumos.forEach(item => {
+                if (item.fornecedor) fornecedores.add(item.fornecedor);
+                if (item.lote) lotes.add(item.lote);
+                if (item.valor) valorTotal += parseFloat(item.valor) || 0;
+
+                let badge = '';
+                if (item.data_validade) {
+                    const val = new Date(item.data_validade);
+                    const hoje = new Date();
+                    const diff = Math.ceil((val - hoje) / (1000 * 60 * 60 * 24));
+                    if (diff < 0) badge = '<span class="badge badge-danger">Vencido</span>';
+                    else if (diff <= 7) badge = '<span class="badge badge-warning">' + diff + 'd</span>';
+                    else if (diff <= 30) badge = '<span class="badge badge-warning">' + diff + 'd</span>';
+                    else badge = '<span class="badge badge-safe">Ok</span>';
+                }
+
+                html += '<tr>' +
+                    '<td><strong>' + (item.nome || '--') + '</strong></td>' +
+                    '<td>' + (item.quantidade != null ? parseFloat(item.quantidade).toFixed(2) : '--') + '</td>' +
+                    '<td>' + (item.unidade || '--') + '</td>' +
+                    '<td>' + (item.local || '--') + '</td>' +
+                    '<td>' + (item.fornecedor || '--') + '</td>' +
+                    '<td>' + (item.lote || '--') + '</td>' +
+                    '<td>' + (item.data_compra ? new Date(item.data_compra).toLocaleDateString('pt-BR') : '--') + '</td>' +
+                    '<td>' + (item.data_validade ? new Date(item.data_validade).toLocaleDateString('pt-BR') : '--') + ' ' + badge + '</td>' +
+                    '<td><div class="action-cell">' +
+                    '<button class="btn-secondary btn-sm" onclick="editarItem(' + item.id + ')"><i class="bi bi-pencil"></i></button>' +
+                    '<button class="btn-secondary btn-sm" onclick="excluirItem(' + item.id + ')" style="background:#fef2f2;color:#dc2626;"><i class="bi bi-trash"></i></button>' +
+                    '</div></td></tr>';
+            });
+            tbody.innerHTML = html;
+            document.getElementById('total-insumos').textContent = insumos.length;
+            document.getElementById('total-fornecedores').textContent = fornecedores.size;
+            document.getElementById('valor-total').textContent = 'R$ ' + valorTotal.toFixed(2);
+            document.getElementById('lotes-ativos').textContent = lotes.size;
+            filtrarTabela();
+        } catch (e) {
+            console.error('Erro ao carregar insumos:', e);
+        }
+    }
+
+    function filtrarTabela() {
+        const q = document.getElementById('search-input').value.toLowerCase();
+        const rows = document.querySelectorAll('#tabela-insumos tr');
+        rows.forEach(row => {
+            if (row.classList.contains('empty-state')) return;
+            row.style.display = (!q || row.textContent.toLowerCase().includes(q)) ? '' : 'none';
+        });
+    }
+
+    function editarItem(id) {
+        window.location.href = '{% url "cadastro-insumo" %}?edit=' + id;
+    }
+
+    async function excluirItem(id) {
+        if (!confirm('Excluir este insumo?')) return;
+        try {
+            const resp = await fetch(API_URL + id + '/', { method: 'DELETE', headers: { 'X-CSRFToken': getCSRFToken() } });
+            if (resp.ok) carregarInsumos();
+            else alert('Erro ao excluir');
+        } catch (e) {
+            alert('Erro de conexão');
+        }
+    }
+
+    function getCSRFToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+    }
+
+    document.addEventListener('DOMContentLoaded', carregarInsumos);
+</script>
+{% endblock %}

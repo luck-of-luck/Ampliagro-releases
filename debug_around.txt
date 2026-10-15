@@ -1,0 +1,211 @@
+gf-grelha { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 760px) {
+  .gf-grelha { grid-template-columns: repeat(2, 1fr); }
+  .gf-nav { overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; }
+  .gf-nav::-webkit-scrollbar { display: none; }
+}
+@media (max-width: 560px) {
+  .gf-grelha { grid-template-columns: 1fr; }
+}
+@media (max-width: 420px) {
+  .gf-grelha { grid-template-columns: 1fr; }
+}
+
+<style>
+/* ═══════════════════════════════════════════════════════════════════════
+   PAINEL DE DETALHE CENTRALIZADO (estilo cadastro-cultura)
+   ══════════════════════════════════════════════════════════════════════ */
+.gf-detail-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(11, 17, 32, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 9998;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .25s ease, visibility .25s ease;
+}
+.gf-detail-overlay.ativo {
+  opacity: 1;
+  visibility: visible;
+}
+
+.gf-detail-wrap {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--lcdpr-space-4);
+  z-index: 9999;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .25s ease, visibility .25s ease;
+}
+.gf-detail-wrap.ativo {
+  opacity: 1;
+  visibility: visible;
+}
+
+.gf-detail-card {
+  width: 100%;
+  max-width: 720px;
+  max-height: 90vh;
+  background: var(--cor-fundo-card);
+  border: 1px solid var(--cor-borda);
+  border-radius: 16px;
+  box-shadow: 0 12px 28px var(--cor-sombra);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transform: scale(0.95);
+  transition: transform .25s var(--cor-ease), opacity .25s ease;
+  opacity: 0;
+}
+.gf-detail-wrap.ativo .gf-detail-card {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.gf-detail-head {
+  padding: var(--lcdpr-space-4) var(--lcdpr-space-5);
+  border-bottom: 1px solid var(--cor-borda);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--cor-fundo-card);
+  flex-shrink: 0;
+}
+.gf-detail-title {
+  font-family: 'Sora', 'IBM Plex Sans', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--cor-texto);
+  margin: 0;
+  letter-spacing: -.01em;
+}
+.gf-detail-close {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--lcdpr-radius-full);
+  background: var(--cor-fundo-card-aninhado);
+  border: 1px solid var(--cor-borda);
+  color: var(--cor-texto-secundario);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--cor-ease-2);
+  flex-shrink: 0;
+}
+.gf-detail-close:hover {
+  background: var(--cor-fundo-card-profundo);
+  color: var(--cor-primaria);
+  border-color: var(--cor-primaria);
+}
+.gf-detail-close svg {
+  width: 20px;
+  height: 20px;
+}
+
+.gf-detail-body {
+  padding: var(--lcdpr-space-5);
+  overflow-y: auto;
+  max-height: calc(90vh - 80px);
+}
+
+.gf-detail-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lcdpr-space-4);
+}
+
+.gf-detail-resumo {
+  font-size: .875rem;
+  line-height: 1.6;
+  color: var(--cor-texto);
+}
+
+.gf-detail-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lcdpr-space-2);
+}
+
+.gf-detail-close {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--lcdpr-radius-full);
+  background: var(--cor-fundo-card-aninhado);
+  border: 1px solid var(--cor-borda);
+  color: var(--cor-texto-secundario);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--cor-ease-2);
+  flex-shrink: 0;
+}
+.gf-detail-close:hover {
+  background: var(--cor-fundo-card-profundo);
+  color: var(--cor-primaria);
+  border-color: var(--cor-primaria);
+}
+.gf-detail-close svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Overlay */
+.gf-detail-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(11, 17, 32, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 9998;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .25s ease, visibility .25s ease;
+}
+.gf-detail-overlay.ativo {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Panel aberto */
+body.gf-detail-open {
+  overflow: hidden;
+}
+.gf-detail-wrap.ativo {
+  opacity: 1;
+  visibility: visible;
+}
+.gf-detail-wrap.ativo .gf-detail-card {
+  transform: scale(1);
+  opacity: 1;
+}
+
+/* Responsivo para o painel */
+@media (max-width: 760px) {
+  .gf-detail-card {
+    max-width: 100%;
+    max-height: 95vh;
+  }
+}
+</style>
+{% endblock %}
+{% block content %}
+<div class="guide-container">
+<div class="guide-header">
+<h1 class="guide-title"><i class="bi bi-tools"></i> Guia de Ferramentas</h1>
+<div style="flex:1; min-width:200px; position:relative;">
+    <i class="bi bi-search" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--cor-texto-fraco);"></i>
+    <input type="text" class="guide-search-input" id="gfBusca" placeholder="Buscar capacidade..." style="width:100%; padding:8px 12px 8px 36px; border-radius:8px; border:1px solid var(--cor-borda); font-size:14px; outline:none; transition:border-color 0.2s;">
+</div>
+{# O n&uacute;mero de IoT &eacute; o &Uacute;NICO n&uacute;mero medido desta p&aacute;gina. Todos os outros v&ecirc;m #}
+{# do cat&aacute;logo e s&atilde;o contagens de linhas, n&atilde;o afirma&ccedil;&otilde;es de medi&ccedil;&atilde;o. #}
+<span class="badge" style="background:var(--cor-primaria-suave);color:var(--cor-primaria);padding:6px 10px;border-radius:999px;font-size:.72rem;font-weight:700">
+  {{ n_catalogo }} capacidades &middot; {{ n_iot }} sensor{{ n_iot|pluralize:"es" }} teu{{ n_iot|pluralize:"s" }}
+</span>
+<a href="{% url 'index_spa' %}" clas

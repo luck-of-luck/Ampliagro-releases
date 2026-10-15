@@ -1,0 +1,148 @@
+{% extends base_template %}
+{% load static %}
+
+{% block title %}Relatar Erro{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-8">
+    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6 md:p-8">
+        <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                <i class="bi bi-bug text-red-600 dark:text-red-400 text-lg"></i>
+            </div>
+            <div>
+                <h1 class="text-xl font-bold text-slate-800 dark:text-slate-100">Relatar Erro</h1>
+                <p class="text-sm text-slate-500 dark:text-slate-400">Ajude-nos a melhorar o sistema</p>
+            </div>
+        </div>
+
+        <form id="erroForm" onsubmit="return submitErro(event)">
+            <div class="space-y-5">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Tipo do Erro</label>
+                    <select id="tipo" name="tipo" required class="w-full text-sm px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400/20">
+                        <option value="">Selecione o tipo...</option>
+                        <option value="bug">Bug / Erro no Sistema</option>
+                        <option value="dados">Dados Incorretos</option>
+                        <option value="performance">Problema de Performance</option>
+                        <option value="seguranca">Suspeita de Segurança</option>
+                        <option value="usabilidade">Problema de Usabilidade</option>
+                        <option value="integracao">Erro de Integração</option>
+                        <option value="outro">Outro</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">O que você estava fazendo?</label>
+                    <textarea id="descricao" name="descricao" rows="4" required placeholder="Descreva a ação que estava realizando quando o erro ocorreu..." class="w-full text-sm px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 placeholder:text-slate-400 focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400/20 transition-all resize-y"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Passos para reproduzir</label>
+                    <textarea id="passos" name="passos" rows="3" placeholder="1. Acesse...&#10;2. Clique em...&#10;3. O erro aparece quando..." class="w-full text-sm px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 placeholder:text-slate-400 focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400/20 transition-all resize-y"></textarea>
+                </div>
+
+                <div class="flex items-start gap-3 p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50">
+                    <input type="checkbox" id="enviarRastreamento" name="enviar_rastreamento" class="mt-1 w-4 h-4 text-emerald-600 bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600 rounded focus:ring-emerald-400 focus:ring-offset-0">
+                    <div>
+                        <label for="enviarRastreamento" class="text-sm font-medium text-slate-700 dark:text-slate-300">Enviar últimos acontecimentos para rastreamento</label>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Permite que a equipe técnica analise os eventos recentes do sistema para identificar a causa raiz do problema.</p>
+                    </div>
+                </div>
+
+                <div id="contextoSection" class="hidden">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Contexto adicional (opcional)</label>
+                    <textarea id="contexto" name="contexto" rows="3" placeholder="Informações extras que possam ajudar no diagnóstico..." class="w-full text-sm px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 placeholder:text-slate-400 focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400/20 transition-all resize-y"></textarea>
+                </div>
+
+                <div class="flex items-center gap-3 pt-2">
+                    <button type="submit" class="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-sm rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 dark:focus:ring-offset-slate-800">
+                        <i class="bi bi-send"></i> Enviar Relato
+                    </button>
+                    <a href="{% url 'index_spa' %}" class="px-6 py-3 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 font-medium text-sm rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">Cancelar</a>
+                </div>
+            </div>
+        </form>
+
+        <div id="successMessage" class="hidden mt-6 p-4 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg">
+            <div class="flex items-center gap-3">
+                <i class="bi bi-check-circle-fill text-emerald-600 dark:text-emerald-400 text-xl"></i>
+                <div>
+                    <h3 class="text-sm font-semibold text-emerald-800 dark:text-emerald-300">Relato enviado com sucesso!</h3>
+                    <p class="text-xs text-emerald-600 dark:text-emerald-400 mt-1">Obrigado por nos ajudar a melhorar. Nossa equipe analisará o relato o mais breve possível.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="errorMessage" class="hidden mt-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+            <div class="flex items-center gap-3">
+                <i class="bi bi-exclamation-triangle-fill text-red-600 dark:text-red-400 text-xl"></i>
+                <div>
+                    <h3 class="text-sm font-semibold text-red-800 dark:text-red-300">Erro ao enviar relato</h3>
+                    <p class="text-xs text-red-600 dark:text-red-400 mt-1" id="errorDetail">Tente novamente ou entre em contato com o suporte.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+document.getElementById('enviarRastreamento').addEventListener('change', function() {
+    var section = document.getElementById('contextoSection');
+    if (this.checked) {
+        section.classList.remove('hidden');
+    } else {
+        section.classList.add('hidden');
+    }
+});
+
+function submitErro(event) {
+    event.preventDefault();
+    var form = document.getElementById('erroForm');
+    var btn = form.querySelector('button[type="submit"]');
+    var originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Enviando...';
+
+    var data = {
+        tipo: document.getElementById('tipo').value,
+        descricao: document.getElementById('descricao').value,
+        passos: document.getElementById('passos').value,
+        enviar_rastreamento: document.getElementById('enviarRastreamento').checked,
+        contexto: document.getElementById('contexto').value,
+        navegador: navigator.userAgent,
+        url: window.location.href,
+    };
+
+    fetch('/api/erros/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCSRFToken ? getCSRFToken() : '',
+        },
+        body: JSON.stringify(data),
+    })
+    .then(function(r) {
+        if (!r.ok) return r.json().then(function(e) { throw new Error(JSON.stringify(e)); });
+        return r.json();
+    })
+    .then(function() {
+        form.classList.add('hidden');
+        document.getElementById('successMessage').classList.remove('hidden');
+    })
+    .catch(function(err) {
+        document.getElementById('errorMessage').classList.remove('hidden');
+        document.getElementById('errorDetail').textContent = err.message || 'Tente novamente.';
+    })
+    .finally(function() {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    });
+
+    return false;
+}
+</script>
+{% endblock %}

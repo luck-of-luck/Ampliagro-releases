@@ -1,0 +1,72 @@
+/*
+ * Empty States
+ */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-12) var(--space-6);
+  text-align: center;
+  background-color: var(--surface-primary);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-lg);
+}
+
+.empty-state__icon {
+  width: 64px;
+  height: 64px;
+  margin-bottom: var(--space-4);
+  color: var(--text-muted);
+}
+
+.empty-state__icon i {
+  font-size: 48px;
+}
+
+.empty-state__title {
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  margin-bottom: var(--space-2);
+}
+
+.empty-state__description {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  max-width: 400px;
+  margin-bottom: var(--space-6);
+  line-height: 1.5;
+}
+
+.empty-state__actions {
+  display: flex;
+  gap: var(--space-3);
+  justify-content: center;
+}
+
+/* Variante para dentro de cards/tabelas pequenas */
+.empty-state--compact {
+  padding: var(--space-6) var(--space-4);
+  border: none;
+  background-color: transparent;
+}
+
+.empty-state--compact .empty-state__icon {
+  width: 40px;
+  height: 40px;
+  margin-bottom: var(--space-3);
+}
+
+.empty-state--compact .empty-state__icon i {
+  font-size: 32px;
+}
+
+.empty-state--compact .empty-state__title {
+  font-size: var(--text-base);
+}
+
+.empty-state--compact .empty-state__description {
+  margin-bottom: 0;
+}

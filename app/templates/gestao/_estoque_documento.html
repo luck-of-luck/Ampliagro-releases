@@ -1,0 +1,34 @@
+<details data-central-ocr data-propriedade="{{ propriedade.pk }}" data-leitura-url="{% url 'ia-imagem-estoque' %}" data-confirmacao-url="{% url 'ia-confirmar-estoque' %}">
+  <summary>Trazer itens de uma foto ou lista para o estoque</summary>
+  <p>Destino: <strong>{{ propriedade.nome }}</strong>. Confira cada item antes de gravar. Esta entrada registra apenas estoque; não cria despesa nem substitui a importação do XML da nota.</p>
+  <noscript><p>Ative o JavaScript para ler o documento e revisar os itens.</p></noscript>
+  <form data-ocr-leitura>
+    {% csrf_token %}
+    <fieldset data-ocr-entrada>
+      <legend>1. Documento ou lista</legend>
+      <label>Foto dos itens (opcional)<input type="file" name="imagem" accept="image/jpeg,image/png,image/webp"></label>
+      <label class="central-ocr-texto">Itens digitados (opcional)<textarea name="texto" rows="4" maxlength="4000" placeholder="Ureia 50 kg&#10;Diesel 200 L"></textarea><small>Um item por linha: nome, quantidade e unidade. Use esta alternativa se a leitura da imagem não estiver disponível.</small></label>
+      <button type="submit">Ler e preparar revisão</button>
+    </fieldset>
+  </form>
+  <form data-ocr-revisao hidden>
+    <fieldset data-ocr-itens>
+      <legend>2. Revise os itens</legend>
+      <p>Corrija os valores lidos, remova linhas que não sejam produtos ou adicione itens faltantes. Nada foi gravado no estoque ainda.</p>
+      <div class="central-ocr-lista" data-ocr-lista></div>
+      <button type="button" data-ocr-adicionar>Adicionar item</button>
+    </fieldset>
+    <button type="submit" data-ocr-confirmar>Confirmar itens no estoque</button>
+  </form>
+  <template data-ocr-item>
+    <fieldset class="central-ocr-item">
+      <legend>Item</legend>
+      <label>Nome<input data-campo="nome" required minlength="2" maxlength="150"></label>
+      <label>Quantidade<input data-campo="quantidade" required inputmode="decimal" placeholder="0,00"></label>
+      <label>Unidade<input data-campo="unidade" required maxlength="20" value="un"></label>
+      <button type="button" data-ocr-remover>Remover item</button>
+    </fieldset>
+  </template>
+  <p role="status" aria-live="polite" data-ocr-status></p>
+  <button type="button" data-ocr-novo hidden>Iniciar outro documento</button>
+</details>

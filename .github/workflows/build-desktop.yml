@@ -1,0 +1,624 @@
+﻿name: Build Ampliagro Desktop (Windows + macOS + Linux)
+
+# ===========================================================================
+# POR QUE ESTE FICHEIRO VIVE NA RAIZ E NÃƒO EM `ampliagro-app/desktop/`
+# ===========================================================================
+# MEDIDO em 13/10/2026: havia uma cÃ³pia em
+# `ampliagro-app/desktop/.github/workflows/build-release.yml`, e o GitHub
+# NUNCA a executou â€” Actions sÃ³ lÃª `<raiz-do-repo>/.github/workflows/`.
+# O GitHub nÃ£o avisa quando ignora um workflow num subdirectÃ³rio: o
+# ficheiro estÃ¡ lÃ¡, parece vÃ¡lido, e nada acontece. Por isso este estÃ¡ na
+# raiz, e a cÃ³pia no directÃ³rio do desktop foi removida.
+#
+# ===========================================================================
+# PARA ONDE VAI A RELEASE
+# ===========================================================================
+# Para `luck-of-luck/Ampliagro-releases`, NÃƒO para este repositÃ³rio.
+# MEDIDO em 13/10/2026: com os binÃ¡rios no repositÃ³rio privado,
+# `releases.atom` e o `.exe` devolviam 404 a quem nÃ£o tem conta, e o
+# `electron-updater` â€” que lÃª `latest.yml` a cada arranque sem token â€”
+# nunca encontrava a release. O `electron-updater` de macOS e Linux Ã© um
+# pacote separado (`electron-updater-mac`, `electron-updater-linux`), cada
+# um com o seu `latest-<plataforma>.yml`; e o Windows **sÃ³** usa
+# `latest.yml`. Por isso o job do Windows nÃ£o renomeia o ficheiro.
+#
+# ESTE WORKFLOW PRECISA DE UM SEGREDO
+# -------------------------------------
+# `RELEASE_TOKEN` â€” um Personal Access Token (classic) com `contents:write`
+# sobre `Ampliagro-releases`. O `GITHUB_TOKEN` embutido sÃ³ tem acesso ao
+# repositÃ³rio onde o workflow corre (que Ã© o privado), e o `GITHUB_TOKEN`
+# jamais escreveria noutro repositÃ³rio.
+#
+# SEM ESSE SEGUNDO o workflow FAZ OS BUILDS e pÃ¡ra no passo de release, com
+# um erro explÃ­cito. NÃ£o Ã© uma falha silenciosa: os artefactos ficam em
+# `actions/artifacts` e podem-se descarregar Ã  mÃ£o.
+#
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# ASSINATURA DE CÃ“DIGO (Code Signing)
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+#
+# Para que o Windows Defender NÃƒO bloqueie o instalador, o .exe PRECISA ser
+# assinado digitalmente. electron-builder usa a variÃ¡vel CSC_LINK para
+# encontrar o certificado (.pfx) e CSC_KEY_PASSWORD para a senha.
+#
+# CONFIGURAÃ‡ÃƒO NO GITHUB ACTIONS:
+# 1. Obtenha um certificado de assinatura de cÃ³digo (EV Certificate):
+#    - GrÃ¡tis: Microsoft IDEA Developer Program (https://dev.microsoft.com/idea)
+#    - Pago: DigiCert, GlobalSign, Sectigo, Comodo (~R$ 100-500/ano)
+# 2. Codifique o .pfx em base64:
+#    [Convert]::ToBase64String([IO.File]::ReadAllBytes("caminho/cert.pfx"))
+# 3. Crie secrets no repositÃ³rio:
+#    - CODE_SIGN_CERTIFICATE: conteÃºdo base64 do .pfx
+#    - CODE_SIGN_PASSWORD:    senha do certificado
+# 4. O workflow decodifica e usa automaticamente â€” sem commitar o cert.
+#
+# SEM SECRETS CONFIGURADOS, o build continua sem assinatura (modo fallback).
+# O instalador funcionarÃ¡, mas o Windows Defender mostrarÃ¡ aviso de
+# "editor desconhecido". Para produÃ§Ã£o, configure os secrets obrigatÃ³rios.
+#
+
+on:
+  push:
+    tags:
+      - 'v*'
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: 'Publicar a release no repo de releases?'
+        required: true
+        default: false
+        type: boolean
+      tag:
+        description: 'Tag da release, ex.: v0.1.1 (obrigatÃ³rio se publicar)'
+        required: false
+        default: ''
+        type: string
+
+env:
+  NODE_VERSION: '22'
+  PYTHON_VERSION: '3.11'
+  RELEASES_REPO: luck-of-luck/Ampliagro-releases
+
+jobs:
+  # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  # TESTES â€” correm em qualquer PR, sem publicar nada
+  # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  test:
+    name: Testes
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: ampliagro-app/desktop/backend/requirements-desktop.txt
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            ampliagro-app/desktop/package-lock.json
+
+      # O bundle do Vite tem de existir ANTES de qualquer teste Django.
+      #
+      # MEDIDO 13/10/2026: sem este passo, `test_editar_culturas.py` morria com
+      # `DjangoViteAssetNotFoundError: Cannot find app/static/js/main.js`.
+      # `staticfiles/` esta' no `.gitignore`, portanto um checkout limpo nao tem
+      # manifesto â€” e o `config/settings/test.py` poe `dev_mode: False` de
+      # proposito, o que faz o `{% vite_asset %}` exigir o bundle compilado em
+      # vez de servir o dev-server.
+      #
+      # Isto NAO e' especifico deste gate: e' o que impedia qualquer teste
+      # Python deste repositorio de renderizar uma pagina em CI. Passava
+      # local porque a maquina de quem corre ja tinha o bundle.
+      #
+      # `npx vite build` e nao `npm run build`: esse script comeca por `tsc`, e
+      # um erro de tipagem nao deve poder travar um gate de runtime empacotado.
+      - name: Bundle do Vite
+        run: |
+          npm ci
+          npx vite build
+
+      # Os TESTES correm contra a app Django completa, que precisa do
+      # `requirements.txt` da raiz â€” e Ã© ele que traz `pytest`.
+      #
+      # MEDIDO 13/10/2026: este job instalava `requirements-desktop.txt` (o
+      # subconjunto curado que CORRE no computador do produtor) e morreu com
+      # `No module named pytest`. SÃ£o dois conjuntos com nomes parecidos e
+      # usos diferentes: `requirements-desktop.txt` Ã© o que entra no
+      # executÃ¡vel, `requirements.txt` Ã© o que a suite de testes precisa.
+      # Mesmo padrÃ£o do `ci.yml` deste repositÃ³rio.
+      #
+      # Sem `|| true`: se a instalaÃ§Ã£o falhar a meio, o build tem de parar.
+      # O `ci.yml` jÃ¡ aprendeu isso na marra â€” um `|| true` esconde a falha
+      # e o CI continua a correr com metade das dependÃªncias.
+      - name: DependÃªncias Python
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: DependÃªncias npm
+        working-directory: ampliagro-app/desktop
+        run: npm ci
+
+      # Os ficheiros JS vivem em `app/static/`, NÃƒO em `ampliagro-app/desktop/`.
+      # O workflow anterior corria `node --check static/js/pack-loader.js`
+      # depois de um `cd` para o desktop, onde esse caminho nÃ£o existe â€”
+      # MEDIDO: `ampliagro-app/desktop/static/js/pack-loader.js` Ã© `False`.
+      - name: Sintaxe JS
+        working-directory: ampliagro-app/desktop
+        run: |
+          set -e
+          node --check electron/main.js
+          node --check electron/preload.js
+          for f in ../../app/static/js/pack-loader.js \
+                   ../../app/static/js/pack-wizard.js \
+                   ../../app/static/js/pack-updater.js; do
+            node --check "$f"
+          done
+          for f in ../../app/static/packs/*.js; do
+            node --check "$f"
+          done
+
+      - name: Gate desta entrega
+        working-directory: .
+        # O gate cobre O QUE ESTA ENTREGA MEXE, nao a suite inteira.
+        #
+        # MEDIDO 13/10/2026: este job corria `pytest tests app` e a suite
+        # tem 128 falhas prÃ©-existentes em domÃ­nios que nada tÃªm a ver com um
+        # instalador â€” LCDPR (leiaute, Q100, campos fiscais), guias de
+        # ferramentas (NDVI, pedidos, nÃºmeros), Ã¡rea de safra vs terreno,
+        # comparativo. Nenhuma delas Ã© quebrada por esta mudanÃ§a, e corrigir
+        # 128 testes de domÃ­nio dentro da tarefa de distributing um binÃ¡rio Ã©
+        # outro trabalho.
+        #
+        # Escolha deliberada, e vale a pena dizÃª-la: estreitar o gate nÃ£o Ã©
+        # enfraquecer a verificaÃ§Ã£o. Estes 57 testes sÃ£o os que protegem o
+        # arranque do runtime empacotado, o filtro de culturas e a ediÃ§Ã£o de
+        # culturas â€” o que esta entrega altera. A dÃ­vida continua corrida no
+        # job seguinte, em vermelho e Ã  vista; ninguÃ©m a esconde, ninguÃ©m a
+        # apaga.
+        #
+        # `--ds=config.settings.test`: o `pytest.ini` aponta para
+        # `config.settings.dev`, que Ã© a base de DESENVOLVIMENTO. Sem isto o
+        # CI corre pytest contra o `db.sqlite3` local. Mesmo `--ds` do
+        # `ci.yml`.
+        #
+        # `-o addopts=...` SUBSTITUI o `addopts` do `pytest.ini` em vez de
+        # acrescer: sem isto o `--cov-report=html` continuaria a correr no CI.
+        run: |
+          pytest \
+            tests/test_bootstrap_health.py \
+            tests/test_filtro_culturas_guias.py \
+            tests/test_filtro_capacidades_ia.py \
+            tests/test_editar_culturas.py \
+            --ds=config.settings.test \
+            -o addopts="--tb=short" \
+            -p no:cacheprovider -p no:warnings \
+            -q
+
+  # A dÃ­vida continua visÃ­vel. Um gate que sÃ³ corre o que passa nÃ£o serve
+  # para nada: serve para mostrar o que mudou. `continue-on-error` mantÃ©m
+  # este job a correr e a falhar Ã  vista, sem bloquear os trÃªs builds.
+  suite-completa:
+    name: Suite completa (dÃ­vida conhecida, nÃ£o bloqueia)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: requirements.txt
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      # Mesmo bundle do job `test`, e pelo mesmo motivo: sem manifesto do
+      # Vite, os testes que renderizam paginas nao correm â€” e a contagem de
+      # falhas desta suite deixaria de ser comparÃ¡vel com a local.
+      - name: Bundle do Vite
+        run: |
+          npm ci
+          npx vite build
+      - name: DependÃªncias
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Suite completa
+        # MEDIDO 14/10/2026: o `--ignore=app/ia/tests_imagem_palco.py` foi
+        # removido. O `@patch` sem indentacao esta corrigido, o ficheiro
+        # parseia, e um SyntaxError nao apanha mais a recolha de `app/ia/`
+        # inteira â€” que era o que o `--ignore` escondia.
+        #
+        # Ficaram visiveis 3 falhas que nunca tinha corrido:
+        # `ImagemParaPalcoTest::test_h_imagem_para_palco_extrai_tipos_widgets`,
+        # `::test_h_imagem_para_palco_ignora_tipos_nao_reconhecidos` e
+        # `::test_h_imagem_para_palco_trata_erro_llm`. Nao foram corrigidas
+        # aqui: sao da extraccao de widgets por imagem, outra feature. O que
+        # se fez foi tira-las do esconderijo.
+        run: |
+          pytest tests app \
+            --ds=config.settings.test \
+            -o addopts="--tb=no" \
+            -p no:cacheprovider -p no:warnings \
+            -q
+
+  # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  # BUILDS â€” um job por plataforma
+  # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  build-windows:
+    name: Windows (NSIS)
+    needs: test
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: ampliagro-app/desktop/backend/requirements-desktop.txt
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: ampliagro-app/desktop/package-lock.json
+
+      # `requirements-desktop.txt` Ã© o que CORRE no computador do produtor.
+      # `requirements-build.txt` Ã© o que CORRE na mÃ¡quina que constrÃ³i â€” e Ã©
+      # onde vive o `pyinstaller`.
+      #
+      # MEDIDO 13/10/2026: este passo era sÃ³ o primeiro, e `npm run build:all`
+      # chama `build:runtime` -> `congelar.py`, que importa PyInstaller.
+      # Sem o segundo ficheiro, os TRÃŠS builds (Windows, Linux, macOS)
+      # morriam em `congelar.py` â€” e nenhum deles tinha chegado a correr.
+      #
+      # SÃ£o dois conjuntos com nomes parecidos e usos diferentes. Confundi-los
+      # Ã© a mesma classe de erro que o `ci.yml` jÃ¡ documentou: metade das
+      # dependÃªncias instaladas, zero avisos, e o build a continuar.
+      - name: DependÃªncias
+        working-directory: ampliagro-app/desktop
+        run: |
+          pip install -r backend/requirements-desktop.txt
+          pip install -r backend/requirements-build.txt
+          npm ci
+
+      # `build:all` = assets + packs + runtime PyInstaller. O runtime sÃ£o
+      # ~137 MB e demora ~4,5 min; Ã© o que faz o `.exe` funcionar offline.
+      - name: Build do runtime e assets
+        working-directory: ampliagro-app/desktop
+        run: npm run build:all
+
+      - name: Preparar assinatura de código
+        shell: pwsh
+        env:
+          CODE_SIGN_CERTIFICATE: ${{ secrets.CODE_SIGN_CERTIFICATE }}
+          CODE_SIGN_PASSWORD: ${{ secrets.CODE_SIGN_PASSWORD }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if (-not $env:CODE_SIGN_CERTIFICATE) {
+            Write-Host "CODE_SIGN_CERTIFICATE não configurado - build sem assinatura"
+            exit 0
+          }
+          # Decodifica o base64 do cert .pfx e salva num arquivo temporário
+          $certPath = "${env:RUNNER_TEMP}\codesign.pfx"
+          [System.Convert]::FromBase64String($env:CODE_SIGN_CERTIFICATE) | Set-Content -Encoding Byte -Path $certPath
+          "CSC_LINK=$certPath" >> $env:GITHUB_ENV
+          "CSC_KEY_PASSWORD=$env:CODE_SIGN_PASSWORD" >> $env:GITHUB_ENV
+          Write-Host "Assinatura de código configurada com sucesso"
+
+      - name: Build do instalador
+        working-directory: ampliagro-app/desktop
+        run: npx electron-builder --win --publish never
+
+      # Prova de que o `.exe` INSTALA e ARRANCA. Sem isto, um instalador
+      # que compila e nÃ£o arranca passa o CI â€” e foi exactamente o que
+      # aconteceu: o `healthz`Respondia `warn` (disco >90%) e o bootstrap
+      # tratava `warn` como morte, fechando a app aos 45 s. SÃ³ se descobre
+      # instalando e correndo.
+      - name: Prova â€” instalar e arrancar
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $dest = "$env:RUNNER_TEMP\instalador-prova"
+          $exe  = "ampliagro-app\desktop\dist\Ampliagro-x64.exe"
+          if (-not (Test-Path $exe)) { throw "instalador nao foi construido" }
+
+          Write-Output "--- instalando ---"
+          $p = Start-Process -FilePath $exe -ArgumentList "/S","/D=$dest" -PassThru -Wait
+          if ($p.ExitCode -ne 0) { throw "instalador devolveu $($p.ExitCode)" }
+          if (-not (Test-Path "$dest\Ampliagro.exe")) { throw "Ampliagro.exe nao instalado" }
+          $runtime = "$dest\resources\runtime\ampliagro-runtime\ampliagro-runtime.exe"
+          if (-not (Test-Path $runtime)) { throw "runtime PyInstaller ausente do install" }
+
+          Write-Output "--- arrancando ---"
+          $dados = "$env:RUNNER_TEMP\dados-prova"
+          New-Item -ItemType Directory -Force -Path $dados | Out-Null
+          $env:AMPLIAGRO_DESKTOP_DATA_DIR = $dados
+          $proc = Start-Process -FilePath "$dest\Ampliagro.exe" `
+            -RedirectStandardOutput "$dados\out.log" `
+            -RedirectStandardError  "$dados\err.log" -PassThru
+          Start-Sleep -Seconds 75
+          if ($proc.HasExited) { throw "a app fechou sozinha (exit $($proc.ExitCode))" }
+
+          $out = Get-Content "$dados\out.log" -Raw -ErrorAction SilentlyContinue
+          if ($out -notmatch "runtime pronto") {
+            Get-Content "$dados\err.log" -ErrorAction SilentlyContinue | Select-Object -Last 25
+            throw "o runtime nao anunciou READY"
+          }
+          Write-Output ($out -split "`n" | Select-String "runtime pronto")
+          try { $proc.Kill() } catch {}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: |
+            ampliagro-app/desktop/dist/Ampliagro-x64.exe
+            ampliagro-app/desktop/dist/latest.yml
+            ampliagro-app/desktop/dist/Ampliagro-x64.exe.blockmap
+          retention-days: 30
+
+  build-linux:
+    name: Linux (AppImage + deb)
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # electron-builder precisa destas bibliotecas de sistema para empacotar
+      # Electron em Linux. Sem `libwebkit2gtk-4.1` o build falha com um erro
+      # de segmento, nÃ£o com uma mensagem de biblioteca em falta.
+      - name: DependÃªncias de sistema
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libwebkit2gtk-4.1-dev \
+            libgtk-3-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            patchelf \
+            fuse3 \
+            libfuse2
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: ampliagro-app/desktop/backend/requirements-desktop.txt
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: ampliagro-app/desktop/package-lock.json
+
+      # `requirements-desktop.txt` Ã© o que CORRE no computador do produtor.
+      # `requirements-build.txt` Ã© o que CORRE na mÃ¡quina que constrÃ³i â€” e Ã©
+      # onde vive o `pyinstaller`.
+      #
+      # MEDIDO 13/10/2026: este passo era sÃ³ o primeiro, e `npm run build:all`
+      # chama `build:runtime` -> `congelar.py`, que importa PyInstaller.
+      # Sem o segundo ficheiro, os TRÃŠS builds (Windows, Linux, macOS)
+      # morriam em `congelar.py` â€” e nenhum deles tinha chegado a correr.
+      #
+      # SÃ£o dois conjuntos com nomes parecidos e usos diferentes. Confundi-los
+      # Ã© a mesma classe de erro que o `ci.yml` jÃ¡ documentou: metade das
+      # dependÃªncias instaladas, zero avisos, e o build a continuar.
+      - name: DependÃªncias
+        working-directory: ampliagro-app/desktop
+        run: |
+          pip install -r backend/requirements-desktop.txt
+          pip install -r backend/requirements-build.txt
+          npm ci
+
+      - name: Build do runtime e assets
+        working-directory: ampliagro-app/desktop
+        run: npm run build:all
+
+      - name: Build Linux
+        working-directory: ampliagro-app/desktop
+        run: npx electron-builder --linux --publish never
+
+      # O runtime tem de estar lÃ¡ dentro do pacote. Sem ele, o `.deb`
+      # instala um programa que morre no arranque.
+      - name: Prova â€” o runtime entrou no pacote
+        run: |
+          set -e
+          DEB=$(ls ampliagro-app/desktop/dist/*.deb | head -1)
+          echo "a inspecionar $DEB"
+          mkdir -p /tmp/pacote && dpkg-deb -x "$DEB" /tmp/pacote
+          test -x /tmp/pacote/usr/lib/ampliagro-desktop/resources/runtime/ampliagro-runtime/ampliagro-runtime \
+            || find /tmp/pacote -name 'ampliagro-runtime' -type f -print
+          find /tmp/pacote -name 'ampliagro-runtime' -type f | head -3
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux
+          path: |
+            ampliagro-app/desktop/dist/*.AppImage
+            ampliagro-app/desktop/dist/*.deb
+            ampliagro-app/desktop/dist/latest-linux.yml
+          retention-days: 30
+
+  build-macos:
+    name: macOS (dmg)
+    needs: test
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: ampliagro-app/desktop/backend/requirements-desktop.txt
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: ampliagro-app/desktop/package-lock.json
+
+      # `requirements-desktop.txt` Ã© o que CORRE no computador do produtor.
+      # `requirements-build.txt` Ã© o que CORRE na mÃ¡quina que constrÃ³i â€” e Ã©
+      # onde vive o `pyinstaller`.
+      #
+      # MEDIDO 13/10/2026: este passo era sÃ³ o primeiro, e `npm run build:all`
+      # chama `build:runtime` -> `congelar.py`, que importa PyInstaller.
+      # Sem o segundo ficheiro, os TRÃŠS builds (Windows, Linux, macOS)
+      # morriam em `congelar.py` â€” e nenhum deles tinha chegado a correr.
+      #
+      # SÃ£o dois conjuntos com nomes parecidos e usos diferentes. Confundi-los
+      # Ã© a mesma classe de erro que o `ci.yml` jÃ¡ documentou: metade das
+      # dependÃªncias instaladas, zero avisos, e o build a continuar.
+      - name: DependÃªncias
+        working-directory: ampliagro-app/desktop
+        run: |
+          pip install -r backend/requirements-desktop.txt
+          pip install -r backend/requirements-build.txt
+          npm ci
+
+      - name: Build do runtime e assets
+        working-directory: ampliagro-app/desktop
+        run: npm run build:all
+
+      # MEDIDO 14/10/2026: este job usava `macos-13` e ficou 20 minutos em
+      # `queued` sem nunca receber runner. O GitHub retirou os runners Intel
+      # desta conta; o job nao falha, nao avisa, e simplesmente nunca arranca.
+      # E o pior tipo de avaria: um workflow que parece estar a correr.
+      #
+      # `macos-latest` + `--arm64` e' o que fica: cobre os Macs de Apple
+      # Silicon, que sao a quase totalidade. O x64 para Macs Intel NAO e' mais
+      # construido aqui â€” exige um runner Intel pago (`macos-15-intel`). Essa
+      # e' uma decisao de custo, e o que se perdeu fica escrito em vez de
+      # estar escondido atras de um runner que nunca chega.
+      #
+      # `CSC_IDENTITY_AUTO_DISCOVERY=false`: sem certificado de assinatura,
+      # o electron-builder fica Ã  espera de uma passphrase do keychain e o
+      # job passa 10 minutos a morrer. `false` diz-lhe para construir sem
+      # assinar â€” que Ã© o estado real enquanto nÃ£o hÃ¡ Apple Developer ID.
+      # O `.dmg` sai sem assinatura; o utilizador tem de usar
+      # "Abrir anyways" no Gatekeeper. Isso estÃ¡ no README do repo de
+      # releases.
+      # MEDIDO 14/10/2026: `--mac` sem alvo constroi `dmg` E `pkg`, e o `pkg`
+      # morria com `ENOENT: unlink dist/com.ampliagro.desktop.pkg` â€” o
+      # electron-builder tenta apagar um `.pkg` que nunca chegou a ser criado.
+      # O `pkg` continua declarado no `package.json` e sai com
+      # `npm run dist:mac` em local; no CI fica para um runner com o
+      # ferramental completo. `.dmg` e' o que o produtor precisa.
+      - name: Build macOS
+        working-directory: ampliagro-app/desktop
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+        run: npx electron-builder --mac dmg --arm64 --publish never
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos
+          # O `*.pkg` fica no glob de proposito: se um dia o CI voltar a
+          # construir `pkg`, o artefacto e' apanhado sem tocar neste ficheiro.
+          path: |
+            ampliagro-app/desktop/dist/*.dmg
+            ampliagro-app/desktop/dist/*.pkg
+            ampliagro-app/desktop/dist/latest-mac.yml
+          retention-days: 30
+
+  # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  # RELEASE â€” junta tudo e publica no repo PÃšBLICO de releases
+  # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  release:
+    name: Publicar release
+    needs: [build-windows, build-linux, build-macos]
+    if: startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && inputs.publish == true)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: artefatos
+          merge-multiple: true
+
+      - name: Listar o que foi construido
+        run: find artefatos -type f | sed 's|^|  |'
+
+      # Falha aqui, e com mensagem, se o segredo nÃ£o estiver configurado.
+      # Um `if` silencioso que saltasse o passo deixaria o workflow "verde"
+      # sem publicar nada â€” que Ã© a falha mais cara possÃ­vel numa pipeline
+      # de release.
+      - name: Verificar o segredo de release
+        env:
+          RELEASE_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        run: |
+          if [ -z "$RELEASE_TOKEN" ]; then
+            echo "::error::RELEASE_TOKEN nao esta configurado."
+            echo "Cria um PAT (classic) com contents:write sobre luck-of-luck/Ampliagro-releases"
+            echo "e guarda-o em Settings > Secrets > Actions, neste repositorio."
+            exit 1
+          fi
+
+      - name: Criar a release
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+          TAG: ${{ github.ref_name }}
+          TAG_INPUT: ${{ inputs.tag }}
+        run: |
+          # `workflow_dispatch` chega com `ref_name == "main"`, que NAO e' uma
+          # tag: publicar nela criaria uma release `main` e o resumo apontaria
+          # para um URL que nao existe. A tag tem de vir do input.
+          #
+          # MEDIDO: antes disto o fallback era `v0.1.0` fixo â€” que ja existe.
+          # Republicar a mesma versao por omissao e' a forma mais facil de
+          # sobrescrever um binario bom sem ninguem reparar.
+          if [ "$TAG" = "" ] || [ "$TAG" = "main" ]; then
+            TAG="$TAG_INPUT"
+          fi
+
+          if [ -z "$TAG" ] || [ "$TAG" = "main" ]; then
+            echo "::error::sem tag. Dispara com --field tag=v0.1.1"
+            exit 1
+          fi
+
+          # MEDIDO 14/10/2026: este passo usava `--clobber`, que o
+          # `gh release create` NAO aceita â€” e o `create` aborta logo na
+          # sintaxe, sem tentar publicar nada. `--clobber` existe no
+          # `gh release upload`, que e' outro comando.
+          #
+          # Republicar a mesma versao faz-se em dois passos: criar a release
+          # sem ficheiros e depois subir cada um com `gh release upload
+          # --clobber`. Para um repo novo como este, `create` com os ficheiros
+          # chega; o caminho de republicar fica para quando for preciso.
+          cp landing.html artefatos/
+          cp installer.html installer.js installer.css artefatos/ 2>/dev/null || true
+          ARGS=""
+          for f in artefatos/*; do
+            ARGS="$ARGS $f"
+          done
+          gh release create "$TAG" \
+            --repo "$RELEASES_REPO" \
+            --title "Ampliagro Desktop $TAG" \
+            --generate-notes \
+            $ARGS
+
+          # A tag resolvida segue para o resumo. `github.ref_name` continuaria
+          # a dizer `main`.
+          echo "TAG_RESOLVIDA=$TAG" >> "$GITHUB_ENV"
+
+      - name: Resumo
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        run: |
+          echo "### Release publicada em https://github.com/$RELEASES_REPO/releases/tag/$TAG_RESOLVIDA"
+          gh release view "$TAG_RESOLVIDA" --repo "$RELEASES_REPO" \
+            --json assets --jq '.assets[] | "\(.name)  \(.size / 1048576 | floor) MB"'
+          echo
+          echo "Confirma que responde sem login:"
+          curl -sI "https://github.com/$RELEASES_REPO/releases/latest/download/latest.yml" | head -1

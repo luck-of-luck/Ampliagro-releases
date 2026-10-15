@@ -1,0 +1,46 @@
+function editorComSelecao() {
+      const p = window.IaPrint.selecionar();
+      await esperaOverlay();
+      arrasta({ x: 100, y: 100 }, { x: 500, y: 400 });
+      return { p };
+    }
+
+    function confirmar() {
+      document.getElementById('ia-print-ok').click();
+    }
+
+    /* ── O ecrã preto ─────────────────────────────────────────────────────── */
+
+    it('abre o seletor de área sem pedir permissão de tela', async () => {
+      const p = window.IaPrint.selecionar();
+      await esperaOverlay();
+      /* O overlay de seleção deve estar presente */
+      expect(document.getElementById('ia-print-overlay')).toBeTruthy();
+      /* Não deve ter chamado getDisplayMedia (não há captura de tela) */
+      expect(window.navigator.mediaDevices.getDisplayMedia).not.toHaveBeenCalled();
+      arrasta({ x: 0, y: 0 }, { x: 100, y: 100 });
+      confirmar();
+      await p;
+    });
+
+    it('o overlay mostra as instruções e o retângulo de seleção', async () => {
+      const p = window.IaPrint.selecionar();
+      await esperaOverlay();
+      const overlay = document.getElementById('ia-print-overlay');
+      expect(overlay.querySelector('.ia-print-seletor-rect')).toBeTruthy();
+      expect(overlay.querySelector('.ia-print-seletor-dica')).toBeTruthy();
+      expect(overlay.querySelector('.ia-print-seletor-x')).toBeTruthy();
+      arrasta({ x: 0, y: 0 }, { x: 100, y: 100 });
+      confirmar();
+      await p;
+    });
+
+    it('o overlay mostra um frame CONGELADO, e o vídeo já foi desligado', async () => {
+      const { pista } = stubDeEcra();
+      const p = window.IaPrint.selecionar();
+      await esperaOverlay();
+      const ov = document.getElementById('ia-print-overlay');
+      /* Capturar a própria aba mostra a aba como está renderizada — e um
+         overlay a cobrir a tela toda acabava DENTRO da captura. */
+      expect(ov.querySelector('img#ia-print-fundo')).toBeTruthy();
+      

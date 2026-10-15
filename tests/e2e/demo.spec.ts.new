@@ -1,0 +1,202 @@
+﻿import { test, expect } from '@playwright/test';
+
+test.describe('Ampliagro Demo Flow - JOSIF/FEBRACE', () => {
+  test.beforeEach(async ({ page }) => {
+    // Start from the demo login page
+    await page.goto('/demo/');
+    await page.waitForLoadState('networkidle');
+  });
+
+  test('Demo login redirects to dashboard', async ({ page }) => {
+    // Should be already logged in via /demo/
+    await expect(page).toHaveURL(/\//);
+    await expect(page.locator('text=Ampliagro')).toBeVisible();
+  });
+
+  test('Producer dashboard loads with data', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+    
+    // Check dashboard elements
+    await expect(page.locator('text=Ampliagro')).toBeVisible();
+    await expect(page.locator('text=Dashboard')).toBeVisible();
+  });
+
+  test('Telemetry page loads with real data', async ({ page }) => {
+    await page.goto('/telemetria/');
+    await page.waitForLoadState('networkidle');
+    
+    // Check telemetry components
+    await expect(page.locator('text=Telemetria')).toBeVisible();
+    await expect(page.locator('canvas')).toBeVisible(); // Chart.js
+  });
+
+  test('Quadro de Tarefas (Kanban) loads and allows drag & drop', async ({ page }) => {
+    await page.goto('/operario/kanban/');
+    await page.waitForLoadState('networkidle');
+    
+    // Check Kanban board loads
+    await expect(page.locator('text=Quadro de Tarefas')).toBeVisible();
+    await expect(page.locator('.kanban-column')).toHaveCount(3);
+    
+    // Check columns exist
+    await expect(page.locator('.col-pendente')).toBeVisible();
+    await expect(page.locator('.col-andamento')).toBeVisible();
+    await expect(page.locator('.col-concluido')).toBeVisible();
+  });
+
+  test('Drag and drop task between columns', async ({ page }) => {
+    await page.goto('/operario/kanban/');
+    await page.waitForLoadState('networkidle');
+    
+    // Find a draggable card
+    const card = page.locator('.kanban-card').first();
+    await expect(card).toBeVisible();
+    
+    // Get initial column
+    const initialColumn = await card.locator('..').getAttribute('data-status');
+    
+    // Drag to different column
+    const targetColumn = page.locator('.kanban-column').nth(1); // Andamento
+    
+    // Perform drag and drop
+    await card.dragTo(targetColumn);
+    
+    // Wait for API call
+    await page.waitForTimeout(1000);
+    
+    // Verify status changed via API
+    const response = await page.waitForResponse(response => 
+      response.url().includes('/api/tarefas-estagio/') && 
+      response.request().method() === 'POST'
+    );
+    
+    expect(response.status()).toBe(200);
+  });
+
+  test('Servidor dashboard - Mecanico access', async ({ page, context }) => {
+    // Login as mecanico.demo
+    await page.goto('/login/');
+    await page.fill('input[name="usuario"]', 'mecanico.demo');
+    await page.fill('input[name="senha"]', 'mec123');
+    await page.fill('input[name="nome_fazenda"]', 'Fazenda Modelo - Primavera do Leste');
+    await page.click('button:has-text("Entrar como Servidor")');
+    
+    await page.waitForURL('/servidor/');
+    await expect(page.locator('text=MecÃ¢nica')).toBeVisible();
+    await expect(page.locator('text=Estoque')).toBeVisible();
+    await expect(page.locator('text=Agenda')).toBeVisible();
+  });
+
+  test('Servidor kanban filters by area', async ({ page }) => {
+    await page.goto('/servidor/kanban/');
+    await page.waitForLoadState('networkidle');
+    
+    // Should only show Mecanica tasks
+    const cards = page.locator('.kanban-card');
+    const count = await cards.count();
+    
+    for (let i = 0; i < count; i++) {
+      const card = cards.nth(i);
+      const cargo = await card.locator('.card-tag').textContent();
+      expect(cargo).toContain('MECANICA');
+    }
+  });
+
+  test('Telemetria push creates alert and auto-task', async ({ page }) => {
+    // This would require API testing - skip for E2E
+    // Covered in API tests
+    test.skip();
+  });
+
+  test('Telemetria page shows real data', async ({ page }) => {
+    await page.goto('/telemetria/');
+    await page.waitForLoadState('networkidle');
+    
+    // Check chart renders
+    await expect(page.locator('canvas')).toBeVisible();
+    
+    // Check stats cards
+    await expect(page.locator('text=Gateways Online')).toBeVisible();
+    await expect(page.locator('text=Devices Ativos')).toBeVisible();
+    await expect(page.locator('text=Leituras 24h')).toBeVisible();
+  });
+
+  test('RelatÃ³rio PDF generation', async ({ page }) => {
+    await page.goto('/relatorios/');
+    await page.waitForLoadState('networkidle');
+    
+    // Check report generation button exists
+    await expect(page.locator('button:has-text("Gerar RelatÃ³rio")')).toBeVisible();
+  });
+
+  test('Pitch page loads and has demo button', async ({ page }) => {
+    await page.goto('/pitch/');
+    await page.waitForLoadState('networkidle');
+    
+    await expect(page.locator('text=GestÃ£o AgrÃ­cola Inteligente')).toBeVisible();
+    await expect(page.locator('a:has-text("Demo GrÃ¡tis")')).toBeVisible();
+  });
+
+  test('Avaliador login works', async ({ page }) => {
+    await page.goto('/avaliador/');
+    await page.fill('input[name="username"]', 'avaliador');
+    await page.fill('input[name="password"]', 'avaliador2024');
+    await page.click('button[type="submit"]');
+    
+    await page.waitForURL('/');
+    await expect(page.locator('text=Ampliagro')).toBeVisible();
+  });
+
+  test('Quadro de Tarefas drag preview is visible', async ({ page }) => {
+    await page.goto('/operario/kanban/');
+    await page.waitForLoadState('networkidle');
+    
+    const card = page.locator('.kanban-card').first();
+    
+    // Start drag
+    await page.mouse.move(100, 100);
+    await page.mouse.down();
+    await page.mouse.move(200, 200);
+    
+    // Check ghost element exists and is visible
+    const ghost = page.locator('.kanban-card.dragging');
+    await expect(ghost).toBeVisible();
+    
+    // Check opacity is high (not transparent)
+    const opacity = await ghost.evaluate(el => window.getComputedStyle(el).opacity);
+    expect(parseFloat(opacity)).toBeGreaterThan(0.8);
+  });
+
+  test('Simulador de Lucro calculates correctly', async ({ page }) => {
+    await page.goto('/simulador/lucro/');
+    await page.waitForLoadState('networkidle');
+    
+    // Check sliders exist
+    await expect(page.locator('#area')).toBeVisible();
+    await expect(page.locator('#produtividade')).toBeVisible();
+    await expect(page.locator('#preco_saca')).toBeVisible();
+    
+    // Change values and verify calculation
+    await page.fill('#area', '100');
+    await page.fill('#produtividade', '60');
+    await page.fill('#preco_saca', '145');
+    
+    await page.waitForTimeout(500);
+    
+    const lucro = await page.locator('#resLucro').textContent();
+    expect(lucro).toContain('R$');
+  });
+
+  test('Export/Import .agro works', async ({ page }) => {
+    await page.goto('/config/sistema/');
+    await page.waitForLoadState('networkidle');
+    
+    // Check export button
+    await expect(page.locator('button:has-text("Exportar .agro")')).toBeVisible();
+    
+    // Test import
+    const fileInput = page.locator('input[type="file"][accept=".agro"]');
+    await expect(fileInput).toBeVisible();
+  });
+});

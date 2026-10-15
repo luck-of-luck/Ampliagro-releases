@@ -1,0 +1,206 @@
+{% extends "partials/_premium_cadastro_base.html" %}
+{% load static agro_icons %}
+
+{% block title %}Ampliagro - Controle de Estoque{% endblock %}
+
+{% block cadastro_icon %}bi bi-boxes{% endblock %}
+{% block cadastro_title %}Controle de Estoque{% endblock %}
+{% block cadastro_novo_title %}Novo Item{% endblock %}
+{% block cadastro_lista_title %}Itens em Estoque{% endblock %}
+
+{% block cadastro_subtabs %}
+<div class="pcrud-subtabs" id="cadastroSubTabs">
+    <button class="pcrud-subtab active" data-tab="novo">Novo Item</button>
+    <button class="pcrud-subtab" data-tab="lista">Estoque</button>
+    <button class="pcrud-subtab" data-tab="alertas">Alertas Validade</button>
+</div>
+{% endblock %}
+
+{% block cadastro_stats %}
+<div class="pcrud-stats" id="cadastroStats">
+    <div class="pcrud-stat"><div class="pcrud-stat-label">Total Itens</div><div class="pcrud-stat-value" id="statTotalItens">{{ itens|length }}</div></div>
+    <div class="pcrud-stat"><div class="pcrud-stat-label">Quantidade Total</div><div class="pcrud-stat-value" id="statQtdTotal">{{ qtd_total|floatformat:2 }}</div></div>
+    <div class="pcrud-stat"><div class="pcrud-stat-label">Vencendo (30 dias)</div><div class="pcrud-stat-value" id="statVencendo">{{ itens_vencendo }}</div></div>
+    <div class="pcrud-stat"><div class="pcrud-stat-label">Categorias</div><div class="pcrud-stat-value" id="statCats">{{ categorias_count }}</div></div>
+</div>
+{% endblock %}
+
+{% block cadastro_form_novo %}
+<form id="estoque-form" onsubmit="return submitEstoque(event)">
+    {% csrf_token %}
+    <div class="pcrud-form-grid">
+        <div class="pcrud-form-group">
+            <label>Propriedade</label>
+            <select name="propriedade" required onblur="validateField(this)">
+                <option value="">Selecione...</option>
+                {% for p in propriedades %}
+                <option value="{{ p.id }}">{{ p.nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="pcrud-form-group">
+            <label>Categoria</label>
+            <select name="categoria" required onblur="validateField(this)">
+                <option value="">Selecione...</option>
+                <option value="INSUMO">Insumo</option>
+                <option value="PRODUTO">Produto</option>
+                <option value="RACAO">Ração</option>
+                <option value="EMBALAGEM">Embalagem</option>
+                <option value="PECA">Peça</option>
+                <option value="FERRAMENTA">Ferramenta</option>
+                <option value="OUTRO">Outro</option>
+            </select>
+        </div>
+        <div class="pcrud-form-group">
+            <label>Nome do Item</label>
+            <input type="text" name="nome" placeholder="Ex: Fertilizante NPK 20-10-10" required onblur="validateField(this)">
+        </div>
+        <div class="pcrud-form-group">
+            <label>Quantidade</label>
+            <input type="number" step="0.01" name="quantidade" required placeholder="0,00" onblur="validateField(this)">
+        </div>
+        <div class="pcrud-form-group">
+            <label>Unidade</label>
+            <input type="text" name="unidade" placeholder="kg, L, un, sc" required onblur="validateField(this)">
+        </div>
+        <div class="pcrud-form-group">
+            <label>Local</label>
+            <input type="text" name="local" placeholder="Galpão A, Armazém 1, Silos">
+        </div>
+        <div class="pcrud-form-group">
+            <label>Data de Validade</label>
+            <input type="date" name="data_validade">
+        </div>
+        <div class="pcrud-form-group" style="grid-column:span 2;">
+            <label>Observação</label>
+            <textarea name="observacao" rows="2" placeholder="Observações sobre o item (opcional)"></textarea>
+        </div>
+    </div>
+    <div class="pcrud-form-actions">
+        <button type="submit" class="pcrud-btn pcrud-btn-primary"><i class="bi bi-check-lg"></i> Salvar Item</button>
+        <button type="reset" class="pcrud-btn pcrud-btn-secondary">Limpar</button>
+    </div>
+</form>
+{% endblock %}
+
+{% block cadastro_tab_lista %}
+{% if itens %}
+<div class="pcrud-table-wrap">
+    <table class="pcrud-table">
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Categoria</th>
+                <th>Quantidade</th>
+                <th>Unidade</th>
+                <th>Local</th>
+                <th>Validade</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for i in itens %}
+            <tr>
+                <td><strong>{{ i.nome }}</strong></td>
+                <td>{{ i.get_categoria_display }}</td>
+                <td>{{ i.quantidade|floatformat:2 }}</td>
+                <td>{{ i.unidade|default:"—" }}</td>
+                <td>{{ i.local|default:"—" }}</td>
+                <td>
+                    {% if i.data_validade %}
+                        {% if i.data_validade < today %}<span style="color:var(--cor-erro);">{{ i.data_validade|date:"d/m/Y" }}</span>
+                        {% elif i.data_validade < vencimento_limite %}<span style="color:var(--cor-aviso);">{{ i.data_validade|date:"d/m/Y" }}</span>
+                        {% else %}{{ i.data_validade|date:"d/m/Y" }}{% endif %}
+                    {% else %}—{% endif %}
+                </td>
+                <td>
+                    <div class="action-cell">
+                        <button class="pcrud-btn pcrud-btn-secondary pcrud-btn-sm" onclick="editarEstoque({{ i.id }})"><i class="bi bi-pencil"></i> Editar</button>
+                        <button class="pcrud-btn pcrud-btn-danger pcrud-btn-sm" onclick="excluirEstoque({{ i.id }})"><i class="bi bi-trash"></i> Excluir</button>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+{% include "partials/_empty_state_cta.html" with empty_icone="bi bi-box-seam" empty_titulo="Nenhum item cadastrado no estoque" empty_descricao="Cadastre o primeiro item para controlar entrada, saída e alerta de validade." empty_acao="Cadastrar item" empty_aba="novo" %}
+{% endif %}
+{% endblock %}
+
+{% block cadastro_extra_tabs %}
+<!-- Tab: Alertas Validade -->
+<div class="pcrud-tab" id="tab-alertas">
+    <h2><i class="bi bi-exclamation-triangle"></i> Itens Próximos ao Vencimento</h2>
+    <div class="pcrud-form-card" style="padding:0;">
+        {% if itens_vencendo_lista %}
+        <div class="pcrud-table-wrap">
+            <table class="pcrud-table">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Quantidade</th>
+                        <th>Unidade</th>
+                        <th>Validade</th>
+                        <th>Dias Restantes</th>
+                        <th>Ação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in itens_vencendo_lista %}
+                    <tr>
+                        <td><strong>{{ i.nome }}</strong></td>
+                        <td>{{ i.quantidade|floatformat:2 }}</td>
+                        <td>{{ i.unidade }}</td>
+                        <td><span style="color:{% if i.data_validade < today %}var(--cor-erro){% elif i.data_validade < vencimento_limite %}var(--cor-aviso){% else %}var(--cor-texto){% endif %};font-weight:600;">{{ i.data_validade|date:"d/m/Y" }}</span></td>
+                        <td>{{ i.dias_restantes }}</td>
+                        <td><button class="pcrud-btn pcrud-btn-secondary pcrud-btn-sm" onclick="editarEstoque({{ i.id }})"><i class="bi bi-pencil"></i> Ver</button></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="pcrud-empty"><i class="bi bi-check-circle" style="color:var(--cor-sucesso);"></i>Nenhum item vencendo nos próximos 30 dias.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+(function() {
+    window.submitEstoque = async function(event) {
+        event.preventDefault();
+        if (!validateForm('estoque-form')) { showToast('Corrija os campos em destaque', 'error'); return false; }
+        const f = document.getElementById('estoque-form');
+        const data = {
+            propriedade: parseInt(f.propriedade.value),
+            categoria: f.categoria.value,
+            nome: f.nome.value,
+            quantidade: parseFloat(f.quantidade.value),
+            unidade: f.unidade.value || '',
+            local: f.local.value || '',
+            data_validade: f.data_validade.value || null,
+            observacao: f.observacao.value || '',
+        };
+        const btn = f.querySelector('.pcrud-btn-primary'); showLoading(btn);
+        try {
+            const resp = await fetch('/api/estoque/', { method:'POST', headers:{'Content-Type':'application/json','X-CSRFToken':getCSRFToken()}, body: JSON.stringify(data) });
+            if (resp.ok) { showToast('Item cadastrado!','success'); setTimeout(() => location.reload(), 800); }
+            else { const err = await resp.json(); showToast('Erro: '+JSON.stringify(err),'error'); }
+        } catch(e) { showToast('Erro: '+e.message,'error'); } finally { hideLoading(btn); }
+        return false;
+    };
+
+    window.excluirEstoque = function(id) {
+        if (!confirm('Excluir este item?')) return;
+        fetch('/api/estoque/'+id+'/', { method:'DELETE', headers:{'X-CSRFToken':getCSRFToken()} })
+            .then(r => { if(r.ok){ showToast('Excluído','success'); setTimeout(() => location.reload(), 500); } else showToast('Erro','error'); });
+    };
+
+})();
+</script>
+{% endblock %}

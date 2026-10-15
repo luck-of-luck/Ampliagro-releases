@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Ampliagro — Servidor | {{ config.titulo }}{% endblock %}
+
+{% block extra_css %}
+{% include "partials/_premium_cadastro_styles.html" %}
+
+{% endblock %}
+
+{% block dashboard_appbar %}{% endblock %}
+
+{% block content %}
+<div class="pcrud-container">
+  <!-- Hero. data-auto-contraste faz o auto-contraste.js medir o gradiente REAL
+       (inclusive quando um tema claro reescreve as cores) e escolher a cor de
+       texto. Sem isso, temas como "Por-do-sol" deixavam esta linha ilegivel:
+       texto branco sobre gradiente amarelo-limao a ~1.3:1. -->
+  <div class="servidor-hero" data-auto-contraste>
+    <div style="position:relative;z-index:1">
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <span style="width:44px;height:44px;border-radius:10px;background:rgba(255,255,255,.18);display:grid;place-items:center;font-size:1.3rem"><i class="bi {{ config.icone|default:'bi-grid' }}"></i></span>
+        <div>
+          <h1><i class="bi {{ config.icone }}"></i> {{ config.titulo }} — Painel Servidor</h1>
+          <p>{{ config.descricao|default:"Acesso gerenciado pelo produtor" }} • Fazenda: <strong>{{ propriedade.nome|default:"—" }}</strong> • Servidor: <strong>{{ request.user.username }}</strong> • Área: <span class="badge-area" style="background:#fff;color:#0f172a">{{ perfil.get_area_servidor_display|default:perfil.area_servidor }}</span></p>
+        </div>
+        <div style="margin-left:auto;display:flex;gap:6px">
+<!-- Logout e' POST-only (`logout_view` tem @require_POST). Um <a href> aqui
+             fazia GET e o servidor respondia 405 — o botao "Sair" mais visivel da
+             tela do servidor nao deslogava ninguem, e a sessao continuava aberta.
+             Form POST + csrf funciona sem depender de JS.
+             Comentario HTML e' nao `{# #}` porque o lexer de template do Django
+             nao aplica DOTALL: um `{# ... #}` em varias linhas vaza como texto
+             visivel na pagina. `app/tests_templates.py` reprova esse caso. -->
+          <form action="{% url 'logout' %}" method="post" style="display:inline">
+            {% csrf_token %}
+            <button type="submit" class="pcrud-btn pcrud-btn-secondary pcrud-btn-sm" style="background:rgba(255,255,255,.9);color:#0f172a"><i class="bi bi-box-arrow-right"></i> Sair</button>
+          </form>
+        </div>
+      </div>
+      {# Sem opacity aqui: alpha REDUZ o contraste de verdade (esta linha ficava a 3.26:1 mesmo depois do motor). #}
+      {# A leveza agora e escolhida pelo auto-contraste.js, que mede e usa a cor de maior razao. #}
+      <div style="margin-top:10px;font-size:.78rem">Vinculado por: {{ perfil.vinculado_por.username|default:"produtor" }} • Permissões: <code id="permPages" style="background:rgba(0,0,0,.18);padding:2px 6px;border-radius:6px">{{ config.paginas|join:", " }}</code> • <span id="permFlag"></span></div>
+    </div>
+  </div>
+
+  <!-- Stats rápido -->
+  <div class="pcrud-stats" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))">
+    <div class="pcrud-stat"><div class="pcrud-stat-label">Máquinas</div><div class="pcrud-stat-value" id="statMaq">{{ maquinas|length|default:"—" }}</div></div>
+    <div class="pcrud-stat"><div class="pcrud-stat-label">Itens Mecânica</div><div class="pcrud-stat-value" id="statEst">{{ estoque_mec|length|default:"—" }}</div></div>
+    <div class="pcrud-stat"><div class="pcrud-stat-label">Revisões Pendentes</div><div class="pcrud-stat-value" id="statAgenda">{{ agenda_revisao|length|default:"0" }}</div></div>
+    <div class="pcrud-stat"><div class="pcrud-stat-label">Alertas</div><div class="pcrud-stat-value" style="color:#dc2626">{{ alertas|length|default:"0" }}</div></div>
+  </div>
+
+  <!-- Grid de seções — cada uma com data-pagina para o script filtrar -->
+  <div class="servidor-grid" id="servidorGrid">
+
+    <!-- MECÂNICA: Estoque -->
+    <div class="servidor-card" data-pagina="estoque_mecanico" data-area="MECANICA">
+      <h3><i class="bi bi-box-seam"></i> Estoque — Peças & Ferramentas</h3>
+      {% if estoque_mec %}
+      <table class="pcrud-table">
+        <thead><tr><th>Item</th><th>Qtd</th><th>Local</th></tr></thead>
+        <tbody>
+          {% for item in estoque_mec %}
+          <tr><td>{{ item.nome }}</td><td>{{ item.quantidade }} {{ item.unidade }}</td><td>{{ item.local|default:"—" }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}<div style="color:var(--cor-texto-medio);font-size:.85rem">Nenhum item mecânico cadastrado</div>{% endif %}
+      {% if config.pode_criar %}<button class="pcrud-btn pcrud-btn-primary pcrud-btn-sm" style="margin-top:8px" onclick="showToast('Solicitação de criação enviada ao produtor','info')"><i class="bi bi-plus"></i> Solicitar peça</button>{% endif %}
+    </div>
+
+    <!-- MECÂNICA: Agenda Revisão -->
+    <div class="servidor-card" data-pagina="agenda_revisao" data-area="MECANICA">
+      <h3><i class="bi bi-calendar-check"></i> Agenda — Revisão de Equipamentos</h3>
+      {% if agenda_revisao %}
+      <table class="pcrud-table">
+        <thead><tr><th>Máquina</th><th>Próx. Revisão</th><th>Horas</th></tr></thead>
+        <tbody>
+          {% for m in agenda_revisao %}
+          <tr><td>{{ m.nome }}</td><td>{{ m.proxima_manutencao|date:"d/m/Y" }}</td><td>{{ m.horas_uso }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}<div style="color:var(--cor-texto-medio);font-size:.85rem">Nenhuma revisão agendada</div>{% endif %}
+    </div>
+
+    <!-- MECÂNICA: Maquinário -->
+    <div class="servidor-card" data-pagina="maquinario" data-area="MECANICA">
+      <h3><i class="bi bi-truck"></i> Maquinário</h3>
+      {% if maquinas %}
+      <table class="pcrud-table">
+        <thead><tr><th>Máquina</th><th>Tipo</th><th>Horas</th></tr></thead>
+        <tbody>
+          {% for m in maquinas %}
+          <tr><td>{{ m.nome }}</td><td>{{ m.get_tipo_display }}</td><td>{{ m.horas_uso }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}<div style="color:var(--cor-texto-medio);font-size:.85rem">Sem máquinas vinculadas</div>{% endif %}
+    </div>
+
+    <!-- CAMPO -->
+    <div class="servidor-card" data-pagina="talhoes" data-area="CAMPO">
+      <h3><i class="bi bi-map"></i> Talhões</h3>
+      {% if talhoes %}
+      <table class="pcrud-table"><thead><tr><th>Talhão</th><th>Área</th><th>Solo</th></tr></thead>
+      <tbody>{% for t in talhoes %}<tr><td>{{ t.nome }}</td><td>{{ t.area_hectare }} ha</td><td>{{ t.tipo_solo|default:"—" }}</td></tr>{% endfor %}</tbody></table>
+      {% else %}<div style="color:var(--cor-texto-medio);font-size:.85rem">Sem talhões</div>{% endif %}
+    </div>
+
+    <div class="servidor-card" data-pagina="safras" data-area="CAMPO">
+      <h3><i class="bi bi-bar-chart"></i> Safras</h3>
+      {% if safras %}
+      <table class="pcrud-table"><thead><tr><th>Safra</th><th>Cultura</th><th>Área</th></tr></thead>
+      <tbody>{% for s in safras %}<tr><td>{{ s.safra_nome|default:s.ano }}</td><td>{{ s.cultura.nome }}</td><td>{{ s.area_plantada }} ha</td></tr>{% endfor %}</tbody></table>
+      {% else %}<div style="color:var(--cor-texto-medio);font-size:.85rem">Sem safras</div>{% endif %}
+    </div>
+
+    <!-- PECUÁRIA -->
+    <div class="servidor-card" data-pagina="rebanho" data-area="PECUARIA">
+      <h3><i class="bi bi-heart-pulse"></i> Rebanho</h3>
+      {% if animais %}
+      <table class="pcrud-table"><thead><tr><th>Espécie</th><th>Raça</th><th>Qtd</th></tr></thead>
+      <tbody>{% for a in animais %}<tr><td>{{ a.get_especie_display }}</td><td>{{ a.raca }}</td><td>{{ a.quantidade }}</td></tr>{% endfor %}</tbody></table>
+      {% else %}<div style="color:var(--cor-texto-medio);font-size:.85rem">Sem rebanho</div>{% endif %}
+    </div>
+
+    <!-- Tarefas (geral) -->
+    <div class="servidor-card" data-pagina="lista_tarefas" data-area="GERAL">
+      <h3><i class="bi bi-list-task"></i> Tarefas</h3>
+      {% if tarefas %}
+      <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px">
+        {% for t in tarefas %}
+        <li style="padding:8px;border:1px solid var(--cor-borda);border-radius:8px;display:flex;justify-content:space-between;align-items:center;gap:8px">
+          <span>{{ t.descricao|truncatechars:60 }} — <small>{{ t.estagio.nome }}</small></span>
+          <span style="font-size:.7rem;padding:2px 6px;border-radius:999px;background:{% if t.concluida %}#dcfce7;color:#166534{% else %}#fef9c3;color:#854d0e{% endif %}">{% if t.concluida %}concluída{% else %}pendente{% endif %}</span>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}<div style="color:var(--cor-texto-medio);font-size:.85rem">Nenhuma tarefa atribuída</div>{% endif %}
+    </div>
+
+    <!-- Telemetria resumo -->
+    <div class="servidor-card" data-pagina="telemetria" data-area="MECANICA,CAMPO">
+      <h3><i class="bi bi-broadcast"></i> Telemetria Recente</h3>
+      {% if telemetria_recente %}
+      <table class="pcrud-table"><thead><tr><th>Quando</th><th>Métrica</th><th>Valor</th></tr></thead>
+      <tbody>{% for tel in telemetria_recente %}<tr><td>{{ tel.timestamp|date:"d/m H:i" }}</td><td>{{ tel.metric }}</td><td>{{ tel.value }} {{ tel.unit }}</td></tr>{% endfor %}</tbody></table>
+      {% else %}<div style="color:var(--cor-texto-medio);font-size:.85rem">Sem leituras recentes</div>{% endif %}
+      <a href="{% url 'telemetria' %}" class="pcrud-btn pcrud-btn-secondary pcrud-btn-sm" style="margin-top:8px"><i class="bi bi-graph-up"></i> Ver telemetria completa</a>
+    </div>
+
+    <!-- Estoque geral (ESTOQUE) -->
+    <div class="servidor-card" data-pagina="estoque_geral" data-area="ESTOQUE">
+      <h3><i class="bi bi-boxes"></i> Estoque Geral</h3>
+      <div style="color:var(--cor-texto-medio);font-size:.85rem">Acesso a insumos, peças, ração — filtrado por permissão</div>
+      <a href="/cadastro/estoque/" class="pcrud-btn pcrud-btn-secondary pcrud-btn-sm" style="margin-top:8px">Abrir estoque</a>
+    </div>
+
+  </div>
+
+  <!-- Rodapé permissão -->
+  <div style="margin-top:14px;padding:10px;border:1px dashed var(--cor-borda);border-radius:10px;font-size:.8rem;color:var(--cor-texto-medio)">
+    <i class="bi bi-shield-lock"></i> Liberdade gerenciada: este dashboard é <strong>estático e filtrado</strong>. O produtor define em <em>Cadastro &gt; Funcionários &gt; Área &amp; Permissões</em> o que você vê e pode editar. Um script (<code>servidor.js</code>) lê <code>/api/servidor/config/</code> e mostra/esconde seções por <code>data-pagina</code> e <code>data-area</code> conforme sua área ({{ perfil.area_servidor|default:"GERAL" }}).
+  </div>
+</div>
+
+<div id="toast" class="pcrud-toast"></div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/servidor.js' %}"></script>
+<!-- config_json|safe era XSS armazenado: PerfilUsuario.permissoes e um JSONField
+     editavel pelo produtor, e um "</script>" no titulo quebrava o <script> e
+     executava JS arbitrario no navegador do servidor logado. json_script escapa
+     <, > e & como \u003C etc., entao o breakout nao fecha.
+     Comentario HTML, nao {# #}: o lexer do Django nao aplica DOTALL e um
+     {# ... #} de varias linhas vaza como texto na pagina. -->
+{{ config|json_script:"servidor-cfg" }}
+<script>
+// Fallback inline se servidor.js não carregar
+document.addEventListener('DOMContentLoaded', function(){
+  var el = document.getElementById('servidor-cfg');
+  if(!el) return;
+  var cfg = JSON.parse(el.textContent);
+  var badge = document.getElementById('permFlag');
+  if(badge) badge.textContent = (cfg.pode_criar? 'criar ':'') + (cfg.pode_editar? 'editar':'somente leitura');
+});
+function showToast(m,t='success'){var e=document.getElementById('toast'); if(!e) return alert(m); e.textContent=m; e.className='pcrud-toast show pcrud-toast-'+t; clearTimeout(e._h); e._h=setTimeout(()=>e.classList.remove('show'),3000)}
+</script>
+{% endblock %}

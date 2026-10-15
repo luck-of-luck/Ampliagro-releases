@@ -1,0 +1,33 @@
+{% extends "partials/_premium_cadastro_base.html" %}
+{% block title %}Ampliagro - VRA{% endblock %}
+{% block cadastro_icon %}bi bi-bullseye{% endblock %}
+{% block cadastro_title %}Prescrição VRA{% endblock %}
+{% block cadastro_novo_title %}Nova Prescrição{% endblock %}
+{% block cadastro_lista_title %}Prescrições{% endblock %}
+{% block cadastro_subtabs %}<div class="pcrud-subtabs"><button class="pcrud-subtab active" data-tab="novo">Nova</button><button class="pcrud-subtab" data-tab="lista">Lista</button></div>{% endblock %}
+{% block cadastro_stats %}<div class="pcrud-stats"><div class="pcrud-stat"><div class="pcrud-stat-label">Total</div><div class="pcrud-stat-value">{{ prescricoes|length }}</div></div></div>{% endblock %}
+{% block cadastro_form_novo %}
+<form id="vra-form" onsubmit="return submitVRA(event)">
+{% csrf_token %}
+<div class="pcrud-form-grid">
+<div class="pcrud-form-group"><label>Safra *</label><select name="safra" required>{% for s in safras %}<option value="{{ s.id }}">{{ s.safra_nome }} ({{ s.cultura.nome }})</option>{% endfor %}</select></div>
+<div class="pcrud-form-group"><label>Talhão *</label><select name="talhao" required>{% for t in talhoes %}<option value="{{ t.id }}">{{ t.nome }} ({{ t.area_hectares }} ha)</option>{% endfor %}</select></div>
+<div class="pcrud-form-group"><label>Insumo</label><select name="insumo"><option value="">Selecione...</option></select></div>
+<div class="pcrud-form-group"><label>Tipo</label><select name="tipo_insumo"><option value="FERTILIZANTE">Fertilizante</option><option value="CORRETIVO">Corretivo</option><option value="DEFENSIVO">Defensivo</option><option value="SEMENTE">Semente</option></select></div>
+<div class="pcrud-form-group"><label>Dose/ha</label><input type="number" step="0.01" name="dose_ha" required></div>
+<div class="pcrud-form-group"><label>Unidade</label><input type="text" name="unidade" placeholder="kg/ha"></div>
+<div class="pcrud-form-group" style="grid-column:span 2;"><label>Grade GeoJSON (FeatureCollection)</label><textarea name="grade_geojson" rows="3" placeholder='{"type":"FeatureCollection","features":[...]}'></textarea></div>
+</div>
+<div class="pcrud-form-actions"><button type="submit" class="pcrud-btn pcrud-btn-primary"><i class="bi bi-check-lg"></i> Salvar e gerar ISO</button></div>
+<div id="vra-mapa" style="height:200px;background:var(--cor-fundo-card-aninhado);border:1px solid var(--cor-borda);border-radius:12px;margin-top:12px;display:flex;align-items:center;justify-content:center;color:var(--cor-texto-fraco);">Mapa prescrição — selecione talhão para carregar geometria + NDVI</div>
+</form>
+{% endblock %}
+{% block cadastro_tab_lista %}
+<div class="pcrud-table-wrap"><table class="pcrud-table"><thead><tr><th>Data</th><th>Safra</th><th>Talhão</th><th>Tipo</th><th>Dose</th><th>ISO</th><th>Ações</th></tr></thead><tbody>
+{% for p in prescricoes %}<tr><td>{{ p.criado_em|date:"d/m/Y" }}</td><td>{{ p.safra.safra_nome }}</td><td>{{ p.talhao.nome }}</td><td>{{ p.tipo_insumo }}</td><td>{{ p.dose_ha }}</td><td>{% if p.arquivo_iso %}<a href="{{ p.arquivo_iso.url }}">ISO</a>{% else %}—{% endif %}</td><td><button class="pcrud-btn pcrud-btn-danger pcrud-btn-sm" onclick="excluirVRA({{ p.id }})"><i class="bi bi-trash"></i></button></td></tr>{% endfor %}
+</tbody></table></div>
+{% endblock %}
+{% block scripts %}{{ block.super }}<script>
+function submitVRA(e){ e.preventDefault(); var f=document.getElementById('vra-form'); var data={ safra: parseInt(f.safra.value), talhao: parseInt(f.talhao.value), tipo_insumo: f.tipo_insumo.value, dose_ha: parseFloat(f.dose_ha.value), unidade: f.unidade.value, grade_geojson: f.grade_geojson.value? JSON.parse(f.grade_geojson.value):{}, cultura: 1 }; fetch('/api/prescricoes-vra/',{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':getCSRFToken()},body:JSON.stringify(data)}).then(r=>{ if(r.ok){ showToast('VRA salva','success'); setTimeout(()=>location.reload(),600);} else r.json().then(j=>showToast(JSON.stringify(j),'error'));}); return false;}
+function excluirVRA(id){ if(!confirm('Excluir?'))return; fetch('/api/prescricoes-vra/'+id+'/',{method:'DELETE',headers:{'X-CSRFToken':getCSRFToken()}}).then(r=>{ if(r.ok) location.reload();});}
+</script>{% endblock %}

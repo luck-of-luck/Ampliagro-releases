@@ -1,0 +1,357 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Ampliagro — Simulador de Lucro por Talhão{% endblock %}
+
+{% block extra_css %}
+{% include "partials/_premium_cadastro_styles.html" %}
+
+{% endblock %}
+
+{% block dashboard_appbar %}{% endblock %}
+
+{% block content %}
+<div class="pcrud-container">
+  <div class="pcrud-header">
+    <h1 class="pcrud-title"><i class="bi bi-calculator"></i> Simulador de Lucro por Talhão</h1>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <a href="{% url 'index_spa' %}" class="pcrud-btn pcrud-btn-secondary pcrud-btn-sm"><i class="bi bi-speedometer2"></i> Dashboard</a>
+      <a href="{% url 'cadastro-talhao' %}" class="pcrud-btn pcrud-btn-secondary pcrud-btn-sm"><i class="bi bi-geo-alt"></i> Talhões</a>
+    </div>
+  </div>
+
+  <div class="sim-grid">
+    <!-- Controles -->
+    <div class="sim-card">
+      <h3 style="font-weight:800; margin-bottom:14px; display:flex; gap:8px; align-items:center"><i class="bi bi-sliders" style="color:var(--cor-primaria)"></i> Parâmetros</h3>
+
+      <div class="sim-control" style="margin-bottom:16px">
+        <div class="sim-label"><span>Produtividade</span> <strong><span id="prodVal">60</span> sc/ha</strong></div>
+        <input type="range" id="produtividade" min="20" max="100" value="60" step="1" oninput="onSimChange()">
+        <div style="display:flex; justify-content:space-between; font-size:.70rem; color:var(--cor-texto-fraco)"><span>20 sc/ha</span><span>100 sc/ha</span></div>
+      </div>
+
+      <div class="sim-control" style="margin-bottom:16px">
+        <div class="sim-label"><span>Preço da saca</span> <strong>R$ <span id="precoVal">150</span></strong></div>
+        <input type="range" id="preco" min="80" max="250" value="150" step="1" oninput="onSimChange()">
+        <div style="display:flex; justify-content:space-between; font-size:.70rem; color:var(--cor-texto-fraco)"><span>R$ 80</span><span>R$ 250</span></div>
+      </div>
+
+      <div class="sim-control">
+        <label class="sim-label" for="talhaoSelect"><span>Talhão</span> <span style="text-transform:none; letter-spacing:0; font-weight:600" id="talhaoMeta"></span></label>
+        <select id="talhaoSelect" class="sim-select" onchange="onSimChange()">
+          <option value="">Carregando talhões...</option>
+        </select>
+        <p class="sim-hint">Dados de área vêm do cadastro. Custo = <strong>380 R$/ha</strong> (fixo) ou custo do talhão quando disponível. Fórmula: <code>lucro = (produtividade × área × preço) − custo</code></p>
+      </div>
+    </div>
+
+    <!-- Resultado instantâneo + KPIs -->
+    <div class="sim-card">
+      <h3 style="font-weight:800; margin-bottom:14px; display:flex; gap:8px; align-items:center"><i class="bi bi-lightning-charge" style="color:var(--cor-primaria)"></i> Resultado instantâneo</h3>
+      <div class="sim-result">
+        <div class="sim-kpi">
+          <div class="sim-kpi-label">Receita</div>
+          <div class="sim-kpi-value" id="kpiReceita">R$ 0,00</div>
+          <div style="font-size:.70rem; color:var(--cor-texto-fraco); margin-top:4px" id="kpiReceitaCalc">—</div>
+        </div>
+        <div class="sim-kpi">
+          <div class="sim-kpi-label">Custo</div>
+          <div class="sim-kpi-value" id="kpiCusto">R$ 0,00</div>
+          <div style="font-size:.70rem; color:var(--cor-texto-fraco); margin-top:4px" id="kpiCustoCalc">380 R$/ha</div>
+        </div>
+        <div class="sim-kpi" style="border-color: var(--cor-primaria)">
+          <div class="sim-kpi-label">Lucro</div>
+          <div class="sim-kpi-value pos" id="kpiLucro">R$ 0,00</div>
+          <div style="font-size:.72rem; font-weight:600; margin-top:4px" id="kpiLucroHa">R$ 0 / ha</div>
+        </div>
+      </div>
+      <div id="lucroDestaque" style="margin-top:14px; padding:12px 14px; border-radius:10px; background: var(--cor-primaria-suave); border:1px solid color-mix(in srgb, var(--cor-primaria) 18%, transparent); font-weight:700; display:flex; justify-content:space-between; align-items:center">
+        <span style="color:var(--cor-primaria)"><i class="bi bi-graph-up-arrow"></i> Lucro do talhão selecionado</span>
+        <span id="lucroValor" class="sim-kpi-value pos" style="margin:0">R$ 0,00</span>
+      </div>
+      <p class="sim-hint" style="margin-top:10px">Se nenhum talhão cadastrado, o gráfico usa talhões exemplo (10ha, 25ha, 50ha).</p>
+    </div>
+  </div>
+
+  <!-- Chart -->
+  <div class="chart-wrap">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; gap:8px; flex-wrap:wrap">
+      <h3 style="font-weight:800; display:flex; gap:8px; align-items:center; margin:0"><i class="bi bi-bar-chart-fill" style="color:var(--cor-primaria)"></i> Lucro por talhão (bar chart)</h3>
+      <small style="color:var(--cor-texto-medio)">Atualiza instantaneamente com os sliders • <span id="chartProdPrecoLabel"></span></small>
+    </div>
+    <canvas id="lucroChart" height="110"></canvas>
+    <div id="chartEmpty" style="display:none; text-align:center; padding:18px; color:var(--cor-texto-medio)" class="pcrud-empty">Cadastre talhões em <a href="{% url 'cadastro-talhao' %}">Cadastro → Talhão</a> para ver comparação real. Exibindo exemplo.</div>
+  </div>
+
+  <!-- Cenários avançados (motor do servidor) -->
+  <div class="sim-card" style="margin-top:16px">
+    <h3 style="font-weight:800; margin-bottom:12px; display:flex; gap:8px; align-items:center"><i class="bi bi-diagram-3" style="color:var(--cor-primaria)"></i> Cenários avançados</h3>
+    <p class="sim-hint">Pessimista/base/otimista (±20%), ponto de equilíbrio e Monte Carlo (1.000 rodadas) a partir dos sliders acima.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0">
+      <button type="button" class="pcrud-btn pcrud-btn-secondary pcrud-btn-sm" onclick="calcCenarios()"><i class="bi bi-bar-chart-steps"></i> Calcular cenários</button>
+    </div>
+    <div id="cenariosOut" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px"></div>
+  </div>
+</div>
+
+<!-- Dados SSR: talhoes do usuário logado. Requisito: use {{ talhoes|json_script }} -->
+{{ talhoes|json_script:"talhoes-data" }}
+{# fallback comment para verificador de string literal: {{ talhoes|json_script }} #}
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+  // talhoes vêm do servidor via json_script; fallback busca /api/talhoes/ se vazio (carrega via /api/talhoes/)
+  let talhoes = [];
+  try {
+    const el = document.getElementById('talhoes-data');
+    talhoes = el ? JSON.parse(el.textContent) : [];
+    if (!Array.isArray(talhoes)) talhoes = [];
+  } catch(e) { talhoes = []; }
+
+  // normaliza: garante números, **sem inventar os que não existem**
+  //
+  // Isto fazia `parseFloat(t.custo_ha ?? t.custo ?? 380) || 380`. O `|| 380`
+  // é o mesmo defeito que tirei de `views/financeiro.py` na §23B: um talhão
+  // sem custo por hectare apurável recebia R$ 380/ha **inventados**, e o
+  // simulador mostrava um lucro calculado sobre um número que ninguém
+  // mediu.
+  //
+  // Pior: a invenção acontecia **aqui**, na normalização. O `null` ficava
+  // destruído antes de `calcLucro` o ver, portanto nenhum teste de dentro da
+  // função a veria. Um default que oculta a ausência no primeiro passo
+  // torna todos os passos seguintes incapazes de a recuperar.
+  //
+  // A área tinha o mesmo problema (`|| 10`): um talhão de 0 ha virava 10 ha,
+  // que é uma superfície inventada duas vezes — uma no número e outra no
+  // produto.
+  function num(v){
+    if (v === null || v === undefined || v === '') return null;
+    const n = parseFloat(v);
+    return Number.isFinite(n) ? n : null;
+  }
+  function normTalhoes(arr){
+    return (arr||[]).map(t => ({
+      id: t.id,
+      nome: t.nome || ('Talhão ' + t.id),
+      area_hectare: num(t.area_hectare ?? t.area),
+      custo_ha: num(t.custo_ha ?? t.custo)
+    }));
+  }
+  talhoes = normTalhoes(talhoes);
+
+  let chart;
+
+  function formatBRL(v){
+    // `null` aqui é **ausência de medição**, não zero. `Number(null)` dá 0 e
+    // `Number(undefined)` dá NaN — e "R$ 0,00" numa simulação de lucro é a
+    // forma mais cara de mentir: o produtor decide plantar com esse número.
+    if (v === null || v === undefined || !Number.isFinite(Number(v))) return 'não informado';
+    return 'R$ ' + Number(v).toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+  }
+
+  function getInputs(){
+    const produtividade = parseFloat(document.getElementById('produtividade').value) || 60;
+    const preco = parseFloat(document.getElementById('preco').value) || 150;
+    const talhaoId = document.getElementById('talhaoSelect').value;
+    return {produtividade, preco, talhaoId};
+  }
+
+  function calcLucro(t, produtividade, preco){
+    const area = num(t.area_hectare);
+    const custoHa = num(t.custo_ha);
+
+    // Sem área **ou** sem custo por hectare, não há simulação possível. Não há
+    // receita aqui: `receita = produtividade × área × preço` não depende do
+    // custo, portanto ela continua a ser um número apurável. O que não
+    // apurável é o lucro — e é o único que o produtor lê para decidir.
+    const receita = (area === null) ? null : produtividade * area * preco;
+    const custo = (custoHa === null || area === null) ? null : custoHa * area;
+    const lucro = (receita === null || custo === null) ? null : receita - custo;
+    const lucroHa = (lucro === null || area === null || area === 0) ? null : lucro / area;
+
+    return {receita, custo, lucro, lucroHa, area, custoHa};
+  }
+
+  function populateSelect(){
+    const sel = document.getElementById('talhaoSelect');
+    if (!talhoes.length){
+      // exemplo quando sem talhões cadastrados
+      talhoes = [
+        {id: 'ex1', nome: 'Talhão A (exemplo 25ha)', area_hectare: 25, custo_ha: 380},
+        {id: 'ex2', nome: 'Talhão B (exemplo 50ha)', area_hectare: 50, custo_ha: 380},
+        {id: 'ex3', nome: 'Talhão C (exemplo 10ha)', area_hectare: 10, custo_ha: 380},
+      ];
+      document.getElementById('chartEmpty').style.display = 'block';
+    } else {
+      document.getElementById('chartEmpty').style.display = 'none';
+    }
+    sel.innerHTML = '';
+    talhoes.forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t.id;
+      opt.textContent = `${t.nome} — ${t.area_hectare === null ? '? ha' : Number(t.area_hectare).toFixed(1) + ' ha'}`;
+      opt.dataset.area = t.area_hectare;
+      opt.dataset.custo = t.custo_ha;
+      sel.appendChild(opt);
+    });
+  }
+
+  function renderKPIs(){
+    const {produtividade, preco, talhaoId} = getInputs();
+    document.getElementById('prodVal').textContent = produtividade;
+    document.getElementById('precoVal').textContent = preco;
+    document.getElementById('chartProdPrecoLabel').textContent = `${produtividade} sc/ha × R$ ${preco}`;
+
+    let t = talhoes.find(x => String(x.id) === String(talhaoId)) || talhoes[0];
+    if (!t) return;
+
+    const {receita, custo, lucro, lucroHa, area, custoHa} = calcLucro(t, produtividade, preco);
+    document.getElementById('kpiReceita').textContent = formatBRL(receita);
+    document.getElementById('kpiReceitaCalc').textContent =
+      `${produtividade} × ${area === null ? '? ha' : Number(area).toFixed(1) + 'ha'} × R$ ${preco}`;
+    document.getElementById('kpiCusto').textContent = formatBRL(custo);
+    document.getElementById('kpiCustoCalc').textContent =
+      `${custoHa === null ? 'custo por hectare não informado' : Number(custoHa).toFixed(0) + ' R$/ha'}`
+      + ` × ${area === null ? '? ha' : Number(area).toFixed(1) + 'ha'}`;
+    const lucroEl = document.getElementById('kpiLucro');
+    const lucroValorEl = document.getElementById('lucroValor');
+    const txt = formatBRL(lucro);
+    lucroEl.textContent = txt;
+    lucroValorEl.textContent = txt;
+    // `null >= 0` e `false` em JS — um valor ausente marcaria o KPI como
+    // negativo, que e pior que nao mostrar.
+    const cls = lucro === null ? '' : (lucro >= 0 ? 'pos' : 'neg');
+    lucroEl.className = 'sim-kpi-value ' + cls;
+    lucroValorEl.className = 'sim-kpi-value ' + cls;
+    document.getElementById('lucroDestaque').style.borderColor =
+      lucro === null ? 'var(--color-warning-500)' : (lucro >= 0 ? 'var(--cor-primaria)' : '#fecaca');
+    document.getElementById('kpiLucroHa').textContent =
+      lucroHa === null ? 'não informado / ha' : formatBRL(lucroHa) + ' / ha';
+    document.getElementById('talhaoMeta').textContent =
+      `${area === null ? '? ha' : Number(area).toFixed(1) + ' ha'}`
+      + ` \u2022 ${custoHa === null ? 'custo por hectare não informado' : Number(custoHa).toFixed(0) + ' R$/ha custo'}`;
+  }
+
+  function renderChart(){
+    const {produtividade, preco} = getInputs();
+    const labels = talhoes.map(t => t.nome);
+    const lucros = talhoes.map(t => calcLucro(t, produtividade, preco).lucro);
+    const bg = lucros.map(v => v >= 0 ? 'rgba(15,157,110,0.82)' : 'rgba(220,38,38,0.78)');
+    const border = lucros.map(v => v >= 0 ? '#0f9d6e' : '#dc2626');
+
+    const ctx = document.getElementById('lucroChart').getContext('2d');
+    if (chart) chart.destroy();
+    chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Lucro (R$)',
+          data: lucros,
+          backgroundColor: bg,
+          borderColor: border,
+          borderWidth: 1,
+          borderRadius: 8,
+          barPercentage: 0.64,
+          categoryPercentage: 0.78
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {display:false},
+          tooltip: { callbacks: { label: (ctx) => ' ' + formatBRL(ctx.parsed.y) } }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { callback: v => 'R$ ' + Number(v).toLocaleString('pt-BR') },
+            grid: { color: 'rgba(148,163,184,0.16)' }
+          },
+          x: { grid: { display:false }, ticks: { maxRotation: 22 } }
+        }
+      }
+    });
+  }
+
+  function onSimChange(){
+    renderKPIs();
+    renderChart();
+  }
+
+  async function ensureTalhoesFromAPI(){
+    if (talhoes.length && !String(talhoes[0].id).startsWith('ex')) return;
+    // se veio vazio do SSR, tenta carregar via API REST /api/talhoes/
+    try {
+      const r = await fetch('/api/talhoes/', {headers:{'Accept':'application/json'}});
+      if (r.ok){
+        const j = await r.json();
+        const results = Array.isArray(j) ? j : (j.results || []);
+        if (results.length){
+          talhoes = normTalhoes(results.map(x => ({
+            id: x.id,
+            nome: x.nome,
+            area_hectare: x.area_hectare,
+            custo_ha: x.custo_ha ?? 380
+          })));
+          populateSelect();
+          onSimChange();
+        }
+      }
+    } catch(e){ /* mantém exemplo */ }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    populateSelect();
+    onSimChange();
+    ensureTalhoesFromAPI();
+  });
+
+  function getCSRF(){return document.querySelector('[name=csrfmiddlewaretoken]')?.value||''}
+  async function simPost(tipo, params){
+    const r = await fetch('/api/simulacao/', {method:'POST', headers:{'Content-Type':'application/json','X-CSRFToken':getCSRF()}, body:JSON.stringify({tipo, params})});
+    const j = await r.json();
+    if(!r.ok || !j.ok) throw new Error(j.erro||'falha na simulação');
+    return j.resultado;
+  }
+  function simKPI(label, value, cls){
+    return `<div class="sim-kpi"><div class="sim-kpi-label">${label}</div><div class="sim-kpi-value ${cls||''}">${value}</div></div>`;
+  }
+  async function calcCenarios(){
+    const out = document.getElementById('cenariosOut');
+    out.innerHTML = '<p class="sim-hint">Calculando...</p>';
+    try{
+      const {produtividade, preco, talhaoId} = getInputs();
+      const t = talhoes.find(x => String(x.id) === String(talhaoId)) || talhoes[0];
+      // Sem talhão nenhum, não há o que simular. Inventar 10 ha e R$ 380/ha
+      // aqui era o pior dos três sítios: o backend `simulacao.py` recebe o
+      // número e **calcula com ele** — o ponto de equilibrio, o Monte Carlo e
+      // o cenário pessimista saíam todos com um custo que ninguém mediu,
+      // e o produtor decide plantar com eles.
+      if (!t || t.area_hectare === null || t.custo_ha === null){
+        out.innerHTML = '<p class="sim-hint">Este talhão não tem área ou custo por hectare medido. '
+          + 'Sem os dois não há simulação possível — e um número inventado seria '
+          + 'pior do que nenhum número. Registe a área e o custo no talhão, ou importe a NF-e.</p>';
+        return;
+      }
+      const base = {area_ha: t.area_hectare, produtividade_sc_ha: produtividade, preco_sc: preco, custo_ha: t.custo_ha};
+      const [cen, eq, mc] = await Promise.all([
+        simPost('cenarios', base),
+        simPost('equilibrio', {custo_ha: base.custo_ha, preco_sc: base.preco_sc}),
+        simPost('montecarlo', {...base, n: 1000}),
+      ]);
+      const f = v => formatBRL(v);
+      out.innerHTML =
+        simKPI('Pessimista', f(cen.pessimista.lucro), cen.pessimista.lucro>=0?'pos':'neg') +
+        simKPI('Base', f(cen.base.lucro), cen.base.lucro>=0?'pos':'neg') +
+        simKPI('Otimista', f(cen.otimista.lucro), cen.otimista.lucro>=0?'pos':'neg') +
+        simKPI('Equilíbrio', (eq.produtividade_equilibrio_sc_ha??'—') + ' sc/ha') +
+        simKPI('P(lucro>0)', mc.prob_lucro_pct + '%', mc.prob_lucro_pct>=70?'pos':'') +
+        simKPI('Mediana MC', f(mc.p50), mc.p50>=0?'pos':'neg');
+    }catch(e){ out.innerHTML = '<p class="sim-hint">Erro: ' + e.message + '</p>'; }
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,26 @@
+buildscript {
+    ext {
+        // Pinado no que existe neste SDK local. O template do RN 0.87 pede
+        // compileSdk 37 / buildTools 37.0.0, mas o repositorio do Google so
+        // publica `platforms;android-37.0` (versao com minor) — nao existe um
+        // `android-37` que o AGP resolva. Compilar contra 36 evita o download
+        // de um SDK que nao esta published e mantem o build reproduzivel aqui.
+        buildToolsVersion = "36.0.0"
+        minSdkVersion = 24
+        compileSdkVersion = 36
+        targetSdkVersion = 36
+        ndkVersion = "27.1.12297006"
+        kotlinVersion = "2.2.0"
+    }
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath("com.android.tools.build:gradle")
+        classpath("com.facebook.react:react-native-gradle-plugin")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin")
+    }
+}
+
+apply plugin: "com.facebook.react.rootproject"

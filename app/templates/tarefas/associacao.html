@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Associação de Tarefas — Ampliagro{% endblock %}
+{% block extra_css %}{% include "partials/_premium_cadastro_styles.html" %}
+
+{% endblock %}
+{% block dashboard_appbar %}{% endblock %}
+{% block content %}
+<div class="pcrud-container">
+  <div class="pcrud-header">
+    <h1 class="pcrud-title"><i class="bi bi-link-45deg"></i> Associação de Tarefas <span style="font-weight:500;color:var(--cor-texto-medio);font-size:.9rem">• {{ propriedade.nome|default:"—" }}</span></h1>
+    <div style="display:flex;gap:8px">
+      <a href="{% url 'operario-kanban' %}" class="pcrud-btn pcrud-btn-secondary pcrud-btn-sm"><i class="bi bi-kanban"></i> Quadro</a>
+      <a href="{% url 'servidor-dashboard' %}" class="pcrud-btn pcrud-btn-secondary pcrud-btn-sm"><i class="bi bi-grid"></i> Painel</a>
+    </div>
+  </div>
+
+  <div class="pcrud-stats" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))">
+    <div class="pcrud-stat"><div class="pcrud-stat-label">Total</div><div class="pcrud-stat-value">{{ tarefas|length }}</div></div>
+    <div class="pcrud-stat"><div class="pcrud-stat-label">Pendentes</div><div class="pcrud-stat-value">{{ colunas.pendente|length }}</div></div>
+    <div class="pcrud-stat"><div class="pcrud-stat-label">Em andamento</div><div class="pcrud-stat-value">{{ colunas.andamento|length }}</div></div>
+    <div class="pcrud-stat"><div class="pcrud-stat-label">Concluídas</div><div class="pcrud-stat-value">{{ colunas.concluido|length }}</div></div>
+  </div>
+
+  <form method="get" style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0">
+    <select name="status" style="padding:8px;border:1px solid var(--cor-borda);border-radius:8px"><option value="">Todos status</option><option value="pendente" {% if filtros.status == 'pendente' %}selected{% endif %}>Pendente</option><option value="andamento" {% if filtros.status == 'andamento' %}selected{% endif %}>Em andamento</option><option value="concluido" {% if filtros.status == 'concluido' %}selected{% endif %}>Concluído</option></select>
+    <select name="cargo" style="padding:8px;border:1px solid var(--cor-borda);border-radius:8px"><option value="">Todas áreas</option><option value="MECANICA" {% if filtros.cargo == 'MECANICA' %}selected{% endif %}>Mecânica</option><option value="CAMPO" {% if filtros.cargo == 'CAMPO' %}selected{% endif %}>Campo</option><option value="PECUARIA" {% if filtros.cargo == 'PECUARIA' %}selected{% endif %}>Pecuária</option><option value="ESTOQUE" {% if filtros.cargo == 'ESTOQUE' %}selected{% endif %}>Estoque</option><option value="AGRONOMIA" {% if filtros.cargo == 'AGRONOMIA' %}selected{% endif %}>Agronomia</option></select>
+    <select name="cultura" style="padding:8px;border:1px solid var(--cor-borda);border-radius:8px"><option value="">Todas culturas</option>{% for c in culturas %}<option value="{{ c.id }}" {% if filtros.cultura|add:'' == c.id|add:'' %}selected{% endif %}>{{ c.nome }}</option>{% endfor %}</select>
+    <button class="pcrud-btn pcrud-btn-secondary pcrud-btn-sm" type="submit">Filtrar</button>
+    <a href="{% url 'tarefas-associacao' %}" class="pcrud-btn pcrud-btn-secondary pcrud-btn-sm">Limpar</a>
+  </form>
+
+  <div class="assoc-grid">
+    <div class="assoc-card" style="padding:0;overflow:hidden">
+      <div style="padding:10px 14px;border-bottom:1px solid var(--cor-borda);display:flex;justify-content:space-between;align-items:center">
+        <strong style="font-size:.85rem">Tarefas da fazenda ({{ tarefas|length }})</strong>
+        <label style="font-size:.78rem;display:flex;gap:6px;align-items:center"><input type="checkbox" id="selAll"> Selecionar todas</label>
+      </div>
+      <div style="max-height:520px;overflow:auto">
+        <table class="pcrud-table assoc-table">
+          <thead><tr><th style="width:36px"></th><th>Tarefa</th><th>Estágio</th><th>Área</th><th>Status</th><th>Prioridade</th></tr></thead>
+          <tbody>
+            {% for t in tarefas %}
+            <tr>
+              <td><input type="checkbox" class="sel" value="{{ t.id }}"></td>
+              <td style="max-width:260px"><div style="font-weight:600;font-size:.85rem">{{ t.descricao|truncatechars:60 }}</div><small style="color:var(--cor-texto-medio)">#{{ t.id }} • {{ t.estagio.nome }}</small></td>
+              <td><span style="font-size:.75rem;background:#f1f5f9;padding:2px 6px;border-radius:6px">{{ t.estagio.nome }}</span></td>
+              <td><span style="font-size:.72rem;background:#dcfce7;color:#166534;padding:2px 6px;border-radius:999px">{{ t.cargo_alvo|default:"Geral" }}</span></td>
+              <td><span style="font-size:.7rem;padding:2px 6px;border-radius:999px;background:{% if t.status == 'concluido' %}#dcfce7;color:#166534{% elif t.status == 'andamento' %}#dbeafe;color:#1e40af{% else %}#fef9c3;color:#92400e{% endif %}">{{ t.get_status_display }}</span></td>
+              <td><span style="font-size:.68rem">{{ t.get_prioridade_display }}</span></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" style="text-align:center;padding:18px;color:var(--cor-texto-medio)">Nenhuma tarefa — crie no Quadro de Tarefas ou via cultura</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div style="padding:10px 14px;border-top:1px solid var(--cor-borda);display:flex;justify-content:space-between;align-items:center">
+        <span id="selCount" style="font-size:.78rem;color:var(--cor-texto-medio)">0 selecionadas</span>
+        <span style="font-size:.72rem;color:var(--cor-texto-medio)">Dica: use os filtros acima para achar tarefas por área/cultura</span>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="assoc-card">
+        <h4 style="font:700 .9rem var(--f-display);margin:0 0 8px 0">Associar selecionadas a</h4>
+        <label style="font-size:.78rem;font-weight:600">Funcionário</label>
+        <select id="assocFunc" style="width:100%;padding:8px;border:1px solid var(--cor-borda);border-radius:8px;margin-bottom:8px"><option value="">— manter —</option>{% for f in funcionarios %}<option value="{{ f.id }}">{{ f.nome }} — {{ f.get_cargo_display }}</option>{% endfor %}</select>
+        <label style="font-size:.78rem;font-weight:600">Área / Cargo alvo</label>
+        <select id="assocCargo2" style="width:100%;padding:8px;border:1px solid var(--cor-borda);border-radius:8px;margin-bottom:8px"><option value="">— manter —</option><option value="MECANICA">Mecânica</option><option value="CAMPO">Campo</option><option value="PECUARIA">Pecuária</option><option value="ESTOQUE">Estoque</option><option value="AGRONOMIA">Agronomia</option><option value="ADMIN">Administrativo</option><option value="FINANCEIRO">Financeiro</option><option value="GERAL">Geral</option></select>
+        <label style="font-size:.78rem;font-weight:600">Prioridade</label>
+        <select id="assocPrio" style="width:100%;padding:8px;border:1px solid var(--cor-borda);border-radius:8px;margin-bottom:8px"><option value="">— manter —</option><option value="baixa">Baixa</option><option value="media">Média</option><option value="alta">Alta</option><option value="urgente">Urgente</option></select>
+        <label style="font-size:.78rem;font-weight:600">Status</label>
+        <select id="assocStatus" style="width:100%;padding:8px;border:1px solid var(--cor-borda);border-radius:8px;margin-bottom:10px"><option value="">— manter —</option><option value="pendente">Pendente</option><option value="andamento">Em andamento</option><option value="concluido">Concluído</option></select>
+        <button id="btnAplicar" class="pcrud-btn pcrud-btn-primary" style="width:100%;justify-content:center"><i class="bi bi-link"></i> Aplicar associação</button>
+        <div style="margin-top:8px;font-size:.72rem;color:var(--cor-texto-medio)">O servidor vê no <em>Quadro de Tarefas</em> filtrado por sua área. O script <code>servidor.js</code> puxa da fazenda.</div>
+      </div>
+      <div style="background:var(--cor-fundo-card);border:1px solid var(--cor-borda);border-radius:12px;padding:12px">
+        <h4 style="font:700 .85rem var(--f-display);margin:0 0 6px 0">Atalhos</h4>
+        <a href="{% url 'operario-kanban' %}" class="pcrud-btn pcrud-btn-secondary pcrud-btn-sm" style="width:100%;justify-content:center;margin-bottom:6px">Abrir Quadro de Tarefas</a>
+        <a href="{% url 'servidor-dashboard' %}" class="pcrud-btn pcrud-btn-secondary pcrud-btn-sm" style="width:100%;justify-content:center">Painel Servidor</a>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="toast" class="pcrud-toast"></div>
+{% endblock %}
+{% block scripts %}
+<script>
+function getCSRF(){return document.querySelector('[name=csrfmiddlewaretoken]')?.value || document.cookie.match(/csrftoken=([^;]+)/)?.[1] || ''}
+function toast(m,t='success'){const e=document.getElementById('toast'); if(!e) return alert(m); e.textContent=m; e.className='pcrud-toast show pcrud-toast-'+t; clearTimeout(e._h); e._h=setTimeout(()=>e.classList.remove('show'),3000)}
+document.getElementById('selAll')?.addEventListener('change', e=>{
+  document.querySelectorAll('.sel').forEach(cb=> cb.checked=e.target.checked);
+  updCount();
+});
+document.addEventListener('change', e=>{ if(e.target.classList.contains('sel')) updCount(); });
+function updCount(){ const n=document.querySelectorAll('.sel:checked').length; document.getElementById('selCount').textContent=n+' selecionadas'; }
+document.getElementById('btnAplicar')?.addEventListener('click', async ()=>{
+  const ids=[...document.querySelectorAll('.sel:checked')].map(cb=> parseInt(cb.value));
+  if(!ids.length) return toast('Selecione ao menos uma tarefa','warning');
+  const payload={ids};
+  const v=document.getElementById('assocFunc').value; if(v) payload.funcionario=parseInt(v);
+  const c=document.getElementById('assocCargo2').value; if(c) payload.cargo=c;
+  const p=document.getElementById('assocPrio').value; if(p) payload.prioridade=p;
+  const s=document.getElementById('assocStatus').value; if(s) payload.status=s;
+  try{
+    const r=await fetch('{% url "api-tarefas-associar" %}',{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':getCSRF()},body:JSON.stringify(payload)});
+    const j=await r.json();
+    if(!r.ok||!j.ok) throw new Error(j.erro||JSON.stringify(j));
+    toast(`Associadas ${j.atualizadas} tarefas`,'success');
+    setTimeout(()=>location.reload(),700);
+  }catch(e){ toast('Erro: '+e.message,'error'); }
+});
+</script>
+{% endblock %}

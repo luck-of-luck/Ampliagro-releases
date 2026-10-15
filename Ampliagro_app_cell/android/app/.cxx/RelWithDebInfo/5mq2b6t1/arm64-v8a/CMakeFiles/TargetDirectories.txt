@@ -1,0 +1,6 @@
+C:/Trabalho/Projetos/Ativos/Ampliagro2/Ampliagro_app_cell/android/app/.cxx/RelWithDebInfo/5mq2b6t1/arm64-v8a/CMakeFiles/appmodules.dir
+C:/Trabalho/Projetos/Ativos/Ampliagro2/Ampliagro_app_cell/android/app/.cxx/RelWithDebInfo/5mq2b6t1/arm64-v8a/CMakeFiles/edit_cache.dir
+C:/Trabalho/Projetos/Ativos/Ampliagro2/Ampliagro_app_cell/android/app/.cxx/RelWithDebInfo/5mq2b6t1/arm64-v8a/CMakeFiles/rebuild_cache.dir
+C:/Trabalho/Projetos/Ativos/Ampliagro2/Ampliagro_app_cell/android/app/.cxx/RelWithDebInfo/5mq2b6t1/arm64-v8a/safeareacontext_autolinked_build/CMakeFiles/react_codegen_safeareacontext.dir
+C:/Trabalho/Projetos/Ativos/Ampliagro2/Ampliagro_app_cell/android/app/.cxx/RelWithDebInfo/5mq2b6t1/arm64-v8a/safeareacontext_autolinked_build/CMakeFiles/edit_cache.dir
+C:/Trabalho/Projetos/Ativos/Ampliagro2/Ampliagro_app_cell/android/app/.cxx/RelWithDebInfo/5mq2b6t1/arm64-v8a/safeareacontext_autolinked_build/CMakeFiles/rebuild_cache.dir

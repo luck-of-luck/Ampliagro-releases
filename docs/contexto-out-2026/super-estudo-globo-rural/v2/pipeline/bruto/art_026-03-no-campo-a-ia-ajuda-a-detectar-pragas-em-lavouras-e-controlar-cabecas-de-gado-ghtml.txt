@@ -1,0 +1,73 @@
+A Inteligência Artificial (IA) já faz parte da rotina de 41,9% das fazendas e agroindústrias no Brasil, segundo estimativa elaborada pelo professor Oscar Burd, da Fundação Getúlio Vargas (FGV). Para se ter uma ideia do avanço, o mesmo índice era de 16,9% em 2022. Para chegar ao percentual, o especialista cruzou dados de levantamentos do IBGE (Pintec Semestral 2024), Sebrae, OMPI (Organização Mundial da Propriedade Intelectual) e consultorias especializadas em agtechs.
+
+“A velocidade surpreende pela curva de aceleração. Enquanto tecnologias anteriores, como o GPS, levaram décadas para se massificar, a IA saltou de uma curiosidade experimental para uma ferramenta de core business em menos de cinco anos”, compara Burd.
+
+De acordo com ele, a IA deixou de ser exclusividade de grandes grupos e foi “democratizada com aplicativos, plataformas e também em tecnologias embarcadas em diferentes equipamentos.
+
+Hoje, tratores de baixa potência já saem de fábrica com sistemas de monitoramento inteligentes e startups oferecem soluções de IA como serviço (SaaS), que permitem ao pequeno produtor acessar diagnósticos via smartphone”, explica.
+
+Para Burd, a IA é uma das “revoluções tecnológicas” com adoção mais rápida na história da humanidade, inclusive no agro. Quem investir em IA nos próximos 12 meses terá de três a cinco anos de vantagem competitiva”, afirma.
+
+A tecnologia tem múltiplas aplicações na rotina das fazendas: no manejo das lavouras ou da criação de animais e na gestão do negócio, por exemplo.
+
+A razão é simples. Com digitalização, tudo” pode gerar dados e eles podem ser processados pelos programas de IA. A partir daí, a tecnologia os relaciona com bases de informação disponíveis e gera recomendações aplicáveis às atividades produtivas.
+
+No caso da SLC Agrícola , um dos maiores grupos produtores de grãos no país, a entrada na Era da IA ocorreu entre 2017 e 2018, primeiro com aprendizado de máquina (machine learning, em inglês) e visão computacional, e se aprofunda desde então.
+
+De acordo com o diretor de tecnologia do grupo, Rafael Rosa, a IA permeia diversas atividades com programas computacionais embarcados tanto em equipamentos (maquinários, drones , sensores, balanças, silos, etc) como em aplicativos digitais.
+
+Para ele, o principal benefício está na análise de grandes volumes de dados para tomada de decisões agronômicas muito mais rápidas e assertivas.
+
+“Apenas um trator pode gerar um milhão de dados por dia. Mas, além deles, também temos dados de sensores, satélites, drones e outros milhares de equipamentos”, diz.
+
+Na gestão agronômica, esse conjunto favorece a detecção de pragas e doenças por imagem em tempo real para pulverização seletiva, previsão de estresse hídrico por lote e carências nutricionais das plantas.
+
+A SLC conta, inclusive, com cientistas de dados para desenvolvimento de soluções próprias. Criamos um modelo para tentar identificar qual seria a melhor variedade de semente para cada talhão”, afirma.
+
+Tudo isso combinado já gerou economias relevantes, na casa de R$ 300 milhões desde 2018. A safra com maior ganho de eficiência com nova tecnologias foi, justamente, a de 2024/2025 com R$ 86 milhões.
+
+Sempre destacamos benefícios tanto do ponto de vista de eficiência operacional e econômica, quanto também do ponto de vista ambiental e de sustentabilidade”, frisa.
+
+Além dessas aplicações, os sistemas de IA também são comumente utilizados para otimização de rotas de máquinas para reduzir consumo de combustível e predição climática hiperlocalizada a fim de definir janelas ideais para os principais manejos.
+
+O produtor rural Tasso Jayme vê a IA como uma possibilidade de retomar os bons tempos da pecuária . Ele mantém 2,5 mil cabeças em Goianésia (GO), a cerca de 170 km de Goiânia, além de 4 mil hectares de lavouras de soja e cana.
+
+“Estou na pecuária há 50 anos, desde minha adolescência. Antes era minha principal atividade, mas há alguns anos ficou muito complicado. As novas tecnologias podem trazer de volta os bons tempos”, avalia.
+
+O pecuarista iniciou em fevereiro suas primeiras atividades com uso da tecnologia. Trata-se de visão computacional com uso de drone para identificar os melhores talhões e o volume de sementes exato para o plantio de pasto.
+
+“Com IA, conseguimos localizar as áreas ideais para lançar as sementes sobre as áreas de soja. Assim, o pasto vai aproveitar a adubação. O drone fez imagens também para indicar as necessidades de calagem, adubação e número de cabeças [de gado] por hectare”, relata.
+
+Além de estudar sobre o assunto, Tasso também conta com a parceria do filho, que é engenheiro e estudante de agronomia, para adotar novas aplicações de IA. “É uma tendência. Quem não entrar, mesmo contra a vontade, vai ficar para trás”, opina.
+
+Ele observa que, atualmente, o manejo evolui rapidamente. “Antigamente, levava dez anos para chegar alguma inovação importante. Hoje muda todo ano e com novidades que fazem diferença”, completa.
+
+O professor Burd também destaca a funcionalidade da IA para outras etapas do negócio de uma empresa rural, como a comercialização.
+
+Os algoritmos cruzam dados de safra com tendências de mercado para indicar, por exemplo, o melhor momento de venda ou travamento de preços”, exemplifica.
+
+A SLC também faz uso da tecnologia para a comercialização da safra a partir de um amplo conjunto de informações como relatórios do USDA (Departamento de Agicultura dos EUA), tamanho da safra brasileira e Argentina, câmbio, cotações futuras e outros.
+
+Isso aponta tendências e previsões de comportamento de preços. Não buscamos 100% de precisão, mas sim indicadores de tendência, que já ajudam bastante nas decisões. Esses modelos nunca são 100% assertivos, porque o agro está sempre mudando, mas ajudam muito na tomada de decisão”, reconhece.
+
+A incorporação da inteligência artificial no agronegócio brasileiro ainda enfrenta entraves estruturais importantes. A conectividade continua sendo um dos principais gargalos.
+
+Embora a cobertura 4G e 5G em imóveis rurais tenha alcançado 43,8% em 2024, segundo levantamento da ConectarAgro, mais da metade das propriedades ainda opera em verdadeiros “apagões digitais”, dependendo de soluções offline ou de conexões via satélite, geralmente mais caras.
+
+“A tecnologia pode ser sofisticada, mas sem conectividade ela simplesmente não chega ao campo. Muitas propriedades ainda trabalham em condições digitais muito limitadas”, observa o professor Burd.
+
+Segundo ele, outro obstáculo relevante está na mão de obra qualificada. Há escassez de profissionais capazes de interpretar os dados e recomendações produzidos pelos sistemas de IA.
+
+Outro ponto sensível é o custo inicial de implementação. Sensores, infraestrutura de dados e integração de plataformas ainda representam investimento elevado para muitas empresas rurais.
+
+Levantamento do IBGE indica que 78,6% das empresas que tentaram adotar tecnologias avançadas apontam o custo como barreira relevante.
+
+A expansão da IA no campo também traz certos riscos. A crescente conectividade das fazendas abre espaço para ameaças de cibersegurança.
+
+Sistemas de irrigação , máquinas autônomas e plataformas de gestão são potenciais alvos de ataques digitais. Em 2025, o setor registrou cerca de 3,2 mil ataques cibernéticos mensais, segundo dados da ISP.Tools.
+
+“Quando a fazenda se conecta, ela também se expõe. Um ataque de ransomware pode travar máquinas ou sistemas em momentos críticos da safra”, alerta Burd.
+
+Outro risco apontado por ele é a dependência tecnológica. “Se um algoritmo falha ou um serviço de nuvem sai do ar no meio de uma janela climática curta, a operação inteira pode ser afetada”, explica.
+
+A privacidade dos dados agrícolas também pode ficar exposta, acrescenta. Informações sobre produtividade, manejo e localização das áreas passam a circular em plataformas digitais, muitas delas controladas por grandes empresas de tecnologia.

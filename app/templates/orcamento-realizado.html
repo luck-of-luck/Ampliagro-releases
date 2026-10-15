@@ -1,0 +1,293 @@
+{% extends base_template %}
+{% load static %}
+{% block title %}Ampliagro - Orcado x Realizado{% endblock %}
+{% block extra_css %}{% endblock %}
+{% block dashboard_appbar %}{% endblock %}
+{% block content %}
+<div class="section-container">
+    <div class="section-header">
+        <h1 class="section-title"><i class="bi bi-clipboard-data me-2"></i>Orcamento x Realizado</h1>
+        <div style="display:flex;gap:0.75rem;">
+            <input type="number" class="search-input" id="ano-input" placeholder="Ano"
+                   style="flex:0 0 auto;min-width:7rem" inputmode="numeric">
+            <a href="{% url 'custos-producao' %}" class="btn-secondary" style="text-decoration:none">
+                <i class="bi bi-calculator me-1"></i>Custo por safra
+            </a>
+        </div>
+    </div>
+
+    {# ------------------------------------------------------------------ #}
+    {# O AVISO. Vem antes dos numeros, porque um numero sem o aviso e' um   #}
+    {# numero que mente: R$ 9.000 de despesa que nao esta em nenhum talhao  #}
+    {# nao aparece na tabela, e sem este bloco parece que o custo e' zero. #}
+    {# ------------------------------------------------------------------ #}
+    <div id="aviso-pendencias" hidden></div>
+
+    <div class="stats-grid" id="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value" id="stat-orcado">--</div>
+            <div class="stat-label">Orcado</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="stat-realizado">--</div>
+            <div class="stat-label">Realizado</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="stat-desvio">--</div>
+            <div class="stat-label">Desvio</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="stat-lucro">--</div>
+            <div class="stat-label">Lucro realizado</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="stat-lucro-ha">--</div>
+            <div class="stat-label">Lucro por ha</div>
+        </div>
+    </div>
+
+    <div class="content-card">
+        <div class="card-title"><i class="bi bi-table"></i> Por talhao</div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Talhao</th>
+                        <th>Area</th>
+                        <th>Orcado</th>
+                        <th>Realizado</th>
+                        <th>Desvio</th>
+                        <th>% do orcado</th>
+                        <th>Custo/ha</th>
+                        <th>Lucro</th>
+                        <th>Lucro/ha</th>
+                    </tr>
+                </thead>
+                <tbody id="tabela">
+                    <tr><td colspan="9" class="empty-state">Carregando...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="text-muted mt-2 mb-0" style="font-size:0.85rem">
+            <strong>Orcado</strong> vem do Plano de Safra. <strong>Realizado</strong> so conta
+            o que foi <strong>pago</strong> - um boleto em aberto nao e' custo ainda.
+            Um <code>--</code> nao e' zero: e' falta de registo.
+        </p>
+    </div>
+</div>
+
+<script>
+{% verbatim %}
+(function () {
+    // `--` e nao `0.00`. Esta e' a regra que atravessa o servico e o ecrã:
+    // "nao ha registo" e "registou-se zero" sao coisas diferentes, e so
+    // mostrar a segunda faz o produtor tomar decisao sobre um numero que
+    // ninguem registou. Mesmo `fmt()` que o resto do painel usa.
+    function fmt(v) {
+        if (v === null || v === undefined) return '--';
+        const n = parseFloat(v);
+        if (isNaN(n)) return '--';
+        return 'R$ ' + n.toLocaleString('pt-BR', {
+            minimumFractionDigits: 2, maximumFractionDigits: 2
+        });
+    }
+
+    function pct(v) {
+        if (v === null || v === undefined) return '--';
+        const n = parseFloat(v);
+        if (isNaN(n)) return '--';
+        const s = n > 0 ? '+' : '';
+        return s + n.toLocaleString('pt-BR', {
+            minimumFractionDigits: 1, maximumFractionDigits: 1
+        }) + '%';
+    }
+
+    function num(v, casas) {
+        if (v === null || v === undefined) return '--';
+        const n = parseFloat(v);
+        if (isNaN(n)) return '--';
+        return n.toLocaleString('pt-BR', {
+            minimumFractionDigits: casas, maximumFractionDigits: casas
+        });
+    }
+
+    // A desvio coloring: gastar mais do que o orcado e' a unica celula que
+    // "grita". Verde para dentro do orcado, vermelho para fora. A celula
+    // continua a dizer o numero - a cor e' um segundo sinal, nunca o unico,
+    // porque cor sozinha nao chega a quem nao distingue.
+    function classeDesvio(v) {
+        if (v === null || v === undefined) return '';
+        const n = parseFloat(v);
+        if (isNaN(n)) return '';
+        if (n > 0) return 'desvio-acima';
+        if (n < 0) return 'desvio-dentro';
+        return 'desvio-exato';
+    }
+
+    function el(tag, txt, cls) {
+        const t = document.createElement(tag);
+        if (txt !== null && txt !== undefined) t.textContent = txt;
+        if (cls) t.className = cls;
+        return t;
+    }
+
+    function montarAviso(p) {
+        const box = document.getElementById('aviso-pendencias');
+        box.innerHTML = '';
+        const partes = [];
+
+        if (p.nao_alocado_registros > 0) {
+            partes.push(
+                '<strong>' + p.nao_alocado_registros + ' lancamento(s) sem talhao</strong> ' +
+                '(' + fmt(p.nao_alocado_despesa) + ' em despesa) nao entram nesta conta. ' +
+                'Abra o cadastro financeiro e ligue cada um ao talhao.'
+            );
+        }
+        if (p.talhoes_sem_orcado && p.talhoes_sem_orcado.length) {
+            partes.push(
+                'Sem orcado registado: <strong>' +
+                p.talhoes_sem_orcado.join(', ') +
+                '</strong>. Sem plano de safra nao ha coluna para comparar.'
+            );
+        }
+        if (p.comprometido_total > 0) {
+            partes.push(
+                fmt(p.comprometido_total) + ' esta Comprometido (lancado, nao pago) e ' +
+                'por isso <strong>nao</strong> entra no realizado.'
+            );
+        }
+        if (p.talhoes_sem_lancamento && p.talhoes_sem_lancamento.length) {
+            const t = p.talhoes_sem_lancamento;
+            partes.push(
+                'Sem qualquer lancamento: <strong>' +
+                t.slice(0, 5).join(', ') + (t.length > 5 ? ' e mais ' + (t.length - 5) : '') +
+                '</strong>. Ausencia de registo nao e' zero.'
+            );
+        }
+
+        if (!partes.length) return;   // nada a avisar: some o bloco
+
+        const ul = document.createElement('ul');
+        ul.style.margin = '0';
+        ul.style.paddingLeft = '1.2rem';
+        partes.forEach(function (t) {
+            const li = document.createElement('li');
+            li.innerHTML = t;
+            ul.appendChild(li);
+        });
+        const card = el('div', null, 'content-card');
+        card.style.borderLeft = '4px solid var(--warning, #f0ad4e)';
+        card.style.marginBottom = '1rem';
+        const titulo = el('div');
+        titulo.className = 'card-title';
+        titulo.innerHTML = '<i class="bi bi-exclamation-triangle"></i> O que esta em falta';
+        card.appendChild(titulo);
+        card.appendChild(ul);
+        box.appendChild(card);
+        box.hidden = false;
+    }
+
+    function montarTabela(linhas) {
+        const corpo = document.getElementById('tabela');
+        corpo.innerHTML = '';
+
+        if (!linhas.length) {
+            const tr = document.createElement('tr');
+            const td = el('td', 'Nenhum talhao activo nesta propriedade.', 'empty-state');
+            td.colSpan = 9;
+            tr.appendChild(td);
+            corpo.appendChild(tr);
+            return;
+        }
+
+        // Pior custo por hectare primeiro: e' a ordem que responde
+        // "onde e' que o dinheiro foi". A tabela traz tambem o lucro, porque
+        // e' a outra metade da pergunta - e sao duas ordens diferentes.
+        linhas.sort(function (a, b) {
+            const x = a.custo_por_ha, y = b.custo_por_ha;
+            if (x === null && y === null) return a.talhao.localeCompare(b.talhao);
+            if (x === null) return 1;    // sem area vai para o fim
+            if (y === null) return -1;
+            return y - x;
+        });
+
+        linhas.forEach(function (l) {
+            const tr = document.createElement('tr');
+
+            tr.appendChild(el('td', l.talhao));
+
+            const area = el('td', num(l.area_ha, 2) === '--' ? '--' : num(l.area_ha, 2) + ' ha');
+            tr.appendChild(area);
+
+            tr.appendChild(el('td', fmt(l.orcado)));
+            tr.appendChild(el('td', fmt(l.realizado_despesa)));
+
+            const desvio = el('td', fmt(l.desvio), classeDesvio(l.desvio));
+            tr.appendChild(desvio);
+
+            const p = el('td', pct(l.desvio_pct), classeDesvio(l.desvio));
+            tr.appendChild(p);
+
+            tr.appendChild(el('td', l.custo_por_ha === null ? '--' : fmt(l.custo_por_ha)));
+            tr.appendChild(el('td', fmt(l.lucro_realizado)));
+            tr.appendChild(el('td', l.lucro_por_ha === null ? '--' : fmt(l.lucro_por_ha)));
+
+            corpo.appendChild(tr);
+        });
+    }
+
+    function montarStats(d) {
+        const linhas = d.linhas || [];
+        const somouOrcado = linhas.some(function (l) { return l.orcado !== null; });
+        const temOrcado = somouOrcado
+            ? linhas.reduce(function (s, l) { return s + (l.orcado || 0); }, 0)
+            : null;
+
+        document.getElementById('stat-orcado').textContent = fmt(temOrcado);
+        document.getElementById('stat-realizado').textContent = fmt(d.total_despesa);
+
+        const desvio = d.tem_dados && temOrcado !== null ? d.total_despesa - temOrcado : null;
+        const elDesvio = document.getElementById('stat-desvio');
+        elDesvio.textContent = fmt(desvio);
+        elDesvio.className = 'stat-value ' + classeDesvio(desvio);
+
+        document.getElementById('stat-lucro').textContent = fmt(d.lucro_total);
+        document.getElementById('stat-lucro-ha').textContent = fmt(d.lucro_por_ha);
+    }
+
+    function carregar() {
+        const ano = document.getElementById('ano-input').value.trim();
+        let url = '/api/financeiro/custo-talhao/';
+        if (ano) url += '?ano=' + encodeURIComponent(ano);
+
+        fetch(url)
+            .then(function (r) {
+                if (!r.ok) throw new Error('HTTP ' + r.status);
+                return r.json();
+            })
+            .then(function (d) {
+                montarStats(d);
+                montarTabela(d.linhas || []);
+                if (d.pendencias) montarAviso(d.pendencias);
+            })
+            .catch(function (e) {
+                document.getElementById('tabela').innerHTML =
+                    '<tr><td colspan="9" class="empty-state">Nao foi possivel carregar: ' +
+                    (e && e.message ? e.message : 'erro desconhecido') + '</td></tr>';
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        carregar();
+        const ano = document.getElementById('ano-input');
+        if (ano) {
+            ano.addEventListener('change', carregar);
+            ano.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') carregar();
+            });
+        }
+    });
+})();
+{% endverbatim %}
+</script>
+{% endblock %}

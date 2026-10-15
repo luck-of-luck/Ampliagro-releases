@@ -1,0 +1,172 @@
+{% extends base_template %}
+{% load static %}
+
+{% block title %}Ampliagro - Rotas{% endblock %}
+
+{% block extra_css %}
+
+{% endblock %}
+
+{% block dashboard_appbar %}{% endblock %}
+
+{% block content %}
+<div class="section-container">
+    <div class="section-header">
+        <h1 class="section-title"><i class="bi bi-signpost-2 me-2"></i>Rotas</h1>
+        <div style="display:flex;gap:0.75rem;">
+            <a href="{% url 'logistica-caminhao' %}" class="btn-secondary"><i class="bi bi-truck"></i> Frota</a>
+            <button class="btn-primary" onclick="novaRota()"><i class="bi bi-plus-lg"></i> Nova Rota</button>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Rotas Ativas</div>
+            <div class="stat-value" id="rotas-ativas">--</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Entregas Hoje</div>
+            <div class="stat-value" id="entregas-hoje">--</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Km Total Mês</div>
+            <div class="stat-value" id="km-mes">--</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Concluídas</div>
+            <div class="stat-value" id="rotas-concluidas">--</div>
+        </div>
+    </div>
+
+    <div class="content-card">
+        <div class="search-bar">
+            <input type="text" class="search-input" id="search-input" placeholder="Buscar por origem, destino, motorista..." oninput="filtrarTabela()">
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Origem</th>
+                        <th>Destino</th>
+                        <th>Distância (km)</th>
+                        <th>Motorista</th>
+                        <th>Caminhão</th>
+                        <th>Data</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tabela-rotas">
+                    <tr>
+                        <td colspan="8" class="empty-state">
+                            <i class="bi bi-signpost-2" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>
+                            Nenhuma rota cadastrada.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+    const API_URL = '/api/rotas/';
+
+    async function carregarRotas() {
+        try {
+            const resp = await fetch(API_URL);
+            if (!resp.ok) throw new Error('Falha ao carregar');
+            const dados = await resp.json();
+            const tbody = document.getElementById('tabela-rotas');
+            const lista = Array.isArray(dados) ? dados : (dados.results || []);
+
+            if (!lista.length) {
+                tbody.innerHTML = '<tr><td colspan="8" class="empty-state"><i class="bi bi-signpost-2" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>Nenhuma rota cadastrada.</td></tr>';
+                atualizarStats(0, 0, '0 km', 0);
+                return;
+            }
+
+            let html = '';
+            let ativas = 0, concluidas = 0, hoje = 0, kmTotal = 0;
+            const hojeStr = new Date().toISOString().split('T')[0];
+
+            lista.forEach(r => {
+                const st = (r.status || '').toLowerCase();
+                if (st === 'ativa' || st === 'ativo' || st === 'em andamento') ativas++;
+                else if (st === 'concluida' || st === 'concluída') concluidas++;
+                if (r.data && r.data.split('T')[0] === hojeStr) hoje++;
+                if (r.distancia_km || r.distancia) kmTotal += parseFloat(r.distancia_km || r.distancia || 0);
+
+                let badge = '';
+                if (st === 'concluida' || st === 'concluída') badge = '<span class="badge badge-success">Concluída</span>';
+                else if (st === 'ativa' || st === 'ativo' || st === 'em andamento') badge = '<span class="badge badge-info">Ativa</span>';
+                else if (st === 'cancelada') badge = '<span class="badge badge-danger">Cancelada</span>';
+                else badge = '<span class="badge badge-warning">' + (r.status || '--') + '</span>';
+
+                html += '<tr>' +
+                    '<td>' + (r.origem || '--') + '</td>' +
+                    '<td><strong>' + (r.destino || '--') + '</strong></td>' +
+                    '<td>' + (r.distancia_km || r.distancia || '--') + '</td>' +
+                    '<td>' + (r.motorista || '--') + '</td>' +
+                    '<td>' + (r.caminhao || r.caminhao_placa || '--') + '</td>' +
+                    '<td>' + (r.data ? new Date(r.data).toLocaleDateString('pt-BR') : '--') + '</td>' +
+                    '<td>' + badge + '</td>' +
+                    '<td><div class="action-cell">' +
+                    '<button class="btn-secondary btn-sm" onclick="editarRota(' + r.id + ')"><i class="bi bi-pencil"></i></button>' +
+                    '<button class="btn-secondary btn-sm" onclick="excluirRota(' + r.id + ')" style="background:#fef2f2;color:#dc2626;"><i class="bi bi-trash"></i></button>' +
+                    '</div></td></tr>';
+            });
+            tbody.innerHTML = html;
+            atualizarStats(ativas, hoje, kmTotal.toFixed(0) + ' km', concluidas);
+            filtrarTabela();
+        } catch (e) {
+            console.error('Erro ao carregar rotas:', e);
+        }
+    }
+
+    function atualizarStats(ativas, entregasHoje, kmMes, concluidas) {
+        document.getElementById('rotas-ativas').textContent = ativas;
+        document.getElementById('entregas-hoje').textContent = entregasHoje;
+        document.getElementById('km-mes').textContent = kmMes;
+        document.getElementById('rotas-concluidas').textContent = concluidas;
+    }
+
+    function filtrarTabela() {
+        const q = document.getElementById('search-input').value.toLowerCase();
+        const rows = document.querySelectorAll('#tabela-rotas tr');
+        rows.forEach(row => {
+            if (row.classList.contains('empty-state')) return;
+            row.style.display = (!q || row.textContent.toLowerCase().includes(q)) ? '' : 'none';
+        });
+    }
+
+    function novaRota() {
+        window.location.href = '/cadastro-rota/';
+    }
+
+    function editarRota(id) {
+        window.location.href = '/cadastro-rota/?edit=' + id;
+    }
+
+    async function excluirRota(id) {
+        if (!confirm('Excluir esta rota?')) return;
+        try {
+            const resp = await fetch(API_URL + id + '/', { method: 'DELETE', headers: { 'X-CSRFToken': getCSRFToken() } });
+            if (resp.ok) carregarRotas();
+            else alert('Erro ao excluir');
+        } catch (e) {
+            alert('Erro de conexão');
+        }
+    }
+
+    function getCSRFToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+    }
+
+    document.addEventListener('DOMContentLoaded', carregarRotas);
+</script>
+{% endblock %}

@@ -1,0 +1,132 @@
+{% extends base_template %}
+{% load static %}
+
+{% block title %}Ampliagro - Racoes e Nutricao{% endblock %}
+
+{% block extra_css %}
+
+{% endblock %}
+
+{% block dashboard_appbar %}{% endblock %}
+
+{% block content %}
+<div class="section-container">
+    <div class="section-header">
+        <h1 class="section-title">Racoes e Nutricao</h1>
+        <a href="{% url 'index_spa' %}" class="btn-secondary btn-sm">Voltar ao Dashboard</a>
+    </div>
+
+    <div class="content-card">
+        <h2 style="font-size:1rem;font-weight:600;margin-bottom:1.25rem;color:var(--ncs-green-dark);">Nova Racao</h2>
+        <form id="racao-form" onsubmit="return submitRacao(event)">
+            {% csrf_token %}
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Fazenda</label>
+                    <select name="propriedade" required>
+                        <option value="">Selecione...</option>
+                        {% for p in propriedades %}<option value="{{ p.id }}">{{ p.nome }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Nome da Racao</label>
+                    <input type="text" name="nome" required placeholder="Ex: Racao de engorda">
+                </div>
+                <div class="form-group">
+                    <label>Tipo</label>
+                    <select name="tipo" required>
+                        <option value="">Selecione...</option>
+                        <option value="CONCENTRADO">Concentrado</option>
+                        <option value="VOLUMOSO">Volumoso</option>
+                        <option value="MINERAL">Mineral</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Quantidade (kg)</label>
+                    <input type="number" step="0.01" name="quantidade" required placeholder="0,00">
+                </div>
+                <div class="form-group">
+                    <label>Fornecedor</label>
+                    <input type="text" name="fornecedor" placeholder="Nome do fornecedor">
+                </div>
+                <div class="form-group">
+                    <label>Data de Validade</label>
+                    <input type="date" name="data_validade">
+                </div>
+            </div>
+            <div style="margin-top:1.25rem;display:flex;gap:0.75rem;">
+                <button type="submit" class="btn-primary"><i class="bi bi-check-lg"></i> Salvar Racao</button>
+                <button type="reset" class="btn-secondary">Limpar</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="content-card">
+        <h2 style="font-size:1rem;font-weight:600;margin-bottom:1rem;color:var(--ncs-green-dark);">Racoes Cadastradas</h2>
+        {% if racoes %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Tipo</th>
+                        <th>Quantidade (kg)</th>
+                        <th>Fornecedor</th>
+                        <th>Validade</th>
+                        <th>Acoes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in racoes %}
+                    <tr>
+                        <td><strong>{{ r.nome }}</strong></td>
+                        <td><span class="badge badge-{{ r.tipo|lower }}">{{ r.get_tipo_display }}</span></td>
+                        <td>{{ r.quantidade|floatformat:2 }}</td>
+                        <td>{{ r.fornecedor|default:"-" }}</td>
+                        <td>{{ r.data_validade|date:"d/m/Y"|default:"-" }}</td>
+                        <td><button class="btn-danger btn-sm" onclick="excluirRacao({{ r.id }})">Excluir</button></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state"><i class="bi bi-inbox" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>Nenhuma racao cadastrada.</div>
+        {% endif %}
+    </div>
+</div>
+<div id="toast" class="toast"></div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+function getCSRFToken() { return document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''; }
+function showToast(msg, type) { const t = document.getElementById('toast'); t.textContent = msg; t.className = 'toast toast-' + type + ' show'; setTimeout(() => t.classList.remove('show'), 3000); }
+
+async function submitRacao(event) {
+    event.preventDefault();
+    const f = document.getElementById('racao-form');
+    const data = {
+        propriedade: parseInt(f.propriedade.value),
+        nome: f.nome.value,
+        tipo: f.tipo.value,
+        quantidade: parseFloat(f.quantidade.value),
+        fornecedor: f.fornecedor.value || '',
+        data_validade: f.data_validade.value || null,
+    };
+    try {
+        const r = await fetch('/api/racoes/', { method:'POST', headers:{'Content-Type':'application/json','X-CSRFToken':getCSRFToken()}, body: JSON.stringify(data) });
+        if (r.ok) { showToast('Racao cadastrada!','success'); setTimeout(()=>location.reload(),1000); }
+        else { const e=await r.json(); showToast('Erro: '+JSON.stringify(e),'error'); }
+    } catch(e) { showToast('Erro: '+e.message,'error'); }
+    return false;
+}
+
+function excluirRacao(id) {
+    if (!confirm('Excluir esta racao?')) return;
+    fetch('/api/racoes/'+id+'/', { method:'DELETE', headers:{'X-CSRFToken':getCSRFToken()} })
+        .then(r => { if(r.ok){ showToast('Racao excluida','success'); setTimeout(()=>location.reload(),1000); } else showToast('Erro','error'); });
+}
+</script>
+{% endblock %}

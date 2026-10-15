@@ -1,0 +1,28 @@
+# Dependências OPCIONAIS do servidor MCP (stdio) do AmplIA.
+#
+# POR QUE ESTE FICHEIRO EXISTE E NÃO UMA LINHA EM `requirements.txt`
+# ------------------------------------------------------------------
+# O `mcp` é a única forma de um cliente de fora (Claude Desktop, Hermes,
+# opencode, qualquer agente) falar com a AmplIA por stdio. Mas o AmplIA
+# funciona sem ele: o Django arranca, o painel serve, a IA do navegador
+# (WebLLM) chama `/api/amplia/*` por HTTP, e a suite de testes passa. Pôr o
+# SDK no `requirements.txt` obrigaria toda a gente — incluindo os deploys que
+# nunca vão usar stdio — a instalar uma dependência que não usam.
+#
+# Por isso é um extra: instala-se quando se quer a porta aberta.
+#
+#     .\.venv\Scripts\python.exe -m pip install -r requirements-mcp.txt
+#
+# Estando instalado, confirma com:
+#
+#     .\.venv\Scripts\python.exe manage.py amplia_mcp doctor
+#
+# A versão é fixada com tecto superior, pela mesma política do resto do
+# projecto: `>=floor,<next_major` limita a superfície de ataque da cadeia de
+# fornecimento sem travar actualizações normais.
+#
+# O AmplIA não depende deste pacote em nenhum momento. Nada em `app/` faz
+# `import mcp` fora de `app/amplia_mcp/servidor.py`, e esse import é
+# preguiçoso e está dentro de um `try`. Tirar este ficheiro não parte nada.
+
+mcp>=1.2.0,<2

@@ -1,0 +1,245 @@
+{% extends "partials/_premium_cadastro_base.html" %}
+{% load static agro_icons %}
+
+{% block title %}Ampliagro - Cadastro de Talhões{% endblock %}
+
+{% block cadastro_icon %}bi bi-grid-3x3-gap{% endblock %}
+{% block cadastro_title %}Cadastro de Talhões{% endblock %}
+{% block cadastro_novo_title %}Novo Talhão{% endblock %}
+{% block cadastro_lista_title %}Talhões Cadastrados{% endblock %}
+
+{% block cadastro_subtabs %}
+<div class="pcrud-subtabs" id="cadastroSubTabs">
+    <button class="pcrud-subtab active" data-tab="novo">Novo Talhão</button>
+    <button class="pcrud-subtab" data-tab="lista">Talhões Cadastrados</button>
+    <button class="pcrud-subtab" data-tab="geometria">Geometria/Mapa</button>
+</div>
+{% endblock %}
+
+{% block cadastro_stats %}
+<div class="pcrud-stats" id="cadastroStats">
+    <div class="pcrud-stat"><div class="pcrud-stat-label">Total Talhões</div><div class="pcrud-stat-value" id="statTotalTalhoes">{{ talhoes|length }}</div></div>
+    <div class="pcrud-stat"><div class="pcrud-stat-label">Área Total (ha)</div><div class="pcrud-stat-value" id="statAreaTotal">{{ area_total|floatformat:2 }}</div></div>
+    <div class="pcrud-stat"><div class="pcrud-stat-label">Ativos</div><div class="pcrud-stat-value" id="statAtivos">{{ talhoes_ativos }}</div></div>
+    <div class="pcrud-stat"><div class="pcrud-stat-label">Com Geometria</div><div class="pcrud-stat-value" id="statComGeo">{{ talhoes_com_geo }}</div></div>
+</div>
+{% endblock %}
+
+{% block cadastro_form_novo %}
+<form id="talhao-form" onsubmit="return submitTalhao(event)">
+    {% csrf_token %}
+    <div class="pcrud-form-grid">
+        <div class="pcrud-form-group">
+            <label>Propriedade</label>
+            <select name="propriedade" required onblur="validateField(this)">
+                <option value="">Selecione...</option>
+                {% for p in propriedades %}
+                <option value="{{ p.id }}">{{ p.nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="pcrud-form-group">
+            <label>Nome do Talhão</label>
+            <input type="text" name="nome" placeholder="Ex: Talhão A1" required onblur="validateField(this)">
+        </div>
+        <div class="pcrud-form-group">
+            <label>Área (ha)</label>
+            <input type="number" step="0.01" name="area_hectare" required placeholder="0,00" onblur="validateField(this)">
+        </div>
+        <div class="pcrud-form-group">
+            <label>Cultura Atual</label>
+            <select name="cultura_atual" onchange="onCulturaChange(this)">
+                <option value="">Selecione (opcional)...</option>
+                {% for c in culturas %}
+                <option value="{{ c.id }}">{{ c.nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="pcrud-form-group cultura-type-group" id="cultura-type-group" style="display:none;">
+            <label>Tipo/Variedade da Cultura</label>
+            <select name="cultura_type" id="id_cultura_type">
+                <option value="">Selecione...</option>
+            </select>
+        </div>
+        <div class="pcrud-form-group">
+            <label>Tipo de Solo</label>
+            <input type="text" name="tipo_solo" placeholder="Ex: Argissolo, Latossolo, Neossolo">
+        </div>
+        <div class="pcrud-form-group">
+            <label>Ativo</label>
+            <div style="display:flex;align-items:center;gap:8px;">
+                <input type="checkbox" name="ativo" id="id_ativo" checked style="width:auto;height:auto;">
+                <label for="id_ativo" style="margin:0;font-weight:500;font-size:.813rem;text-transform:none;letter-spacing:0;cursor:pointer;">Talhão ativo</label>
+            </div>
+        </div>
+    </div>
+    <div class="pcrud-form-actions">
+        <button type="submit" class="pcrud-btn pcrud-btn-primary"><i class="bi bi-check-lg"></i> Salvar Talhão</button>
+        <button type="reset" class="pcrud-btn pcrud-btn-secondary">Limpar</button>
+    </div>
+</form>
+{% endblock %}
+
+{% block cadastro_tab_lista %}
+{% if talhoes %}
+<div class="pcrud-table-wrap">
+    <table class="pcrud-table">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Propriedade</th>
+                <th>Área (ha)</th>
+                <th>Cultura</th>
+                <th>Tipo/Variedade</th>
+                <th>Solo</th>
+                <th>Ativo</th>
+                <th>Geometria</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for t in talhoes %}
+            <tr>
+                <td><strong>{{ t.nome }}</strong></td>
+                <td>{{ t.propriedade.nome }}</td>
+                <td>{{ t.area_hectare|floatformat:2 }}</td>
+                <td>{{ t.cultura_atual.nome|default:"—" }}</td>
+                <td style="font-size:.75rem;color:var(--cor-texto-medio);">
+                    {% if t.coordenadas and t.coordenadas.cultura_type %}
+                    <span style="background:var(--cor-primaria-suave);color:var(--cor-primaria);padding:2px 8px;border-radius:999px;font-weight:600;">{{ t.coordenadas.cultura_type }}</span>
+                    {% else %}—{% endif %}
+                </td>
+                <td>{{ t.tipo_solo|default:"—" }}</td>
+                <td>{% if t.ativo %}<span style="color:var(--cor-sucesso);">● Ativo</span>{% else %}<span style="color:var(--cor-erro);">● Inativo</span>{% endif %}</td>
+                <td>{% if t.geometria %}<span style="color:var(--cor-primaria);"><i class="bi bi-geo-alt-fill"></i> Sim</span>{% else %}<span style="color:var(--cor-texto-fraco);">—</span>{% endif %}</td>
+                <td>
+                    <div class="action-cell">
+                        <button class="pcrud-btn pcrud-btn-secondary pcrud-btn-sm" onclick="editarTalhao({{ t.id }})"><i class="bi bi-pencil"></i> Editar</button>
+                        <button class="pcrud-btn pcrud-btn-danger pcrud-btn-sm" onclick="excluirTalhao({{ t.id }})"><i class="bi bi-trash"></i> Excluir</button>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+{% include "partials/_empty_state_cta.html" with empty_icone="bi bi-bounding-box" empty_titulo="Nenhum talhão cadastrado" empty_descricao="Cadastre o primeiro talhão para vincular safras, aplicar VRA e área por cultura." empty_acao="Cadastrar talhão" empty_aba="novo" %}
+{% endif %}
+{% endblock %}
+
+{% block cadastro_extra_tabs %}
+<!-- Tab: Geometria/Mapa -->
+<div class="pcrud-tab" id="tab-geometria">
+    <h2><i class="bi bi-geo-alt"></i> Geometria & Mapa</h2>
+    <div class="pcrud-form-card">
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;">
+            <button class="pcrud-btn pcrud-btn-secondary pcrud-btn-sm" onclick="abrirEditorGeoJSON()"><i class="bi bi-pencil-square"></i> Editar GeoJSON</button>
+            <button class="pcrud-btn pcrud-btn-secondary pcrud-btn-sm" onclick="importarKML()"><i class="bi bi-upload"></i> Importar KML</button>
+            <button class="pcrud-btn pcrud-btn-secondary pcrud-btn-sm" onclick="exportarGeoJSON()"><i class="bi bi-download"></i> Exportar GeoJSON</button>
+            <button class="pcrud-btn pcrud-btn-primary pcrud-btn-sm" onclick="abrirMapaSelecao()"><i class="bi bi-map"></i> Desenhar no Mapa</button>
+        </div>
+        <div id="mapa-talhao" style="width:100%;height:500px;border-radius:12px;border:1px solid var(--cor-borda);background:var(--cor-fundo-card-aninhado);"></div>
+        <div class="pcrud-form-actions" style="margin-top:16px;">
+            <button class="pcrud-btn pcrud-btn-primary" onclick="salvarGeometria()"><i class="bi bi-save"></i> Salvar Geometria</button>
+            <button class="pcrud-btn pcrud-btn-secondary" onclick="limparGeometria()"><i class="bi bi-trash"></i> Limpar</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="{% static 'js/cultures-loader.js' %}"></script>
+<script>
+(function() {
+    // Cultura type loading
+    window.onCulturaChange = function(sel) {
+        var group = document.getElementById('cultura-type-group');
+        var typeSel = document.getElementById('id_cultura_type');
+        typeSel.innerHTML = '<option value="">Selecione...</option>';
+        if (!sel.value) { group.style.display = 'none'; return; }
+        var nome = sel.options[sel.selectedIndex].text;
+        if (window.CulturesLoader && window.CULTURE_GROUPS) {
+            var found = null;
+            for (var gi = 0; gi < window.CULTURE_GROUPS.length; gi++) {
+                var g = window.CULTURE_GROUPS[gi];
+                for (var ci = 0; ci < g.cultures.length; ci++) {
+                    var c = g.cultures[ci];
+                    if (c.title && (c.title.toLowerCase() === nome.toLowerCase() ||
+                        c.django_nome && c.django_nome.toLowerCase() === nome.toLowerCase())) {
+                        found = c; break;
+                    }
+                }
+                if (found) break;
+            }
+            if (found && found.types && Object.keys(found.types).length) {
+                Object.keys(found.types).forEach(function(key) {
+                    var t = found.types[key];
+                    typeSel.innerHTML += '<option value="' + key + '">' + t.label + '</option>';
+                });
+                group.style.display = 'block';
+            } else { group.style.display = 'none'; }
+        }
+    };
+
+    // Submit Talhão
+    window.submitTalhao = async function(event) {
+        event.preventDefault();
+        if (!validateForm('talhao-form')) return false;
+        const btn = document.querySelector('#talhao-form .pcrud-btn-primary');
+        const culturaType = document.getElementById('id_cultura_type').value;
+        const f = document.getElementById('talhao-form');
+        const data = {
+            propriedade: parseInt(f.propriedade.value),
+            nome: f.nome.value,
+            area_hectare: parseFloat(f.area_hectare.value),
+            cultura_atual: parseInt(f.cultura_atual.value) || null,
+            tipo_solo: f.tipo_solo.value || '',
+            ativo: f.ativo?.checked ?? true,
+            coordenadas: {}
+        };
+        if (culturaType) data.coordenadas.cultura_type = culturaType;
+        showLoading(btn);
+        try {
+            const resp = await fetch('/api/talhoes/', {
+                method: 'POST', headers: {'Content-Type':'application/json','X-CSRFToken':getCSRFToken()}, body: JSON.stringify(data)
+            });
+            if (resp.ok) { showToast('Talhão cadastrado!','success'); setTimeout(() => location.reload(), 800); }
+            else { const err = await resp.json(); showToast('Erro: '+JSON.stringify(err),'error'); }
+        } catch(e) { showToast('Erro: '+e.message,'error'); } finally { hideLoading(btn); }
+        return false;
+    };
+
+    window.excluirTalhao = function(id) {
+        if (!confirm('Excluir este talhão?')) return;
+        fetch('/api/talhoes/'+id+'/', { method:'DELETE', headers:{'X-CSRFToken':getCSRFToken()} })
+            .then(r => { if(r.ok){ showToast('Excluído','success'); setTimeout(() => location.reload(), 500); } else showToast('Erro','error'); });
+    };
+
+    // Pre-seleciona cultura vinda de ?cultura= (isolamento por cultura — vem do registro-cultura)
+    (function preselectCultura() {
+        try {
+            var params = new URLSearchParams(window.location.search);
+            var cid = params.get('cultura');
+            if (cid) {
+                var sel = document.querySelector('select[name=\"cultura_atual\"]');
+                if (sel) {
+                    sel.value = cid;
+                    // dispara onCulturaChange para carregar tipos
+                    if (typeof window.onCulturaChange === 'function') window.onCulturaChange(sel);
+                }
+            }
+        } catch(e) {}
+    })();
+
+    // Geometria/Mapa placeholders
+    window.abrirEditorGeoJSON = function() { showToast('Editor GeoJSON em desenvolvimento','info'); };
+    window.importarKML = function() { showToast('Importar KML em desenvolvimento','info'); };
+    window.exportarGeoJSON = function() { showToast('Exportar GeoJSON em desenvolvimento','info'); };
+    window.abrirMapaSelecao = function() { showToast('Mapa de seleção em desenvolvimento','info'); };
+    window.salvarGeometria = function() { showToast('Salvar geometria em desenvolvimento','info'); };
+    window.limparGeometria = function() { showToast('Limpar geometria em desenvolvimento','info'); };
+})();
+</script>
+{% endblock %}

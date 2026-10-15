@@ -1,0 +1,299 @@
+{% extends "partials/_premium_cadastro_base.html" %}
+{% load static agro_icons %}
+
+{% block title %}Ampliagro - Cadastro de Maquinários{% endblock %}
+
+{% block cadastro_icon %}bi bi-tractor{% endblock %}
+{% block cadastro_title %}Cadastro de Maquinários{% endblock %}
+{% block cadastro_novo_title %}Novo Maquinário{% endblock %}
+{% block cadastro_lista_title %}Maquinários Cadastrados{% endblock %}
+
+{% block cadastro_subtabs %}
+<div class="pcrud-subtabs" id="cadastroSubTabs">
+    <button class="pcrud-subtab active" data-tab="novo">Novo Maquinário</button>
+    <button class="pcrud-subtab" data-tab="lista">Maquinários Cadastrados</button>
+    <button class="pcrud-subtab" data-tab="manutencao">Manutenções</button>
+</div>
+{% endblock %}
+
+{% block cadastro_stats %}
+<div class="pcrud-stats" id="cadastroStats">
+    <div class="pcrud-stat"><div class="pcrud-stat-label">Total Maquinários</div><div class="pcrud-stat-value" id="statTotalMaq">{{ maquinarios|length }}</div></div>
+    <div class="pcrud-stat"><div class="pcrud-stat-label">Ativos</div><div class="pcrud-stat-value" id="statAtivos">{{ maquinarios_ativos }}</div></div>
+    <div class="pcrud-stat"><div class="pcrud-stat-label">Em Manutenção</div><div class="pcrud-stat-value" id="statEmManut">{{ maquinarios_em_manut }}</div></div>
+    <div class="pcrud-stat"><div class="pcrud-stat-label">Horas Totais</div><div class="pcrud-stat-value" id="statHorasTotal">{{ horas_total|floatformat:1 }}</div></div>
+</div>
+{% endblock %}
+
+{% block cadastro_form_novo %}
+<form id="maquinario-form" onsubmit="return submitMaquinario(event)">
+    {% csrf_token %}
+    <div class="pcrud-form-grid">
+        <div class="pcrud-form-group">
+            <label>Propriedade</label>
+            <select name="propriedade" required onblur="validateField(this)">
+                <option value="">Selecione...</option>
+                {% for p in propriedades %}
+                <option value="{{ p.id }}">{{ p.nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="pcrud-form-group">
+            <label>Tipo</label>
+            <select name="tipo" required onblur="validateField(this)">
+                <option value="">Selecione...</option>
+                <option value="TRATOR">Trator</option>
+                <option value="COLHEITADEIRA">Colheitadeira</option>
+                <option value="PULVERIZADOR">Pulverizador</option>
+                <option value="CAMINHAO">Caminhão</option>
+                <option value="IMPLEMENTO">Implemento</option>
+                <option value="PLANTADEIRA">Plantadeira</option>
+                <option value="DRONE">Drone</option>
+                <option value="OUTRO">Outro</option>
+            </select>
+        </div>
+        <div class="pcrud-form-group">
+            <label>Nome</label>
+            <input type="text" name="nome" placeholder="Ex: Trator John Deere 5075" required onblur="validateField(this)">
+        </div>
+        <div class="pcrud-form-group">
+            <label>Marca</label>
+            <input type="text" name="marca" placeholder="Ex: John Deere, Massey, Valtra">
+        </div>
+        <div class="pcrud-form-group">
+            <label>Modelo</label>
+            <input type="text" name="modelo" placeholder="Ex: 5075E, MF 6713">
+        </div>
+        <div class="pcrud-form-group">
+            <label>Ano de Fabricação</label>
+            <input type="number" name="ano_fabricacao" placeholder="Ex: 2022" min="1950" max="2030">
+        </div>
+        <div class="pcrud-form-group">
+            <label>Horas de Uso</label>
+            <input type="number" step="0.1" name="horas_uso" placeholder="0,0" min="0">
+        </div>
+        <div class="pcrud-form-group">
+            <label>Última Manutenção</label>
+            <input type="date" name="ultima_manutencao">
+        </div>
+        <div class="pcrud-form-group">
+            <label>Próxima Manutenção</label>
+            <input type="date" name="proxima_manutencao">
+        </div>
+        <div class="pcrud-form-group">
+            <label>Ativo</label>
+            <div style="display:flex;align-items:center;gap:8px;">
+                <input type="checkbox" name="ativo" id="id_ativo" checked style="width:auto;height:auto;">
+                <label for="id_ativo" style="margin:0;font-weight:500;font-size:.813rem;text-transform:none;letter-spacing:0;cursor:pointer;">Maquinário ativo</label>
+            </div>
+        </div>
+    </div>
+    <div class="pcrud-form-actions">
+        <button type="submit" class="pcrud-btn pcrud-btn-primary"><i class="bi bi-check-lg"></i> Salvar Maquinário</button>
+        <button type="reset" class="pcrud-btn pcrud-btn-secondary">Limpar</button>
+    </div>
+</form>
+{% endblock %}
+
+{% block cadastro_tab_lista %}
+{% if maquinarios %}
+<div class="pcrud-table-wrap">
+    <table class="pcrud-table">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Tipo</th>
+                <th>Marca/Modelo</th>
+                <th>Ano</th>
+                <th>Horas Uso</th>
+                <th>Últ. Manutenção</th>
+                <th>Próx. Manutenção</th>
+                <th>Ativo</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for m in maquinarios %}
+            <tr>
+                <td><strong>{{ m.nome }}</strong></td>
+                <td>{{ m.get_tipo_display }}</td>
+                <td>{{ m.marca|default:"—" }} / {{ m.modelo|default:"—" }}</td>
+                <td>{{ m.ano_fabricacao|default:"—" }}</td>
+                <td>{{ m.horas_uso|floatformat:1|default:"—" }}</td>
+                <td>{{ m.ultima_manutencao|date:"d/m/Y"|default:"—" }}</td>
+                <td>{{ m.proxima_manutencao|date:"d/m/Y"|default:"—" }}</td>
+                <td>{% if m.ativo %}<span style="color:var(--cor-sucesso);">● Ativo</span>{% else %}<span style="color:var(--cor-erro);">● Inativo</span>{% endif %}</td>
+                <td>
+                    <div class="action-cell">
+                        <button class="pcrud-btn pcrud-btn-secondary pcrud-btn-sm" onclick="editarMaquinario({{ m.id }})"><i class="bi bi-pencil"></i> Editar</button>
+                        <button class="pcrud-btn pcrud-btn-danger pcrud-btn-sm" onclick="excluirMaquinario({{ m.id }})"><i class="bi bi-trash"></i> Excluir</button>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+{% include "partials/_empty_state_cta.html" with empty_icone="bi bi-tractor" empty_titulo="Nenhum maquinário cadastrado" empty_descricao="Cadastre a primeira maquina para ligar horímetro, manutenção e custo de mão de obra." empty_acao="Cadastrar maquinário" empty_aba="novo" %}
+{% endif %}
+{% endblock %}
+
+{% block cadastro_extra_tabs %}
+<!-- Tab: Manutenções -->
+<div class="pcrud-tab" id="tab-manutencao">
+    <h2><i class="bi bi-tools"></i> Agenda de Manutenções</h2>
+    <div class="pcrud-form-card">
+        <form id="manutencao-form" onsubmit="return submitManutencao(event)">
+            {% csrf_token %}
+            <div class="pcrud-form-grid">
+                <div class="pcrud-form-group">
+                    <label>Maquinário</label>
+                    <select name="maquinario" required onblur="validateField(this)">
+                        <option value="">Selecione...</option>
+                        {% for m in maquinarios %}
+                        <option value="{{ m.id }}">{{ m.nome }} ({{ m.get_tipo_display }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="pcrud-form-group">
+                    <label>Tipo de Manutenção</label>
+                    <select name="tipo_manutencao" required>
+                        <option value="PREVENTIVA">Preventiva</option>
+                        <option value="CORRETIVA">Corretiva</option>
+                        <option value="PREDITIVA">Preditiva</option>
+                        <option value="LUBRIFICACAO">Lubrificação</option>
+                        <option value="TROCA_OLEO">Troca de Óleo</option>
+                        <option value="TROCA_FILTRO">Troca de Filtro</option>
+                        <option value="OUTRA">Outra</option>
+                    </select>
+                </div>
+                <div class="pcrud-form-group">
+                    <label>Data</label>
+                    <input type="date" name="data" value="{{ today|date:'Y-m-d' }}" required onblur="validateField(this)">
+                </div>
+                <div class="pcrud-form-group">
+                    <label>Horas no Momento</label>
+                    <input type="number" step="0.1" name="horas_momento" placeholder="Horas de uso atuais" min="0">
+                </div>
+                <div class="pcrud-form-group">
+                    <label>Custo (R$)</label>
+                    <input type="number" step="0.01" name="custo" placeholder="0,00" min="0">
+                </div>
+                <div class="pcrud-form-group">
+                    <label>Responsável</label>
+                    <input type="text" name="responsavel" placeholder="Nome do responsável/oficina">
+                </div>
+                <div class="pcrud-form-group">
+                    <label>Observação</label>
+                    <textarea name="observacao" rows="2" placeholder="Detalhes do serviço realizado..."></textarea>
+                </div>
+            </div>
+            <div class="pcrud-form-actions">
+                <button type="submit" class="pcrud-btn pcrud-btn-primary"><i class="bi bi-check-lg"></i> Registrar Manutenção</button>
+                <button type="reset" class="pcrud-btn pcrud-btn-secondary">Limpar</button>
+            </div>
+        </form>
+    </div>
+
+    {% if manutencoes %}
+    <h2 style="margin-top:28px;"><i class="bi bi-clock-history"></i> Histórico de Manutenções</h2>
+    <div class="pcrud-form-card" style="padding:0;">
+        <div class="pcrud-table-wrap">
+            <table class="pcrud-table">
+                <thead>
+                    <tr>
+                        <th>Maquinário</th>
+                        <th>Tipo</th>
+                        <th>Data</th>
+                        <th>Horas</th>
+                        <th>Custo</th>
+                        <th>Responsável</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for man in manutencoes %}
+                    <tr>
+                        <td>{{ man.maquinario.nome }}</td>
+                        <td>{{ man.get_tipo_manutencao_display }}</td>
+                        <td>{{ man.data|date:"d/m/Y" }}</td>
+                        <td>{{ man.horas_momento|floatformat:1|default:"—" }}</td>
+                        <td>R$ {{ man.custo|floatformat:2|default:"—" }}</td>
+                        <td>{{ man.responsavel|default:"—" }}</td>
+                        <td><button class="pcrud-btn pcrud-btn-danger pcrud-btn-sm" onclick="excluirManutencao({{ man.id }})"><i class="bi bi-trash"></i></button></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+(function() {
+    window.submitMaquinario = async function(event) {
+        event.preventDefault();
+        if (!validateForm('maquinario-form')) { showToast('Corrija os campos em destaque', 'error'); return false; }
+        const f = document.getElementById('maquinario-form');
+        const data = {
+            propriedade: parseInt(f.propriedade.value),
+            tipo: f.tipo.value,
+            nome: f.nome.value,
+            marca: f.marca.value || '',
+            modelo: f.modelo.value || '',
+            ano_fabricacao: parseInt(f.ano_fabricacao.value) || null,
+            horas_uso: parseFloat(f.horas_uso.value) || 0,
+            ultima_manutencao: f.ultima_manutencao.value || null,
+            proxima_manutencao: f.proxima_manutencao.value || null,
+            ativo: f.ativo?.checked ?? true,
+        };
+        const btn = f.querySelector('.pcrud-btn-primary'); showLoading(btn);
+        try {
+            const resp = await fetch('/api/maquinarios/', { method:'POST', headers:{'Content-Type':'application/json','X-CSRFToken':getCSRFToken()}, body: JSON.stringify(data) });
+            if (resp.ok) { showToast('Maquinário cadastrado!','success'); setTimeout(() => location.reload(), 800); }
+            else { const err = await resp.json(); showToast('Erro: '+JSON.stringify(err),'error'); }
+        } catch(e) { showToast('Erro: '+e.message,'error'); } finally { hideLoading(btn); }
+        return false;
+    };
+
+    window.excluirMaquinario = function(id) {
+        if (!confirm('Excluir este maquinário?')) return;
+        fetch('/api/maquinarios/'+id+'/', { method:'DELETE', headers:{'X-CSRFToken':getCSRFToken()} })
+            .then(r => { if(r.ok){ showToast('Excluído','success'); setTimeout(() => location.reload(), 500); } else showToast('Erro','error'); });
+    };
+
+    window.submitManutencao = async function(event) {
+        event.preventDefault();
+        if (!validateForm('manutencao-form')) { showToast('Corrija os campos em destaque', 'error'); return false; }
+        const f = document.getElementById('manutencao-form');
+        const data = {
+            maquinario: parseInt(f.maquinario.value),
+            tipo_manutencao: f.tipo_manutencao.value,
+            data: f.data.value,
+            horas_momento: parseFloat(f.horas_momento.value) || null,
+            custo: parseFloat(f.custo.value) || null,
+            responsavel: f.responsavel.value || '',
+            observacao: f.observacao.value || '',
+        };
+        const btn = f.querySelector('.pcrud-btn-primary'); showLoading(btn);
+        try {
+            const r = await fetch('/api/maquinarios/manutencoes/', { method:'POST', headers:{'Content-Type':'application/json','X-CSRFToken':getCSRFToken()}, body: JSON.stringify(data) });
+            if (r.ok) { showToast('Manutenção registrada!','success'); setTimeout(() => location.reload(), 800); }
+            else { const e=await r.json(); showToast('Erro: '+JSON.stringify(e),'error'); }
+        } catch(e) { showToast('Erro: '+e.message,'error'); } finally { hideLoading(btn); }
+        return false;
+    };
+
+    window.excluirManutencao = function(id) {
+        if (!confirm('Excluir este registro de manutenção?')) return;
+        fetch('/api/maquinarios/manutencoes/'+id+'/', { method:'DELETE', headers:{'X-CSRFToken':getCSRFToken()} })
+            .then(r => { if(r.ok){ showToast('Excluído','success'); setTimeout(() => location.reload(), 500); } else showToast('Erro','error'); });
+    };
+})();
+</script>
+{% endblock %}

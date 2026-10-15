@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Acesso Restrito — Ampliagro{% endblock %}
+
+{% block extra_css %}
+{% include "partials/_premium_cadastro_styles.html" %}
+
+{% endblock %}
+
+{% block dashboard_appbar %}{% endblock %}
+
+{% block content %}
+<div class="pcrud-container">
+  <div class="erro-hero">
+    <div class="erro-code"><i class="bi bi-shield-lock"></i> 403 — Acesso Restrito</div>
+    <div class="erro-sub">Esta página é <strong>exclusiva do produtor</strong>. Seu perfil <strong>{{ area }}</strong> não tem hierarquia para acessá-la. O bloqueio acontece <strong>antes</strong> de qualquer dado ser exibido.</div>
+    <div style="margin-top:14px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+      <a href="{% url 'servidor-dashboard' %}" class="pcrud-btn pcrud-btn-primary"><i class="bi bi-grid"></i> Voltar ao seu dashboard ({{ titulo_area }})</a>
+      <!-- Logout e' POST-only. Este <a href> fazia GET e levava 405 — quem caia nesta
+         tela de acesso restrito ficava preso na sessao, sem forma de sair.
+         Comentario HTML e' nao `{# #}` porque o lexer de template do Django nao
+         aplica DOTALL, e um `{# ... #}` em varias linhas vaza como texto visivel
+         na pagina. `app/tests_templates.py` reprova esse caso. -->
+      <form action="{% url 'logout' %}" method="post" style="display:inline">
+        {% csrf_token %}
+        <button type="submit" class="pcrud-btn pcrud-btn-secondary">Sair</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="erro-card">
+    <h3 style="font-weight:700;margin:0 0 8px 0"><i class="bi bi-diagram-3"></i> Sua hierarquia</h3>
+    <ul style="margin:0;padding-left:18px;line-height:1.7;font-size:.9rem">
+      <li><strong>Usuário:</strong> {{ request.user.username }} — <span style="background:#dcfce7;color:#166534;padding:2px 6px;border-radius:999px;font-size:.75rem">{{ area }}</span></li>
+      <li><strong>Página solicitada:</strong> <code>{{ view_name }}</code></li>
+      <li><strong>Regra:</strong> tudo do produtor é restrito para servidores, exceto áreas que precisam administrar (ex: <code>MECANICA → maquinário/estoque</code>, <code>CAMPO → talhões/safras</code>). Seu produtor libera extras em <em>Cadastro &gt; Funcionários &gt; Área &amp; Permissões</em> → campo <code>paginas_extra</code>.</li>
+    </ul>
+    <div style="margin-top:10px;padding:10px;background:#f8fafc;border-radius:8px;font-size:.82rem">
+      <strong>Script da profissão:</strong> seu dashboard em <code>/servidor/</code> é montado por <code>servidor.js</code> que lê <code>/api/servidor/config/</code> e puxa só os dados da fazenda <strong>{{ request.user.perfil.propriedade_vinculada.nome|default:"—" }}</strong> referentes à sua profissão. Cada área tem seu espaço no script.
+    </div>
+  </div>
+
+  <div class="erro-card" style="border-style:dashed">
+    <h3 style="font-weight:700;margin:0 0 6px 0"><i class="bi bi-folder2-open"></i> Organização em pastas</h3>
+    <div style="font-family:monospace;font-size:.78rem;line-height:1.7">
+      app/templates/produtor/  — tudo exclusivo do produtor (propriedades, financeiro completo)<br>
+      app/templates/servidor/  — dashboards por área (mecânica, campo, pecuária...)<br>
+      app/templates/globais/  — cores, modos, erro_hierarquia, componentes compartilhados<br>
+      app/static/css/globais/ — <code>theme.css</code>, <code>navbar-premium.css</code> (modos claro/escuro)<br>
+      app/static/js/servidor/ — <code>servidor.js</code> (espaço por profissão que puxa dados da fazenda)
+    </div>
+  </div>
+</div>
+{% endblock %}

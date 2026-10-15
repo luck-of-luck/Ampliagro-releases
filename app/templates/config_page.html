@@ -1,0 +1,539 @@
+{% extends base_template %}
+{% load static %}
+
+{% block title %}Ampliagro - Configurações{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/paginas/config_page.css' %}">
+
+
+{% endblock %}
+
+{% block dashboard_appbar %}{% endblock %}
+
+{% block content %}
+<div class="section-container">
+    <div class="section-header">
+        <h1 class="section-title"><i class="bi bi-sliders me-2"></i>Configurações</h1>
+    </div>
+
+    <div class="section-tabs">
+        <button class="tab-btn active" data-tab-target="theme"><i class="bi bi-palette"></i> Tema</button>
+        <button class="tab-btn" data-tab-target="custom"><i class="bi bi-puzzle"></i> Preferências</button>
+        <button class="tab-btn" data-tab-target="advanced"><i class="bi bi-cpu"></i> Avançado</button>
+    </div>
+
+    <!-- ═══ Tema (Personalizar) ═══ -->
+    <div id="theme-tab" class="tab-content active">
+        <div class="content-card">
+            <h2 class="section-subtitle"><i class="bi bi-palette me-2"></i>Tema Personalizado</h2>
+
+            <div class="theme-preview" id="theme-preview">
+                <div class="theme-preview-header" id="preview-header">ampliagro — Dashboard</div>
+                <div class="theme-preview-body">
+                    <div class="theme-preview-sidebar" id="preview-sidebar">
+                        <div class="theme-preview-card" style="background: color-mix(in srgb, var(--theme-card, #ffffff) 80%, transparent);">
+                            Menu
+                        </div>
+                    </div>
+                    <div class="theme-preview-main" id="preview-main">
+                        <div class="theme-preview-card" style="background: color-mix(in srgb, var(--theme-card, #ffffff) 90%, transparent);">
+                            Widgets do dashboard
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="theme-accent">Cor Primária (Destaques)</label>
+                    <input type="color" id="theme-accent" value="#006b68">
+                </div>
+                <div class="form-group">
+                    <label for="theme-navbar">Cor da Barra Superior</label>
+                    <input type="color" id="theme-navbar" value="#0f172a">
+                </div>
+                <div class="form-group">
+                    <label for="theme-workspace">Cor do Espaço de Trabalho</label>
+                    <input type="color" id="theme-workspace" value="#f1f5f9">
+                </div>
+                <div class="form-group">
+                    <label for="theme-card">Cor dos Cards</label>
+                    <input type="color" id="theme-card" value="#ffffff">
+                </div>
+                <div class="form-group">
+                    <label for="theme-widgetbar">Cor da Barra de Widgets</label>
+                    <input type="color" id="theme-widgetbar" value="#e2e8f0">
+                </div>
+                <div class="form-group">
+                    <label for="theme-text">Cor do Texto</label>
+                    <input type="color" id="theme-text" value="#0f172a">
+                </div>
+                <div class="form-group full-width">
+                    <label>Presets Rápidos</label>
+                    <div id="theme-presets">
+                        <div class="theme-preset" data-preset="esmeralda">
+                            <span class="theme-swatch" style="background:#006b68;"></span>
+                            Esmeralda
+                            <span class="preset-dots">
+                                <span class="preset-dot" style="background:#006b68;"></span>
+                                <span class="preset-dot" style="background:#0f172a;"></span>
+                                <span class="preset-dot" style="background:#f1f5f9;"></span>
+                                <span class="preset-dot" style="background:#ffffff;"></span>
+                            </span>
+                        </div>
+                        <div class="theme-preset" data-preset="oceano">
+                            <span class="theme-swatch" style="background:#0ea5e9;"></span>
+                            Oceano
+                            <span class="preset-dots">
+                                <span class="preset-dot" style="background:#0ea5e9;"></span>
+                                <span class="preset-dot" style="background:#082f49;"></span>
+                                <span class="preset-dot" style="background:#f0f9ff;"></span>
+                                <span class="preset-dot" style="background:#ffffff;"></span>
+                            </span>
+                        </div>
+                        <div class="theme-preset" data-preset="amazonia">
+                            <span class="theme-swatch" style="background:#16a34a;"></span>
+                            Amazônia
+                            <span class="preset-dots">
+                                <span class="preset-dot" style="background:#16a34a;"></span>
+                                <span class="preset-dot" style="background:#052e16;"></span>
+                                <span class="preset-dot" style="background:#f0fdf4;"></span>
+                                <span class="preset-dot" style="background:#ffffff;"></span>
+                            </span>
+                        </div>
+                        <div class="theme-preset" data-preset="tijolo">
+                            <span class="theme-swatch" style="background:#d97706;"></span>
+                            Terra
+                            <span class="preset-dots">
+                                <span class="preset-dot" style="background:#d97706;"></span>
+                                <span class="preset-dot" style="background:#1c1917;"></span>
+                                <span class="preset-dot" style="background:#fafaf9;"></span>
+                                <span class="preset-dot" style="background:#ffffff;"></span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="theme-apply-areas">Áreas de Aplicação</label>
+                    <select id="theme-apply-areas" style="padding:0.625rem;">
+                        <option value="all">Todas</option>
+                        <option value="navbar">Somente Navbar</option>
+                        <option value="workspace">Somente Workspace</option>
+                        <option value="widgetbar">Somente Widgetbar</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="theme-dark">Modo Escuro Combinado</label>
+                    <select id="theme-dark" style="padding:0.625rem;">
+                        <option value="0">Claro</option>
+                        <option value="1">Escuro</option>
+                    </select>
+                </div>
+                <div class="form-group full-width">
+                    <div class="actions-row">
+                        <button class="btn-secondary" id="preview-theme-btn"><i class="bi bi-eye me-2"></i>Visualizar</button>
+                        <button class="btn-success" id="save-theme-btn"><i class="bi bi-check-circle me-2"></i>Salvar Tema</button>
+                        <button class="btn-secondary" id="reset-theme-btn"><i class="bi bi-arrow-clockwise me-2"></i>Restaurar Padrão</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ Preferências Customizadas ═══ -->
+    <div id="custom-tab" class="tab-content">
+        <div class="content-card">
+            <h2 class="section-subtitle"><i class="bi bi-plus-circle me-2"></i>Adicionar Preferência</h2>
+            <form id="config-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="id_chave">Chave</label>
+                        <input type="text" id="id_chave" name="chave" placeholder="ex: unidade_padrao" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="id_valor">Valor</label>
+                        <input type="text" id="id_valor" name="valor" placeholder="ex: kg" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="id_tipo">Tipo</label>
+                        <select id="id_tipo" name="tipo">
+                            <option value="text">Texto</option>
+                            <option value="number">Número</option>
+                            <option value="boolean">Booleano</option>
+                            <option value="color">Cor</option>
+                        </select>
+                    </div>
+                    <div style="margin-bottom:1rem;">
+                        <button type="submit" class="btn-primary"><i class="bi bi-plus-lg"></i> Adicionar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="content-card">
+            <h2 class="section-subtitle"><i class="bi bi-list me-2"></i>Preferências Customizadas</h2>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Chave</th>
+                            <th>Valor</th>
+                            <th>Tipo</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-configs">
+                        <tr>
+                            <td colspan="4" class="empty-state">
+                                <i class="bi bi-puzzle" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>
+                                Nenhuma preferência customizada.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ Avançado ═══ -->
+    <div id="advanced-tab" class="tab-content">
+        <div class="content-card">
+            <h2 class="section-subtitle"><i class="bi bi-cpu me-2"></i>Configurações Avançadas</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="auto-refresh">Atualização Automática</label>
+                    <select id="auto-refresh">
+                        <option value="off">Desativado</option>
+                        <option value="30">30 segundos</option>
+                        <option value="60">1 minuto</option>
+                        <option value="300">5 minutos</option>
+                        <option value="1800">30 minutos</option>
+                        <option value="3600">1 hora</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="notification-sound">Som de Notificação</label>
+                    <select id="notification-sound">
+                        <option value="default">Padrão</option>
+                        <option value="chime">Sino</option>
+                        <option value="alert">Alerta</option>
+                        <option value="none">Nenhum</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="map-provider">Provedor de Mapas</label>
+                    <select id="map-provider">
+                        <option value="auto">Automático</option>
+                        <option value="openstreetmap">OpenStreetMap</option>
+                        <option value="leaflet">Leaflet</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="language">Idioma</label>
+                    <select id="language">
+                        <option value="pt-BR">Português (Brasil)</option>
+                        <option value="en">English</option>
+                        <option value="es">Español</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="compact-mode">Modo Compacto</label>
+                    <select id="compact-mode">
+                        <option value="0">Desativado</option>
+                        <option value="1">Ativado</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="eco-mode">Modo ECO (economia)</label>
+                    <select id="eco-mode">
+                        <option value="0">Desativado</option>
+                        <option value="1">Ativado</option>
+                    </select>
+                </div>
+                <div class="form-group full-width">
+                    <div class="actions-row">
+                        <button class="btn-primary" id="save-advanced-btn"><i class="bi bi-check-circle me-2"></i>Salvar Configurações</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="toast" class="toast"></div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+(function() {
+    var STORAGE_KEY = 'ampliagro_config_livre';
+    function getScopedPrefsKey(){
+        try{
+            var base='ampliagro-preferences';
+            var uid=window.AMPLIAGRO_USER_ID;
+            if(uid!==null && uid!==undefined && uid!=='') return base+'_u'+uid;
+            return base;
+        }catch(e){ return 'ampliagro-preferences'; }
+    }
+    var PREFS_KEY = getScopedPrefsKey();
+
+    function getJSON(key, fallback) {
+        try { return JSON.parse(localStorage.getItem(key)) || fallback; }
+        catch (e) { return fallback; }
+    }
+
+    function setJSON(key, value) {
+        try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
+        // Espelha também na chave plain para compatibilidade com login.html
+        try{
+            var base='ampliagro-preferences';
+            if(key!==base) localStorage.setItem(base, JSON.stringify(value));
+        }catch(e){}
+    }
+
+    function getConfigs() { return getJSON(STORAGE_KEY, []); }
+    function salvarConfigs(c) { setJSON(STORAGE_KEY, c); }
+
+    function mostrarToast(msg, tipo) {
+        var t = document.getElementById('toast');
+        if (!t) return;
+        t.textContent = msg;
+        t.className = 'toast ' + (tipo === 'info' ? 'toast-info' : 'toast-success') + ' show';
+        setTimeout(function() { t.classList.remove('show'); }, 3000);
+    }
+
+    /* ═══ Tabs ═══ */
+    document.querySelectorAll('.tab-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+            document.querySelectorAll('.tab-content').forEach(function(tc) { tc.classList.remove('active'); });
+            btn.classList.add('active');
+            var target = btn.getAttribute('data-tab-target');
+            var tab = document.getElementById(target + '-tab');
+            if (tab) tab.classList.add('active');
+        });
+    });
+
+    /* ═══ Tema personalizado ═══ */
+    var prefs = getJSON(PREFS_KEY, {});
+    var custom = (prefs.theme && prefs.theme.custom) || {};
+
+    var fields = ['accent', 'navbar', 'workspace', 'card', 'widgetbar', 'text'];
+    var DEFAULTS = {
+        accent: '#006b68', navbar: '#0f172a', workspace: '#f1f5f9',
+        card: '#ffffff', widgetbar: '#e2e8f0', text: '#0f172a'
+    };
+
+    function loadThemeToControls() {
+        var c = (prefs.theme && prefs.theme.custom) || {};
+        fields.forEach(function(f) {
+            var el = document.getElementById('theme-' + f);
+            if (el && c[f]) el.value = c[f];
+        });
+        if (document.getElementById('theme-dark')) {
+            document.getElementById('theme-dark').value = (c.dark ? '1' : '0');
+        }
+    }
+
+    function collectTheme() {
+        var c = {};
+        fields.forEach(function(f) {
+            var el = document.getElementById('theme-' + f);
+            if (el) c[f] = el.value;
+        });
+        c.dark = document.getElementById('theme-dark') ? document.getElementById('theme-dark').value === '1' : false;
+        c.applyNavbar = true;
+        c.applyWorkspace = true;
+        c.applyWidgetbar = true;
+        return c;
+    }
+
+    function applyThemePreview(c) {
+        var root = document.documentElement;
+        root.classList.add('custom-theme');
+        root.classList.add('custom-theme-navbar', 'custom-theme-workspace', 'custom-theme-widgetbar');
+        if (c.dark) { root.classList.add('dark'); } else { root.classList.remove('dark'); }
+        root.style.setProperty('--theme-accent', c.accent);
+        root.style.setProperty('--theme-text', c.text);
+        root.style.setProperty('--theme-navbar', c.navbar);
+        root.style.setProperty('--theme-workspace', c.workspace);
+        root.style.setProperty('--theme-card', c.card);
+        root.style.setProperty('--theme-widgetbar', c.widgetbar);
+
+        var ph = document.getElementById('preview-header');
+        if (ph) { ph.style.background = c.navbar; ph.style.color = c.text; }
+        var ps = document.getElementById('preview-sidebar');
+        if (ps) ps.style.background = c.workspace;
+        var pm = document.getElementById('preview-main');
+        if (pm) pm.style.background = c.workspace;
+    }
+
+    var presets = {
+        esmeralda: { accent: '#006b68', navbar: '#0f172a', workspace: '#f1f5f9', card: '#ffffff', widgetbar: '#e2e8f0', text: '#0f172a', dark: false },
+        oceano: { accent: '#0ea5e9', navbar: '#082f49', workspace: '#f0f9ff', card: '#ffffff', widgetbar: '#e0f2fe', text: '#082f49', dark: false },
+        amazonia: { accent: '#16a34a', navbar: '#052e16', workspace: '#f0fdf4', card: '#ffffff', widgetbar: '#dcfce7', text: '#052e16', dark: false },
+        tijolo: { accent: '#d97706', navbar: '#1c1917', workspace: '#fafaf9', card: '#ffffff', widgetbar: '#fef3c7', text: '#1c1917', dark: false }
+    };
+
+    document.querySelectorAll('.theme-preset').forEach(function(p) {
+        p.addEventListener('click', function() {
+            var preset = presets[p.getAttribute('data-preset')];
+            if (!preset) return;
+            fields.forEach(function(f) {
+                var el = document.getElementById('theme-' + f);
+                if (el && preset[f]) el.value = preset[f];
+            });
+            if (document.getElementById('theme-dark')) document.getElementById('theme-dark').value = '0';
+            applyThemePreview(collectTheme());
+            document.querySelectorAll('.theme-preset').forEach(function(x) { x.classList.remove('active'); });
+            p.classList.add('active');
+        });
+    });
+
+    document.getElementById('preview-theme-btn').addEventListener('click', function() {
+        applyThemePreview(collectTheme());
+        mostrarToast('Visualização aplicada em tempo real.', 'info');
+    });
+
+    document.getElementById('save-theme-btn').addEventListener('click', function() {
+        var c = collectTheme();
+        prefs.theme = prefs.theme || {};
+        prefs.theme.mode = 'custom';
+        prefs.theme.custom = c;
+        setJSON(PREFS_KEY, prefs);
+        try{ if(window.restaurarTemaDoUsuario) window.restaurarTemaDoUsuario(); else applyThemePreview(c); }catch(e){ applyThemePreview(c); }
+        try{ if(window.applyThemeVars) window.applyThemeVars(); }catch(e){}
+        mostrarToast('Tema salvo com sucesso!');
+    });
+
+    document.getElementById('reset-theme-btn').addEventListener('click', function() {
+        prefs.theme = prefs.theme || {};
+        delete prefs.theme.custom;
+        prefs.theme.mode = 'claro';
+        setJSON(PREFS_KEY, prefs);
+        try{
+            if(window.aplicarTema) window.aplicarTema('claro');
+            else {
+                var root = document.documentElement;
+                Array.from(root.classList).forEach(function(cl){ if(cl.indexOf('custom-theme')===0) root.classList.remove(cl); });
+                root.classList.remove('dark');
+                root.setAttribute('data-tema','claro');
+            }
+        }catch(e){
+            var root2 = document.documentElement;
+            root2.classList.remove('custom-theme', 'custom-theme-navbar', 'custom-theme-workspace', 'custom-theme-widgetbar', 'dark');
+        }
+        try{ if(window.applyThemeVars) window.applyThemeVars(); }catch(e){}
+        fields.forEach(function(f) {
+            var el = document.getElementById('theme-' + f);
+            if (el) el.value = DEFAULTS[f];
+        });
+        if (document.getElementById('theme-dark')) document.getElementById('theme-dark').value = '0';
+        mostrarToast('Tema restaurado para o padrão.', 'info');
+    });
+
+    loadThemeToControls();
+
+    /* ═══ Preferências customizadas ═══ */
+    function renderTabela() {
+        var configs = getConfigs();
+        var tbody = document.getElementById('tabela-configs');
+        if (!tbody) return;
+
+        if (!configs.length) {
+            tbody.innerHTML = '<tr><td colspan="4" class="empty-state"><i class="bi bi-puzzle" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>Nenhuma preferência customizada.</td></tr>';
+            return;
+        }
+
+        var html = '';
+        configs.forEach(function(c, idx) {
+            var valorDisplay = c.valor;
+            if (c.tipo === 'color') {
+                valorDisplay = '<span class="color-preview" style="background:' + c.valor + '"></span>' + c.valor;
+            } else if (c.tipo === 'boolean') {
+                valorDisplay = (c.valor === 'true' || c.valor === true) ? 'Sim' : 'Não';
+            }
+            html += '<tr>' +
+                '<td><strong>' + c.chave + '</strong></td>' +
+                '<td>' + valorDisplay + '</td>' +
+                '<td><span class="badge" style="background:#e2e8f0;color:#475569;padding:0.125rem 0.5rem;border-radius:9999px;font-size:0.625rem;font-weight:600;">' + (c.tipo || 'text') + '</span></td>' +
+                '<td><button class="btn-danger" data-remove="' + idx + '"><i class="bi bi-trash"></i></button></td></tr>';
+        });
+        tbody.innerHTML = html;
+        tbody.querySelectorAll('[data-remove]').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var configs = getConfigs();
+                configs.splice(parseInt(btn.getAttribute('data-remove'), 10), 1);
+                salvarConfigs(configs);
+                renderTabela();
+                mostrarToast('Preferência removida.', 'info');
+            });
+        });
+    }
+
+    var form = document.getElementById('config-form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            var chave = document.getElementById('id_chave').value.trim();
+            var valor = document.getElementById('id_valor').value.trim();
+            var tipo = document.getElementById('id_tipo').value;
+            if (!chave || !valor) return;
+
+            var configs = getConfigs();
+            if (configs.some(function(c) { return c.chave === chave; })) {
+                alert('Já existe uma preferência com esta chave.');
+                return;
+            }
+            configs.push({ chave: chave, valor: valor, tipo: tipo });
+            salvarConfigs(configs);
+            renderTabela();
+            form.reset();
+            mostrarToast('Preferência "' + chave + '" adicionada!');
+        });
+    }
+
+    /* ═══ Avançado ═══ */
+    function loadAdvanced() {
+        var adv = getJSON('ampliagro_advanced', {});
+        var map = { 'auto-refresh': 'autoRefresh', 'notification-sound': 'sound', 'map-provider': 'mapProvider', 'language': 'language', 'compact-mode': 'compact', 'eco-mode': 'eco' };
+        Object.keys(map).forEach(function(id) {
+            var el = document.getElementById(id);
+            if (el && adv[map[id]] !== undefined) el.value = adv[map[id]];
+        });
+    }
+
+    var saveAdv = document.getElementById('save-advanced-btn');
+    if (saveAdv) {
+        saveAdv.addEventListener('click', function() {
+            var adv = getJSON('ampliagro_advanced', {});
+            var map = { 'auto-refresh': 'autoRefresh', 'notification-sound': 'sound', 'map-provider': 'mapProvider', 'language': 'language', 'compact-mode': 'compact', 'eco-mode': 'eco' };
+            Object.keys(map).forEach(function(id) {
+                var el = document.getElementById(id);
+                if (el) adv[map[id]] = el.value;
+            });
+            setJSON('ampliagro_advanced', adv);
+            if (adv.autoRefresh && adv.autoRefresh !== 'off') {
+                var secs = parseInt(adv.autoRefresh, 10);
+                if (window._advRefreshTimer) clearInterval(window._advRefreshTimer);
+                window._advRefreshTimer = setInterval(function() {
+                    try {
+                        var evt = new CustomEvent('ampliagro:refresh');
+                        window.dispatchEvent(evt);
+                    } catch (e) {}
+                }, secs * 1000);
+            } else if (window._advRefreshTimer) {
+                clearInterval(window._advRefreshTimer);
+                window._advRefreshTimer = null;
+            }
+            mostrarToast('Configurações avançadas salvas!');
+        });
+    }
+
+    renderTabela();
+    loadAdvanced();
+})();
+</script>
+{% endblock %}

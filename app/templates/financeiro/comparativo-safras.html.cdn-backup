@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Ampliagro — Comparativo de Safras{% endblock %}
+
+{% block content %}
+<div class="pcrud-container" style="max-width:1200px; margin: 2rem auto; font-family:'Inter', sans-serif;">
+  <div class="pcrud-header" style="margin-bottom:2rem; display:flex; justify-content:space-between; align-items:center;">
+    <h1 class="pcrud-title"><i class="bi bi-bar-chart-steps" style="color:var(--cor-primaria)"></i> Comparativo de Safras</h1>
+  </div>
+
+  <div style="background:var(--cor-fundo-card); border-radius:16px; border:1px solid var(--cor-borda); padding:2rem; box-shadow:0 10px 30px var(--cor-sombra);">
+    <div id="loading" style="text-align:center; padding:3rem; color:var(--cor-texto-medio);">
+      <div class="spinner-border text-primary" role="status"></div>
+      <p style="margin-top:1rem; font-weight:600;">Carregando dados das safras...</p>
+    </div>
+
+    <div id="content" style="display:none;">
+      <canvas id="comparativoChart" height="120"></canvas>
+
+      <div id="tabelaComparativo" style="margin-top:2rem; display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:1.5rem;">
+        <!-- Tabela dinâmica injetada aqui -->
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  function formatBRL(v){
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits:0 }).format(v);
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    fetch('/api/financeiro/comparativo-safras/')
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('content').style.display = 'block';
+
+        if(data.error || !data.comparativo || data.comparativo.length === 0) {
+          document.getElementById('content').innerHTML = '<div class="pcrud-empty">Nenhum dado de safra encontrado para comparação.</div>';
+          return;
+        }
+
+        const safras = data.comparativo.reverse(); // Ordem cronológica
+
+        // Render Chart
+        const ctx = document.getElementById('comparativoChart').getContext('2d');
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: safras.map(s => s.nome),
+            datasets: [
+              {
+                label: 'Receita',
+                data: safras.map(s => s.receita),
+                backgroundColor: 'rgba(15, 157, 110, 0.8)',
+                borderRadius: 4
+              },
+              {
+                label: 'Custo Total',
+                data: safras.map(s => s.custo),
+                backgroundColor: 'rgba(220, 38, 38, 0.8)',
+                borderRadius: 4
+              },
+              {
+                label: 'Lucro Líquido',
+                data: safras.map(s => s.lucro),
+                backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                borderRadius: 4
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              tooltip: {
+                callbacks: {
+                  label: (ctx) => ' ' + ctx.dataset.label + ': ' + formatBRL(ctx.raw)
+                }
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: { callback: v => formatBRL(v) },
+                grid: { color: 'rgba(148,163,184,0.1)' }
+              },
+              x: { grid: { display: false } }
+            }
+          }
+        });
+
+        // Render Table Cards
+        const tabela = document.getElementById('tabelaComparativo');
+        safras.forEach(s => {
+          const lucroClass = s.lucro >= 0 ? 'color:#0f9d6e;' : 'color:#dc2626;';
+          tabela.innerHTML += `
+            <div style="background:var(--cor-fundo-card-aninhado); border-radius:12px; padding:1.5rem; border:1px solid var(--cor-borda);">
+              <h3 style="font-size:1.1rem; font-weight:800; margin-bottom:1rem; border-bottom:1px solid var(--cor-borda); padding-bottom:.5rem;">${s.nome}</h3>
+              <div style="display:flex; justify-content:space-between; margin-bottom:.5rem; font-size:.9rem;">
+                <span style="color:var(--cor-texto-medio); font-weight:600;">Receita</span>
+                <span style="font-family:'JetBrains Mono', monospace; font-weight:700;">${formatBRL(s.receita)}</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; margin-bottom:.5rem; font-size:.9rem;">
+                <span style="color:var(--cor-texto-medio); font-weight:600;">Custo</span>
+                <span style="font-family:'JetBrains Mono', monospace; font-weight:700;">${formatBRL(s.custo)}</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; margin-bottom:.5rem; font-size:.9rem; margin-top:1rem; padding-top:1rem; border-top:1px dashed var(--cor-borda);">
+                <span style="color:var(--cor-texto); font-weight:800;">Lucro</span>
+                <span style="font-family:'JetBrains Mono', monospace; font-weight:800; ${lucroClass}">${formatBRL(s.lucro)}</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-size:.8rem;">
+                <span style="color:var(--cor-texto-medio); font-weight:600;">Margem</span>
+                <span style="font-family:'JetBrains Mono', monospace; font-weight:700;">${s.margem}%</span>
+              </div>
+            </div>
+          `;
+        });
+      })
+      .catch(err => {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('content').style.display = 'block';
+        document.getElementById('content').innerHTML = '<div class="pcrud-empty" style="color:#dc2626">Erro ao carregar dados do comparativo.</div>';
+        console.error(err);
+      });
+  });
+</script>
+{% endblock %}

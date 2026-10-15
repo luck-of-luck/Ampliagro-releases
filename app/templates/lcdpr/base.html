@@ -1,0 +1,21 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    {% include "partials/brand-head.html" %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}LCDPR — Livro Caixa Digital do Produtor Rural{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/lcdpr.css' %}">
+    <link rel="stylesheet" href="{% static 'css/ampliagro.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="lcdpr-body">
+    {% include 'lcdpr/header.html' %}
+    <main class="lcdpr-main">
+        {% block content %}{% endblock %}
+    </main>
+    {% include 'lcdpr/footer.html' %}
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

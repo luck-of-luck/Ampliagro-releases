@@ -1,0 +1,131 @@
+{% extends base_template %}
+{% load static %}
+
+{% block title %}Ampliagro - Cadastrar Operários{% endblock %}
+
+{% block extra_css %}
+
+{% endblock %}
+
+{% block dashboard_appbar %}{% endblock %}
+
+{% block content %}
+<div class="registrar-container">
+    <div class="registrar-header">
+        <h1 class="registrar-title"><i class="bi bi-person-plus"></i> Cadastrar Operários</h1>
+        <a href="{% url 'index_spa' %}" class="btn-secondary">Voltar ao Dashboard</a>
+    </div>
+
+    <div class="content-card">
+        <h2 style="font-size:1rem;font-weight:600;margin-bottom:1rem;color:var(--ncs-green-dark);">Criar Login para Funcionário</h2>
+        <p style="font-size:0.813rem;color:#64748b;margin-bottom:1.5rem;">
+            Selecione um funcionário existente e crie um login para que ele acesse o sistema como operário.
+        </p>
+        <form id="login-form" onsubmit="return criarLogin(event)">
+            {% csrf_token %}
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Propriedade *</label>
+                    <select name="propriedade" required>
+                        <option value="">Selecione...</option>
+                        {% for p in propriedades %}
+                        <option value="{{ p.id }}">{{ p.nome }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Funcionário *</label>
+                    <select name="funcionario" id="funcionario-select" required>
+                        <option value="">Selecione um funcionário...</option>
+                        {% for f in funcionarios %}
+                        <option value="{{ f.id }}" data-nome-fazenda="{{ f.nome_fazenda_login }}">{{ f.nome }} - {{ f.get_cargo_display }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Nome da Fazenda (Login) *</label>
+                    <input type="text" name="nome_fazenda_login" id="nome-fazenda" placeholder="Nome usado no login" required>
+                </div>
+            </div>
+            <button type="submit" class="btn-primary"><i class="bi bi-key"></i> Criar Login</button>
+        </form>
+    </div>
+
+    <div class="content-card">
+        <h2 style="font-size:1rem;font-weight:600;margin-bottom:1rem;color:var(--ncs-green-dark);">Funcionários com Login</h2>
+        <div id="func-table-wrap">
+            <div class="empty-state"><i class="bi bi-hourglass" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>Carregando...</div>
+        </div>
+    </div>
+</div>
+<div id="toast" class="toast"></div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+function getCSRFToken() { return document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''; }
+function showToast(msg, type) { var t = document.getElementById('toast'); t.textContent = msg; t.className = 'toast toast-' + type + ' show'; setTimeout(function() { t.classList.remove('show'); }, 3000); }
+
+document.getElementById('funcionario-select').addEventListener('change', function() {
+    var opt = this.options[this.selectedIndex];
+    var nomeFazenda = opt.getAttribute('data-nome-fazenda');
+    document.getElementById('nome-fazenda').value = nomeFazenda || '';
+});
+
+function criarLogin(e) {
+    e.preventDefault();
+    var f = document.getElementById('login-form');
+    var data = {
+        funcionario_id: parseInt(f.funcionario.value),
+        nome_fazenda_login: f.nome_fazenda_login.value.trim()
+    };
+
+    fetch('{% url "operario-criar-login" %}', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() },
+        body: JSON.stringify(data)
+    })
+    .then(function(r) { return r.json().then(function(d) { return { ok: r.ok, data: d }; }); })
+    .then(function(res) {
+        if (res.ok) { showToast('Login criado com sucesso!', 'success'); carregarFuncionarios(); }
+        else { showToast('Erro: ' + (res.data.error || 'Desconhecido'), 'error'); }
+    })
+    .catch(function(err) { showToast('Erro: ' + err.message, 'error'); });
+    return false;
+}
+
+function removerLogin(id) {
+    if (!confirm('Remover login deste funcionário?')) return;
+    fetch('{% url "operario-remover-login" %}', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() },
+        body: JSON.stringify({ funcionario_id: id })
+    })
+    .then(function(r) { return r.json().then(function(d) { return { ok: r.ok, data: d }; }); })
+    .then(function(res) {
+        if (res.ok) { showToast('Login removido', 'success'); carregarFuncionarios(); }
+        else { showToast('Erro: ' + (res.data.error || 'Desconhecido'), 'error'); }
+    });
+}
+
+function carregarFuncionarios() {
+    fetch('/api/funcionarios/')
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            var wrap = document.getElementById('func-table-wrap');
+            var comLogin = data.filter(function(f) { return f.user !== null && f.user !== undefined; });
+            if (comLogin.length === 0) {
+                wrap.innerHTML = '<div class="empty-state"><i class="bi bi-inbox" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>Nenhum funcionário com login.</div>';
+                return;
+            }
+            wrap.innerHTML = '<div class="table-wrap"><table><thead><tr><th>Nome</th><th>Cargo</th><th>Login</th><th>Status</th><th>Ações</th></tr></thead><tbody>' +
+                comLogin.map(function(f) {
+                    return '<tr><td><strong>' + f.nome + '</strong></td><td>' + (f.cargo_display || f.cargo) + '</td><td>' + (f.nome_fazenda_login || '-') + '</td><td><span class="badge badge-yes">Ativo</span></td><td><div class="action-cell"><button class="btn-danger btn-sm" onclick="removerLogin(' + f.id + ')">Remover</button></div></td></tr>';
+                }).join('') + '</tbody></table></div>';
+        });
+}
+
+document.addEventListener('DOMContentLoaded', carregarFuncionarios);
+</script>
+{% endblock %}

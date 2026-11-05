@@ -1,1 +1,0 @@
-# Ampliagro IoT package

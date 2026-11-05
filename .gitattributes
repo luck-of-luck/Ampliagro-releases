@@ -25,7 +25,7 @@
 *.gif   binary
 *.ico   binary
 *.pdf   binary
-*.zip   binary
+*.zip filter=lfs diff=lfs merge=lfs -text
 *.whl   binary
 *.woff  binary
 *.woff2 binary
@@ -33,14 +33,12 @@
 *.sqlite3 binary
 *.db    binary
 *.pyc   binary
-
 # Scripts de shell: LF e' o standard. Um .sh com CRLF da
 # "$'\r': command not found" em Linux/macOS.
 *.sh text eol=lf
-
 # .bat e' o oposto: o cmd.exe do Windows precisa de CRLF.
 *.bat  text eol=crlf
 *.cmd  text eol=crlf
-
 # O resto: detectado. Python, JS, HTML, YAML, JSON.
 *       text=auto
+*.apk filter=lfs diff=lfs merge=lfs -text
